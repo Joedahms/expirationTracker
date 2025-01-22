@@ -1,2 +1,0 @@
-/home/joe/Documents/school/ECE492/raspi-yolo/src/display/build/CMakeFiles/edit_cache.dir
-/home/joe/Documents/school/ECE492/raspi-yolo/src/display/build/CMakeFiles/rebuild_cache.dir
