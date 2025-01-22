@@ -7,19 +7,19 @@ on:
   push:
     branches-ignore: ["main"]
     
-  permissions:
-    contents: read
-    statuses: write
+permissions:
+   contents: read
+   statuses: write
 
-  jobs:
-    format:
-      runs-on: ubuntu-latest
+jobs:
+  format:
+    runs-on: ubuntu-latest
 
-      steps:
-        - uses: actions/checkout@v4
-        - name: clang-format check
-          uses: jidicula/clang-format-action@v4.14.0
-          with:
-            clang-format-version: "17"
-            check-path: "src/**"
+    steps:
+      - uses: actions/checkout@v4
+      - name: clang-format check
+        uses: jidicula/clang-format-action@v4.14.0
+        with:
+          clang-format-version: "17"
+          check-path: "src/**"
 
