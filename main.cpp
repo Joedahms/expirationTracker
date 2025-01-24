@@ -1,9 +1,9 @@
 #include <glog/logging.h>
 #include <iostream>
 
-#include "display/src/pipe.h"
+#include "display/src/display_pipe.h"
 #include "pipes.h"
-#include "vision/src/pipe.h"
+#include "vision/src/vision_pipe.h"
 
 void initializePipes(DisplayPipes&, VisionPipes&, HardwarePipes&);
 

@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include "../../pipes.h"
-#include "pipe.h"
+#include "display_pipe.h"
 
 void displayEntry(struct DisplayPipes pipes) {
   LOG(INFO) << "Within display process";

@@ -1,7 +1,7 @@
 #include <glog/logging.h>
 #include <iostream>
 
-#include "pipe.h"
+#include "vision_pipe.h"
 
 // 0 reading
 // 1 writing
