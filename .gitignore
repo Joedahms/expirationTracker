@@ -1,3 +1,1 @@
-display/build/**
-vision/build/**
-hardware/build/**
+build/**
