@@ -1,6 +1,8 @@
 #ifndef VISION_PIPE_H
 #define VISION_PIPE_H
 
-void visionEntry();
+#include "../../pipes.h"
+
+void visionEntry(struct VisionPipes);
 
 #endif
