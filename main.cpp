@@ -3,9 +3,19 @@
 
 #include "display/src/pipe.h"
 #include "vision/src/pipe.h"
+#include "pipes.h"
+
+void initializePipes(DisplayPipes&, VisionPipes&, HardwarePipes&);
 
 int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
+
+  DisplayPipes displayPipes;
+  VisionPipes visionPipes;
+  HardwarePipes hardwarePipes;
+
+  //Initialize all pipes
+  initializePipes(displayPipes, visionPipes, hardwarePipes);
 
   LOG(INFO) << "Starting display process..";
   int displayPid;
@@ -14,7 +24,7 @@ int main(int argc, char* argv[]) {
   }
   else if (displayPid == 0) {
     // display function
-    displayEntry();
+    displayEntry(displayPipes);
     return 0;
   }
   else {
@@ -41,7 +51,7 @@ int main(int argc, char* argv[]) {
     LOG(FATAL) << "Error starting vision process";
   }
   else if (visionPid == 0) {
-    visionEntry();
+    visionEntry(visionPipes);
     LOG(INFO) << "Vision process";
     return 0;
   }
@@ -51,4 +61,33 @@ int main(int argc, char* argv[]) {
 
   google::ShutdownGoogleLogging();
   return 0;
+}
+
+void initializePipes(DisplayPipes& display, VisionPipes& vision, HardwarePipes& hardware) {
+  // Display ↔ Hardware
+  pipe(display.toHardware);
+  hardware.fromDisplay[READ] = display.toHardware[READ];
+  hardware.fromDisplay[WRITE] = display.toHardware[WRITE];
+
+  pipe(display.fromHardware);
+  hardware.toDisplay[READ] = display.fromHardware[READ];
+  hardware.toDisplay[WRITE] = display.fromHardware[WRITE];
+
+  // Display ↔ Vision
+  pipe(display.toVision);
+  vision.fromDisplay[READ] = display.toVision[READ];
+  vision.fromDisplay[WRITE] = display.toVision[WRITE];
+
+  pipe(display.fromVision);
+  vision.toDisplay[READ] = display.fromVision[READ];
+  vision.toDisplay[WRITE] = display.fromVision[WRITE];
+
+  // Vision ↔ Hardware
+  pipe(vision.toHardware);
+  hardware.fromVision[READ] = vision.toHardware[READ];
+  hardware.fromVision[WRITE] = vision.toHardware[WRITE];
+
+  pipe(vision.fromHardware);
+  hardware.toVision[READ] = vision.fromHardware[READ];
+  hardware.toVision[WRITE] = vision.fromHardware[WRITE];
 }
