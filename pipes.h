@@ -2,8 +2,11 @@
 #define PIPES_H
 
 // Define constants for readability
-constexpr int READ  = 0; // Read end of the pipe
-constexpr int WRITE = 1; // Write end of the pipe
+#define READ  0
+#define WRITE 1
+
+// constexpr int READ  = 0; // Read end of the pipe
+// constexpr int WRITE = 1; // Write end of the pipe
 
 // Struct for Display process pipes
 struct DisplayPipes {
@@ -31,7 +34,5 @@ struct HardwarePipes {
   int toVision[2];   // Hardware -> Vision
   int fromVision[2]; // Vision -> Hardware
 };
-
-inline int getPipe(int pipes[2], int mode) { return pipes[mode]; }
 
 #endif

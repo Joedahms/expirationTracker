@@ -23,7 +23,6 @@ int main(int argc, char* argv[]) {
     LOG(FATAL) << "Error starting display process";
   }
   else if (displayPid == 0) {
-    // display function
     displayEntry(displayPipes);
     return 0;
   }
@@ -37,7 +36,7 @@ int main(int argc, char* argv[]) {
     LOG(FATAL) << "Error starting hardware process";
   }
   else if (hardwarePid == 0) {
-    // hardware function
+    // Insert hardware entry function here
     LOG(INFO) << "Hardware process";
     return 0;
   }
@@ -63,6 +62,16 @@ int main(int argc, char* argv[]) {
   return 0;
 }
 
+/**
+ * Ensure that the read ends in one process are equivalent to the write ends in the
+ * others.
+ *
+ * Input:
+ * - Pipes for the main display process
+ * - Pipes for the main vision process
+ * - Pipes for the main hardware process
+ * Output: None
+ */
 void initializePipes(DisplayPipes& display,
                      VisionPipes& vision,
                      HardwarePipes& hardware) {
