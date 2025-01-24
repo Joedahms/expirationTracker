@@ -3,5 +3,5 @@
 
 void displayEntry() {
   LOG(INFO) << "Within display process";
-  std::cout << "here" << std::endl;
+  std::cout << "DISPLAY" << std::endl;
 }
