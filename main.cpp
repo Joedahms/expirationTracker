@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "display/src/pipe.h"
+#include "vision/src/pipe.h"
 
 int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
@@ -40,7 +41,7 @@ int main(int argc, char* argv[]) {
     LOG(FATAL) << "Error starting vision process";
   }
   else if (visionPid == 0) {
-    // vision function
+    visionEntry();
     LOG(INFO) << "Vision process";
     return 0;
   }
@@ -48,5 +49,6 @@ int main(int argc, char* argv[]) {
     LOG(INFO) << "Vision process started successfully";
   }
 
+  google::ShutdownGoogleLogging();
   return 0;
 }
