@@ -5,9 +5,6 @@
 #define READ  0
 #define WRITE 1
 
-// constexpr int READ  = 0; // Read end of the pipe
-// constexpr int WRITE = 1; // Write end of the pipe
-
 // Struct for Display process pipes
 struct DisplayPipes {
   int toHardware[2];   // Display -> Hardware
