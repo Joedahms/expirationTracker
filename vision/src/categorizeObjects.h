@@ -3,9 +3,9 @@
 
 #include <string>
 
-std::string analyzeImage(const char* imagePath,
-                         const char* configPath,
-                         const char* weightsPath,
-                         const char* namesPath);
+std::string analyzeImage(const std::string imagePath,
+                         const std::string configPath,
+                         const std::string weightsPath,
+                         const std::string namesPath);
 
 #endif

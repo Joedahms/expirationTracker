@@ -15,18 +15,18 @@
  * @param namesPath Path to the class names file (e.g., coco.names).
  * @return A string containing the detected objects and their confidence levels.
  */
-std::vector<std::string> loadClassLabels(const char*);
+std::vector<std::string> loadClassLabels(const std::string);
 
-std::string analyzeImage(const char* imagePath,
-                         const char* configPath,
-                         const char* weightsPath,
-                         const char* namesPath) {
+std::string analyzeImage(const std::string imagePath,
+                         const std::string configPath,
+                         const std::string weightsPath,
+                         const std::string namesPath) {
   // Load the YOLO model
-  network* net = load_network((char*)configPath, (char*)weightsPath, 0);
+  network* net = load_network((char*)configPath.c_str(), (char*)weightsPath.c_str(), 0);
   set_batch_network(net, 1);
 
   // Load the image
-  image im = load_image_color((char*)imagePath, 0, 0);
+  image im = load_image_color((char*)imagePath.c_str(), 0, 0);
   if (!im.data) {
     return "Failed to load image: " + std::string(imagePath);
   }
@@ -72,7 +72,7 @@ std::string analyzeImage(const char* imagePath,
   return result.empty() ? "No objects detected" : result;
 }
 
-std::vector<std::string> loadClassLabels(const char* namesPath) {
+std::vector<std::string> loadClassLabels(const std::string namesPath) {
   std::vector<std::string> classNames;
   std::ifstream file(namesPath);
   if (!file.is_open()) {
