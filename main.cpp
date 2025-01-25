@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "display/src/display_pipe.h"
+#include "hardware/src/hardware_pipe.h"
 #include "pipes.h"
 #include "vision/src/vision_pipe.h"
 
@@ -24,6 +25,7 @@ int main(int argc, char* argv[]) {
   }
   else if (displayPid == 0) {
     displayEntry(displayPipes);
+    LOG(INFO) << "Display process";
     return 0;
   }
   else {
@@ -36,7 +38,7 @@ int main(int argc, char* argv[]) {
     LOG(FATAL) << "Error starting hardware process";
   }
   else if (hardwarePid == 0) {
-    // Insert hardware entry function here
+    hardwareEntry(hardwarePipes);
     LOG(INFO) << "Hardware process";
     return 0;
   }
