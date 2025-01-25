@@ -20,9 +20,6 @@ void visionEntry(struct VisionPipes pipes) {
   close(pipes.fromDisplay[READ]);
   close(pipes.toHardware[WRITE]);
 
-  // used
-  close(pipes.toDisplay[WRITE]);
-
   LOG(INFO) << "Sending Message from Vision to Display";
   const char* message = "Hello from Vision!";
   write(pipes.toDisplay[WRITE], message, strlen(message) + 1);

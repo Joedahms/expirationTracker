@@ -30,7 +30,4 @@ void displayEntry(struct DisplayPipes pipes) {
   else {
     LOG(FATAL) << "Failed to read from Vision process";
   }
-
-  // Close the read end after processing
-  close(pipes.fromVision[READ]);
 }
