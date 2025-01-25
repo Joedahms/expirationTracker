@@ -16,19 +16,37 @@
 void visionEntry(struct VisionPipes pipes) {
   LOG(INFO) << "Within vision process";
 
-  // not ever used
+  // Close unused ends of the pipes
   close(pipes.fromDisplay[WRITE]);
   close(pipes.fromHardware[WRITE]);
   close(pipes.toDisplay[READ]);
   close(pipes.toHardware[READ]);
 
-  // not currently used
-  close(pipes.fromHardware[READ]);
-  close(pipes.fromDisplay[READ]);
-  close(pipes.toHardware[WRITE]);
+  // Close not currently used ends
+  // close(pipes.fromHardware[READ]); // Not currently used
+  close(pipes.fromDisplay[READ]); // Not currently used
+  close(pipes.toDisplay[WRITE]);  // Not currently used
+  close(pipes.toHardware[WRITE]); // Not currently used
 
-  LOG(INFO) << "Sending Message from Vision to Display";
+  // Open a file to save the received JPEG data
+  FILE* receivedImage = fopen("received_image.jpg", "wb");
+  if (!receivedImage) {
+    LOG(FATAL) << "Failed to open output file for JPEG";
+    return;
+  }
 
-  std::string message = "Hello from Vision!";
-  write(pipes.toDisplay[WRITE], message.c_str(), message.length() + 1);
+  // Read data from the pipe and write to the file
+  char bufferImage[4096]; // Buffer for reading pipe chunks
+  ssize_t bytesRead;
+  while ((bytesRead = read(pipes.fromHardware[READ], bufferImage, sizeof(bufferImage))) >
+         0) {
+    fwrite(bufferImage, 1, bytesRead, receivedImage);
+  }
+
+  if (bytesRead == -1) {
+    LOG(FATAL) << "Failed to read JPEG data from pipe";
+  }
+
+  fclose(receivedImage);
+  LOG(INFO) << "JPEG file received from Vision process";
 }

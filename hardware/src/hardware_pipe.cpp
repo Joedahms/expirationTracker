@@ -16,19 +16,34 @@
 void hardwareEntry(struct HardwarePipes pipes) {
   LOG(INFO) << "Within vision process";
 
-  // not ever used
+  // Close unused ends of the pipes
   close(pipes.fromDisplay[WRITE]);
   close(pipes.fromVision[WRITE]);
   close(pipes.toDisplay[READ]);
   close(pipes.toVision[READ]);
 
-  // not currently used
-  close(pipes.fromVision[READ]);
-  close(pipes.fromDisplay[READ]);
-  close(pipes.toVision[WRITE]);
+  // Close not currently used ends
+  close(pipes.fromDisplay[READ]); // Not currently used
+  close(pipes.fromVision[READ]);  // Not currently used
+  close(pipes.toDisplay[WRITE]);  // Not currently used
+  // close(pipes.toVision[WRITE]);   // Not currently used
 
-  LOG(INFO) << "Sending Message from Hardware to Display";
+  LOG(INFO) << "Sending Image from Hardware to Vision";
+  FILE* appleImage = fopen("../apple.jpg", "rb");
+  if (!appleImage) {
+    LOG(FATAL) << "Failed to open JPEG file";
+    return;
+  }
 
-  std::string message = "Hello from Hardware!";
-  write(pipes.toDisplay[WRITE], message.c_str(), message.length() + 1);
+  // Read the file and write to the pipe
+  char bufferImage[4096]; // Buffer for reading file chunks
+  ssize_t bytesRead;
+  while ((bytesRead = fread(bufferImage, 1, sizeof(bufferImage), appleImage)) > 0) {
+    if (write(pipes.toVision[WRITE], bufferImage, bytesRead) == -1) {
+      LOG(FATAL) << "Failed to write JPEG data to pipe";
+    }
+  }
+
+  fclose(appleImage);
+  LOG(INFO) << "JPEG file sent to Display process";
 }
