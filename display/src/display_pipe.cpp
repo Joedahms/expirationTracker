@@ -19,15 +19,17 @@ void displayEntry(struct DisplayPipes pipes) {
   close(pipes.toHardware[WRITE]);  // Not currently used
 
   LOG(INFO) << "Receiving message from Vision process";
-  char buffer[256];
-  ssize_t bytesRead = read(pipes.fromVision[READ], buffer, sizeof(buffer) - 1);
-
-  if (bytesRead > 0) {
-    buffer[bytesRead] = '\0'; // Null-terminate the received string
-    LOG(INFO) << "Display received message: " << buffer;
-    std::cout << buffer << std::endl;
+  std::string buffer;
+  char character;
+  while (read(pipes.fromVision[READ], &character, 1) > 0) {
+    if (character != 0) {
+      buffer.push_back(character);
+    }
   }
-  else {
+
+  if (buffer.length() == 0) {
     LOG(FATAL) << "Failed to read from Vision process";
   }
+  LOG(INFO) << "Display received message: " << buffer;
+  std::cout << buffer << std::endl;
 }
