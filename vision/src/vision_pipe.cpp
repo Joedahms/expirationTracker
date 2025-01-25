@@ -1,10 +1,9 @@
+#include <fstream>
 #include <glog/logging.h>
 #include <iostream>
+#include <string>
 
 #include "vision_pipe.h"
-
-// 0 reading
-// 1 writing
 
 void visionEntry(struct VisionPipes pipes) {
   LOG(INFO) << "Within vision process";
@@ -21,6 +20,7 @@ void visionEntry(struct VisionPipes pipes) {
   close(pipes.toHardware[WRITE]);
 
   LOG(INFO) << "Sending Message from Vision to Display";
-  const char* message = "Hello from Vision!";
-  write(pipes.toDisplay[WRITE], message, strlen(message) + 1);
+
+  std::string message = "Hello from Vision!";
+  write(pipes.toDisplay[WRITE], message.c_str(), message.length() + 1);
 }
