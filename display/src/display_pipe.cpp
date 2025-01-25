@@ -22,9 +22,8 @@ void displayEntry(struct DisplayPipes pipes) {
   close(pipes.fromHardware[WRITE]); // Display does not write to fromHardware
 
   // Close not currently used ends
-  close(pipes.fromHardware[READ]); // Not currently used
-  close(pipes.toVision[WRITE]);    // Not currently used
-  close(pipes.toHardware[WRITE]);  // Not currently used
+  close(pipes.toVision[WRITE]);   // Not currently used
+  close(pipes.toHardware[WRITE]); // Not currently used
 
   LOG(INFO) << "Receiving message from Vision process";
   std::string buffer;
@@ -40,4 +39,19 @@ void displayEntry(struct DisplayPipes pipes) {
   }
   LOG(INFO) << "Display received message: " << buffer;
   std::cout << buffer << std::endl;
+
+  LOG(INFO) << "Receiving message from Hardware process";
+  std::string buffer1;
+  char character1;
+  while (read(pipes.fromHardware[READ], &character1, 1) > 0) {
+    if (character1 != 0) {
+      buffer1.push_back(character1);
+    }
+  }
+
+  if (buffer1.length() == 0) {
+    LOG(FATAL) << "Failed to read from Hardware process";
+  }
+  LOG(INFO) << "Display received message: " << buffer1;
+  std::cout << buffer1 << std::endl;
 }
