@@ -4,6 +4,14 @@
 #include "../../pipes.h"
 #include "display_pipe.h"
 
+/**
+ * Entry into the display code. Only called from main after display child process is
+ * forked.
+ *
+ * Input:
+ * - Pipes for display to communicate with the other processes
+ * Output: None
+ */
 void displayEntry(struct DisplayPipes pipes) {
   LOG(INFO) << "Within display process";
 

@@ -5,6 +5,14 @@
 
 #include "vision_pipe.h"
 
+/**
+ * Entry into the vision code. Only called from main after vision child process is
+ * forked.
+ *
+ * Input:
+ * - Pipes for vision to communicate with the other processes
+ * Output: None
+ */
 void visionEntry(struct VisionPipes pipes) {
   LOG(INFO) << "Within vision process";
 
