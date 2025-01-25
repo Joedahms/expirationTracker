@@ -3,8 +3,8 @@
 #include <iostream>
 #include <string>
 
+#include "categorizeObjects.h"
 #include "vision_pipe.h"
-
 /**
  * Entry into the vision code. Only called from main after vision child process is
  * forked.
@@ -47,6 +47,12 @@ void visionEntry(struct VisionPipes pipes) {
     LOG(FATAL) << "Failed to read JPEG data from pipe";
   }
 
+  // After receiving and saving "received_image.jpg"
+  std::string detections = analyzeImage(
+      "received_image.jpg", "../third_party/darknet/cfg/yolov4.cfg",
+      "../third_party/darknet/yolov4.weights", "../third_party/darknet/cfg/coco.names");
+
+  std::cout << detections << "HAHA" << std::endl;
   fclose(receivedImage);
   LOG(INFO) << "JPEG file received from Vision process";
 }
