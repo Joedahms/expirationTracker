@@ -3,6 +3,7 @@
 
 #include "../../pipes.h"
 #include "display_entry.h"
+#include "sdl_entry.h"
 
 /**
  * Entry into the display code. Only called from main after display child process is
@@ -21,11 +22,18 @@ void displayEntry(struct DisplayPipes pipes) {
   close(pipes.fromVision[WRITE]);   // Display does not write to fromVision
   close(pipes.fromHardware[WRITE]); // Display does not write to fromHardware
 
-  // Close not currently used ends
-  close(pipes.fromHardware[READ]); // Not currently used
-  close(pipes.toVision[WRITE]);    // Not currently used
-  close(pipes.toHardware[WRITE]);  // Not currently used
+  int sdlPid;
+  if ((sdlPid = fork()) == -1) {
+    LOG(FATAL) << "Error starting SDL process";
+  }
+  else if (sdlPid == 0) {
+    sdlEntry();
+  }
+  else {
+    // Still in display entry
+  }
 
+  /*
   LOG(INFO) << "Receiving message from Vision process";
   std::string buffer;
   char character;
@@ -40,4 +48,5 @@ void displayEntry(struct DisplayPipes pipes) {
   }
   LOG(INFO) << "Display received message: " << buffer;
   std::cout << buffer << std::endl;
+  */
 }
