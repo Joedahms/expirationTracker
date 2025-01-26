@@ -22,17 +22,30 @@ void displayEntry(struct DisplayPipes pipes) {
   close(pipes.fromVision[WRITE]);   // Display does not write to fromVision
   close(pipes.fromHardware[WRITE]); // Display does not write to fromHardware
 
+  // SDL pipes
+  int sdlToDisplay[2];
+  int displayToSdl[2];
+  pipe(sdlToDisplay);
+  pipe(displayToSdl);
+
   int sdlPid;
   if ((sdlPid = fork()) == -1) {
     LOG(FATAL) << "Error starting SDL process";
   }
   else if (sdlPid == 0) {
+    close(sdlToDisplay[READ]);
+    close(displayToSdl[WRITE]);
+
     sdlEntry();
   }
   else {
     // Still in display entry
+    close(sdlToDisplay[WRITE]);
+    close(displayToSdl[READ]);
   }
 
+  // Code used to test pipes when first figuring out IPC. Commented out because we know
+  // this works but may still need it later for reference.
   /*
   LOG(INFO) << "Receiving message from Vision process";
   std::string buffer;
