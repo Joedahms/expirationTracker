@@ -1,9 +1,12 @@
+#include <filesystem>
 #include <fstream>
 #include <glog/logging.h>
 #include <iostream>
 #include <string>
 
 #include "hardware_pipe.h"
+
+void send_images(int, const std::string&);
 
 /**
  * Entry into the hardware code. Only called from main after hardware child process is
@@ -29,21 +32,50 @@ void hardwareEntry(struct HardwarePipes pipes) {
   // close(pipes.toVision[WRITE]);   // Not currently used
 
   LOG(INFO) << "Sending Image from Hardware to Vision";
-  FILE* appleImage = fopen("../images/banana.jpg", "rb");
-  if (!appleImage) {
-    LOG(FATAL) << "Failed to open JPEG file";
-    return;
-  }
+  send_images(pipes.toVision[WRITE], "../images/");
+  LOG(INFO) << "JPEG file sent to Display process";
+}
 
-  // Read the file and write to the pipe
-  char bufferImage[4096]; // Buffer for reading file chunks
-  ssize_t bytesRead;
-  while ((bytesRead = fread(bufferImage, 1, sizeof(bufferImage), appleImage)) > 0) {
-    if (write(pipes.toVision[WRITE], bufferImage, bytesRead) == -1) {
-      LOG(FATAL) << "Failed to write JPEG data to pipe";
+void send_images(int write_fd, const std::string& directory_path) {
+  for (const auto& entry : std::filesystem::directory_iterator(directory_path)) {
+    if (entry.is_regular_file()) {
+      const std::string file_path = entry.path().string();
+
+      // Check if the file has a .jpg extension
+      if (entry.path().extension() != ".jpg") {
+        continue; // Skip non-.jpg files
+      }
+      // Open the file
+      std::ifstream file(file_path, std::ios::binary | std::ios::ate);
+      if (!file.is_open()) {
+        std::cerr << "Failed to open file: " << file_path << std::endl;
+        continue;
+      }
+
+      // Get the file size
+      std::streamsize file_size = file.tellg();
+      file.seekg(0, std::ios::beg);
+
+      // Header: Send the file size (4 bytes)
+      uint32_t header = static_cast<uint32_t>(file_size);
+      write(write_fd, &header, sizeof(header)); // Send file size
+
+      // Send the file data in chunks
+      const int CHUNK_SIZE = 4096;
+      char buffer[CHUNK_SIZE];
+      while (file_size > 0) {
+        std::streamsize to_read =
+            std::min(file_size, static_cast<std::streamsize>(CHUNK_SIZE));
+        file.read(buffer, to_read);
+        write(write_fd, buffer, to_read);
+        file_size -= to_read;
+      }
+
+      file.close();
     }
   }
 
-  fclose(appleImage);
-  LOG(INFO) << "JPEG file sent to Display process";
+  // Send a special header with size 0 to signal end of transmission
+  uint32_t end_signal = 0;
+  write(write_fd, &end_signal, sizeof(end_signal));
 }

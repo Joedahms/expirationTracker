@@ -6,6 +6,9 @@
 
 #include "categorizeObjects.h"
 #include "vision_pipe.h"
+
+void receive_images(int, const std::string&);
+
 /**
  * Entry into the vision code. Only called from main after vision child process is
  * forked.
@@ -33,36 +36,54 @@ void visionEntry(struct VisionPipes pipes) {
   if (!std::filesystem::exists(outputDir)) {
     std::filesystem::create_directory(outputDir);
   }
-
-  int imageCount = 0;
-
-  // Open a file to save the received JPEG data
-  std::string outputFileName =
-      outputDir + "received_image_" + std::to_string(imageCount) + ".jpg";
-  FILE* receivedImage = fopen(outputFileName.c_str(), "wb");
-  if (!receivedImage) {
-    LOG(FATAL) << "Failed to open output file for JPEG";
-    return;
-  }
-
-  // Read data from the pipe and write to the file
-  char bufferImage[4096]; // Buffer for reading pipe chunks
-  ssize_t bytesRead;
-  while ((bytesRead = read(pipes.fromHardware[READ], bufferImage, sizeof(bufferImage))) >
-         0) {
-    fwrite(bufferImage, 1, bytesRead, receivedImage);
-  }
-
-  if (bytesRead == -1) {
-    LOG(FATAL) << "Failed to read JPEG data from pipe";
-  }
-
-  // After receiving and saving "received_image.jpg"
-  std::string detections = analyzeImage(
-      outputFileName, "../third_party/darknet/cfg/yolov4.cfg",
-      "../third_party/darknet/yolov4.weights", "../third_party/darknet/cfg/coco.names");
-
-  std::cout << detections << "HAHA" << std::endl;
-  fclose(receivedImage);
+  receive_images(pipes.fromHardware[READ], outputDir);
   LOG(INFO) << "JPEG file received from Vision process";
+}
+
+void receive_images(int read_fd, const std::string& output_directory) {
+  uint32_t image_size;
+  int image_count = 0;
+
+  while (true) {
+    // Step 1: Read the header (image size in bytes)
+    if (read(read_fd, &image_size, sizeof(image_size)) <= 0) {
+      perror("Failed to read header");
+      break;
+    }
+
+    // Step 2: Check for end-of-transmission signal
+    if (image_size == 0) {
+      std::cout << "End of transmission received." << std::endl;
+      break;
+    }
+
+    // Step 3: Open an output file for the image
+    std::string output_file =
+        output_directory + "/image_" + std::to_string(image_count++) + ".jpg";
+    std::ofstream file(output_file, std::ios::binary);
+    if (!file.is_open()) {
+      perror("Failed to open output file");
+      continue;
+    }
+
+    // Step 4: Read the image data
+    const int CHUNK_SIZE = 4096;
+    char buffer[CHUNK_SIZE];
+    while (image_size > 0) {
+      ssize_t to_read =
+          std::min(static_cast<ssize_t>(image_size), static_cast<ssize_t>(CHUNK_SIZE));
+      ssize_t bytes_read = read(read_fd, buffer, to_read);
+
+      if (bytes_read <= 0) {
+        perror("Error reading from pipe");
+        break;
+      }
+
+      file.write(buffer, bytes_read);
+      image_size -= bytes_read;
+    }
+
+    file.close();
+    std::cout << "Image saved to: " << output_file << std::endl;
+  }
 }

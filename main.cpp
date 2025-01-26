@@ -1,13 +1,12 @@
 #include <glog/logging.h>
 #include <iostream>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #include "display/src/display_pipe.h"
 #include "hardware/src/hardware_pipe.h"
 #include "pipes.h"
 #include "vision/src/vision_pipe.h"
-#include <atomic>
-#include <glog/logging.h>
-#include <iostream>
 
 int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
@@ -61,6 +60,15 @@ int main(int argc, char* argv[]) {
     LOG(INFO) << "Vision process started successfully";
   }
 
+  int status;
+  waitpid(displayPid, &status, 0);
+  LOG(INFO) << "Display process terminated with status: " << status;
+
+  waitpid(hardwarePid, &status, 0);
+  LOG(INFO) << "Hardware process terminated with status: " << status;
+
+  waitpid(visionPid, &status, 0);
+  LOG(INFO) << "Vision process terminated with status: " << status;
   google::ShutdownGoogleLogging();
   return 0;
 }
