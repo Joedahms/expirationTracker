@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <limits.h>
+#include <map>
 #include <string>
 #include <unistd.h>
 #include <vector>
@@ -21,6 +22,7 @@ std::string analyzeImage(const std::string imagePath,
                          const std::string configPath,
                          const std::string weightsPath,
                          const std::string namesPath) {
+  suppressOutput();
   // Load the YOLO model
   network* net = load_network((char*)configPath.c_str(), (char*)weightsPath.c_str(), 0);
   set_batch_network(net, 1);
@@ -44,17 +46,32 @@ std::string analyzeImage(const std::string imagePath,
   detection* dets =
       get_network_boxes(net, im.w, im.h, thresh, hier_thresh, 0, 1, &nboxes, 1);
 
+  restoreOutput();
+
   // Load class names
   std::vector<std::string> classNames = loadClassLabels(namesPath);
 
-  // Build the result string
   std::string result;
+  std::map<std::string, float> maxConfidence; // Store max confidence for each class
+
   for (int i = 0; i < nboxes; i++) {
     for (int j = 0; j < net->layers[net->n - 1].classes; j++) {
       if (dets[i].prob[j] > thresh) {
-        result += classNames[j] + " (" + std::to_string(dets[i].prob[j] * 100) + "%), ";
+        std::string className = classNames[j];
+        float confidence      = dets[i].prob[j] * 100;
+
+        // Update max confidence for this class
+        if (maxConfidence.find(className) == maxConfidence.end() ||
+            maxConfidence[className] < confidence) {
+          maxConfidence[className] = confidence;
+        }
       }
     }
+  }
+
+  // Build the final result string
+  for (const auto& pair : maxConfidence) {
+    result += pair.first + " (" + std::to_string(pair.second) + "%), ";
   }
 
   // Cleanup
@@ -86,4 +103,20 @@ std::vector<std::string> loadClassLabels(const std::string namesPath) {
   }
   file.close();
   return classNames;
+}
+
+// Function to suppress stdout and stderr
+void suppressOutput() {
+  fflush(stdout);
+  fflush(stderr);
+  freopen("/dev/null", "w", stdout);
+  freopen("/dev/null", "w", stderr);
+}
+
+// Function to restore stdout and stderr
+void restoreOutput() {
+  fflush(stdout);
+  fflush(stderr);
+  freopen("/dev/tty", "w", stdout);
+  freopen("/dev/tty", "w", stderr);
 }

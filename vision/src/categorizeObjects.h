@@ -8,4 +8,7 @@ std::string analyzeImage(const std::string imagePath,
                          const std::string weightsPath,
                          const std::string namesPath);
 
+void suppressOutput();
+void restoreOutput();
+
 #endif

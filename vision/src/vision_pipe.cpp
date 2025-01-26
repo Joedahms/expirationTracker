@@ -37,7 +37,16 @@ void visionEntry(struct VisionPipes pipes) {
     std::filesystem::create_directory(outputDir);
   }
   receive_images(pipes.fromHardware[READ], outputDir);
-  LOG(INFO) << "JPEG file received from Vision process";
+  LOG(INFO) << "Vision Received all images from hardware";
+
+  for (const auto& entry : std::filesystem::directory_iterator(outputDir)) {
+    // After receiving and saving "received_image.jpg"
+    std::string detections = analyzeImage(
+        entry.path(), "../third_party/darknet/cfg/yolov4.cfg",
+        "../third_party/darknet/yolov4.weights", "../third_party/darknet/cfg/coco.names");
+
+    std::cout << entry.path() << " has been identified as: " << detections << std::endl;
+  }
 }
 
 void receive_images(int read_fd, const std::string& output_directory) {
