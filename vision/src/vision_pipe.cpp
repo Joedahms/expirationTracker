@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <fstream>
 #include <glog/logging.h>
 #include <iostream>
@@ -28,8 +29,17 @@ void visionEntry(struct VisionPipes pipes) {
   close(pipes.toDisplay[WRITE]);  // Not currently used
   close(pipes.toHardware[WRITE]); // Not currently used
 
+  const std::string outputDir = "./received_images/";
+  if (!std::filesystem::exists(outputDir)) {
+    std::filesystem::create_directory(outputDir);
+  }
+
+  int imageCount = 0;
+
   // Open a file to save the received JPEG data
-  FILE* receivedImage = fopen("received_image.jpg", "wb");
+  std::string outputFileName =
+      outputDir + "received_image_" + std::to_string(imageCount) + ".jpg";
+  FILE* receivedImage = fopen(outputFileName.c_str(), "wb");
   if (!receivedImage) {
     LOG(FATAL) << "Failed to open output file for JPEG";
     return;
@@ -49,7 +59,7 @@ void visionEntry(struct VisionPipes pipes) {
 
   // After receiving and saving "received_image.jpg"
   std::string detections = analyzeImage(
-      "received_image.jpg", "../third_party/darknet/cfg/yolov4.cfg",
+      outputFileName, "../third_party/darknet/cfg/yolov4.cfg",
       "../third_party/darknet/yolov4.weights", "../third_party/darknet/cfg/coco.names");
 
   std::cout << detections << "HAHA" << std::endl;

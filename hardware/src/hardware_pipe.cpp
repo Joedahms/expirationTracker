@@ -29,7 +29,7 @@ void hardwareEntry(struct HardwarePipes pipes) {
   // close(pipes.toVision[WRITE]);   // Not currently used
 
   LOG(INFO) << "Sending Image from Hardware to Vision";
-  FILE* appleImage = fopen("../banana.jpg", "rb");
+  FILE* appleImage = fopen("../images/banana.jpg", "rb");
   if (!appleImage) {
     LOG(FATAL) << "Failed to open JPEG file";
     return;
