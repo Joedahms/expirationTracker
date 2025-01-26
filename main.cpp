@@ -1,7 +1,7 @@
 #include <glog/logging.h>
 #include <iostream>
 
-#include "display/src/display_pipe.h"
+#include "display/src/display_entry.h"
 #include "pipes.h"
 #include "vision/src/vision_pipe.h"
 

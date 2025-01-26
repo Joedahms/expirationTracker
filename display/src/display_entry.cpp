@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include "../../pipes.h"
-#include "display_pipe.h"
+#include "display_entry.h"
 
 /**
  * Entry into the display code. Only called from main after display child process is

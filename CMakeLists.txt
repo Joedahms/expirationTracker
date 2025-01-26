@@ -6,8 +6,8 @@ find_package (glog 0.4.0 REQUIRED)
 add_executable (expirationTracker 
   main.cpp
   
-  display/src/display_pipe.h
-  display/src/display_pipe.cpp
+  display/src/display_entry.h
+  display/src/display_entry.cpp
 
   vision/src/vision_pipe.h
   vision/src/vision_pipe.cpp
