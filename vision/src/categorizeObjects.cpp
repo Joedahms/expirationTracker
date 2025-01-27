@@ -16,13 +16,13 @@
  * @param namesPath Path to the class names file (e.g., coco.names).
  * @return A string containing the detected objects and their confidence levels.
  */
-std::vector<std::string> loadClassLabels(const std::string);
 
 std::string analyzeImage(const std::string imagePath,
                          const std::string configPath,
                          const std::string weightsPath,
                          const std::string namesPath) {
-  suppressOutput();
+  suppressOutput(); // Darknet outputs a bunch of crap to std::out. Make this stop
+
   // Load the YOLO model
   network* net = load_network((char*)configPath.c_str(), (char*)weightsPath.c_str(), 0);
   set_batch_network(net, 1);
@@ -46,7 +46,7 @@ std::string analyzeImage(const std::string imagePath,
   detection* dets =
       get_network_boxes(net, im.w, im.h, thresh, hier_thresh, 0, 1, &nboxes, 1);
 
-  restoreOutput();
+  restoreOutput(); // Allow output to std::out again
 
   // Load class names
   std::vector<std::string> classNames = loadClassLabels(namesPath);
@@ -89,6 +89,12 @@ std::string analyzeImage(const std::string imagePath,
   return result.empty() ? "No objects detected" : result;
 }
 
+/**
+ * Load class labels from the given path
+ *
+ * @param namesPath Path to the class names file (e.g., coco.names).
+ * @return A vector of strings containing all class labels
+ */
 std::vector<std::string> loadClassLabels(const std::string namesPath) {
   std::vector<std::string> classNames;
   std::ifstream file(namesPath);

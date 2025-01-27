@@ -2,6 +2,7 @@
 #define CATEGORIZE_OBJECTS_H
 
 #include <string>
+#include <vector>
 
 std::string analyzeImage(const std::string imagePath,
                          const std::string configPath,
@@ -10,5 +11,6 @@ std::string analyzeImage(const std::string imagePath,
 
 void suppressOutput();
 void restoreOutput();
+std::vector<std::string> loadClassLabels(const std::string);
 
 #endif
