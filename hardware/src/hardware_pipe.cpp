@@ -6,8 +6,6 @@
 
 #include "hardware_pipe.h"
 
-void send_images(int, const std::string&);
-
 /**
  * Entry into the hardware code. Only called from main after hardware child process is
  * forked.
@@ -31,12 +29,22 @@ void hardwareEntry(struct HardwarePipes pipes) {
   close(pipes.toDisplay[WRITE]);  // Not currently used
   // close(pipes.toVision[WRITE]);   // Not currently used
 
-  LOG(INFO) << "Sending Image from Hardware to Vision";
-  send_images(pipes.toVision[WRITE], "../images/");
-  LOG(INFO) << "JPEG file sent to Display process";
+  LOG(INFO) << "Sending Images from Hardware to Vision";
+  sendImagesWithinDirectory(pipes.toVision[WRITE], "../images/");
+  LOG(INFO) << "Done Sending Images from Hardware to Vision";
 }
 
-void send_images(int write_fd, const std::string& directory_path) {
+/**
+ * Method to send images from a given directory using the pipe provided. It cycles through
+ * all .jpg images within the directory and sends them across processes.
+ *
+ * Input:
+ * - Pipe to write image information to
+ * - directory path as a string to get images from
+ * Output: None
+ */
+
+void sendImagesWithinDirectory(int pipeToWrite, const std::string& directory_path) {
   for (const auto& entry : std::filesystem::directory_iterator(directory_path)) {
     if (entry.is_regular_file()) {
       const std::string file_path = entry.path().string();
@@ -58,7 +66,7 @@ void send_images(int write_fd, const std::string& directory_path) {
 
       // Header: Send the file size (4 bytes)
       uint32_t header = static_cast<uint32_t>(file_size);
-      write(write_fd, &header, sizeof(header)); // Send file size
+      write(pipeToWrite, &header, sizeof(header)); // Send file size
 
       // Send the file data in chunks
       const int CHUNK_SIZE = 4096;
@@ -67,7 +75,7 @@ void send_images(int write_fd, const std::string& directory_path) {
         std::streamsize to_read =
             std::min(file_size, static_cast<std::streamsize>(CHUNK_SIZE));
         file.read(buffer, to_read);
-        write(write_fd, buffer, to_read);
+        write(pipeToWrite, buffer, to_read);
         file_size -= to_read;
       }
 
@@ -77,5 +85,5 @@ void send_images(int write_fd, const std::string& directory_path) {
 
   // Send a special header with size 0 to signal end of transmission
   uint32_t end_signal = 0;
-  write(write_fd, &end_signal, sizeof(end_signal));
+  write(pipeToWrite, &end_signal, sizeof(end_signal));
 }
