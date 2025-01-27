@@ -35,6 +35,7 @@ Display::Display(const char* windowTitle,
   this->mainMenu  = std::make_unique<MainMenu>(this->displayGlobal);
   this->scanning  = std::make_unique<Scanning>(this->displayGlobal);
   this->pauseMenu = std::make_unique<PauseMenu>(this->displayGlobal);
+  this->itemList  = std::make_unique<ItemList>(this->displayGlobal);
 
   displayIsRunning = true;
 }
@@ -136,13 +137,16 @@ void Display::checkState() {
   case 0: // Main menu
     break;
 
-  case 1: // displayplay
+  case 1: // Scanning
     if (!this->scanning->getStateEntered()) {
       this->scanning->enterScanning();
     }
     break;
 
   case 2: // Pause menu
+    break;
+
+  case 3: // Item list
     break;
 
   default:
@@ -162,7 +166,7 @@ void Display::handleEvents() {
     this->state = this->mainMenu->handleEvents(&this->displayIsRunning);
     break;
 
-  case 1: // Gameplay
+  case 1: // Scanning
     this->state = this->scanning->handleEvents(&this->displayIsRunning);
     break;
 
@@ -170,6 +174,9 @@ void Display::handleEvents() {
     this->state = this->pauseMenu->handleEvents(&this->displayIsRunning);
     break;
 
+  case 3: // Item List
+    this->state = this->itemList->handleEvents(&this->displayIsRunning);
+    break;
   default:
     break;
   }
@@ -194,6 +201,9 @@ void Display::checkKeystates() {
   case 2: // Pause menu
     break;
 
+  case 3: // Item list
+    this->state = this->itemList->checkKeystates();
+    break;
   default:
     break;
   }
@@ -216,6 +226,9 @@ void Display::update() {
     break;
 
   case 2: // Pause menu
+    break;
+
+  case 3: // Item list
     break;
 
   default:
@@ -241,6 +254,10 @@ void Display::renderState() {
 
   case 2: // Pause menu
     this->pauseMenu->render();
+    break;
+
+  case 3: // Item list
+    this->itemList->render();
     break;
 
   default:

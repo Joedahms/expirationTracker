@@ -7,9 +7,8 @@
 #include "main_menu.h"
 
 /**
- * Input:
- * - displayGlobal - Global display variables
- * Output: None
+ * @param displayGlobal Global display variables.
+ * @return None
  */
 MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
   this->displayGlobal        = displayGlobal;
@@ -47,24 +46,31 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
 /**
  * Handle SDL events that occur in the main menu state.
  *
- * Input:
- * - displayIsRunning - Whether or not the display is running.
- * Output: Current state the display is in.
+ * @param displayIsRunning Whether or not the display is running.
+ * @return Current state the display is in.
  */
 int MainMenu::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
-  int returnValue = 0;
+  int returnValue = MAIN_MENU;
   while (SDL_PollEvent(&event) != 0) { // While there are events in the queue
-    switch (event.type) {              // Check which type of event
+    int mouseX = event.motion.x;
+    int mouseY = event.motion.y;
+
+    switch (event.type) { // Check which type of event
     case SDL_QUIT:
       *displayIsRunning = false;
       break;
 
+    // Check if mouse was clicked over any buttons
     case SDL_MOUSEBUTTONDOWN:
-      if (this->newScanButton->checkHovered(event.motion.x, event.motion.y) == 0) {
-        break; // Stay in main menu state
+      if (this->newScanButton->checkHovered(mouseX, mouseY) == true) {
+        returnValue = SCANNING;
+        break;
       }
-      returnValue = 1; // Mouse was over button, switch to gameplay state
+      else if (this->viewStoredButton->checkHovered(mouseX, mouseY) == true) {
+        returnValue = ITEM_LIST;
+        break;
+      }
       break;
 
     default:
@@ -75,10 +81,10 @@ int MainMenu::handleEvents(bool* displayIsRunning) {
 }
 
 /**
- * Render the display title and the start button
+ * Render the display title and the start button.
  *
- * Input: None
- * Output: None
+ * @param None
+ * @return None
  */
 void MainMenu::render() {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background

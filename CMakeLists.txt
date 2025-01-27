@@ -37,6 +37,8 @@ add_executable (expirationTracker
   display/src/states/scanning.cpp
   display/src/states/pause_menu.h
   display/src/states/pause_menu.cpp
+  display/src/states/item_list.h
+  display/src/states/item_list.cpp
 
   vision/src/vision_pipe.h
   vision/src/vision_pipe.cpp

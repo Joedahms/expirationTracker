@@ -44,8 +44,7 @@ int Scanning::handleEvents(bool* displayIsRunning) {
     }
   }
 
-  // Still in scanning state
-  return 1;
+  return SCANNING;
 }
 
 /**
@@ -57,28 +56,11 @@ int Scanning::handleEvents(bool* displayIsRunning) {
 int Scanning::checkKeystates() {
   const Uint8* keystates = SDL_GetKeyboardState(NULL);
 
-  // Camera movement (arrow keys)
-  if (keystates[SDL_SCANCODE_UP]) {
-    return 1;
-  }
-  else if (keystates[SDL_SCANCODE_DOWN]) {
-    return 1;
-  }
-  else if (keystates[SDL_SCANCODE_RIGHT]) {
-    return 1;
-  }
-  else if (keystates[SDL_SCANCODE_LEFT]) {
-    return 1;
-  }
-  else { // No arrow key pressed
-  }
-
-  // Pause menu
   if (keystates[SDL_SCANCODE_ESCAPE]) {
-    return 2;
+    return PAUSE_MENU;
   }
 
-  return 1;
+  return SCANNING;
 }
 
 /**

@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "states/item_list.h"
 #include "states/main_menu.h"
 #include "states/pause_menu.h"
 #include "states/scanning.h"
@@ -34,15 +35,13 @@ private:
   struct DisplayGlobal displayGlobal;
 
   // State the display is currently in
-  // 0: Main menu
-  // 1: Scanning
-  // 2: Pause menu
   int state = 0;
 
   // States
   std::unique_ptr<MainMenu> mainMenu; // State entered when the display boots
   std::unique_ptr<Scanning> scanning; // State entered when an item is being scanned
   std::unique_ptr<PauseMenu> pauseMenu;
+  std::unique_ptr<ItemList> itemList; // Display all items stored
 
   bool displayIsRunning = false;
 };
