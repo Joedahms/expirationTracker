@@ -16,8 +16,8 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
 
   // Title
-  const char* fontPath     = "../16020_FUTURAM.ttf";
-  const char* titleContent = "TRASHORE";
+  const char* fontPath     = "../display/fonts/16020_FUTURAM.ttf";
+  const char* titleContent = "Expiration Tracker";
   SDL_Color titleColor     = {0, 255, 0, 255}; // Green
 
   // x,y -> 100, 100. 0 width/height

@@ -25,8 +25,9 @@ Button::Button(struct DisplayGlobal displayGlobal,
   this->defaultColor        = {255, 0, 0, 255}; // Red
 
   SDL_Color textColor = {255, 255, 0, 255}; // Yellow
-  this->text = std::make_unique<Text>(this->displayGlobal, "../16020_FUTURAM.ttf",
-                                      text.c_str(), 24, textColor, rectangle);
+  this->text =
+      std::make_unique<Text>(this->displayGlobal, "../display/fonts/16020_FUTURAM.ttf",
+                             text.c_str(), 24, textColor, rectangle);
 
   // Center the text within the button
   this->text->centerHorizontal(&this->backgroundRectangle);
