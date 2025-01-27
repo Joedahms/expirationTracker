@@ -3,26 +3,28 @@
 #include <iostream>
 #include <string>
 
-#include "game_global.h"
+#include "display_global.h"
 #include "gameplay.h"
 
 /**
- * @param gameGlobal - Global variables.
+ * @param displayGlobal - Global variables.
  */
-Gameplay::Gameplay(struct GameGlobal gameGlobal) { this->gameGlobal = gameGlobal; }
+Gameplay::Gameplay(struct DisplayGlobal displayGlobal) {
+  this->displayGlobal = displayGlobal;
+}
 
 /**
  * Handle all events in the SDL event queue.
  *
- * @param gameIsRunning - Whether or not the game is running.
- * @return - The current state of the game after updating gameplay.
+ * @param displayIsRunning - Whether or not the display is running.
+ * @return - The current state of the display after updating gameplay.
  */
-int Gameplay::handleEvents(bool* gameIsRunning) {
+int Gameplay::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
   while (SDL_PollEvent(&event) != 0) { // While events in the queue
     switch (event.type) {
     case SDL_QUIT: // Quit event
-      *gameIsRunning = false;
+      *displayIsRunning = false;
       break;
       /*
           case SDL_MOUSEWHEEL:                          // Mousewheel event
@@ -63,7 +65,7 @@ int Gameplay::handleEvents(bool* gameIsRunning) {
  * Perform the appropriate action depending on which keyboard key has been pressed.
  *
  * @param - None
- * @return - The state the game is in after checking if any keys have been pressed.
+ * @return - The state the display is in after checking if any keys have been pressed.
  */
 int Gameplay::checkKeystates() {
   const Uint8* keystates = SDL_GetKeyboardState(NULL);
@@ -99,7 +101,7 @@ int Gameplay::checkKeystates() {
  * @return - None
  */
 void Gameplay::update() {
-  //  writeToLogFile(this->gameGlobal.logFile, "updating in gameplay");
+  //  writeToLogFile(this->displayGlobal.logFile, "updating in gameplay");
 }
 
 /**
@@ -109,7 +111,7 @@ void Gameplay::update() {
  * @return - None
  */
 void Gameplay::render() {
-  SDL_RenderClear(this->gameGlobal.renderer);
+  SDL_RenderClear(this->displayGlobal.renderer);
 
   /*
   int cameraXPosition = this->camera->getXPosition();
@@ -123,14 +125,14 @@ void Gameplay::render() {
       int currentYPosition = y + floor(cameraYPosition / 16);
 
       // Render all visible tiles
-      SDL_RenderCopy(this->gameGlobal.renderer,
+      SDL_RenderCopy(this->displayGlobal.renderer,
                      this->tileMap->getTileTexture(currentXPosition, currentYPosition),
                      NULL, &(this->camera->destinationRect[x][y]));
 
       // If the current tile is selected
       if (this->tileMap->getSelected(currentXPosition, currentYPosition)) {
         // Render selected texture over it
-        SDL_RenderCopy(this->gameGlobal.renderer, this->selectedTexture, NULL,
+        SDL_RenderCopy(this->displayGlobal.renderer, this->selectedTexture, NULL,
                        &(camera->destinationRect[x][y]));
       }
     }
@@ -139,7 +141,7 @@ void Gameplay::render() {
   this->npcVector[0]->render();
   */
 
-  SDL_RenderPresent(this->gameGlobal.renderer);
+  SDL_RenderPresent(this->displayGlobal.renderer);
 }
 
 /**
@@ -149,7 +151,7 @@ void Gameplay::render() {
  * @return - None
  */
 void Gameplay::enterGameplay() {
-  SDL_Surface* windowSurface = SDL_GetWindowSurface(this->gameGlobal.window);
+  SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
   initializeTextures();
 
   // State has been entered once
@@ -164,11 +166,11 @@ void Gameplay::enterGameplay() {
  */
 void Gameplay::initializeTextures() {
   /*
-  writeToLogFile(this->gameGlobal.logFile, "Initializing textures...");
+  writeToLogFile(this->displayGlobal.logFile, "Initializing textures...");
   SDL_Surface* tmp_surface = IMG_Load("sprites/selected.png");
-  selectedTexture = SDL_CreateTextureFromSurface(this->gameGlobal.renderer, tmp_surface);
-  SDL_FreeSurface(tmp_surface);
-  writeToLogFile(this->gameGlobal.logFile, "Textures initialized");
+  selectedTexture = SDL_CreateTextureFromSurface(this->displayGlobal.renderer,
+  tmp_surface); SDL_FreeSurface(tmp_surface); writeToLogFile(this->displayGlobal.logFile,
+  "Textures initialized");
   */
 }
 

@@ -8,34 +8,34 @@
 /**
  * @constructor Text
  *
- * @param gameGlobal
+ * @param displayGlobal
  * @param fontPath - Path to where the font is stored.
  * @param content - What characters the text represents.
  * @param fontSize
  * @param color
  * @param rectangle
  */
-Text::Text(struct GameGlobal gameGlobal,
+Text::Text(struct DisplayGlobal displayGlobal,
            const char* fontPath,
            const char* content,
            int fontSize,
            SDL_Color color,
            SDL_Rect rectangle) {
-  this->gameGlobal = gameGlobal;
+  this->displayGlobal = displayGlobal;
 
   this->content  = content;
   this->fontSize = fontSize;
 
   this->font = TTF_OpenFont(fontPath, this->fontSize);
   if (this->font == NULL) {
-    //    writeToLogFile(this->gameGlobal.logFile, TTF_GetError());
+    //    writeToLogFile(this->displayGlobal.logFile, TTF_GetError());
   }
 
   this->color     = color;
   this->rectangle = rectangle;
 
   SDL_Surface* textSurface = TTF_RenderText_Solid(this->font, this->content, this->color);
-  this->texture = SDL_CreateTextureFromSurface(this->gameGlobal.renderer, textSurface);
+  this->texture = SDL_CreateTextureFromSurface(this->displayGlobal.renderer, textSurface);
   SDL_FreeSurface(textSurface);
 
   SDL_QueryTexture(this->texture, NULL, NULL, &this->rectangle.w, &this->rectangle.h);
@@ -48,5 +48,5 @@ Text::Text(struct GameGlobal gameGlobal,
  * @output none
  */
 void Text::render() {
-  SDL_RenderCopy(this->gameGlobal.renderer, this->texture, NULL, &this->rectangle);
+  SDL_RenderCopy(this->displayGlobal.renderer, this->texture, NULL, &this->rectangle);
 }

@@ -21,9 +21,9 @@ add_executable (expirationTracker
 
   display/src/button.h
   display/src/button.cpp
-  display/src/game_global.h
-  display/src/game.h
-  display/src/game.cpp
+  display/src/display_global.h
+  display/src/display.h
+  display/src/display.cpp
   display/src/gameplay.h
   display/src/gameplay.cpp
   display/src/main_menu.h

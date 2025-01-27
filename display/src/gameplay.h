@@ -5,14 +5,14 @@
 #include <memory>
 #include <string>
 
-#include "game_global.h"
+#include "display_global.h"
 
 /**
  * Gameplay state. State entered when user presses start button in main menu.
  */
 class Gameplay {
 public:
-  Gameplay(struct GameGlobal);
+  Gameplay(struct DisplayGlobal);
   int handleEvents(bool*);
   int checkKeystates();
   void update();
@@ -22,7 +22,7 @@ public:
   bool getStateEntered(); // Check if the state has already been entered
 
 private:
-  struct GameGlobal gameGlobal;
+  struct DisplayGlobal displayGlobal;
   bool stateEntered = false; // Has the state been entered before
 
   SDL_Texture* selectedTexture;

@@ -6,7 +6,7 @@
 #include <string>
 
 #include "button.h"
-#include "game_global.h"
+#include "display_global.h"
 #include "text.h"
 
 /**
@@ -16,12 +16,12 @@
  */
 class PauseMenu {
 public:
-  PauseMenu(struct GameGlobal);
+  PauseMenu(struct DisplayGlobal);
   int handleEvents(bool*);
   void render();
 
 private:
-  struct GameGlobal gameGlobal;
+  struct DisplayGlobal displayGlobal;
   std::unique_ptr<Text> title;
   std::unique_ptr<Button> resumeButton;
   std::unique_ptr<Button> mainMenuButton;

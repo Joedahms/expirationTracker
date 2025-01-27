@@ -5,7 +5,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <string>
 
-#include "game_global.h"
+#include "display_global.h"
 #include "rectangle.h"
 
 /**
@@ -15,7 +15,7 @@
  */
 class Text {
 public:
-  Text(struct GameGlobal, const char*, const char*, int, SDL_Color, SDL_Rect);
+  Text(struct DisplayGlobal, const char*, const char*, int, SDL_Color, SDL_Rect);
 
   // Center text horizontally within a type
   template <typename T> void centerHorizontal(T centerWithin) {
@@ -30,7 +30,7 @@ public:
   void render();
 
 private:
-  struct GameGlobal gameGlobal;
+  struct DisplayGlobal displayGlobal;
   TTF_Font* font;
   const char* content;
   int fontSize;
