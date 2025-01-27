@@ -5,7 +5,7 @@
  \* Detailed description of what function's purpose is  
  \*  
  \* Input:  
- \* - Name of Input 1 - Description of Input 1  
- \* - Name of Input 2 - Description of Input 2  
- \* Output: output  
+ \* @param Name of Input 1 Description of Input 1  
+ \* @param Name of Input 2 Description of Input 2  
+ \* @return Description of return value
  */  

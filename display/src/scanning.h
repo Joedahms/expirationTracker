@@ -1,5 +1,5 @@
-#ifndef GAMEPLAY_H
-#define GAMEPLAY_H
+#ifndef SCANNING_H
+#define SCANNING_H
 
 #include <SDL2/SDL.h>
 #include <memory>
@@ -8,16 +8,16 @@
 #include "display_global.h"
 
 /**
- * Gameplay state. State entered when user presses start button in main menu.
+ * Scanning state. State entered when user presses scan new item button in main menu.
  */
-class Gameplay {
+class Scanning {
 public:
-  Gameplay(struct DisplayGlobal);
+  Scanning(struct DisplayGlobal);
   int handleEvents(bool*);
   int checkKeystates();
   void update();
   void render();
-  void enterGameplay();
+  void enterScanning();
   void initializeTextures();
   bool getStateEntered(); // Check if the state has already been entered
 

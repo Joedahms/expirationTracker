@@ -5,13 +5,13 @@
 #include <string>
 
 #include "display_global.h"
-#include "gameplay.h"
+#include "scanning.h"
 
 /**
  * Input:
- * - displayGlobal - Global variables.
+ * @param displayGlobal Global variables
  */
-Gameplay::Gameplay(struct DisplayGlobal displayGlobal) {
+Scanning::Scanning(struct DisplayGlobal displayGlobal) {
   this->displayGlobal = displayGlobal;
 }
 
@@ -19,10 +19,10 @@ Gameplay::Gameplay(struct DisplayGlobal displayGlobal) {
  * Handle all events in the SDL event queue.
  *
  * Input:
- * - displayIsRunning - Whether or not the display is running.
- * Output: The current state of the display after updating gameplay.
+ * @param displayIsRunning Whether or not the display is running
+ * @return The current state of the display after updating scanning
  */
-int Gameplay::handleEvents(bool* displayIsRunning) {
+int Scanning::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
   while (SDL_PollEvent(&event) != 0) { // While events in the queue
     switch (event.type) {
@@ -60,17 +60,17 @@ int Gameplay::handleEvents(bool* displayIsRunning) {
     }
   }
 
-  // Still in gameplay state
+  // Still in scanning state
   return 1;
 }
 
 /**
  * Perform the appropriate action depending on which keyboard key has been pressed.
  *
- * Input: None
- * Output: The state the display is in after checking if any keys have been pressed.
+ * @param None
+ * @return The state the display is in after checking if any keys have been pressed
  */
-int Gameplay::checkKeystates() {
+int Scanning::checkKeystates() {
   const Uint8* keystates = SDL_GetKeyboardState(NULL);
 
   // Camera movement (arrow keys)
@@ -100,20 +100,20 @@ int Gameplay::checkKeystates() {
 /**
  * Update the camera and set the selected tile.
  *
- * Input: None
- * Output: None
+ * @param None
+ * @return None
  */
-void Gameplay::update() {
-  //  writeToLogFile(this->displayGlobal.logFile, "updating in gameplay");
+void Scanning::update() {
+  //  writeToLogFile(this->displayGlobal.logFile, "updating in scanning");
 }
 
 /**
- * Render all gameplay elements.
+ * Render all scanning elements.
  *
- * Input: None
- * Output: None
+ * @param None
+ * @return None
  */
-void Gameplay::render() {
+void Scanning::render() {
   SDL_RenderClear(this->displayGlobal.renderer);
 
   /*
@@ -148,12 +148,12 @@ void Gameplay::render() {
 }
 
 /**
- * Perform necessary actions when the gameplay state is entered for the first.
+ * Perform necessary actions when the scanning state is entered for the first.
  *
- * Input: None
- * Output: None
+ * @param None
+ * @return None
  */
-void Gameplay::enterGameplay() {
+void Scanning::enterScanning() {
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
   initializeTextures();
 
@@ -162,12 +162,12 @@ void Gameplay::enterGameplay() {
 }
 
 /**
- * Initialize all textures in the gameplay state.
+ * Initialize all textures in the scanning state.
  *
- * Input: None
- * Output: None
+ * @param None
+ * @return None
  */
-void Gameplay::initializeTextures() {
+void Scanning::initializeTextures() {
   LOG(INFO) << "Initializing textures";
   /*
   SDL_Surface* tmp_surface = IMG_Load("sprites/selected.png");
@@ -178,9 +178,9 @@ void Gameplay::initializeTextures() {
 }
 
 /**
- * Check if the gameplay state has been entered before.
+ * Check if the scanning state has been entered before.
  *
- * Input: None
- * Output: None
+ * @param None
+ * @return None
  */
-bool Gameplay::getStateEntered() { return this->stateEntered; }
+bool Scanning::getStateEntered() { return this->stateEntered; }

@@ -24,8 +24,8 @@ add_executable (expirationTracker
   display/src/display_global.h
   display/src/display.h
   display/src/display.cpp
-  display/src/gameplay.h
-  display/src/gameplay.cpp
+  display/src/scanning.h
+  display/src/scanning.cpp
   display/src/main_menu.h
   display/src/main_menu.cpp
   display/src/pause_menu.h

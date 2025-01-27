@@ -8,15 +8,14 @@
 #include "display_global.h"
 
 /**
- * Input:
- * - windowTitle - Title of the display window
- * - windowXPosition - X position of the display window
- * - windowYPostition - Y position of the display window
- * - screenWidth - Width of the display window
- * - screenHeight - Height of the display window
- * - fullscreen - Whether or not the display window should be fullscreen
- * - displayGlobal - Global display variables
- * Output: None
+ * @param windowTitle Title of the display window
+ * @param windowXPosition X position of the display window
+ * @param windowYPostition Y position of the display window
+ * @param screenWidth Width of the display window
+ * @param screenHeight Height of the display window
+ * @param fullscreen Whether or not the display window should be fullscreen
+ * @param displayGlobal Global display variables
+ * @return None
  */
 Display::Display(const char* windowTitle,
                  int windowXPosition,
@@ -34,7 +33,7 @@ Display::Display(const char* windowTitle,
 
   // Initialize states
   this->mainMenu  = std::make_unique<MainMenu>(this->displayGlobal);
-  this->gameplay  = std::make_unique<Gameplay>(this->displayGlobal);
+  this->scanning  = std::make_unique<Scanning>(this->displayGlobal);
   this->pauseMenu = std::make_unique<PauseMenu>(this->displayGlobal);
 
   displayIsRunning = true;
@@ -43,15 +42,14 @@ Display::Display(const char* windowTitle,
 /**
  * Setup the SDL display window.
  *
- * Input:
- * - windowTitle - The name of the window. Is what is displayed on the top bezel of
+ * @param windowTitle The name of the window. Is what is displayed on the top bezel of
  * the window when the display is running.
- * - windowXPosition - The X position of the window on the user's screen.
- * - windowYPosition - The Y position of the window on the user's screen.
- * - screenWidth - The width of the screen in pixels.
- * - screenHeight - The height of the screen in pixels.
- * - fullscreen - Whether or not the display window should be fullscreen.
- * Output: Pointer to the SDL display window.
+ * @param windowXPosition The X position of the window on the user's screen.
+ * @param windowYPosition The Y position of the window on the user's screen.
+ * @param screenWidth The width of the screen in pixels.
+ * @param screenHeight The height of the screen in pixels.
+ * @param fullscreen Whether or not the display window should be fullscreen.
+ * @return Pointer to the SDL display window.
  */
 SDL_Window* Display::setupWindow(const char* windowTitle,
                                  int windowXPosition,
@@ -80,9 +78,9 @@ SDL_Window* Display::setupWindow(const char* windowTitle,
 /**
  * Setup SDL, the renderer, and TTF. Renderer is part of the global display objects.
  *
- * Input:
+ * @param
  * - window - The SDL display window.
- * Output: None
+ * @return None
  */
 void Display::initializeSdl(SDL_Window* window) {
   // Initialize SDL
@@ -131,8 +129,8 @@ void Display::initializeSdl(SDL_Window* window) {
  * Check which state the display is in. If there was a state switch and the current
  * state has not been entered before, run its enter method.
  *
- * Input: None
- * Output: None
+ * @param None
+ * @return None
  */
 void Display::checkState() {
   switch (this->state) {
@@ -140,8 +138,8 @@ void Display::checkState() {
     break;
 
   case 1: // displayplay
-    if (!this->gameplay->getStateEntered()) {
-      this->gameplay->enterGameplay();
+    if (!this->scanning->getStateEntered()) {
+      this->scanning->enterScanning();
     }
     break;
 
@@ -156,8 +154,8 @@ void Display::checkState() {
 /**
  * Check the current state, and call that state's handle events method.
  *
- * Input: None
- * Output: None
+ * @param None
+ * @return None
  */
 void Display::handleEvents() {
   switch (this->state) {
@@ -166,7 +164,7 @@ void Display::handleEvents() {
     break;
 
   case 1: // Gameplay
-    this->state = this->gameplay->handleEvents(&this->displayIsRunning);
+    this->state = this->scanning->handleEvents(&this->displayIsRunning);
     break;
 
   case 2: // Pause menu
@@ -182,16 +180,16 @@ void Display::handleEvents() {
  * Check the current state of the display and call that state's method to check the
  * key states
  *
- * Input: None
- * Output: None
+ * @param None
+ * @return None
  */
 void Display::checkKeystates() {
   switch (this->state) {
   case 0: // Main menu
     break;
 
-  case 1: // Gameplay
-    this->state = this->gameplay->checkKeystates();
+  case 1: // Scanning
+    this->state = this->scanning->checkKeystates();
     break;
 
   case 2: // Pause menu
@@ -206,16 +204,16 @@ void Display::checkKeystates() {
  * First check if it's time to update. If it is, reset the time since last
  * update. Then check the current state and call that state's function to update.
  *
- * Input: None
- * Output: None
+ * @param None
+ * @return None
  */
 void Display::update() {
   switch (this->state) { // Check current state
   case 0:                // Main menu
     break;
 
-  case 1: // Gameplay
-    this->gameplay->update();
+  case 1: // Scanning
+    this->scanning->update();
     break;
 
   case 2: // Pause menu
@@ -229,8 +227,8 @@ void Display::update() {
 /**
  * Check current state and call that state's function to render.
  *
- * Input: None
- * Output: None
+ * @param None
+ * @return None
  */
 void Display::renderState() {
   switch (this->state) {
@@ -238,8 +236,8 @@ void Display::renderState() {
     this->mainMenu->render();
     break;
 
-  case 1: // Gameplay
-    this->gameplay->render();
+  case 1: // Scanning
+    this->scanning->render();
     break;
 
   case 2: // Pause menu
@@ -254,8 +252,8 @@ void Display::renderState() {
 /**
  * Free SDL resources and quit.
  *
- * Input: None
- * Output: None
+ * @param None
+ * @return None
  */
 void Display::clean() {
   SDL_DestroyWindow(this->displayGlobal.window);

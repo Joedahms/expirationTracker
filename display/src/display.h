@@ -7,9 +7,9 @@
 #include <string>
 #include <vector>
 
-#include "gameplay.h"
 #include "main_menu.h"
 #include "pause_menu.h"
+#include "scanning.h"
 
 #include "display_global.h"
 
@@ -35,13 +35,13 @@ private:
 
   // State the display is currently in
   // 0: Main menu
-  // 1: Gameplay
+  // 1: Scanning
   // 2: Pause menu
   int state = 0;
 
   // States
-  std::unique_ptr<MainMenu> mainMenu; // State entered when the display starts
-  std::unique_ptr<Gameplay> gameplay;
+  std::unique_ptr<MainMenu> mainMenu; // State entered when the display boots
+  std::unique_ptr<Scanning> scanning; // State entered when an item is being scanned
   std::unique_ptr<PauseMenu> pauseMenu;
 
   bool displayIsRunning = false;
