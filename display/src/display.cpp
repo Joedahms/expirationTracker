@@ -78,8 +78,7 @@ SDL_Window* Display::setupWindow(const char* windowTitle,
 /**
  * Setup SDL, the renderer, and TTF. Renderer is part of the global display objects.
  *
- * @param
- * - window - The SDL display window.
+ * @param window The SDL display window
  * @return None
  */
 void Display::initializeSdl(SDL_Window* window) {

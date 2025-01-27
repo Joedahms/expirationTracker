@@ -5,20 +5,29 @@
 #include <string>
 
 #include "../display_global.h"
+#include "../text.h"
 #include "scanning.h"
 
 /**
- * Input:
  * @param displayGlobal Global variables
  */
 Scanning::Scanning(struct DisplayGlobal displayGlobal) {
-  this->displayGlobal = displayGlobal;
+  this->displayGlobal        = displayGlobal;
+  SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
+
+  const char* fontPath               = "../display/fonts/16020_FUTURAM.ttf";
+  const char* progressMessageContent = "Scanning In Progress";
+  SDL_Color progressMessageColor     = {0, 255, 0, 255}; // Green
+  SDL_Rect progressMessageRectangle  = {100, 100, 0, 0}; // x y w h
+  this->progressMessage =
+      std::make_unique<Text>(this->displayGlobal, fontPath, progressMessageContent, 24,
+                             progressMessageColor, progressMessageRectangle);
+  this->progressMessage->centerHorizontal(windowSurface);
 }
 
 /**
  * Handle all events in the SDL event queue.
  *
- * Input:
  * @param displayIsRunning Whether or not the display is running
  * @return The current state of the display after updating scanning
  */
@@ -29,32 +38,7 @@ int Scanning::handleEvents(bool* displayIsRunning) {
     case SDL_QUIT: // Quit event
       *displayIsRunning = false;
       break;
-      /*
-          case SDL_MOUSEWHEEL:                          // Mousewheel event
-            if (event.wheel.y > 0) {                    // Scroll up -> zoom in
-              if (this->tileMap->getTileSize() == 16) { // If not already zoomed in
-                this->zoomedIn  = true;
-                this->zoomedOut = false;
-
-                this->tileMap->setTileSize(32);
-                this->camera->zoomIn(32, this->tileMap->getTotalXTiles(),
-                                     this->tileMap->getTotalYTiles());
-                break;
-              }
-            }
-            else if (event.wheel.y < 0) {               // Scroll down -> zoom out
-              if (this->tileMap->getTileSize() == 32) { // If not already zoomed out
-                this->zoomedIn  = false;
-                this->zoomedOut = true;
-
-                this->tileMap->setTileSize(16);
-                this->camera->zoomOut(16, this->tileMap->getTotalXTiles(),
-                                      this->tileMap->getTotalYTiles());
-                break;
-              }
-            }
-      */
-
+      // Touch event here
     default:
       break;
     }
@@ -98,7 +82,7 @@ int Scanning::checkKeystates() {
 }
 
 /**
- * Update the camera and set the selected tile.
+ *
  *
  * @param None
  * @return None
@@ -114,36 +98,9 @@ void Scanning::update() {
  * @return None
  */
 void Scanning::render() {
+  SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background
   SDL_RenderClear(this->displayGlobal.renderer);
-
-  /*
-  int cameraXPosition = this->camera->getXPosition();
-  int cameraYPosition = this->camera->getYPosition();
-
-  // Loop through all visible x tiles
-  for (int x = 0; x < this->camera->getVisibleXTiles() + 1; x++) {
-    // Loop through all visible y tiles
-    for (int y = 0; y < this->camera->getVisibleYTiles() + 1; y++) {
-      int currentXPosition = x + floor(cameraXPosition / 16);
-      int currentYPosition = y + floor(cameraYPosition / 16);
-
-      // Render all visible tiles
-      SDL_RenderCopy(this->displayGlobal.renderer,
-                     this->tileMap->getTileTexture(currentXPosition, currentYPosition),
-                     NULL, &(this->camera->destinationRect[x][y]));
-
-      // If the current tile is selected
-      if (this->tileMap->getSelected(currentXPosition, currentYPosition)) {
-        // Render selected texture over it
-        SDL_RenderCopy(this->displayGlobal.renderer, this->selectedTexture, NULL,
-                       &(camera->destinationRect[x][y]));
-      }
-    }
-  }
-
-  this->npcVector[0]->render();
-  */
-
+  this->progressMessage->render();
   SDL_RenderPresent(this->displayGlobal.renderer);
 }
 

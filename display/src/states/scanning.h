@@ -25,7 +25,9 @@ private:
   struct DisplayGlobal displayGlobal;
   bool stateEntered = false; // Has the state been entered before
 
-  SDL_Texture* selectedTexture;
+  std::unique_ptr<Text> progressMessage;
+
+  //  SDL_Texture* selectedTexture;
 };
 
 #endif
