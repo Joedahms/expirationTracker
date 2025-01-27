@@ -7,11 +7,9 @@
 #include "rectangle.h"
 
 /**
- * @constructor: MainMenu
- *
- * Setup the display title and start button.
- * @param displayGlobal - Global display variables
- * @output - None
+ * Input:
+ * - displayGlobal - Global display variables
+ * Output: None
  */
 MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
   this->displayGlobal        = displayGlobal;
@@ -41,11 +39,11 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
 }
 
 /**
- * @function handleEvents
- *
  * Handle SDL events that occur in the main menu state.
- * @param displayIsRunning - Whether or not the display is running.
- * @output - Current state the display is in.
+ *
+ * Input:
+ * - displayIsRunning - Whether or not the display is running.
+ * Output: Current state the display is in.
  */
 int MainMenu::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
@@ -74,11 +72,10 @@ int MainMenu::handleEvents(bool* displayIsRunning) {
 }
 
 /**
- * @function render
- *
  * Render the display title and the start button
- * @param none
- * @output none
+ *
+ * Input: None
+ * Output: None
  */
 void MainMenu::render() {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background

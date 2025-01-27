@@ -7,11 +7,9 @@
 #include "rectangle.h"
 
 /**
- * @function: PauseMenu
- *
- * PauseMenu constructor.
- * @param displayGlobal - Global display variables
- * @output - None
+ * Input:
+ * - displayGlobal - Global display variables
+ * Output: None
  */
 PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
   this->displayGlobal        = displayGlobal;
@@ -48,11 +46,11 @@ PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
 }
 
 /**
- * @function handleEvents
- *
  * Handle SDL events that occur in the pause menu state.
- * @param displayIsRunning - Whether or not the display is running.
- * @output - Current state the display is in.
+ *
+ * Input:
+ * - displayIsRunning - Whether or not the display is running.
+ * Output: Current state the display is in.
  */
 int PauseMenu::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
@@ -96,11 +94,10 @@ int PauseMenu::handleEvents(bool* displayIsRunning) {
 }
 
 /**
- * @function render
- *
  * Render paused and the button
- * @param - None
- * @output - None
+ *
+ * Input: None
+ * Output: None
  */
 void PauseMenu::render() {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background

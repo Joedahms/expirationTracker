@@ -67,9 +67,9 @@ int main(int argc, char* argv[]) {
  * others.
  *
  * Input:
- * - Pipes for the main display process
- * - Pipes for the main vision process
- * - Pipes for the main hardware process
+ * - display: Pipes for the main display process
+ * - vision: Pipes for the main vision process
+ * - hardware: Pipes for the main hardware process
  * Output: None
  */
 void initializePipes(DisplayPipes& display,

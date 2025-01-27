@@ -6,14 +6,12 @@
 #include "text.h"
 
 /**
- * @constructor Text
- *
- * @param displayGlobal
- * @param fontPath - Path to where the font is stored.
- * @param content - What characters the text represents.
- * @param fontSize
- * @param color
- * @param rectangle
+ * - displayGlobal - Global variables
+ * - fontPath - Path to where the font is stored.
+ * - content - What characters the text represents.
+ * - fontSize - Size of the font
+ * - color - Color of the font
+ * - rectangle - SDL rectangle defining the text
  */
 Text::Text(struct DisplayGlobal displayGlobal,
            const char* fontPath,
@@ -42,10 +40,8 @@ Text::Text(struct DisplayGlobal displayGlobal,
 }
 
 /**
- * @function render
- *
- * @param none
- * @output none
+ * Input: None
+ * Output: None
  */
 void Text::render() {
   SDL_RenderCopy(this->displayGlobal.renderer, this->texture, NULL, &this->rectangle);

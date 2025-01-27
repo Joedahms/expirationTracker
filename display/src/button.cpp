@@ -5,9 +5,9 @@
 #include "button.h"
 #include "display_global.h"
 
-/*
- * Name: Button
- * Purpose: Set the properties of the button
+/**
+ * Set the properties of the button.
+ *
  * Input:
  * - Global display variables
  * - Rectangle to render the button with
@@ -33,9 +33,9 @@ Button::Button(struct DisplayGlobal displayGlobal,
   this->text->centerVertical(&this->backgroundRectangle);
 }
 
-/*
- * Name: checkHovered
- * Purpose: Check if the mouse is over the button
+/**
+ * Check if the mouse is over the button
+ *
  * Input:
  * - X position of the mouse
  * - Y position of the mouse
@@ -59,9 +59,9 @@ bool Button::checkHovered(int mouseXPosition, int mouseYPosition) {
   return true;
 }
 
-/*
- * Name: render
- * Purpose: Render the button
+/**
+ * Render the button
+ *
  * Input:
  * - None
  * Output: None

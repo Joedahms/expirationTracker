@@ -10,8 +10,6 @@
 #include "text.h"
 
 /**
- * @class MainMenu
- *
  * Main menu state. This is the state the display enters upon launching.
  */
 class MainMenu {

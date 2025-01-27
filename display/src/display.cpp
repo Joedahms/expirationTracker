@@ -50,8 +50,8 @@ Display::Display(const char* windowTitle,
  * - windowYPosition - The Y position of the window on the user's screen.
  * - screenWidth - The width of the screen in pixels.
  * - screenHeight - The height of the screen in pixels.
- * @param fullscreen - Whether or not the display window should be fullscreen.
- * @return - Pointer to the SDL display window.
+ * - fullscreen - Whether or not the display window should be fullscreen.
+ * Output: Pointer to the SDL display window.
  */
 SDL_Window* Display::setupWindow(const char* windowTitle,
                                  int windowXPosition,
@@ -80,8 +80,9 @@ SDL_Window* Display::setupWindow(const char* windowTitle,
 /**
  * Setup SDL, the renderer, and TTF. Renderer is part of the global display objects.
  *
- * @param window - The SDL display window.
- * @return - None
+ * Input:
+ * - window - The SDL display window.
+ * Output: None
  */
 void Display::initializeSdl(SDL_Window* window) {
   // Initialize SDL
@@ -130,8 +131,8 @@ void Display::initializeSdl(SDL_Window* window) {
  * Check which state the display is in. If there was a state switch and the current
  * state has not been entered before, run its enter method.
  *
- * @param - None
- * @return - None
+ * Input: None
+ * Output: None
  */
 void Display::checkState() {
   switch (this->state) {
@@ -155,8 +156,8 @@ void Display::checkState() {
 /**
  * Check the current state, and call that state's handle events method.
  *
- * @param - None
- * @return - None
+ * Input: None
+ * Output: None
  */
 void Display::handleEvents() {
   switch (this->state) {
@@ -181,8 +182,8 @@ void Display::handleEvents() {
  * Check the current state of the display and call that state's method to check the
  * key states
  *
- * @param - None
- * @return - None
+ * Input: None
+ * Output: None
  */
 void Display::checkKeystates() {
   switch (this->state) {
@@ -205,8 +206,8 @@ void Display::checkKeystates() {
  * First check if it's time to update. If it is, reset the time since last
  * update. Then check the current state and call that state's function to update.
  *
- * @param - None
- * @return - None
+ * Input: None
+ * Output: None
  */
 void Display::update() {
   switch (this->state) { // Check current state
@@ -228,8 +229,8 @@ void Display::update() {
 /**
  * Check current state and call that state's function to render.
  *
- * @param - None
- * @return - None
+ * Input: None
+ * Output: None
  */
 void Display::renderState() {
   switch (this->state) {
@@ -253,8 +254,8 @@ void Display::renderState() {
 /**
  * Free SDL resources and quit.
  *
- * @param - None
- * @return - None
+ * Input: None
+ * Output: None
  */
 void Display::clean() {
   SDL_DestroyWindow(this->displayGlobal.window);

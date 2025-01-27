@@ -7,7 +7,8 @@
 #include "gameplay.h"
 
 /**
- * @param displayGlobal - Global variables.
+ * Input:
+ * - displayGlobal - Global variables.
  */
 Gameplay::Gameplay(struct DisplayGlobal displayGlobal) {
   this->displayGlobal = displayGlobal;
@@ -16,8 +17,9 @@ Gameplay::Gameplay(struct DisplayGlobal displayGlobal) {
 /**
  * Handle all events in the SDL event queue.
  *
- * @param displayIsRunning - Whether or not the display is running.
- * @return - The current state of the display after updating gameplay.
+ * Input:
+ * - displayIsRunning - Whether or not the display is running.
+ * Output: The current state of the display after updating gameplay.
  */
 int Gameplay::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
@@ -64,8 +66,8 @@ int Gameplay::handleEvents(bool* displayIsRunning) {
 /**
  * Perform the appropriate action depending on which keyboard key has been pressed.
  *
- * @param - None
- * @return - The state the display is in after checking if any keys have been pressed.
+ * Input: None
+ * Output: The state the display is in after checking if any keys have been pressed.
  */
 int Gameplay::checkKeystates() {
   const Uint8* keystates = SDL_GetKeyboardState(NULL);
@@ -74,7 +76,9 @@ int Gameplay::checkKeystates() {
   if (keystates[SDL_SCANCODE_UP]) {
     return 1;
   }
-  else if (keystates[SDL_SCANCODE_DOWN]) {
+  ts()’: / home / joe / Documents / school / ECE492 / raspi - yolo / display / src /
+                                                                  display.cpp : 172 : 56
+      : error : ‘class Display’ has no member else if (keystates[SDL_SCANCODE_DOWN]) {
     return 1;
   }
   else if (keystates[SDL_SCANCODE_RIGHT]) {
@@ -97,8 +101,8 @@ int Gameplay::checkKeystates() {
 /**
  * Update the camera and set the selected tile.
  *
- * @param - None
- * @return - None
+ * Input: None
+ * Output: None
  */
 void Gameplay::update() {
   //  writeToLogFile(this->displayGlobal.logFile, "updating in gameplay");
@@ -107,8 +111,8 @@ void Gameplay::update() {
 /**
  * Render all gameplay elements.
  *
- * @param - None
- * @return - None
+ * Input: None
+ * Output: None
  */
 void Gameplay::render() {
   SDL_RenderClear(this->displayGlobal.renderer);
@@ -147,8 +151,8 @@ void Gameplay::render() {
 /**
  * Perform necessary actions when the gameplay state is entered for the first.
  *
- * @param - None
- * @return - None
+ * Input: None
+ * Output: None
  */
 void Gameplay::enterGameplay() {
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
@@ -161,8 +165,8 @@ void Gameplay::enterGameplay() {
 /**
  * Initialize all textures in the gameplay state.
  *
- * @param - None
- * @return - None
+ * Input: None
+ * Output: None
  */
 void Gameplay::initializeTextures() {
   /*
@@ -177,7 +181,7 @@ void Gameplay::initializeTextures() {
 /**
  * Check if the gameplay state has been entered before.
  *
- * @param - None
- * @return - Whether the state has been entered before
+ * Input: None
+ * Output: None
  */
 bool Gameplay::getStateEntered() { return this->stateEntered; }

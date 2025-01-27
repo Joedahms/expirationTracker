@@ -10,8 +10,6 @@
 #include "text.h"
 
 /**
- * @class PauseMenu
- *
  * Pause menu state. Entered when pausing from gameplay.
  */
 class PauseMenu {
