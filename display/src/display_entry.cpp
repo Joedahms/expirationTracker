@@ -2,7 +2,8 @@
 #include <iostream>
 
 #include "../../pipes.h"
-#include "display_pipe.h"
+#include "display_entry.h"
+#include "sdl_entry.h"
 
 /**
  * Entry into the display code. Only called from main after display child process is
@@ -13,7 +14,7 @@
  * Output: None
  */
 void displayEntry(struct DisplayPipes pipes) {
-  LOG(INFO) << "Within display process";
+  LOG(INFO) << "Entered display process";
 
   // Close unused ends of the pipes
   close(pipes.toVision[READ]);      // Display does not read from toVision
@@ -21,11 +22,31 @@ void displayEntry(struct DisplayPipes pipes) {
   close(pipes.fromVision[WRITE]);   // Display does not write to fromVision
   close(pipes.fromHardware[WRITE]); // Display does not write to fromHardware
 
-  // Close not currently used ends
-  close(pipes.fromHardware[READ]); // Not currently used
-  close(pipes.toVision[WRITE]);    // Not currently used
-  close(pipes.toHardware[WRITE]);  // Not currently used
+  // SDL pipes
+  int sdlToDisplay[2];
+  int displayToSdl[2];
+  pipe(sdlToDisplay);
+  pipe(displayToSdl);
 
+  int sdlPid;
+  if ((sdlPid = fork()) == -1) {
+    LOG(FATAL) << "Error starting SDL process";
+  }
+  else if (sdlPid == 0) {
+    close(sdlToDisplay[READ]);
+    close(displayToSdl[WRITE]);
+
+    sdlEntry();
+  }
+  else {
+    // Still in display entry
+    close(sdlToDisplay[WRITE]);
+    close(displayToSdl[READ]);
+  }
+
+  // Code used to test pipes when first figuring out IPC. Commented out because we know
+  // this works but may still need it later for reference.
+  /*
   LOG(INFO) << "Receiving message from Vision process";
   std::string buffer;
   char character;
@@ -40,4 +61,5 @@ void displayEntry(struct DisplayPipes pipes) {
   }
   LOG(INFO) << "Display received message: " << buffer;
   std::cout << buffer << std::endl;
+  */
 }
