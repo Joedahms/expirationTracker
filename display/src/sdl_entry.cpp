@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <glog/logging.h>
 
 #include "display.h"
 #include "display_global.h"
@@ -11,6 +12,8 @@
  * Output: None
  */
 void sdlEntry() {
+  LOG(INFO) << "SDL display process started successfully";
+
   struct DisplayGlobal displayGlobal;
 
   Uint64 frame_start;

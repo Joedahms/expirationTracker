@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <assert.h>
+#include <glog/logging.h>
 #include <iostream>
 #include <string>
 
@@ -76,9 +77,7 @@ int Gameplay::checkKeystates() {
   if (keystates[SDL_SCANCODE_UP]) {
     return 1;
   }
-  ts()’: / home / joe / Documents / school / ECE492 / raspi - yolo / display / src /
-                                                                  display.cpp : 172 : 56
-      : error : ‘class Display’ has no member else if (keystates[SDL_SCANCODE_DOWN]) {
+  else if (keystates[SDL_SCANCODE_DOWN]) {
     return 1;
   }
   else if (keystates[SDL_SCANCODE_RIGHT]) {
@@ -169,13 +168,13 @@ void Gameplay::enterGameplay() {
  * Output: None
  */
 void Gameplay::initializeTextures() {
+  LOG(INFO) << "Initializing textures";
   /*
-  writeToLogFile(this->displayGlobal.logFile, "Initializing textures...");
   SDL_Surface* tmp_surface = IMG_Load("sprites/selected.png");
   selectedTexture = SDL_CreateTextureFromSurface(this->displayGlobal.renderer,
-  tmp_surface); SDL_FreeSurface(tmp_surface); writeToLogFile(this->displayGlobal.logFile,
-  "Textures initialized");
+  tmp_surface); SDL_FreeSurface(tmp_surface);
   */
+  LOG(INFO) << "Textures initialized";
 }
 
 /**

@@ -59,9 +59,9 @@ int MainMenu::handleEvents(bool* displayIsRunning) {
         break; // Stay in main menu state
       }
       //      writeToLogFile(this->displayGlobal.logFile,
-      //                    "Main menu button was pressed, switching to displayplay
+      //                    "Main menu button was pressed, switching to gameplay
       //                    state");
-      returnValue = 1; // Mouse was over button, switch to displayplay state
+      returnValue = 1; // Mouse was over button, switch to gameplay state
       break;
 
     default:

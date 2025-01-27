@@ -14,7 +14,7 @@
  * Output: None
  */
 void displayEntry(struct DisplayPipes pipes) {
-  LOG(INFO) << "Within display process";
+  LOG(INFO) << "Entered display process";
 
   // Close unused ends of the pipes
   close(pipes.toVision[READ]);      // Display does not read from toVision

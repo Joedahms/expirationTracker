@@ -86,20 +86,20 @@ SDL_Window* Display::setupWindow(const char* windowTitle,
  */
 void Display::initializeSdl(SDL_Window* window) {
   // Initialize SDL
-  //  writeToLogFile(this->displayGlobal.logFile, "Initializing SDL...");
+  LOG(INFO) << "Initializing SDL";
   try {
     int sdlInitReturn = SDL_Init(SDL_INIT_EVERYTHING);
     if (sdlInitReturn != 0) {
       throw;
     }
   } catch (...) {
-    //   writeToLogFile(this->displayGlobal.logFile, "Failed to initialize SDL");
+    LOG(FATAL) << "Failed to initialize SDL";
     exit(1);
   }
-  // writeToLogFile(this->displayGlobal.logFile, "SDL initialized");
+  LOG(INFO) << "SDL initialized";
 
   // Create renderer
-  // writeToLogFile(this->displayGlobal.logFile, "Creating renderer");
+  LOG(INFO) << "Creating renderer";
   try {
     this->displayGlobal.renderer = SDL_CreateRenderer(
         window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
@@ -108,23 +108,23 @@ void Display::initializeSdl(SDL_Window* window) {
     }
     SDL_SetRenderDrawColor(this->displayGlobal.renderer, 255, 255, 255, 255);
   } catch (...) {
-    // writeToLogFile(this->displayGlobal.logFile, "Error creating renderer");
+    LOG(FATAL) << "Error creating renderer";
     exit(1);
   }
-  // writeToLogFile(this->displayGlobal.logFile, "Renderer created");
+  LOG(INFO) << "Renderer created";
 
   // Initialize TTF
-  // writeToLogFile(this->displayGlobal.logFile, "Initializing TTF...");
+  LOG(INFO) << "Initializing TTF";
   try {
     int ttfInitReturn = TTF_Init();
     if (ttfInitReturn == -1) {
       throw;
     }
   } catch (...) {
-    // writeToLogFile(this->displayGlobal.logFile, "Failed to initialize TTF");
+    LOG(FATAL) << "Failed to initialize TTF";
     exit(1);
   }
-  // writeToLogFile(this->displayGlobal.logFile, "TTF initialized");
+  LOG(INFO) << "TTF initialized";
 }
 
 /**
@@ -261,5 +261,5 @@ void Display::clean() {
   SDL_DestroyWindow(this->displayGlobal.window);
   SDL_DestroyRenderer(this->displayGlobal.renderer);
   SDL_Quit();
-  // writeToLogFile(this->displayGlobal.logFile, "display cleaned");
+  LOG(INFO) << "Display cleaned";
 }
