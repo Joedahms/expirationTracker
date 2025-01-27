@@ -5,7 +5,7 @@
  \* Detailed description of what function's purpose is  
  \*  
  \* Input:  
- \* - Input 1  
- \* - Input 2  
+ \* - Name of Input 1 - Description of Input 1  
+ \* - Name of Input 2 - Description of Input 2  
  \* Output: output  
  */  
