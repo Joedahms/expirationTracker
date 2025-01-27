@@ -2,19 +2,16 @@
 #include <fstream>
 #include <glog/logging.h>
 #include <iostream>
-#include <string>
 
 #include "categorizeObjects.h"
 #include "vision_pipe.h"
-
-void receive_images(int, const std::string&);
 
 /**
  * Entry into the vision code. Only called from main after vision child process is
  * forked.
  *
  * Input:
- * - Pipes for vision to communicate with the other processes
+ * @param pipes Pipes for vision to communicate with the other processes
  * Output: None
  */
 void visionEntry(struct VisionPipes pipes) {
@@ -36,42 +33,49 @@ void visionEntry(struct VisionPipes pipes) {
   if (!std::filesystem::exists(outputDir)) {
     std::filesystem::create_directory(outputDir);
   }
-  receive_images(pipes.fromHardware[READ], outputDir);
+  receiveImages(pipes.fromHardware[READ], outputDir);
   LOG(INFO) << "Vision Received all images from hardware";
-
-  for (const auto& entry : std::filesystem::directory_iterator(outputDir)) {
-    // After receiving and saving "received_image.jpg"
-    std::string detections = analyzeImage(
-        entry.path(), "../third_party/darknet/cfg/yolov4.cfg",
-        "../third_party/darknet/yolov4.weights", "../third_party/darknet/cfg/coco.names");
-
-    std::cout << entry.path() << " has been identified as: " << detections << std::endl;
+  LOG(INFO) << "Vision analyzing all images";
+  std::vector<std::string> detections = analyzeImages(outputDir);
+  LOG(INFO) << "Vision successfully analyzed all images";
+  std::cout << "The following objects were detected in the images analyzed:" << std::endl;
+  for (const auto& detection : detections) {
+    std::cout << detection << std::endl;
   }
 }
 
-void receive_images(int read_fd, const std::string& output_directory) {
+/**
+ * Read from the given pipe and create images using the information received. Write
+ * received images to the given output directory.
+ *
+ * Input:
+ * @param ouputDirectory Directory to write information to
+ * @param pipeToRead Pipe to read data from
+ * Output: None
+ */
+void receiveImages(int pipeToRead, const std::string& ouputDirectory) {
   uint32_t image_size;
   int image_count = 0;
 
   while (true) {
     // Step 1: Read the header (image size in bytes)
-    if (read(read_fd, &image_size, sizeof(image_size)) <= 0) {
-      perror("Failed to read header");
+    if (read(pipeToRead, &image_size, sizeof(image_size)) <= 0) {
+      LOG(ERROR) << "Failed to read header";
       break;
     }
 
     // Step 2: Check for end-of-transmission signal
     if (image_size == 0) {
-      std::cout << "End of transmission received." << std::endl;
+      LOG(INFO) << "End of transmission received";
       break;
     }
 
     // Step 3: Open an output file for the image
-    std::string output_file =
-        output_directory + "/image_" + std::to_string(image_count++) + ".jpg";
-    std::ofstream file(output_file, std::ios::binary);
+    std::string outputFile =
+        ouputDirectory + "/image_" + std::to_string(image_count++) + ".jpg";
+    std::ofstream file(outputFile, std::ios::binary);
     if (!file.is_open()) {
-      perror("Failed to open output file");
+      LOG(ERROR) << "Failed to open output file";
       continue;
     }
 
@@ -81,10 +85,10 @@ void receive_images(int read_fd, const std::string& output_directory) {
     while (image_size > 0) {
       ssize_t to_read =
           std::min(static_cast<ssize_t>(image_size), static_cast<ssize_t>(CHUNK_SIZE));
-      ssize_t bytes_read = read(read_fd, buffer, to_read);
+      ssize_t bytes_read = read(pipeToRead, buffer, to_read);
 
       if (bytes_read <= 0) {
-        perror("Error reading from pipe");
+        LOG(ERROR) << "Error reading from pipe";
         break;
       }
 
@@ -93,6 +97,19 @@ void receive_images(int read_fd, const std::string& output_directory) {
     }
 
     file.close();
-    std::cout << "Image saved to: " << output_file << std::endl;
+    LOG(INFO) << "Image saved to: " << outputFile;
   }
+}
+
+std::vector<std::string> analyzeImages(const std::string& imageDirectory) {
+  std::vector<std::string> detections;
+  for (const auto& entry : std::filesystem::directory_iterator(imageDirectory)) {
+    // After receiving and saving "received_image.jpg"
+    std::string detection = analyzeImage(
+        entry.path(), "../third_party/darknet/cfg/yolov4.cfg",
+        "../third_party/darknet/yolov4.weights", "../third_party/darknet/cfg/coco.names");
+
+    detections.push_back(detection);
+  }
+  return detections;
 }
