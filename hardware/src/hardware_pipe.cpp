@@ -11,7 +11,7 @@
  * forked.
  *
  * Input:
- * - Pipes for hardware to communicate with the other processes
+ * @param pipes Pipes for hardware to communicate with the other processes
  * Output: None
  */
 void hardwareEntry(struct HardwarePipes pipes) {
@@ -39,8 +39,8 @@ void hardwareEntry(struct HardwarePipes pipes) {
  * all .jpg images within the directory and sends them across processes.
  *
  * Input:
- * - Pipe to write image information to
- * - directory path as a string to get images from
+ * @param pipeToWrite Pipe to write image information to
+ * @param directory_path Directory path as a string to get images from
  * Output: None
  */
 
