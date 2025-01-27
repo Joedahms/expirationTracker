@@ -4,9 +4,9 @@ project(expirationTracker DESCRIPTION "Track expiration dates" LANGUAGES CXX)
 # Find glog library
 find_package(glog 0.4.0 REQUIRED)
 
-# Add Darknet include and library paths
-set(DARKNET_INCLUDE_DIR /home/loggs/Source/Repos/raspi-yolo/third_party/darknet/include) # Update with your actual path
-set(DARKNET_LIB_DIR /home/loggs/Source/Repos/raspi-yolo/third_party/darknet)            # Path to the directory containing libdarknet.a
+# Find Darknet include directory
+set(DARKNET_INCLUDE_DIR ~/Source/Repos/raspi-yolo/yoloDarknet/include)
+set(DARKNET_LIBRARY ~/Source/Repos/raspi-yolo/yoloDarknet/libdarknet.so) # Update with your actual path
 
 # Add executable
 add_executable(expirationTracker 
@@ -24,7 +24,5 @@ target_include_directories(expirationTracker PRIVATE ${DARKNET_INCLUDE_DIR})
 target_link_libraries(expirationTracker 
   PRIVATE
   glog::glog
-  ${DARKNET_LIB_DIR}/libdarknet.so # Link Darknet static library
-  m
-  pthread
+  ${DARKNET_LIBRARY} # Link Darknet library dynamically
 )
