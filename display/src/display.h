@@ -7,9 +7,9 @@
 #include <string>
 #include <vector>
 
-#include "main_menu.h"
-#include "pause_menu.h"
-#include "scanning.h"
+#include "states/main_menu.h"
+#include "states/pause_menu.h"
+#include "states/scanning.h"
 
 #include "display_global.h"
 

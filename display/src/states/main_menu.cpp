@@ -2,9 +2,9 @@
 #include <iostream>
 #include <string>
 
-#include "display_global.h"
+#include "../display_global.h"
+#include "../rectangle.h"
 #include "main_menu.h"
-#include "rectangle.h"
 
 /**
  * Input:

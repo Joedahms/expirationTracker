@@ -19,21 +19,24 @@ add_executable (expirationTracker
   display/src/sdl_entry.h
   display/src/sdl_entry.cpp
 
+  # GUI
   display/src/button.h
   display/src/button.cpp
   display/src/display_global.h
   display/src/display.h
   display/src/display.cpp
-  display/src/scanning.h
-  display/src/scanning.cpp
-  display/src/main_menu.h
-  display/src/main_menu.cpp
-  display/src/pause_menu.h
-  display/src/pause_menu.cpp
   display/src/rectangle.h
   display/src/rectangle.cpp
   display/src/text.h
   display/src/text.cpp
+
+  # GUI States
+  display/src/states/main_menu.h
+  display/src/states/main_menu.cpp
+  display/src/states/scanning.h
+  display/src/states/scanning.cpp
+  display/src/states/pause_menu.h
+  display/src/states/pause_menu.cpp
 
   vision/src/vision_pipe.h
   vision/src/vision_pipe.cpp

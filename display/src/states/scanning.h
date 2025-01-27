@@ -5,7 +5,7 @@
 #include <memory>
 #include <string>
 
-#include "display_global.h"
+#include "../display_global.h"
 
 /**
  * Scanning state. State entered when user presses scan new item button in main menu.
