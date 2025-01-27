@@ -31,11 +31,19 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
                                        titleColor, titleRectangle);
   this->title->centerHorizontal(windowSurface);
 
-  // Start button
-  SDL_Rect startButtonRectangle = {200, 150, 200, 50};
-  startButtonRectangle = centerRectangleHorizontal(windowSurface, startButtonRectangle);
-  this->startButton =
-      std::make_unique<Button>(this->displayGlobal, startButtonRectangle, "Start");
+  // Scan New Item
+  SDL_Rect newScanButtonRectangle = {200, 150, 200, 50};
+  newScanButtonRectangle =
+      centerRectangleHorizontal(windowSurface, newScanButtonRectangle);
+  this->newScanButton = std::make_unique<Button>(this->displayGlobal,
+                                                 newScanButtonRectangle, "Scan New Item");
+
+  // View Stored Items
+  SDL_Rect viewStoredButtonRectangle = {200, 210, 200, 50};
+  viewStoredButtonRectangle =
+      centerRectangleHorizontal(windowSurface, viewStoredButtonRectangle);
+  this->viewStoredButton = std::make_unique<Button>(
+      this->displayGlobal, viewStoredButtonRectangle, "View Stored Items");
 }
 
 /**
@@ -55,12 +63,9 @@ int MainMenu::handleEvents(bool* displayIsRunning) {
       break;
 
     case SDL_MOUSEBUTTONDOWN:
-      if (this->startButton->checkHovered(event.motion.x, event.motion.y) == 0) {
+      if (this->newScanButton->checkHovered(event.motion.x, event.motion.y) == 0) {
         break; // Stay in main menu state
       }
-      //      writeToLogFile(this->displayGlobal.logFile,
-      //                    "Main menu button was pressed, switching to gameplay
-      //                    state");
       returnValue = 1; // Mouse was over button, switch to gameplay state
       break;
 
@@ -80,7 +85,8 @@ int MainMenu::handleEvents(bool* displayIsRunning) {
 void MainMenu::render() {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background
   SDL_RenderClear(this->displayGlobal.renderer);
-  this->startButton->render();
+  this->newScanButton->render();
+  this->viewStoredButton->render();
   this->title->render();
   SDL_RenderPresent(this->displayGlobal.renderer);
 }

@@ -20,8 +20,9 @@ public:
 
 private:
   struct DisplayGlobal displayGlobal;
-  std::unique_ptr<Text> title;         // Title of the display
-  std::unique_ptr<Button> startButton; // Launch the display
+  std::unique_ptr<Text> title;              // Title of the display
+  std::unique_ptr<Button> newScanButton;    // Scan a new item
+  std::unique_ptr<Button> viewStoredButton; // View stored items
 };
 
 #endif
