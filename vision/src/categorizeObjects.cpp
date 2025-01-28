@@ -1,5 +1,5 @@
 #include "categorizeObjects.h"
-#include "../../third_party/darknet/include/darknet.h"
+#include "../../yoloDarknet/include/darknet.h"
 #include <fstream>
 #include <iostream>
 #include <limits.h>
