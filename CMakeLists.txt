@@ -20,15 +20,30 @@ main.cpp
 display/src/display_entry.h
 display/src/display_entry.cpp
 
-# Entry into SDL after forked from displayEntry
-display/src/sdl_entry.cpp
-display/src/button.cpp
-display/src/display.cpp
-display/src/gameplay.cpp
-display/src/main_menu.cpp
-display/src/pause_menu.cpp
-display/src/rectangle.cpp
-display/src/text.cpp
+  # Entry into SDL after forked from displayEntry
+  display/src/sdl_entry.h
+  display/src/sdl_entry.cpp
+
+  # GUI
+  display/src/button.h
+  display/src/button.cpp
+  display/src/display_global.h
+  display/src/display.h
+  display/src/display.cpp
+  display/src/rectangle.h
+  display/src/rectangle.cpp
+  display/src/text.h
+  display/src/text.cpp
+
+  # GUI States
+  display/src/states/main_menu.h
+  display/src/states/main_menu.cpp
+  display/src/states/scanning.h
+  display/src/states/scanning.cpp
+  display/src/states/pause_menu.h
+  display/src/states/pause_menu.cpp
+  display/src/states/item_list.h
+  display/src/states/item_list.cpp
 
 # Vision process after forked from main
 vision/src/vision_pipe.cpp

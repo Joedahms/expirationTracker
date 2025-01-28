@@ -5,9 +5,9 @@
 #include <memory>
 #include <string>
 
-#include "button.h"
-#include "display_global.h"
-#include "text.h"
+#include "../button.h"
+#include "../display_global.h"
+#include "../text.h"
 
 /**
  * Pause menu state. Entered when pausing from gameplay.

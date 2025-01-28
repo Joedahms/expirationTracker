@@ -8,11 +8,10 @@
 /**
  * Set the properties of the button.
  *
- * Input:
- * - Global display variables
- * - Rectangle to render the button with
- * - The text to print in the middle of the button
- * Output: None
+ * @param displayGlobal Global display variables
+ * @param rectangle Rectangle to render the button with
+ * @param text The text to print in the middle of the button
+ * @return None
  */
 Button::Button(struct DisplayGlobal displayGlobal,
                SDL_Rect rectangle,
@@ -35,12 +34,11 @@ Button::Button(struct DisplayGlobal displayGlobal,
 }
 
 /**
- * Check if the mouse is over the button
+ * Check if the mouse is over the button.
  *
- * Input:
- * - X position of the mouse
- * - Y position of the mouse
- * Output: Whether or not the mouse is over the button
+ * @param mouseXPosition X position of the mouse
+ * @param mouseYPosition Y position of the mouse
+ * @return Whether or not the mouse is over the button
  */
 bool Button::checkHovered(int mouseXPosition, int mouseYPosition) {
   if (mouseXPosition < this->backgroundRectangle.x) { // Outside left edge of button
