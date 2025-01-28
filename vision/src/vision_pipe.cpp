@@ -105,9 +105,9 @@ std::vector<std::string> analyzeImages(const std::string& imageDirectory) {
   std::vector<std::string> detections;
   for (const auto& entry : std::filesystem::directory_iterator(imageDirectory)) {
     // After receiving and saving "received_image.jpg"
-    std::string detection =
-        analyzeImage(entry.path(), "../yoloDarknet/yolov4.cfg",
-                     "../yoloDarknet/yolov4.weights", "../yoloDarknet/coco.names");
+    std::string detection = analyzeImage(
+        entry.path(), "../YOLO/yolov4-tiny/cfg/yolov4-tiny.cfg",
+        "../YOLO/yolov4-tiny/yolov4-tiny.weights", "../YOLO/yolov4-tiny/cfg/coco.names");
 
     detections.push_back(detection);
   }
