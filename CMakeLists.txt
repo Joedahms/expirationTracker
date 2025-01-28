@@ -9,8 +9,8 @@ find_package(SDL2_ttf REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
 
 # Find Darknet include directory
-set(DARKNET_INCLUDE_DIR ~/Source/Repos/raspi-yolo/yoloDarknet/include)
-set(DARKNET_LIBRARY ~/Source/Repos/raspi-yolo/yoloDarknet/libdarknet.so) # Update with your actual path
+set(DARKNET_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/yoloDarknet/include)
+set(DARKNET_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/yoloDarknet/libdarknet.so) # Update with your actual path
 
 # Add executable
 add_executable(expirationTracker 
