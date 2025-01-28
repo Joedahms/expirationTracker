@@ -14,4 +14,7 @@ struct FoodItem {
   int quantity;
 };
 
+void sendFoodItem(struct FoodItem, int);
+struct FoodItem receiveFoodItem(int);
+
 #endif

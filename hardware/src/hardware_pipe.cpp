@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 
+#include "../../food_item.h"
 #include "hardware_pipe.h"
 
 /**
@@ -53,6 +54,7 @@ void sendImagesWithinDirectory(int pipeToWrite, const std::string& directory_pat
       if (entry.path().extension() != ".jpg") {
         continue; // Skip non-.jpg files
       }
+
       // Open the file
       std::ifstream file(file_path, std::ios::binary | std::ios::ate);
       if (!file.is_open()) {

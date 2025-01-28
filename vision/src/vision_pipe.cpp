@@ -3,6 +3,7 @@
 #include <glog/logging.h>
 #include <iostream>
 
+#include "../../food_item.h"
 #include "categorizeObjects.h"
 #include "vision_pipe.h"
 

@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 3.16)
 project(expirationTracker DESCRIPTION "Track expiration dates" LANGUAGES CXX)
 
+set(CMAKE_CXX_STANDARD 20)
+
 find_package (glog 0.4.0 REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
@@ -11,6 +13,7 @@ include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
 
 add_executable (expirationTracker 
   main.cpp
+  food_item.cpp
   
   # Display process after forked from main
   display/src/display_entry.cpp
