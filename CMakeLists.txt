@@ -5,12 +5,9 @@ find_package (glog 0.4.0 REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
+find_package(OpenCV REQUIRED)
 
 include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
-
-# Find Darknet include directory
-set(DARKNET_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/yoloDarknet/include)
-set(DARKNET_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/yoloDarknet/libdarknet.so)
 
 add_executable (expirationTracker 
   main.cpp
@@ -41,11 +38,11 @@ add_executable (expirationTracker
   hardware/src/hardware_pipe.cpp
 )
 
-target_include_directories(expirationTracker PRIVATE ${DARKNET_INCLUDE_DIR})
+target_include_directories(expirationTracker PRIVATE ${OpenCV_INCLUDE_DIRS})
 
 target_link_libraries(expirationTracker
   glog::glog
-  ${DARKNET_LIBRARY} # Link Darknet library dynamically
   ${SDL2_LIBRARIES} SDL2_image
   SDL2_ttf
+  ${OpenCV_LIBS}
 )
