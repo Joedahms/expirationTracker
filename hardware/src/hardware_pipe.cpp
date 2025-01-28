@@ -56,7 +56,7 @@ void sendImagesWithinDirectory(int pipeToWrite, const std::string& directory_pat
       // Open the file
       std::ifstream file(file_path, std::ios::binary | std::ios::ate);
       if (!file.is_open()) {
-        std::cerr << "Failed to open file: " << file_path << std::endl;
+        LOG(FATAL) << "Failed to open file: " << file_path;
         continue;
       }
 

@@ -60,7 +60,7 @@ void receiveImages(int pipeToRead, const std::string& ouputDirectory) {
   while (true) {
     // Step 1: Read the header (image size in bytes)
     if (read(pipeToRead, &image_size, sizeof(image_size)) <= 0) {
-      LOG(ERROR) << "Failed to read header";
+      LOG(FATAL) << "Failed to read header";
       break;
     }
 
@@ -75,7 +75,7 @@ void receiveImages(int pipeToRead, const std::string& ouputDirectory) {
         ouputDirectory + "/image_" + std::to_string(image_count++) + ".jpg";
     std::ofstream file(outputFile, std::ios::binary);
     if (!file.is_open()) {
-      LOG(ERROR) << "Failed to open output file";
+      LOG(FATAL) << "Failed to open output file";
       continue;
     }
 
@@ -88,7 +88,7 @@ void receiveImages(int pipeToRead, const std::string& ouputDirectory) {
       ssize_t bytes_read = read(pipeToRead, buffer, to_read);
 
       if (bytes_read <= 0) {
-        LOG(ERROR) << "Error reading from pipe";
+        LOG(FATAL) << "Error reading from pipe";
         break;
       }
 
