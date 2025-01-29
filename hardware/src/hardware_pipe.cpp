@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 
+#include "../../food_item.h"
 #include "hardware_pipe.h"
 
 /**
@@ -30,7 +31,21 @@ void hardwareEntry(struct HardwarePipes pipes) {
   // close(pipes.toVision[WRITE]);   // Not currently used
 
   LOG(INFO) << "Sending Images from Hardware to Vision";
-  sendImagesWithinDirectory(pipes.toVision[WRITE], "../images/");
+  // sendImagesWithinDirectory(pipes.toVision[WRITE], "../images/");
+
+  struct FoodItem foodItem;
+  foodItem.photoPath = "../images/apple.jpg";
+  foodItem.name      = "Apple";
+  const std::chrono::time_point now{std::chrono::system_clock::now()};
+  foodItem.scanDate = std::chrono::floor<std::chrono::days>(now);
+
+  foodItem.expirationDate = std::chrono::floor<std::chrono::days>(now);
+
+  foodItem.catagory = "fruit";
+  foodItem.weight   = 10.0;
+  foodItem.quantity = 2;
+
+  sendFoodItem(foodItem, pipes.toVision[WRITE]);
   LOG(INFO) << "Done Sending Images from Hardware to Vision";
 }
 
@@ -53,6 +68,7 @@ void sendImagesWithinDirectory(int pipeToWrite, const std::string& directory_pat
       if (entry.path().extension() != ".jpg") {
         continue; // Skip non-.jpg files
       }
+
       // Open the file
       std::ifstream file(file_path, std::ios::binary | std::ios::ate);
       if (!file.is_open()) {
