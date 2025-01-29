@@ -2,6 +2,7 @@
 #include <fstream>
 #include <glog/logging.h>
 #include <iostream>
+#include <memory>
 
 #include "../../food_item.h"
 #include "categorizeObjects.h"
@@ -30,13 +31,23 @@ void visionEntry(struct VisionPipes pipes) {
   close(pipes.toDisplay[WRITE]);  // Not currently used
   close(pipes.toHardware[WRITE]); // Not currently used
 
+  struct FoodItem foodItem;
+  receiveFoodItem(foodItem, pipes.fromHardware[READ]);
+  std::cout << foodItem.photoPath << std::endl;
+  std::cout << foodItem.name << std::endl;
+  std::cout << foodItem.catagory << std::endl;
+  std::cout << foodItem.weight << std::endl;
+  std::cout << foodItem.quantity << std::endl;
+
+  // receiveImages(pipes.fromHardware[READ], outputDir);
+  LOG(INFO) << "Vision Received all images from hardware";
+  LOG(INFO) << "Vision analyzing all images";
+
   const std::string outputDir = "./received_images/";
   if (!std::filesystem::exists(outputDir)) {
     std::filesystem::create_directory(outputDir);
   }
-  receiveImages(pipes.fromHardware[READ], outputDir);
-  LOG(INFO) << "Vision Received all images from hardware";
-  LOG(INFO) << "Vision analyzing all images";
+
   std::vector<std::string> detections = analyzeImages(outputDir);
   LOG(INFO) << "Vision successfully analyzed all images";
   std::cout << "The following objects were detected in the images analyzed:" << std::endl;

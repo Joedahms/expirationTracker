@@ -1,35 +1,77 @@
 #include <glog/logging.h>
 #include <iostream>
+#include <memory>
 #include <unistd.h>
 
 #include "food_item.h"
 
+/**
+ * Send a food item struct through a specified pipe. Not all fields have to be populated.
+ * Strings are handled differently due to them being std::strings.
+ *
+ * @param foodItem The food item to send.
+ * @param pipeToWrite The pipe to send the food item through.
+ * @return None
+ */
 void sendFoodItem(struct FoodItem foodItem, int pipeToWrite) {
-  // Send size of struct in bytes
-  uint32_t foodItemSize = sizeof(foodItem);
-  write(pipeToWrite, &foodItemSize, sizeof(foodItemSize));
+  writeString(pipeToWrite, foodItem.photoPath);
+  writeString(pipeToWrite, foodItem.name);
+  writeString(pipeToWrite, foodItem.catagory);
 
-  // Send struct piece by piece
-  write(pipeToWrite, &foodItem.photoPath, sizeof(foodItem.photoPath));
-  write(pipeToWrite, &foodItem.name, sizeof(foodItem.name));
   write(pipeToWrite, &foodItem.scanDate, sizeof(foodItem.scanDate));
   write(pipeToWrite, &foodItem.expirationDate, sizeof(foodItem.expirationDate));
   write(pipeToWrite, &foodItem.weight, sizeof(foodItem.weight));
-  write(pipeToWrite, &foodItem.catagory, sizeof(foodItem.catagory));
   write(pipeToWrite, &foodItem.quantity, sizeof(foodItem.quantity));
 }
 
-struct FoodItem receiveFoodItem(int pipeToRead) {
-  uint32_t imageSize;
-  if (read(pipeToRead, &imageSize, sizeof(imageSize)) <= 0) {
-    LOG(FATAL) << "Failed to read size header";
-  }
+/**
+ * Receive a food item struct through a pipe. Strings are handled differently due to them
+ * being std::strings.
+ *
+ * @param foodItem A food item struct to store the food item being received. Pass in an
+ * empty food item. After function completes, the received food item will be in this
+ * struct.
+ * @param pipeToRead The pipe to read the food item from.
+ * @return None
+ */
+void receiveFoodItem(struct FoodItem& foodItem, int pipeToRead) {
+  foodItem.photoPath = readString(pipeToRead);
+  foodItem.name      = readString(pipeToRead);
+  foodItem.catagory  = readString(pipeToRead);
 
-  std::cout << imageSize << std::endl;
+  read(pipeToRead, &foodItem.scanDate, sizeof(foodItem.scanDate));
+  read(pipeToRead, &foodItem.expirationDate, sizeof(foodItem.expirationDate));
+  read(pipeToRead, &foodItem.weight, sizeof(foodItem.weight));
+  read(pipeToRead, &foodItem.quantity, sizeof(foodItem.quantity));
+}
 
-  /*
-  while (imageSize > 0) {
-    ssize_t bytesRead = read(pipeToRead, )
-  }
-  */
+/**
+ * Send a string through a pipe. Needed because can't send a std::string directly.
+ *
+ * @param pipeToWrite Pipe to send the string through.
+ * @param stringToSend The string to send through the pipe.
+ * @return None
+ */
+void writeString(int pipeToWrite, const std::string& stringToSend) {
+  size_t stringToSendLength = stringToSend.length();
+  write(pipeToWrite, &stringToSendLength, sizeof(stringToSendLength));
+  write(pipeToWrite, stringToSend.c_str(), stringToSendLength);
+}
+
+/**
+ * Read a string from a pipe. Needed because std::string needs to be sent as a c style
+ * string.
+ *
+ * @param pipeToRead Pipe to read the string from.
+ * @return The string read from the pipe.
+ */
+std::string readString(int pipeToRead) {
+  size_t stringLength;
+  read(pipeToRead, &stringLength, sizeof(stringLength));
+  char* stringBuffer = new char[stringLength + 1];
+  read(pipeToRead, stringBuffer, stringLength);
+  stringBuffer[stringLength] = '\0';
+  std::string sentString(stringBuffer);
+  delete[] stringBuffer;
+  return sentString;
 }
