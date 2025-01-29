@@ -35,9 +35,13 @@ void sendFoodItem(struct FoodItem foodItem, int pipeToWrite) {
  * @return None
  */
 void receiveFoodItem(struct FoodItem& foodItem, int pipeToRead) {
+  std::cout << "here" << std::endl;
   foodItem.photoPath = readString(pipeToRead);
-  foodItem.name      = readString(pipeToRead);
-  foodItem.catagory  = readString(pipeToRead);
+  std::cout << "here2" << std::endl;
+  foodItem.name = readString(pipeToRead);
+  std::cout << "here3" << std::endl;
+  foodItem.catagory = readString(pipeToRead);
+  std::cout << "here4" << std::endl;
 
   read(pipeToRead, &foodItem.scanDate, sizeof(foodItem.scanDate));
   read(pipeToRead, &foodItem.expirationDate, sizeof(foodItem.expirationDate));
