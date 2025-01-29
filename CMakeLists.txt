@@ -19,19 +19,19 @@ add_executable (expirationTracker
   display/src/display_entry.cpp
 
   # Entry into SDL after forked from displayEntry
-  display/src/sdl_entry.cpp
+  display/src/sdl2/sdl_entry.cpp
 
   # GUI
-  display/src/button.cpp
-  display/src/display.cpp
-  display/src/rectangle.cpp
-  display/src/text.cpp
+  display/src/sdl2/button.cpp
+  display/src/sdl2/display.cpp
+  display/src/sdl2/rectangle.cpp
+  display/src/sdl2/text.cpp
 
   # GUI States
-  display/src/states/main_menu.cpp
-  display/src/states/scanning.cpp
-  display/src/states/pause_menu.cpp
-  display/src/states/item_list.cpp
+  display/src/sdl2/states/main_menu.cpp
+  display/src/sdl2/states/scanning.cpp
+  display/src/sdl2/states/pause_menu.cpp
+  display/src/sdl2/states/item_list.cpp
 
   # Vision process after forked from main
   vision/src/vision_pipe.cpp

@@ -3,7 +3,7 @@
 
 #include "../../pipes.h"
 #include "display_entry.h"
-#include "sdl_entry.h"
+#include "sdl2/sdl_entry.h"
 
 /**
  * Entry into the display code. Only called from main after display child process is
@@ -43,23 +43,4 @@ void displayEntry(struct DisplayPipes pipes) {
     close(sdlToDisplay[WRITE]);
     close(displayToSdl[READ]);
   }
-
-  // Code used to test pipes when first figuring out IPC. Commented out because we know
-  // this works but may still need it later for reference.
-  /*
-  LOG(INFO) << "Receiving message from Vision process";
-  std::string buffer;
-  char character;
-  while (read(pipes.fromVision[READ], &character, 1) > 0) {
-    if (character != 0) {
-      buffer.push_back(character);
-    }
-  }
-
-  if (buffer.length() == 0) {
-    LOG(FATAL) << "Failed to read from Vision process";
-  }
-  LOG(INFO) << "Display received message: " << buffer;
-  std::cout << buffer << std::endl;
-  */
 }
