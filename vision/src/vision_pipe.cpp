@@ -35,6 +35,15 @@ void visionEntry(struct VisionPipes pipes) {
   receiveFoodItem(foodItem, pipes.fromHardware[READ]);
   std::cout << foodItem.photoPath << std::endl;
   std::cout << foodItem.name << std::endl;
+
+  std::cout << static_cast<int>(foodItem.scanDate.year()) << std::endl;
+  std::cout << static_cast<unsigned>(foodItem.scanDate.month()) << std::endl;
+  std::cout << static_cast<unsigned>(foodItem.scanDate.day()) << std::endl;
+
+  std::cout << static_cast<int>(foodItem.expirationDate.year()) << std::endl;
+  std::cout << static_cast<unsigned>(foodItem.expirationDate.month()) << std::endl;
+  std::cout << static_cast<unsigned>(foodItem.expirationDate.day()) << std::endl;
+
   std::cout << foodItem.catagory << std::endl;
   std::cout << foodItem.weight << std::endl;
   std::cout << foodItem.quantity << std::endl;
