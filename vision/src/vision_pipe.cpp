@@ -28,7 +28,7 @@ void visionEntry(struct VisionPipes pipes) {
   // Close not currently used ends
   // close(pipes.fromHardware[READ]); // Not currently used
   close(pipes.fromDisplay[READ]); // Not currently used
-  close(pipes.toDisplay[WRITE]);  // Not currently used
+  //  close(pipes.toDisplay[WRITE]);  // Not currently used
   close(pipes.toHardware[WRITE]); // Not currently used
 
   struct timeval timeout;
@@ -51,6 +51,8 @@ void visionEntry(struct VisionPipes pipes) {
   std::cout << foodItem.catagory << std::endl;
   std::cout << foodItem.weight << std::endl;
   std::cout << foodItem.quantity << std::endl;
+
+  sendFoodItem(foodItem, pipes.toDisplay[WRITE]);
 
   LOG(INFO) << "Vision Received all images from hardware";
   LOG(INFO) << "Vision analyzing all images";
