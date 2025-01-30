@@ -3,6 +3,9 @@ project(expirationTracker DESCRIPTION "Track expiration dates" LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
+set(CXXFLAGS  "-Wall")
+set(CMAKE_CXX_FLAGS "${CXXFLAGS}")
+
 find_package (glog 0.4.0 REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)

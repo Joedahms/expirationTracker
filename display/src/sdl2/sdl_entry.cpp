@@ -16,10 +16,6 @@ void sdlEntry() {
 
   struct DisplayGlobal displayGlobal;
 
-  Uint64 frame_start;
-  Uint64 frame_end;
-  float elapsedMS;
-
   // Initialize the display
   std::unique_ptr<Display> display =
       std::make_unique<Display>("Display", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,

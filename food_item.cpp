@@ -35,28 +35,23 @@ void sendFoodItem(struct FoodItem foodItem, int pipeToWrite) {
  * empty food item. After function completes, the received food item will be in this
  * struct.
  * @param pipeToRead The pipe to read the food item from.
+ * @param timeout How long to check the pipe for before returning.
  * @return True if a food item was received and false if no food item was available on the
  * pipe.
  */
 bool receiveFoodItem(struct FoodItem& foodItem, int pipeToRead, struct timeval timeout) {
-  bool received = false;
   fd_set readPipeSet;
-  //  struct timeval timeout;
 
   FD_ZERO(&readPipeSet);
   FD_SET(pipeToRead, &readPipeSet);
 
-  // 1 second
-  //  timeout.tv_sec  = 1;
-  // timeout.tv_usec = 0;
-
+  // Check pipe for data
   int pipeReady = select(pipeToRead + 1, &readPipeSet, NULL, NULL, &timeout);
 
   if (pipeReady == -1) {
     LOG(FATAL) << "Select error when receiving food item";
   }
   else if (pipeReady == 0) { // No data available
-    std::cout << "nope" << std::endl;
     return false;
   }
   if (FD_ISSET(pipeToRead, &readPipeSet)) { // Data available
@@ -68,9 +63,9 @@ bool receiveFoodItem(struct FoodItem& foodItem, int pipeToRead, struct timeval t
     read(pipeToRead, &foodItem.expirationDate, sizeof(foodItem.expirationDate));
     read(pipeToRead, &foodItem.weight, sizeof(foodItem.weight));
     read(pipeToRead, &foodItem.quantity, sizeof(foodItem.quantity));
-    std::cout << "yup" << std::endl;
     return true;
   }
+  return false;
 }
 
 /**
@@ -96,9 +91,7 @@ void writeString(int pipeToWrite, const std::string& stringToSend) {
 std::string readString(int pipeToRead) {
   size_t stringLength;
   read(pipeToRead, &stringLength, sizeof(stringLength));
-  std::cout << "string length " << stringLength << std::endl;
   char* stringBuffer = new char[stringLength + 1];
-
   read(pipeToRead, stringBuffer, stringLength);
   stringBuffer[stringLength] = '\0';
   std::string sentString(stringBuffer);
