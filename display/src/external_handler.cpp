@@ -6,7 +6,11 @@
 
 void externalHandler(struct DisplayPipes pipes) {
   struct FoodItem foodItem;
-  // while (1) {
-  receiveFoodItem(foodItem, pipes.fromVision[WRITE]);
-  //}
+  bool received = false;
+  struct timeval timeout;
+  timeout.tv_sec  = 1;
+  timeout.tv_usec = 0;
+  while (received == false) {
+    received = receiveFoodItem(foodItem, pipes.fromVision[READ], timeout);
+  }
 }
