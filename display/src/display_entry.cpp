@@ -5,6 +5,7 @@
 #include "display_entry.h"
 #include "external_handler.h"
 #include "sdl2/sdl_entry.h"
+#include "sql_food.h"
 
 /**
  * Entry into the display code. Only called from main after display child process is

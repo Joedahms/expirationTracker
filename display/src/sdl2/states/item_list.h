@@ -2,6 +2,7 @@
 #define ITEM_LIST_H
 
 #include <memory>
+#include <sqlite3.h>
 
 #include "../display_global.h"
 #include "../text.h"
