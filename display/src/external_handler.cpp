@@ -24,22 +24,47 @@ void externalHandler(struct DisplayPipes pipes) {
 
   const char* createSqlTable = "CREATE TABLE IF NOT EXISTS foodItems("
                                "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                               "name TEXT NOT NULL,"
-                               "catagory TEXT NOT NULL,"
-                               "scanDateYear INTEGER NOT NULL,"
-                               "scanDateMonth INTEGER NOT NULL,"
-                               "scanDateDay INTEGER NOT NULL,"
-                               "expirationDateYear INTEGER NOT NULL,"
-                               "expirationDateMonth INTEGER NOT NULL,"
-                               "expirationDateDay INTEGER NOT NULL,"
-                               "weight FLOAT NOT NULL,"
-                               "quantity INTEGER NOT NULL);";
+                               "name TEXT,"
+                               "catagory TEXT,"
+                               "scanDateYear INTEGER,"
+                               "scanDateMonth INTEGER,"
+                               "scanDateDay INTEGER,"
+                               "expirationDateYear INTEGER,"
+                               "expirationDateMonth INTEGER,"
+                               "expirationDateDay INTEGER,"
+                               "weight FLOAT,"
+                               "quantity INTEGER);";
   char* errorMessage         = nullptr;
   sqlReturn = sqlite3_exec(database, createSqlTable, NULL, NULL, &errorMessage);
   if (sqlReturn != SQLITE_OK) {
     LOG(FATAL) << "SQL Error: " << errorMessage;
     sqlite3_free(errorMessage);
   }
+
+  const char* insertSql = "INSERT INTO foodItems (name, catagory) VALUES (?, ?);";
+
+  sqlite3_stmt* statement;
+  sqlReturn = sqlite3_prepare_v2(database, insertSql, -1, &statement, nullptr);
+  if (sqlReturn != SQLITE_OK) {
+    LOG(FATAL) << "Prepare error: " << sqlite3_errmsg(database);
+  }
+
+  sqlite3_bind_text(statement, 1, foodItem.name.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(statement, 2, foodItem.catagory.c_str(), -1, SQLITE_TRANSIENT);
+
+  sqlReturn = sqlite3_step(statement);
+  if (sqlReturn != SQLITE_DONE) {
+    LOG(FATAL) << "Execution Error: " << sqlite3_errmsg(database);
+  }
+  sqlite3_finalize(statement);
+  /*
+  int rc = sqlite3_exec(database, insert_sql, 0, 0, &errorMessage);
+  if (rc != SQLITE_OK) {
+    LOG(FATAL) << "Failed to insert: " << errorMessage;
+    sqlite3_free(errorMessage);
+    sqlite3_close(database);
+  }
+  */
 
   sqlite3_close(database);
   std::cout << "here" << std::endl;
