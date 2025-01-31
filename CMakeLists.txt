@@ -3,6 +3,9 @@ project(expirationTracker DESCRIPTION "Track expiration dates" LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
+set(CXXFLAGS  "-Wall")
+set(CMAKE_CXX_FLAGS "${CXXFLAGS}")
+
 find_package (glog 0.4.0 REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
@@ -18,20 +21,24 @@ add_executable (expirationTracker
   # Display process after forked from main
   display/src/display_entry.cpp
 
+  # Handlers for messages from sdl and external sources
+  display/src/external_handler.cpp
+  display/src/sdl_handler.cpp
+
   # Entry into SDL after forked from displayEntry
-  display/src/sdl_entry.cpp
+  display/src/sdl2/sdl_entry.cpp
 
   # GUI
-  display/src/button.cpp
-  display/src/display.cpp
-  display/src/rectangle.cpp
-  display/src/text.cpp
+  display/src/sdl2/button.cpp
+  display/src/sdl2/display.cpp
+  display/src/sdl2/rectangle.cpp
+  display/src/sdl2/text.cpp
 
   # GUI States
-  display/src/states/main_menu.cpp
-  display/src/states/scanning.cpp
-  display/src/states/pause_menu.cpp
-  display/src/states/item_list.cpp
+  display/src/sdl2/states/main_menu.cpp
+  display/src/sdl2/states/scanning.cpp
+  display/src/sdl2/states/pause_menu.cpp
+  display/src/sdl2/states/item_list.cpp
 
   # Vision process after forked from main
   vision/src/vision_pipe.cpp

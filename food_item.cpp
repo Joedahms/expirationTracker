@@ -1,7 +1,9 @@
 #include <glog/logging.h>
 #include <iostream>
 #include <memory>
+#include <sys/select.h>
 #include <unistd.h>
+#include <vector>
 
 #include "food_item.h"
 
@@ -26,23 +28,44 @@ void sendFoodItem(struct FoodItem foodItem, int pipeToWrite) {
 
 /**
  * Receive a food item struct through a pipe. Strings are handled differently due to them
- * being std::strings.
+ * being std::strings. Uses select to timeout if no data available on the pipe. Currently
+ * waits 1 second.
  *
  * @param foodItem A food item struct to store the food item being received. Pass in an
  * empty food item. After function completes, the received food item will be in this
  * struct.
  * @param pipeToRead The pipe to read the food item from.
- * @return None
+ * @param timeout How long to check the pipe for before returning.
+ * @return True if a food item was received and false if no food item was available on the
+ * pipe.
  */
-void receiveFoodItem(struct FoodItem& foodItem, int pipeToRead) {
-  foodItem.photoPath = readString(pipeToRead);
-  foodItem.name      = readString(pipeToRead);
-  foodItem.catagory  = readString(pipeToRead);
+bool receiveFoodItem(struct FoodItem& foodItem, int pipeToRead, struct timeval timeout) {
+  fd_set readPipeSet;
 
-  read(pipeToRead, &foodItem.scanDate, sizeof(foodItem.scanDate));
-  read(pipeToRead, &foodItem.expirationDate, sizeof(foodItem.expirationDate));
-  read(pipeToRead, &foodItem.weight, sizeof(foodItem.weight));
-  read(pipeToRead, &foodItem.quantity, sizeof(foodItem.quantity));
+  FD_ZERO(&readPipeSet);
+  FD_SET(pipeToRead, &readPipeSet);
+
+  // Check pipe for data
+  int pipeReady = select(pipeToRead + 1, &readPipeSet, NULL, NULL, &timeout);
+
+  if (pipeReady == -1) {
+    LOG(FATAL) << "Select error when receiving food item";
+  }
+  else if (pipeReady == 0) { // No data available
+    return false;
+  }
+  if (FD_ISSET(pipeToRead, &readPipeSet)) { // Data available
+    foodItem.photoPath = readString(pipeToRead);
+    foodItem.name      = readString(pipeToRead);
+    foodItem.catagory  = readString(pipeToRead);
+
+    read(pipeToRead, &foodItem.scanDate, sizeof(foodItem.scanDate));
+    read(pipeToRead, &foodItem.expirationDate, sizeof(foodItem.expirationDate));
+    read(pipeToRead, &foodItem.weight, sizeof(foodItem.weight));
+    read(pipeToRead, &foodItem.quantity, sizeof(foodItem.quantity));
+    return true;
+  }
+  return false;
 }
 
 /**

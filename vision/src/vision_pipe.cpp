@@ -31,8 +31,12 @@ void visionEntry(struct VisionPipes pipes) {
   close(pipes.toDisplay[WRITE]);  // Not currently used
   close(pipes.toHardware[WRITE]); // Not currently used
 
+  struct timeval timeout;
+  timeout.tv_sec  = 1;
+  timeout.tv_usec = 0;
   struct FoodItem foodItem;
-  receiveFoodItem(foodItem, pipes.fromHardware[READ]);
+  receiveFoodItem(foodItem, pipes.fromHardware[READ], timeout);
+
   std::cout << foodItem.photoPath << std::endl;
   std::cout << foodItem.name << std::endl;
 
@@ -48,7 +52,6 @@ void visionEntry(struct VisionPipes pipes) {
   std::cout << foodItem.weight << std::endl;
   std::cout << foodItem.quantity << std::endl;
 
-  // receiveImages(pipes.fromHardware[READ], outputDir);
   LOG(INFO) << "Vision Received all images from hardware";
   LOG(INFO) << "Vision analyzing all images";
 
