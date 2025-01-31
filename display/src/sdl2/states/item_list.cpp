@@ -78,15 +78,18 @@ void ItemList::update() {
   if (updateDifference.count() > 5) { // 5 or more seconds since last update
     char* errorMessage    = nullptr;
     const char* selectAll = "SELECT * FROM foodItems;";
-    struct FoodItem foodItem;
+    this->allFoodItems.clear();
 
     int sqlReturn = sqlite3_exec(this->database, selectAll, readFoodItemCallback,
-                                 &foodItem, &errorMessage);
+                                 &allFoodItems, &errorMessage);
+
+    for (auto& i : allFoodItems) {
+      std::cout << i.name << std::endl;
+    }
+
     if (sqlReturn != SQLITE_OK) {
       LOG(FATAL) << "SQL Exec Error: " << errorMessage;
     }
-    std::cout << foodItem.name << std::endl;
-
     this->previousUpdate = this->currentUpdate;
   }
 }

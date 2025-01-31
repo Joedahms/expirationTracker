@@ -86,16 +86,19 @@ void storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
   sqlite3_finalize(statement);
 }
 
-int readFoodItemCallback(void* passedFoodItem,
+int readFoodItemCallback(void* foodItemVector,
                          int numColumns,
                          char** columns,
                          char** columnNames) {
-  struct FoodItem* foodItem = static_cast<FoodItem*>(passedFoodItem);
+  std::vector<FoodItem>* allFoodItems =
+      static_cast<std::vector<FoodItem>*>(foodItemVector);
+  struct FoodItem foodItem;
 
   for (int i = 0; i < numColumns; i++) {
     if (std::string(columnNames[i]) == "name") {
-      foodItem->name = columns[i];
+      foodItem.name = columns[i];
     }
   }
+  allFoodItems->push_back(foodItem);
   return 0;
 }
