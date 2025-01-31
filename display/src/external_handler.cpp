@@ -29,7 +29,6 @@ void externalHandler(struct DisplayPipes pipes) {
   storeFoodItem(database, foodItem);
 
   sqlite3_close(database);
-  std::cout << "here" << std::endl;
 }
 
 /**
