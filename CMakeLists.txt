@@ -26,6 +26,9 @@ add_executable (expirationTracker
   display/src/external_handler.cpp
   display/src/sdl_handler.cpp
 
+  # Database operations on food items
+  display/src/sql_food.cpp
+
   # Entry into SDL after forked from displayEntry
   display/src/sdl2/sdl_entry.cpp
 
