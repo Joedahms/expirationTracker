@@ -6,6 +6,13 @@
 #include "../../pipes.h"
 #include "external_handler.h"
 
+/**
+ * Handle communication between the display and other external processes. Communication to
+ * the SDL process is not handled in this function.
+ *
+ * @param pipes Display pipes used to communicate with external processes
+ * @return None
+ */
 void externalHandler(struct DisplayPipes pipes) {
   struct FoodItem foodItem;
   bool received = false;
