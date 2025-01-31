@@ -14,18 +14,17 @@
  */
 void externalHandler(struct DisplayPipes pipes) {
   struct FoodItem foodItem;
-  bool received = false;
   struct timeval timeout;
-  timeout.tv_sec  = 1;
-  timeout.tv_usec = 0;
-  while (received == false) {
-    received = receiveFoodItem(foodItem, pipes.fromVision[READ], timeout);
+  timeout.tv_sec        = 1;
+  timeout.tv_usec       = 0;
+  bool foodItemReceived = false;
+  foodItemReceived      = receiveFoodItem(foodItem, pipes.fromVision[READ], timeout);
+  if (foodItemReceived) {
+    sqlite3* database = nullptr;
+    openDatabase(&database);
+
+    storeFoodItem(database, foodItem);
+
+    sqlite3_close(database);
   }
-
-  sqlite3* database = nullptr;
-  openDatabase(&database);
-
-  storeFoodItem(database, foodItem);
-
-  sqlite3_close(database);
 }

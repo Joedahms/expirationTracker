@@ -43,6 +43,8 @@ void displayEntry(struct DisplayPipes pipes) {
     // Still in display entry
     close(sdlToDisplay[WRITE]);
     close(displayToSdl[READ]);
-    externalHandler(pipes);
+    while (1) {
+      externalHandler(pipes);
+    }
   }
 }
