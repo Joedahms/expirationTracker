@@ -5,5 +5,6 @@
 
 void openDatabase(sqlite3**);
 void storeFoodItem(sqlite3*, struct FoodItem);
+int readFoodItemCallback(void*, int, char**, char**);
 
 #endif

@@ -1,7 +1,9 @@
 #include <SDL2/SDL_ttf.h>
+#include <glog/logging.h>
 #include <iostream>
 #include <memory>
 
+#include "../../../../food_item.h"
 #include "../../sql_food.h"
 #include "item_list.h"
 
@@ -74,7 +76,17 @@ void ItemList::update() {
       this->currentUpdate - this->previousUpdate);
 
   if (updateDifference.count() > 5) { // 5 or more seconds since last update
-    std::cout << "5 seconds" << std::endl;
+    char* errorMessage    = nullptr;
+    const char* selectAll = "SELECT * FROM foodItems;";
+    struct FoodItem foodItem;
+
+    int sqlReturn = sqlite3_exec(this->database, selectAll, readFoodItemCallback,
+                                 &foodItem, &errorMessage);
+    if (sqlReturn != SQLITE_OK) {
+      LOG(FATAL) << "SQL Exec Error: " << errorMessage;
+    }
+    std::cout << foodItem.name << std::endl;
+
     this->previousUpdate = this->currentUpdate;
   }
 }

@@ -1,4 +1,5 @@
 #include <glog/logging.h>
+#include <iostream>
 #include <sqlite3.h>
 
 #include "../../food_item.h"
@@ -83,4 +84,18 @@ void storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
   }
 
   sqlite3_finalize(statement);
+}
+
+int readFoodItemCallback(void* passedFoodItem,
+                         int numColumns,
+                         char** columns,
+                         char** columnNames) {
+  struct FoodItem* foodItem = static_cast<FoodItem*>(passedFoodItem);
+
+  for (int i = 0; i < numColumns; i++) {
+    if (std::string(columnNames[i]) == "name") {
+      foodItem->name = columns[i];
+    }
+  }
+  return 0;
 }
