@@ -5,6 +5,7 @@
 #include "display_entry.h"
 #include "external_handler.h"
 #include "sdl2/sdl_entry.h"
+#include "sql_food.h"
 
 /**
  * Entry into the display code. Only called from main after display child process is
@@ -43,6 +44,8 @@ void displayEntry(struct DisplayPipes pipes) {
     // Still in display entry
     close(sdlToDisplay[WRITE]);
     close(displayToSdl[READ]);
-    externalHandler(pipes);
+    while (1) {
+      externalHandler(pipes);
+    }
   }
 }

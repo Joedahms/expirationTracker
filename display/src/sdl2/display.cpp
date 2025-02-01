@@ -229,6 +229,7 @@ void Display::update() {
     break;
 
   case 3: // Item list
+    this->itemList->update();
     break;
 
   default:

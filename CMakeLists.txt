@@ -22,14 +22,17 @@ add_executable (expirationTracker
   # Display process after forked from main
   display/src/display_entry.cpp
 
-  # Handlers for messages from sdl and external sources
+  # Handler for messages from other processes
   display/src/external_handler.cpp
-  display/src/sdl_handler.cpp
+
+  # Database operations on food items
+  display/src/sql_food.cpp
 
   # Entry into SDL after forked from displayEntry
   display/src/sdl2/sdl_entry.cpp
 
   # GUI
+  display/src/sdl2/element.cpp
   display/src/sdl2/button.cpp
   display/src/sdl2/display.cpp
   display/src/sdl2/rectangle.cpp

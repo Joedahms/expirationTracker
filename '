@@ -1,0 +1,6 @@
+#ifndef SDL_HANDLER_H
+#define SDL_HANDLER_H
+
+void sdlHandler();
+
+#endif

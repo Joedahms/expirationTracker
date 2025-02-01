@@ -1,11 +1,14 @@
 #include <SDL2/SDL_ttf.h>
+#include <glog/logging.h>
+#include <iostream>
 #include <memory>
 
+#include "../../../../food_item.h"
+#include "../../sql_food.h"
 #include "item_list.h"
 
 /**
  * @param displayGlobal Global display variables.
- * @return None
  */
 ItemList::ItemList(struct DisplayGlobal displayGlobal) {
   this->displayGlobal        = displayGlobal;
@@ -25,7 +28,13 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
       std::make_unique<Text>(this->displayGlobal, fontPath, placeholderTextContent, 24,
                              placeholderTextColor, placeholderTextRectangle);
   this->placeholderText->centerHorizontal(windowSurface);
+
+  previousUpdate = std::chrono::steady_clock::now();
+
+  openDatabase(&this->database);
 }
+
+ItemList::~ItemList() { sqlite3_close(database); }
 
 int ItemList::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
@@ -57,6 +66,32 @@ int ItemList::checkKeystates() {
   }
 
   return ITEM_LIST;
+}
+
+void ItemList::update() {
+  this->currentUpdate = std::chrono::steady_clock::now();
+
+  std::chrono::seconds updateDifference;
+  updateDifference = std::chrono::duration_cast<std::chrono::seconds>(
+      this->currentUpdate - this->previousUpdate);
+
+  if (updateDifference.count() > 5) { // 5 or more seconds since last update
+    char* errorMessage    = nullptr;
+    const char* selectAll = "SELECT * FROM foodItems;";
+    this->allFoodItems.clear();
+
+    int sqlReturn = sqlite3_exec(this->database, selectAll, readFoodItemCallback,
+                                 &allFoodItems, &errorMessage);
+
+    for (auto& i : allFoodItems) {
+      std::cout << i.name << std::endl;
+    }
+
+    if (sqlReturn != SQLITE_OK) {
+      LOG(FATAL) << "SQL Exec Error: " << errorMessage;
+    }
+    this->previousUpdate = this->currentUpdate;
+  }
 }
 
 void ItemList::render() {

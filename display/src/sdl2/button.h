@@ -8,7 +8,7 @@
 #include "display_global.h"
 #include "text.h"
 
-class Button {
+class Button : public Element {
 public:
   Button(struct DisplayGlobal displayGlobal, struct SDL_Rect, const std::string&);
   bool checkHovered(int mouseXPosition, int mouseYPosition);
@@ -16,11 +16,10 @@ public:
 
 private:
   struct DisplayGlobal displayGlobal;
-  std::unique_ptr<Text> text;   // Text within the button
-  SDL_Rect backgroundRectangle; // Rectangle defining where to render the button to
-  SDL_Color backgroundColor;    // Current color
-  SDL_Color defaultColor;       // Color when not hovered
-  SDL_Color hoveredColor;       // Color when hovered
+  std::unique_ptr<Text> text; // Text within the button
+  SDL_Color backgroundColor;  // Current color
+  SDL_Color defaultColor;     // Color when not hovered
+  SDL_Color hoveredColor;     // Color when hovered
 };
 
 #endif

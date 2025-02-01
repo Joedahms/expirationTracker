@@ -7,7 +7,5 @@
 #include "../../pipes.h"
 
 void externalHandler(struct DisplayPipes);
-void openDatabase(sqlite3**);
-void storeFoodItem(sqlite3*, struct FoodItem);
 
 #endif
