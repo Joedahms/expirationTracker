@@ -6,12 +6,13 @@
 #include <string>
 
 #include "display_global.h"
+#include "element.h"
 #include "rectangle.h"
 
 /**
  * Represents a string of characters that can be rendered.
  */
-class Text {
+class Text : public Element {
 public:
   Text(struct DisplayGlobal, const char*, const char*, int, SDL_Color, SDL_Rect);
 
@@ -34,7 +35,6 @@ private:
   int fontSize;
   SDL_Color color;
   SDL_Texture* texture;
-  SDL_Rect rectangle;
 };
 
 #endif

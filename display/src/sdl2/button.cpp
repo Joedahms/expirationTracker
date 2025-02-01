@@ -18,10 +18,10 @@ Button::Button(struct DisplayGlobal displayGlobal,
                const std::string& text) {
   this->displayGlobal = displayGlobal;
 
-  this->backgroundRectangle = rectangle;
-  this->backgroundColor     = {255, 0, 0, 255}; // Red
-  this->hoveredColor        = {0, 255, 0, 255}; // Green
-  this->defaultColor        = {255, 0, 0, 255}; // Red
+  this->rectangle       = rectangle;
+  this->backgroundColor = {255, 0, 0, 255}; // Red
+  this->hoveredColor    = {0, 255, 0, 255}; // Green
+  this->defaultColor    = {255, 0, 0, 255}; // Red
 
   SDL_Color textColor = {255, 255, 0, 255}; // Yellow
   this->text =
@@ -29,8 +29,8 @@ Button::Button(struct DisplayGlobal displayGlobal,
                              text.c_str(), 24, textColor, rectangle);
 
   // Center the text within the button
-  this->text->centerHorizontal(&this->backgroundRectangle);
-  this->text->centerVertical(&this->backgroundRectangle);
+  this->text->centerHorizontal(&this->rectangle);
+  this->text->centerVertical(&this->rectangle);
 }
 
 /**
@@ -41,18 +41,18 @@ Button::Button(struct DisplayGlobal displayGlobal,
  * @return Whether or not the mouse is over the button
  */
 bool Button::checkHovered(int mouseXPosition, int mouseYPosition) {
-  if (mouseXPosition < this->backgroundRectangle.x) { // Outside left edge of button
+  if (mouseXPosition < this->rectangle.x) { // Outside left edge of button
     return false;
   }
-  if (mouseXPosition > this->backgroundRectangle.x +
-                           this->backgroundRectangle.w) { // Outside right edge of button
+  if (mouseXPosition >
+      this->rectangle.x + this->rectangle.w) { // Outside right edge of button
     return false;
   }
-  if (mouseYPosition < this->backgroundRectangle.y) { // Outside top edge of button
+  if (mouseYPosition < this->rectangle.y) { // Outside top edge of button
     return false;
   }
-  if (mouseYPosition > this->backgroundRectangle.y +
-                           this->backgroundRectangle.h) { // Outside bottom edge of button
+  if (mouseYPosition >
+      this->rectangle.y + this->rectangle.h) { // Outside bottom edge of button
     return false;
   }
   return true;
@@ -79,7 +79,7 @@ void Button::render() {
   // Set draw color and fill the button
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, backgroundColor.r,
                          backgroundColor.g, backgroundColor.b, backgroundColor.a);
-  SDL_RenderFillRect(this->displayGlobal.renderer, &this->backgroundRectangle);
+  SDL_RenderFillRect(this->displayGlobal.renderer, &this->rectangle);
 
   this->text->render();
 }

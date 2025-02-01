@@ -32,6 +32,7 @@ add_executable (expirationTracker
   display/src/sdl2/sdl_entry.cpp
 
   # GUI
+  display/src/sdl2/element.cpp
   display/src/sdl2/button.cpp
   display/src/sdl2/display.cpp
   display/src/sdl2/rectangle.cpp
