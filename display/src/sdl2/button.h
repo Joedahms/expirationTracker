@@ -6,6 +6,7 @@
 #include <string>
 
 #include "display_global.h"
+#include "element.h"
 #include "text.h"
 
 class Button : public Element {

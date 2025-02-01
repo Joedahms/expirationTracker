@@ -3,7 +3,6 @@
 #include <string>
 
 #include "../display_global.h"
-#include "../rectangle.h"
 #include "main_menu.h"
 
 /**
@@ -30,17 +29,15 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
 
   // Scan New Item
   SDL_Rect newScanButtonRectangle = {200, 150, 200, 50};
-  newScanButtonRectangle =
-      centerRectangleHorizontal(windowSurface, newScanButtonRectangle);
-  this->newScanButton = std::make_unique<Button>(this->displayGlobal,
+  this->newScanButton             = std::make_unique<Button>(this->displayGlobal,
                                                  newScanButtonRectangle, "Scan New Item");
+  this->newScanButton->centerHorizontal(windowSurface);
 
   // View Stored Items
   SDL_Rect viewStoredButtonRectangle = {200, 210, 200, 50};
-  viewStoredButtonRectangle =
-      centerRectangleHorizontal(windowSurface, viewStoredButtonRectangle);
-  this->viewStoredButton = std::make_unique<Button>(
+  this->viewStoredButton             = std::make_unique<Button>(
       this->displayGlobal, viewStoredButtonRectangle, "View Stored Items");
+  this->newScanButton->centerHorizontal(windowSurface);
 }
 
 /**

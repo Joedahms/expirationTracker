@@ -7,7 +7,6 @@
 
 #include "display_global.h"
 #include "element.h"
-#include "rectangle.h"
 
 /**
  * Represents a string of characters that can be rendered.
@@ -15,16 +14,6 @@
 class Text : public Element {
 public:
   Text(struct DisplayGlobal, const char*, const char*, int, SDL_Color, SDL_Rect);
-
-  // Center text horizontally within a type
-  template <typename T> void centerHorizontal(T centerWithin) {
-    this->rectangle = centerRectangleHorizontal(centerWithin, this->rectangle);
-  }
-
-  // Center text vertically within a type
-  template <typename T> void centerVertical(T centerWithin) {
-    this->rectangle = centerRectangleVertical(centerWithin, this->rectangle);
-  }
 
   void render();
 

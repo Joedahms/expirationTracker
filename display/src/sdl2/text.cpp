@@ -1,8 +1,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <glog/logging.h>
 #include <string>
 
-#include "rectangle.h"
 #include "text.h"
 
 /**
@@ -26,7 +26,7 @@ Text::Text(struct DisplayGlobal displayGlobal,
 
   this->font = TTF_OpenFont(fontPath, this->fontSize);
   if (this->font == NULL) {
-    //    writeToLogFile(this->displayGlobal.logFile, TTF_GetError());
+    LOG(FATAL) << "Text failed to open font";
   }
 
   this->color     = color;

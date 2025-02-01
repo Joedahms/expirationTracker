@@ -3,7 +3,6 @@
 #include <string>
 
 #include "../display_global.h"
-#include "../rectangle.h"
 #include "pause_menu.h"
 
 /**
@@ -33,16 +32,15 @@ PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
 
   // Resume button
   SDL_Rect resumeButtonRectangle = {200, 150, 200, 50};
-  resumeButtonRectangle = centerRectangleHorizontal(windowSurface, resumeButtonRectangle);
   this->resumeButton =
       std::make_unique<Button>(this->displayGlobal, resumeButtonRectangle, "Resume");
+  this->resumeButton->centerHorizontal(windowSurface);
 
   // Main menu button
   SDL_Rect mainMenuButtonRectangle = {200, 225, 200, 50};
-  mainMenuButtonRectangle =
-      centerRectangleHorizontal(windowSurface, mainMenuButtonRectangle);
   this->mainMenuButton =
       std::make_unique<Button>(this->displayGlobal, mainMenuButtonRectangle, "Main Menu");
+  this->mainMenuButton->centerHorizontal(windowSurface);
 }
 
 /**

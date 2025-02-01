@@ -4,6 +4,7 @@
 
 #include "button.h"
 #include "display_global.h"
+#include "element.h"
 
 /**
  * Set the properties of the button.
@@ -29,8 +30,8 @@ Button::Button(struct DisplayGlobal displayGlobal,
                              text.c_str(), 24, textColor, rectangle);
 
   // Center the text within the button
-  this->text->centerHorizontal(&this->rectangle);
-  this->text->centerVertical(&this->rectangle);
+  this->text->centerHorizontal(this->rectangle);
+  this->text->centerVertical(this->rectangle);
 }
 
 /**
