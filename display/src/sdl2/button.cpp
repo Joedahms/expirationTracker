@@ -67,6 +67,14 @@ bool Button::checkHovered(int mouseXPosition, int mouseYPosition) {
  * Output: None
  */
 void Button::render() {
+  if (this->text->checkCenterHorizontal(this->rectangle) == false) {
+    this->text->centerHorizontal(this->rectangle);
+  }
+
+  if (this->text->checkCenterVertical(this->rectangle) == false) {
+    this->text->centerVertical(this->rectangle);
+  }
+
   // Change color if hovered
   int mouseXPosition, mouseYPosition;
   SDL_GetMouseState(&mouseXPosition, &mouseYPosition); // Get the position of the mouse

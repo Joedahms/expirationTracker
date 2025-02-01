@@ -36,7 +36,7 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
   SDL_Rect viewStoredButtonRectangle = {200, 210, 200, 50};
   this->viewStoredButton             = std::make_unique<Button>(
       this->displayGlobal, viewStoredButtonRectangle, "View Stored Items");
-  this->newScanButton->centerHorizontal(windowSurface);
+  this->viewStoredButton->centerHorizontal(windowSurface);
 }
 
 /**
