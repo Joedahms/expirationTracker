@@ -14,7 +14,6 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
 
   // Title
-  const char* fontPath     = "../display/fonts/16020_FUTURAM.ttf";
   const char* titleContent = "Expiration Tracker";
   SDL_Color titleColor     = {0, 255, 0, 255}; // Green
   SDL_Rect titleRectangle  = {
@@ -23,8 +22,8 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
       0,
       0,
   }; // x y w h
-  this->title = std::make_unique<Text>(this->displayGlobal, fontPath, titleContent, 24,
-                                       titleColor, titleRectangle);
+  this->title = std::make_unique<Text>(this->displayGlobal, displayGlobal.futuramFontPath,
+                                       titleContent, 24, titleColor, titleRectangle);
   this->title->centerHorizontal(windowSurface);
 
   // Scan New Item

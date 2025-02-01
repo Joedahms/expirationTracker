@@ -15,7 +15,6 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
 
   // Placeholder text
-  const char* fontPath               = "../display/fonts/16020_FUTURAM.ttf";
   const char* placeholderTextContent = "Placeholder for item list";
   SDL_Color placeholderTextColor     = {0, 255, 0, 255}; // Green
   SDL_Rect placeholderTextRectangle  = {
@@ -24,9 +23,9 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
       0,
       0,
   }; // x y w h
-  this->placeholderText =
-      std::make_unique<Text>(this->displayGlobal, fontPath, placeholderTextContent, 24,
-                             placeholderTextColor, placeholderTextRectangle);
+  this->placeholderText = std::make_unique<Text>(
+      this->displayGlobal, displayGlobal.futuramFontPath, placeholderTextContent, 24,
+      placeholderTextColor, placeholderTextRectangle);
   this->placeholderText->centerHorizontal(windowSurface);
 
   previousUpdate = std::chrono::steady_clock::now();

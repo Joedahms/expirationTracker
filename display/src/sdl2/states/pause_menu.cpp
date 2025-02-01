@@ -15,7 +15,6 @@ PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
 
   // Title
-  const char* fontPath     = "../16020_FUTURAM.ttf";
   const char* titleContent = "Paused";
   SDL_Color titleColor     = {0, 255, 0, 255}; // Green
 
@@ -26,8 +25,8 @@ PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
       0,
       0,
   };
-  this->title = std::make_unique<Text>(this->displayGlobal, fontPath, titleContent, 24,
-                                       titleColor, titleRectangle);
+  this->title = std::make_unique<Text>(this->displayGlobal, displayGlobal.futuramFontPath,
+                                       titleContent, 24, titleColor, titleRectangle);
   this->title->centerHorizontal(windowSurface);
 
   // Resume button
