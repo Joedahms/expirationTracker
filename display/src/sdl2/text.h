@@ -14,7 +14,6 @@
 class Text : public Element {
 public:
   Text(struct DisplayGlobal, const char*, const char*, int, SDL_Color, SDL_Rect);
-
   void render();
 
 private:
