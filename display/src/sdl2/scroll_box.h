@@ -10,7 +10,10 @@
 
 class ScrollBox : public Element {
 public:
+  ScrollBox();
   ScrollBox(SDL_Rect rect, std::vector<std::unique_ptr<Panel>> p);
+
+  void addPanel(std::unique_ptr<Panel> panel);
   void render();
 
 private:

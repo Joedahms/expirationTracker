@@ -11,9 +11,11 @@
 
 class Panel : public Element {
 public:
+  Panel(SDL_Rect, std::vector<std::unique_ptr<Text>> t);
   Panel(SDL_Rect rect,
         std::vector<std::unique_ptr<Text>> t,
         std::vector<std::unique_ptr<Button>> b);
+
   void render();
 
 private:

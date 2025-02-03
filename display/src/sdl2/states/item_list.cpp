@@ -5,13 +5,15 @@
 
 #include "../../../../food_item.h"
 #include "../../sql_food.h"
+#include "../panel.h"
+#include "../scroll_box.h"
+#include "../text.h"
 #include "item_list.h"
 
 /**
- * @param displayGlobal Global display variables.
+ * @param dg Global display variables.
  */
-ItemList::ItemList(struct DisplayGlobal displayGlobal) {
-  this->displayGlobal        = displayGlobal;
+ItemList::ItemList(struct DisplayGlobal dg) : displayGlobal(dg) {
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
 
   // Placeholder text
@@ -24,13 +26,25 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
       0,
   }; // x y w h
   this->placeholderText = std::make_unique<Text>(
-      this->displayGlobal, displayGlobal.futuramFontPath, placeholderTextContent, 24,
-      placeholderTextColor, placeholderTextRectangle);
+      this->displayGlobal, this->displayGlobal.futuramFontPath, placeholderTextContent,
+      24, placeholderTextColor, placeholderTextRectangle);
   this->placeholderText->centerHorizontal(windowSurface);
 
   previousUpdate = std::chrono::steady_clock::now();
 
   openDatabase(&this->database);
+
+  SDL_Rect panelRect = {30, 30, 30, 30};
+  SDL_Rect testRect  = {30, 30, 0, 0};
+  std::vector<std::unique_ptr<Text>> testTexts;
+  std::unique_ptr<Text> text =
+      std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
+                             "test", 24, placeholderTextColor, testRect);
+  testTexts.push_back(std::move(text));
+
+  std::unique_ptr<Panel> panel = std::make_unique<Panel>(panelRect, std::move(testTexts));
+
+  this->scrollBox.addPanel(std::move(panel));
 }
 
 ItemList::~ItemList() { sqlite3_close(database); }
@@ -97,5 +111,6 @@ void ItemList::render() {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background
   SDL_RenderClear(this->displayGlobal.renderer);
   this->placeholderText->render();
+  this->scrollBox.render();
   SDL_RenderPresent(this->displayGlobal.renderer);
 }

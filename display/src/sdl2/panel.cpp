@@ -7,6 +7,11 @@
 #include "panel.h"
 #include "text.h"
 
+Panel::Panel(SDL_Rect rect, std::vector<std::unique_ptr<Text>> t) {
+  this->rectangle = rect;
+  this->texts     = std::move(t);
+}
+
 Panel::Panel(SDL_Rect rect,
              std::vector<std::unique_ptr<Text>> t,
              std::vector<std::unique_ptr<Button>> b) {
@@ -15,4 +20,8 @@ Panel::Panel(SDL_Rect rect,
   this->buttons   = std::move(b);
 }
 
-void Panel::render() {}
+void Panel::render() {
+  for (auto& x : this->texts) {
+    x->render();
+  }
+}
