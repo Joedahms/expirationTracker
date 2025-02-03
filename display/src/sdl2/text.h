@@ -13,7 +13,12 @@
  */
 class Text : public Element {
 public:
-  Text(struct DisplayGlobal, const char*, const char*, int, SDL_Color, SDL_Rect);
+  Text(struct DisplayGlobal displayGlobal,
+       const char* fontPath,
+       const char* content,
+       int fontSize,
+       SDL_Color color,
+       SDL_Rect rectangle);
   void render();
 
 private:

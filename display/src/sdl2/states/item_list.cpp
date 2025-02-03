@@ -34,17 +34,31 @@ ItemList::ItemList(struct DisplayGlobal dg) : displayGlobal(dg) {
 
   openDatabase(&this->database);
 
-  SDL_Rect panelRect = {30, 30, 30, 30};
-  SDL_Rect testRect  = {30, 30, 0, 0};
+  SDL_Rect scrollBoxRect = {0, 0, 100, 100};
+  this->scrollBox.setRectangle(scrollBoxRect);
+  this->scrollBox.setPanelHeight(30);
+
+  SDL_Rect testRect = {0, 0, 0, 0};
   std::vector<std::unique_ptr<Text>> testTexts;
+
   std::unique_ptr<Text> text =
       std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
                              "test", 24, placeholderTextColor, testRect);
   testTexts.push_back(std::move(text));
 
+  SDL_Rect panelRect           = {0, 0, 0, 0};
   std::unique_ptr<Panel> panel = std::make_unique<Panel>(panelRect, std::move(testTexts));
 
+  std::unique_ptr<Text> text2 =
+      std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
+                             "test", 24, placeholderTextColor, testRect);
+  testTexts.push_back(std::move(text2));
+
+  std::unique_ptr<Panel> panel2 =
+      std::make_unique<Panel>(panelRect, std::move(testTexts));
+
   this->scrollBox.addPanel(std::move(panel));
+  this->scrollBox.addPanel(std::move(panel2));
 }
 
 ItemList::~ItemList() { sqlite3_close(database); }

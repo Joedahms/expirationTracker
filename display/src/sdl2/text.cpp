@@ -1,37 +1,32 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <glog/logging.h>
+#include <iostream>
 #include <string>
 
 #include "text.h"
 
 /**
- * - displayGlobal - Global variables
- * - fontPath - Path to where the font is stored.
- * - content - What characters the text represents.
- * - fontSize - Size of the font
- * - color - Color of the font
- * - rectangle - SDL rectangle defining the text
+ * @param displayGlobal Global variables
+ * @param fontPath Path to where the font is stored.
+ * @param content What characters the text represents.
+ * @param fontSize Size of the font
+ * @param color Color of the font
+ * @param rectangle SDL rectangle defining the text
  */
 Text::Text(struct DisplayGlobal displayGlobal,
            const char* fontPath,
            const char* content,
            int fontSize,
            SDL_Color color,
-           SDL_Rect rectangle) {
-  this->displayGlobal = displayGlobal;
-
-  this->content  = content;
-  this->fontSize = fontSize;
-
+           SDL_Rect rectangle)
+    : displayGlobal(displayGlobal), content(content), fontSize(fontSize), color(color) {
   this->font = TTF_OpenFont(fontPath, this->fontSize);
   if (this->font == NULL) {
     LOG(FATAL) << "Text failed to open font";
   }
 
-  this->color     = color;
-  this->rectangle = rectangle;
-
+  this->rectangle          = rectangle;
   SDL_Surface* textSurface = TTF_RenderText_Solid(this->font, this->content, this->color);
   this->texture = SDL_CreateTextureFromSurface(this->displayGlobal.renderer, textSurface);
   SDL_FreeSurface(textSurface);

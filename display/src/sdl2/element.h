@@ -29,6 +29,9 @@ public:
     return centered;
   }
 
+  SDL_Rect getRectangle();
+  void setRectangle(SDL_Rect rectangle);
+
 protected:
   SDL_Rect rectangle;
 };

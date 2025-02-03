@@ -27,3 +27,7 @@ template <> bool Element::checkCenterHorizontal<SDL_Rect>(SDL_Rect centerWithin)
   }
   return centered;
 }
+
+SDL_Rect Element::getRectangle() { return this->rectangle; }
+
+void Element::setRectangle(SDL_Rect rectangle) { this->rectangle = rectangle; };
