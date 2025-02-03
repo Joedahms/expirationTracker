@@ -96,9 +96,11 @@ void ItemList::update() {
 
       std::vector<std::unique_ptr<Text>> texts;
 
+      const char* name = i.name.c_str();
+
       std::unique_ptr<Text> text =
           std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
-                                 "test", 24, placeholderTextColor, rect);
+                                 name, 24, placeholderTextColor, rect);
 
       texts.push_back(std::move(text));
 
