@@ -5,6 +5,7 @@
 
 #include "../../../../food_item.h"
 #include "../../sql_food.h"
+#include "../display_global.h"
 #include "../panel.h"
 #include "../scroll_box.h"
 #include "../text.h"
@@ -15,6 +16,9 @@
  */
 ItemList::ItemList(struct DisplayGlobal dg) : displayGlobal(dg) {
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
+
+  std::cout << this->displayGlobal.futuramFontPath << std::endl;
+  this->scrollBox = std::make_unique<ScrollBox>(this->displayGlobal);
 
   // Placeholder text
   const char* placeholderTextContent = "Placeholder for item list";
@@ -35,8 +39,8 @@ ItemList::ItemList(struct DisplayGlobal dg) : displayGlobal(dg) {
   openDatabase(&this->database);
 
   SDL_Rect scrollBoxRect = {0, 0, 100, 100};
-  this->scrollBox.setRectangle(scrollBoxRect);
-  this->scrollBox.setPanelHeight(30);
+  this->scrollBox->setRectangle(scrollBoxRect);
+  this->scrollBox->setPanelHeight(30);
 }
 
 ItemList::~ItemList() { sqlite3_close(database); }
@@ -84,30 +88,11 @@ void ItemList::update() {
     char* errorMessage    = nullptr;
     const char* selectAll = "SELECT * FROM foodItems;";
     this->allFoodItems.clear();
-    this->scrollBox.clearPanels();
 
     int sqlReturn = sqlite3_exec(this->database, selectAll, readFoodItemCallback,
                                  &allFoodItems, &errorMessage);
 
-    SDL_Color placeholderTextColor = {0, 255, 0, 255}; // Green
-    SDL_Rect rect                  = {0, 0, 0, 0};
-    for (auto& i : allFoodItems) {
-      std::cout << i.name << std::endl;
-
-      std::vector<std::unique_ptr<Text>> texts;
-
-      const char* name = i.name.c_str();
-
-      std::unique_ptr<Text> text =
-          std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
-                                 name, 24, placeholderTextColor, rect);
-
-      texts.push_back(std::move(text));
-
-      std::unique_ptr<Panel> newPanel = std::make_unique<Panel>(rect, std::move(texts));
-
-      this->scrollBox.addPanel(std::move(newPanel));
-    }
+    this->scrollBox->updatePanels(this->allFoodItems);
 
     if (sqlReturn != SQLITE_OK) {
       LOG(FATAL) << "SQL Exec Error: " << errorMessage;
@@ -120,6 +105,6 @@ void ItemList::render() {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background
   SDL_RenderClear(this->displayGlobal.renderer);
   this->placeholderText->render();
-  this->scrollBox.render();
+  this->scrollBox->render();
   SDL_RenderPresent(this->displayGlobal.renderer);
 }
