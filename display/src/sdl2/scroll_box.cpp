@@ -20,25 +20,6 @@ void ScrollBox::addPanel(std::unique_ptr<Panel> panel) {
   }
   newPanel->setRectangle(newPanelRect);
   this->panels.push_back(std::move(newPanel));
-
-  /*
-  int count = 0;
-  for (int i = 0; i < this->panels.size(); i++) {
-    std::cout << "Y position " << i << ": " << yPosition << std::endl;
-    SDL_Rect updatedRectangle = this->panels[i]->getRectangle();
-    updatedRectangle.y        = yPosition;
-    this->panels[i]->updateRectangle(updatedRectangle);
-    yPosition += spacing;
-  }
-  for (auto& currPanel : this->panels) {
-    std::cout << "Y position " << count << ": " << yPosition << std::endl;
-    SDL_Rect updatedRectangle = currPanel->getRectangle();
-    updatedRectangle.y        = yPosition;
-    currPanel->updateRectangle(updatedRectangle);
-    yPosition += spacing;
-    count++;
-  }
-  */
 }
 
 void ScrollBox::render() {
