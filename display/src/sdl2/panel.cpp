@@ -21,6 +21,15 @@ Panel::Panel(SDL_Rect rect,
   this->buttons   = std::move(b);
 }
 
+void Panel::updateElements() {
+  for (auto& x : this->texts) {
+    SDL_Rect textRectangle = x->getRectangle();
+    textRectangle.x        = this->rectangle.x;
+    textRectangle.y        = this->rectangle.y;
+    x->setRectangle(textRectangle);
+  }
+}
+
 void Panel::render() {
   for (auto& x : this->texts) {
     x->render();

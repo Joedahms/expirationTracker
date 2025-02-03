@@ -16,6 +16,7 @@ public:
         std::vector<std::unique_ptr<Text>> t,
         std::vector<std::unique_ptr<Button>> b);
 
+  void updateElements();
   void render();
 
 private:
