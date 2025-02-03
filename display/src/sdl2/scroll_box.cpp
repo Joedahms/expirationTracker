@@ -19,9 +19,11 @@ void ScrollBox::addPanel(std::unique_ptr<Panel> panel) {
     newPanelRect.y = this->panels.back()->getRectangle().y + this->panelHeight;
   }
   newPanel->setRectangle(newPanelRect);
-  newPanel->updateElements();
+  newPanel->updateElementPositions();
   this->panels.push_back(std::move(newPanel));
 }
+
+void ScrollBox::clearPanels() { this->panels.clear(); }
 
 void ScrollBox::render() {
   for (auto& x : this->panels) {

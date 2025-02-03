@@ -37,28 +37,6 @@ ItemList::ItemList(struct DisplayGlobal dg) : displayGlobal(dg) {
   SDL_Rect scrollBoxRect = {0, 0, 100, 100};
   this->scrollBox.setRectangle(scrollBoxRect);
   this->scrollBox.setPanelHeight(30);
-
-  SDL_Rect testRect = {0, 0, 0, 0};
-  std::vector<std::unique_ptr<Text>> testTexts;
-
-  std::unique_ptr<Text> text =
-      std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
-                             "test", 24, placeholderTextColor, testRect);
-  testTexts.push_back(std::move(text));
-
-  SDL_Rect panelRect           = {0, 0, 0, 0};
-  std::unique_ptr<Panel> panel = std::make_unique<Panel>(panelRect, std::move(testTexts));
-
-  std::unique_ptr<Text> text2 =
-      std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
-                             "test", 24, placeholderTextColor, testRect);
-  testTexts.push_back(std::move(text2));
-
-  std::unique_ptr<Panel> panel2 =
-      std::make_unique<Panel>(panelRect, std::move(testTexts));
-
-  this->scrollBox.addPanel(std::move(panel));
-  this->scrollBox.addPanel(std::move(panel2));
 }
 
 ItemList::~ItemList() { sqlite3_close(database); }
@@ -106,12 +84,27 @@ void ItemList::update() {
     char* errorMessage    = nullptr;
     const char* selectAll = "SELECT * FROM foodItems;";
     this->allFoodItems.clear();
+    this->scrollBox.clearPanels();
 
     int sqlReturn = sqlite3_exec(this->database, selectAll, readFoodItemCallback,
                                  &allFoodItems, &errorMessage);
 
+    SDL_Color placeholderTextColor = {0, 255, 0, 255}; // Green
+    SDL_Rect rect                  = {0, 0, 0, 0};
     for (auto& i : allFoodItems) {
       std::cout << i.name << std::endl;
+
+      std::vector<std::unique_ptr<Text>> texts;
+
+      std::unique_ptr<Text> text =
+          std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
+                                 "test", 24, placeholderTextColor, rect);
+
+      texts.push_back(std::move(text));
+
+      std::unique_ptr<Panel> newPanel = std::make_unique<Panel>(rect, std::move(texts));
+
+      this->scrollBox.addPanel(std::move(newPanel));
     }
 
     if (sqlReturn != SQLITE_OK) {

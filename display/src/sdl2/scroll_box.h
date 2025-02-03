@@ -12,6 +12,7 @@ class ScrollBox : public Element {
 public:
   void setPanelHeight(int panelHeight);
   void addPanel(std::unique_ptr<Panel> panel);
+  void clearPanels();
   void render();
 
 private:
