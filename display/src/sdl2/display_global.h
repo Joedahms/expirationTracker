@@ -11,6 +11,7 @@
 struct DisplayGlobal {
   SDL_Renderer* renderer;
   SDL_Window* window;
+  const char* futuramFontPath = "../display/fonts/16020_FUTURAM.ttf";
 };
 
 #endif

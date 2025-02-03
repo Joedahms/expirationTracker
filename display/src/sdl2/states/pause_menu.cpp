@@ -3,7 +3,6 @@
 #include <string>
 
 #include "../display_global.h"
-#include "../rectangle.h"
 #include "pause_menu.h"
 
 /**
@@ -16,7 +15,6 @@ PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
 
   // Title
-  const char* fontPath     = "../16020_FUTURAM.ttf";
   const char* titleContent = "Paused";
   SDL_Color titleColor     = {0, 255, 0, 255}; // Green
 
@@ -27,22 +25,21 @@ PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
       0,
       0,
   };
-  this->title = std::make_unique<Text>(this->displayGlobal, fontPath, titleContent, 24,
-                                       titleColor, titleRectangle);
+  this->title = std::make_unique<Text>(this->displayGlobal, displayGlobal.futuramFontPath,
+                                       titleContent, 24, titleColor, titleRectangle);
   this->title->centerHorizontal(windowSurface);
 
   // Resume button
   SDL_Rect resumeButtonRectangle = {200, 150, 200, 50};
-  resumeButtonRectangle = centerRectangleHorizontal(windowSurface, resumeButtonRectangle);
   this->resumeButton =
       std::make_unique<Button>(this->displayGlobal, resumeButtonRectangle, "Resume");
+  this->resumeButton->centerHorizontal(windowSurface);
 
   // Main menu button
   SDL_Rect mainMenuButtonRectangle = {200, 225, 200, 50};
-  mainMenuButtonRectangle =
-      centerRectangleHorizontal(windowSurface, mainMenuButtonRectangle);
   this->mainMenuButton =
       std::make_unique<Button>(this->displayGlobal, mainMenuButtonRectangle, "Main Menu");
+  this->mainMenuButton->centerHorizontal(windowSurface);
 }
 
 /**

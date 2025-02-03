@@ -3,7 +3,6 @@
 #include <string>
 
 #include "../display_global.h"
-#include "../rectangle.h"
 #include "main_menu.h"
 
 /**
@@ -15,7 +14,6 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
 
   // Title
-  const char* fontPath     = "../display/fonts/16020_FUTURAM.ttf";
   const char* titleContent = "Expiration Tracker";
   SDL_Color titleColor     = {0, 255, 0, 255}; // Green
   SDL_Rect titleRectangle  = {
@@ -24,23 +22,21 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
       0,
       0,
   }; // x y w h
-  this->title = std::make_unique<Text>(this->displayGlobal, fontPath, titleContent, 24,
-                                       titleColor, titleRectangle);
+  this->title = std::make_unique<Text>(this->displayGlobal, displayGlobal.futuramFontPath,
+                                       titleContent, 24, titleColor, titleRectangle);
   this->title->centerHorizontal(windowSurface);
 
   // Scan New Item
   SDL_Rect newScanButtonRectangle = {200, 150, 200, 50};
-  newScanButtonRectangle =
-      centerRectangleHorizontal(windowSurface, newScanButtonRectangle);
-  this->newScanButton = std::make_unique<Button>(this->displayGlobal,
+  this->newScanButton             = std::make_unique<Button>(this->displayGlobal,
                                                  newScanButtonRectangle, "Scan New Item");
+  this->newScanButton->centerHorizontal(windowSurface);
 
   // View Stored Items
   SDL_Rect viewStoredButtonRectangle = {200, 210, 200, 50};
-  viewStoredButtonRectangle =
-      centerRectangleHorizontal(windowSurface, viewStoredButtonRectangle);
-  this->viewStoredButton = std::make_unique<Button>(
+  this->viewStoredButton             = std::make_unique<Button>(
       this->displayGlobal, viewStoredButtonRectangle, "View Stored Items");
+  this->viewStoredButton->centerHorizontal(windowSurface);
 }
 
 /**
