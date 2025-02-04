@@ -152,7 +152,7 @@ void rotateAndCapture() {
         
         LOG(INFO) << "Rotating platform...";
         rotateMotor();
-        sleep(2);
+        usleep(2);
         
         char stop_signal[10];
         if (read(hardwarePipes.fromVision[READ], stop_signal, sizeof(stop_signal)) > 0) {
