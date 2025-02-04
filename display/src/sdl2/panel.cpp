@@ -22,12 +22,25 @@ Panel::Panel(SDL_Rect rect,
 }
 
 void Panel::updateElementPositions() {
+  for (int i = 0; i < this->texts.size(); i++) {
+    SDL_Rect textRectangle = this->texts[i]->getRectangle();
+    textRectangle.y        = this->rectangle.y;
+    if (i == 0) {
+      textRectangle.x = 0;
+    }
+    else {
+      SDL_Rect leftRectangle = this->texts[i - 1]->getRectangle();
+      textRectangle.x        = leftRectangle.x + leftRectangle.w;
+    }
+    this->texts[i]->setRectangle(textRectangle);
+  }
+  /*
   for (auto& x : this->texts) {
-    SDL_Rect textRectangle = x->getRectangle();
     textRectangle.x        = this->rectangle.x;
     textRectangle.y        = this->rectangle.y;
     x->setRectangle(textRectangle);
   }
+  */
 }
 
 void Panel::render() {

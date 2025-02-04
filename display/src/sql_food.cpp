@@ -95,9 +95,55 @@ int readFoodItemCallback(void* foodItemVector,
   struct FoodItem foodItem;
 
   for (int i = 0; i < numColumns; i++) {
-    if (std::string(columnNames[i]) == "name") {
-      foodItem.name = columns[i];
+    std::string columnValue(columns[i], strlen(columns[i]));
+    std::string columnName(columnNames[i], strlen(columnNames[i]));
+
+    if (columnName == "name") {
+      foodItem.name = columnValue;
     }
+    else if (columnName == "catagory") {
+      foodItem.catagory = columnValue;
+    }
+    else if (columnName == "scanDateYear") {
+      foodItem.scanDate =
+          std::chrono::year_month_day(std::chrono::year{stoi(columnValue)},
+                                      foodItem.scanDate.month(), foodItem.scanDate.day());
+    }
+    else if (columnName == "scanDateMonth") {
+      foodItem.scanDate = std::chrono::year_month_day(
+          foodItem.scanDate.year(),
+          std::chrono::month{static_cast<unsigned>(std::stoi(columnValue))},
+          foodItem.scanDate.day());
+    }
+    else if (columnName == "scanDateDay") {
+      foodItem.scanDate = std::chrono::year_month_day(
+          foodItem.scanDate.year(), foodItem.scanDate.month(),
+          std::chrono::day{static_cast<unsigned>(stoi(columnValue))});
+    }
+    else if (columnName == "expirationDateYear") {
+      foodItem.expirationDate = std::chrono::year_month_day(
+          std::chrono::year{stoi(columnValue)}, foodItem.expirationDate.month(),
+          foodItem.expirationDate.day());
+    }
+    else if (columnName == "expirationDateMonth") {
+      foodItem.expirationDate = std::chrono::year_month_day(
+          foodItem.expirationDate.year(),
+          std::chrono::month{static_cast<unsigned>(stoi(columnValue))},
+          foodItem.expirationDate.day());
+    }
+    else if (columnName == "expirationDateDay") {
+      foodItem.expirationDate = std::chrono::year_month_day(
+          foodItem.expirationDate.year(), foodItem.expirationDate.month(),
+          std::chrono::day{static_cast<unsigned>(stoi(columnValue))});
+    }
+    /*
+    else if (std::string(columnNames[i]) == "weight") {
+      foodItem.weight = columns[i];
+    }
+    else if (std::string(columnNames[i]) == "quantity") {
+      foodItem.quantity = columns[i];
+    }
+    */
   }
   allFoodItems->push_back(foodItem);
   return 0;

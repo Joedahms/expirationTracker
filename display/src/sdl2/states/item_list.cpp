@@ -89,6 +89,7 @@ void ItemList::update() {
     const char* selectAll = "SELECT * FROM foodItems;";
     this->allFoodItems.clear();
 
+    // All food items
     int sqlReturn = sqlite3_exec(this->database, selectAll, readFoodItemCallback,
                                  &allFoodItems, &errorMessage);
 
