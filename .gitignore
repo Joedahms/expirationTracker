@@ -1,4 +1,5 @@
 build/**
+.vscode
 
 YOLO/yolov4-tiny
 YOLO/yolov4-tiny.weights

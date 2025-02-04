@@ -38,9 +38,7 @@ void hardwareEntry(struct HardwarePipes pipes) {
   foodItem.name      = "Apple";
   const std::chrono::time_point now{std::chrono::system_clock::now()};
   foodItem.scanDate = std::chrono::floor<std::chrono::days>(now);
-
   foodItem.expirationDate = std::chrono::floor<std::chrono::days>(now);
-
   foodItem.catagory = "fruit";
   foodItem.weight   = 10.0;
   foodItem.quantity = 2;
