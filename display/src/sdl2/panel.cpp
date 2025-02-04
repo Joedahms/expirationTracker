@@ -8,11 +8,26 @@
 #include "panel.h"
 #include "text.h"
 
+/**
+ * Construct a panel with just a rectangle and some text objects. Currently a temporary
+ * function as buttons haven't been integreted into panels yet.
+ *
+ * @param rect SDL rectangle bounding the panel
+ * @param t Vector of text objects to display within the panel
+ */
 Panel::Panel(SDL_Rect rect, std::vector<std::unique_ptr<Text>> t) {
   this->rectangle = rect;
   this->texts     = std::move(t);
 }
 
+/**
+ * Construct a panel with a rectangle, some text, and some buttons. This is not currently
+ * used as no buttons in panels yet.
+ *
+ * @param rect SDL rectangle bounding the panel
+ * @param t Vector of text objects to display within the panel
+ * @param b Vector of button objects to display within the panel
+ */
 Panel::Panel(SDL_Rect rect,
              std::vector<std::unique_ptr<Text>> t,
              std::vector<std::unique_ptr<Button>> b) {
@@ -21,7 +36,16 @@ Panel::Panel(SDL_Rect rect,
   this->buttons   = std::move(b);
 }
 
+/**
+ * Currently this function only updates the text objects, it will need to be expanded to
+ * update buttons in the future when they are added. It ensures that all of the text
+ * objects are aligned as desired within the panel.
+ *
+ * @param None
+ * @return None
+ */
 void Panel::updateElementPositions() {
+  // Align all text objects right next to each other
   for (int i = 0; i < this->texts.size(); i++) {
     SDL_Rect textRectangle = this->texts[i]->getRectangle();
     textRectangle.y        = this->rectangle.y;
@@ -34,15 +58,14 @@ void Panel::updateElementPositions() {
     }
     this->texts[i]->setRectangle(textRectangle);
   }
-  /*
-  for (auto& x : this->texts) {
-    textRectangle.x        = this->rectangle.x;
-    textRectangle.y        = this->rectangle.y;
-    x->setRectangle(textRectangle);
-  }
-  */
 }
 
+/**
+ * Render all elements within the panel.
+ *
+ * @param None
+ * @return None
+ */
 void Panel::render() {
   for (auto& x : this->texts) {
     x->render();

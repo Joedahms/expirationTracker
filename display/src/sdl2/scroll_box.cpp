@@ -13,6 +13,14 @@ ScrollBox::ScrollBox(struct DisplayGlobal dg) : displayGlobal(dg) {}
 
 void ScrollBox::setPanelHeight(int panelHeight) { this->panelHeight = panelHeight; }
 
+/**
+ * Update all panels in the scroll box with food item information. Assumed that one panel
+ * corresponds to one food item. Therefore there will be as many panels in the scroll box
+ * as there are food items passed.
+ *
+ * @param allFoodItems A vector of all the food items to put in panels
+ * @return None
+ */
 void ScrollBox::updatePanels(std::vector<FoodItem> allFoodItems) {
   this->panels.clear();
   for (auto& foodItem : allFoodItems) {
@@ -69,6 +77,13 @@ void ScrollBox::updatePanels(std::vector<FoodItem> allFoodItems) {
   }
 }
 
+/**
+ * Add a new panel to the scroll box. Adds the new panel directly below the previously
+ * lowest panel.
+ *
+ * @param The new panel to add
+ * @return None
+ */
 void ScrollBox::addPanel(std::unique_ptr<Panel> panel) {
   std::unique_ptr newPanel = std::move(panel);
   SDL_Rect newPanelRect    = newPanel->getRectangle();
