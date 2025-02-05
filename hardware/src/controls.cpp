@@ -87,7 +87,7 @@ void takePhotos(int angle) {
     }
     else if (top_cam == 0) {
         std::string top_photo = CAMERA1_CMD + IMAGE_DIR + std::to_string(angle) + "_T.jpg";
-        if (system(top_cam.c_str()) == -1) {
+        if (system(top_photo.c_str()) == -1) {
             LOG(FATAL) << "Failed to capture image from top camera.";
         }
         exit(0);
@@ -99,7 +99,7 @@ void takePhotos(int angle) {
     }
     else if (side_cam == 0) {
         std::string side_photo = CAMERA1_CMD + IMAGE_DIR + std::to_string(angle) + "_S.jpg";
-        if (system(side_cam.c_str()) == -1) {
+        if (system(side_photo.c_str()) == -1) {
             LOG(FATAL) << "Failed to capture image from side camera.";
         }
         exit(0);
@@ -125,7 +125,7 @@ void sendDataToVision(const std::string IMAGE_DIR, float weight) {
     item.photoPath = IMAGE_DIR;
     item.name = "";
     item.scanDate = std::chrono::floor<std::chrono::days>(now);
-    item.expirationDate = std::chrono::floor<std::chrono::days>(now);
+    item.expirationDate = "year_month_day";
     item.catagory = "";
     item.weight = weight;
     item.quantity = 1;

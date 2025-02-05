@@ -49,6 +49,9 @@ add_executable (expirationTracker
 
   #Hardware process after forked from main
   hardware/src/hardware_pipe.cpp
+
+  #Hardware setup and control functions
+  hardware/src/controls.cpp
 )
 
 target_include_directories(expirationTracker PRIVATE ${OpenCV_INCLUDE_DIRS})
