@@ -21,8 +21,9 @@ Text::Text(struct DisplayGlobal displayGlobal,
            int fontSize,
            SDL_Color color,
            SDL_Rect rectangle)
-    : displayGlobal(displayGlobal), content(content), fontSize(fontSize), color(color) {
-  this->font = TTF_OpenFont(fontPath, this->fontSize);
+    : content(content), fontSize(fontSize), color(color) {
+  this->displayGlobal = displayGlobal;
+  this->font          = TTF_OpenFont(fontPath, this->fontSize);
   if (this->font == NULL) {
     LOG(FATAL) << "Text failed to open font";
   }

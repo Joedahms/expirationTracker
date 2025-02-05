@@ -12,7 +12,7 @@
 
 class Button : public Element {
 public:
-  Button(struct DisplayGlobal dg,
+  Button(struct DisplayGlobal displayGlobal,
          const SDL_Rect& rectangle,
          const std::string& textContent);
   Button(struct DisplayGlobal dg,
@@ -25,7 +25,6 @@ public:
   void render() const override;
 
 private:
-  struct DisplayGlobal displayGlobal;
   std::unique_ptr<Text> text; // Text within the button
   SDL_Color backgroundColor;  // Current color
   SDL_Color defaultColor;     // Color when not hovered

@@ -3,6 +3,8 @@
 
 #include <SDL2/SDL.h>
 
+#include "display_global.h"
+
 class Element {
 public:
   /**
@@ -60,10 +62,11 @@ public:
   virtual void render() const = 0;
   SDL_Rect getRectangle() { return this->rectangle; }
   void setRectangle(SDL_Rect rectangle);
-  //  bool hasBorder() { return this->border; }
-  //  void renderBorder();
+  bool hasBorder() { return this->border; }
+  void renderBorder();
 
 protected:
+  struct DisplayGlobal displayGlobal;
   SDL_Rect rectangle;
   bool border         = false;
   int borderThickness = 1;

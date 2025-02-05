@@ -22,7 +22,6 @@ public:
   void render() const override;
 
 private:
-  struct DisplayGlobal displayGlobal;
   TTF_Font* font;
   const char* content;
   int fontSize;

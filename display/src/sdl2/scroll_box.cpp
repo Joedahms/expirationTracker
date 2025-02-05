@@ -9,7 +9,9 @@
 #include "panel.h"
 #include "scroll_box.h"
 
-ScrollBox::ScrollBox(struct DisplayGlobal dg) : displayGlobal(dg) {}
+ScrollBox::ScrollBox(struct DisplayGlobal displayGlobal) {
+  this->displayGlobal = displayGlobal;
+}
 
 void ScrollBox::setPanelHeight(int panelHeight) { this->panelHeight = panelHeight; }
 

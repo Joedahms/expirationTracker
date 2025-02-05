@@ -12,14 +12,13 @@
 
 class ScrollBox : public Element {
 public:
-  ScrollBox(struct DisplayGlobal dg);
+  ScrollBox(struct DisplayGlobal displayGlobal);
   void setPanelHeight(int panelHeight);
   void updatePanels(std::vector<FoodItem> allFoodItems);
   void addPanel(std::unique_ptr<Panel> panel);
   void render() const override;
 
 private:
-  struct DisplayGlobal displayGlobal;
   std::vector<std::unique_ptr<Panel>> panels;
   int panelHeight;
 };

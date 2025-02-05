@@ -14,11 +14,11 @@
  * @param text The text to print in the middle of the button
  * @return None
  */
-Button::Button(struct DisplayGlobal dg,
+Button::Button(struct DisplayGlobal displayGlobal,
                const SDL_Rect& rectangle,
-               const std::string& textContent)
-    : displayGlobal(dg) {
-  this->rectangle = rectangle;
+               const std::string& textContent) {
+  this->displayGlobal = displayGlobal;
+  this->rectangle     = rectangle;
 
   this->backgroundColor = {255, 0, 0, 255}; // Red
   this->hoveredColor    = {0, 255, 0, 255}; // Green
@@ -42,12 +42,13 @@ Button::Button(struct DisplayGlobal dg,
  * @param text The text to print in the middle of the button
  * @return None
  */
-Button::Button(struct DisplayGlobal dg,
+Button::Button(struct DisplayGlobal displayGlobal,
                const SDL_Rect& rectangle,
                const std::string& textContent,
                const int& clickRet)
-    : displayGlobal(dg), clickReturn(clickRet) {
-  this->rectangle = rectangle;
+    : clickReturn(clickRet) {
+  this->displayGlobal = displayGlobal;
+  this->rectangle     = rectangle;
 
   this->backgroundColor = {255, 0, 0, 255}; // Red
   this->hoveredColor    = {0, 255, 0, 255}; // Green
