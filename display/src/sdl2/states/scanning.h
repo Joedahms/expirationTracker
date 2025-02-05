@@ -13,22 +13,17 @@
  */
 class Scanning : public State {
 public:
-  Scanning(struct DisplayGlobal);
+  Scanning(struct DisplayGlobal displayGlobal);
   int handleEvents(bool*) override;
   int checkKeystates();
-  void update();
+  void update() override;
   void render() const override;
   void enterScanning();
   void initializeTextures();
   bool getStateEntered(); // Check if the state has already been entered
 
 private:
-  struct DisplayGlobal displayGlobal;
   bool stateEntered = false; // Has the state been entered before
-
-  std::unique_ptr<Text> progressMessage;
-
-  //  SDL_Texture* selectedTexture;
 };
 
 #endif

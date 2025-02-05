@@ -25,18 +25,18 @@ PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
   this->texts.push_back(std::move(title));
 
   // Resume button
-  SDL_Rect resumeButtonRectangle = {200, 150, 200, 50};
-  std::unique_ptr<Button> resumeButton =
-      std::make_unique<Button>(this->displayGlobal, resumeButtonRectangle, "Resume");
+  SDL_Rect resumeButtonRectangle       = {200, 150, 200, 50};
+  std::unique_ptr<Button> resumeButton = std::make_unique<Button>(
+      this->displayGlobal, resumeButtonRectangle, "Resume", SCANNING);
   resumeButton->centerHorizontal(windowSurface);
   this->buttons.push_back(std::move(resumeButton));
 
   // Main menu button
-  SDL_Rect mainMenuButtonRectangle = {200, 225, 200, 50};
-  std::unique_ptr<Button> mainMenuButton =
-      std::make_unique<Button>(this->displayGlobal, mainMenuButtonRectangle, "Main Menu");
+  SDL_Rect mainMenuButtonRectangle       = {200, 225, 200, 50};
+  std::unique_ptr<Button> mainMenuButton = std::make_unique<Button>(
+      this->displayGlobal, mainMenuButtonRectangle, "Main Menu", MAIN_MENU);
   mainMenuButton->centerHorizontal(windowSurface);
-  this->buttons.push_back(std::move(resumeButton));
+  this->buttons.push_back(std::move(mainMenuButton));
 }
 
 /**
@@ -66,6 +66,12 @@ int PauseMenu::handleEvents(bool* displayIsRunning) {
     }
   }
   return returnValue;
+}
+
+void PauseMenu::update() {
+  for (auto& currentButton : this->buttons) {
+    currentButton->update();
+  }
 }
 
 /**

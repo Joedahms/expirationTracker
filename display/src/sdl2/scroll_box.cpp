@@ -66,7 +66,6 @@ void ScrollBox::updatePanels(std::vector<FoodItem> allFoodItems) {
 
     std::string expirationDateYear =
         std::to_string(static_cast<int>(foodItem.expirationDate.year()));
-    std::cout << expirationDateYear << std::endl;
     std::unique_ptr<Text> year =
         std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
                                expirationDateYear.c_str(), 24, textColor, rect);

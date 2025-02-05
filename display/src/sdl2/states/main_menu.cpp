@@ -36,7 +36,7 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
   std::unique_ptr<Button> viewStoredButton = std::make_unique<Button>(
       this->displayGlobal, viewStoredButtonRectangle, "View Stored Items", ITEM_LIST);
   viewStoredButton->centerHorizontal(windowSurface);
-  this->buttons.push_back(std::move(newScanButton));
+  this->buttons.push_back(std::move(viewStoredButton));
 }
 
 /**
@@ -68,6 +68,12 @@ int MainMenu::handleEvents(bool* displayIsRunning) {
   return returnValue;
 }
 
+void MainMenu::update() {
+  for (auto& currentButton : this->buttons) {
+    currentButton->update();
+  }
+}
+
 /**
  * Render the display title and the start button.
  *
@@ -77,8 +83,6 @@ int MainMenu::handleEvents(bool* displayIsRunning) {
 void MainMenu::render() const {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background
   SDL_RenderClear(this->displayGlobal.renderer);
-  std::cout << "before" << std::endl;
   renderElements();
-  std::cout << "after" << std::endl;
   SDL_RenderPresent(this->displayGlobal.renderer);
 }

@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "../display_global.h"
 #include "state.h"
 
@@ -18,5 +20,8 @@ void State::renderElements() const {
   }
   for (auto& currText : this->texts) {
     currText->render();
+  }
+  for (auto& currScrollBox : this->scrollBoxes) {
+    currScrollBox->render();
   }
 }

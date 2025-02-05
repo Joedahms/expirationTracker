@@ -219,6 +219,7 @@ void Display::checkKeystates() {
 void Display::update() {
   switch (this->state) { // Check current state
   case 0:                // Main menu
+    this->mainMenu->update();
     break;
 
   case 1: // Scanning
@@ -226,6 +227,7 @@ void Display::update() {
     break;
 
   case 2: // Pause menu
+    this->pauseMenu->update();
     break;
 
   case 3: // Item list

@@ -19,10 +19,11 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) {
   const char* progressMessageContent = "Scanning In Progress";
   SDL_Color progressMessageColor     = {0, 255, 0, 255}; // Green
   SDL_Rect progressMessageRectangle  = {100, 100, 0, 0}; // x y w h
-  this->progressMessage =
+  std::unique_ptr<Text> progressMessage =
       std::make_unique<Text>(this->displayGlobal, fontPath, progressMessageContent, 24,
                              progressMessageColor, progressMessageRectangle);
-  this->progressMessage->centerHorizontal(windowSurface);
+  progressMessage->centerHorizontal(windowSurface);
+  this->texts.push_back(std::move(progressMessage));
 }
 
 /**
@@ -69,9 +70,7 @@ int Scanning::checkKeystates() {
  * @param None
  * @return None
  */
-void Scanning::update() {
-  //  writeToLogFile(this->displayGlobal.logFile, "updating in scanning");
-}
+void Scanning::update() {}
 
 /**
  * Render all scanning elements.
@@ -82,7 +81,7 @@ void Scanning::update() {
 void Scanning::render() const {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background
   SDL_RenderClear(this->displayGlobal.renderer);
-  this->progressMessage->render();
+  renderElements();
   SDL_RenderPresent(this->displayGlobal.renderer);
 }
 

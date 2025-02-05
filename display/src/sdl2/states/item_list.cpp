@@ -14,11 +14,9 @@
 /**
  * @param dg Global display variables.
  */
-ItemList::ItemList(struct DisplayGlobal dg) : displayGlobal(dg) {
+ItemList::ItemList(struct DisplayGlobal displayGlobal) {
+  this->displayGlobal        = displayGlobal;
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
-
-  std::cout << this->displayGlobal.futuramFontPath << std::endl;
-  this->scrollBox = std::make_unique<ScrollBox>(this->displayGlobal);
 
   // Placeholder text
   const char* placeholderTextContent = "Placeholder for item list";
@@ -29,18 +27,21 @@ ItemList::ItemList(struct DisplayGlobal dg) : displayGlobal(dg) {
       0,
       0,
   }; // x y w h
-  this->placeholderText = std::make_unique<Text>(
+  std::unique_ptr<Text> placeholderText = std::make_unique<Text>(
       this->displayGlobal, this->displayGlobal.futuramFontPath, placeholderTextContent,
       24, placeholderTextColor, placeholderTextRectangle);
-  this->placeholderText->centerHorizontal(windowSurface);
+  placeholderText->centerHorizontal(windowSurface);
+  this->texts.push_back(std::move(placeholderText));
 
   previousUpdate = std::chrono::steady_clock::now();
 
   openDatabase(&this->database);
 
-  SDL_Rect scrollBoxRect = {0, 0, 100, 100};
-  this->scrollBox->setRectangle(scrollBoxRect);
-  this->scrollBox->setPanelHeight(30);
+  std::unique_ptr<ScrollBox> scrollBox = std::make_unique<ScrollBox>(this->displayGlobal);
+  SDL_Rect scrollBoxRect               = {0, 0, 100, 100};
+  scrollBox->setRectangle(scrollBoxRect);
+  scrollBox->setPanelHeight(30);
+  this->scrollBoxes.push_back(std::move(scrollBox));
 }
 
 ItemList::~ItemList() { sqlite3_close(database); }
@@ -93,7 +94,7 @@ void ItemList::update() {
     int sqlReturn = sqlite3_exec(this->database, selectAll, readFoodItemCallback,
                                  &allFoodItems, &errorMessage);
 
-    this->scrollBox->updatePanels(this->allFoodItems);
+    this->scrollBoxes[0]->updatePanels(this->allFoodItems);
 
     if (sqlReturn != SQLITE_OK) {
       LOG(FATAL) << "SQL Exec Error: " << errorMessage;
@@ -105,15 +106,6 @@ void ItemList::update() {
 void ItemList::render() const {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background
   SDL_RenderClear(this->displayGlobal.renderer);
-  this->placeholderText->render();
-  /*
-  if (this->placeholderText->hasBorder()) {
-    this->placeholderText->renderBorder();
-  }
-  this->scrollBox->render();
-  if (this->scrollBox->hasBorder()) {
-    this->scrollBox->renderBorder();
-  }
-  */
+  renderElements();
   SDL_RenderPresent(this->displayGlobal.renderer);
 }

@@ -14,16 +14,14 @@
 
 class ItemList : public State {
 public:
-  ItemList(struct DisplayGlobal dg);
+  ItemList(struct DisplayGlobal displayGlobal);
   ~ItemList();
   int handleEvents(bool*) override;
   int checkKeystates();
-  void update();
+  void update() override;
   void render() const override;
 
 private:
-  struct DisplayGlobal displayGlobal;
-  std::unique_ptr<Text> placeholderText;
   sqlite3* database = nullptr;
   std::chrono::steady_clock::time_point previousUpdate;
   std::chrono::steady_clock::time_point currentUpdate;

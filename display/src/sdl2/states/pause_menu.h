@@ -17,6 +17,7 @@ class PauseMenu : public State {
 public:
   PauseMenu(struct DisplayGlobal);
   int handleEvents(bool*) override;
+  void update() override;
   void render() const override;
 };
 

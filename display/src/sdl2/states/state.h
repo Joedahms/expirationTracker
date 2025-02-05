@@ -11,12 +11,14 @@
 
 #include "../button.h"
 #include "../display_global.h"
+#include "../scroll_box.h"
 #include "../text.h"
 
 class State {
 public:
-  virtual void render() const     = 0;
   virtual int handleEvents(bool*) = 0;
+  virtual void update()           = 0;
+  virtual void render() const     = 0;
   int checkButtonsClicked(const int& mouseX, const int& mouseY) const;
   void renderElements() const;
 
@@ -24,6 +26,7 @@ protected:
   struct DisplayGlobal displayGlobal;
   std::vector<std::unique_ptr<Text>> texts;
   std::vector<std::unique_ptr<Button>> buttons;
+  std::vector<std::unique_ptr<ScrollBox>> scrollBoxes;
 };
 
 #endif
