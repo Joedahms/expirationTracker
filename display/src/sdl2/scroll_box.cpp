@@ -73,8 +73,9 @@ void ScrollBox::updatePanels(std::vector<FoodItem> allFoodItems) {
                                expirationDateYear.c_str(), 24, textColor, rect);
     texts.push_back(std::move(year));
 
-    std::unique_ptr<Panel> newPanel = std::make_unique<Panel>(rect, std::move(texts));
-    addPanel(std::move(newPanel));
+    std::unique_ptr<Panel> newPanel =
+        std::make_unique<Panel>(this->displayGlobal, rect, std::move(texts));
+    addPanel(std::move(newPanel), this->rectangle);
   }
 }
 
@@ -85,10 +86,11 @@ void ScrollBox::updatePanels(std::vector<FoodItem> allFoodItems) {
  * @param The new panel to add
  * @return None
  */
-void ScrollBox::addPanel(std::unique_ptr<Panel> panel) {
+void ScrollBox::addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectangle) {
   std::unique_ptr newPanel = std::move(panel);
   SDL_Rect newPanelRect    = newPanel->getRectangle();
   newPanelRect.h           = this->panelHeight;
+  newPanelRect.w           = containingRectangle.w;
   if (this->panels.size() == 0) {
     newPanelRect.y = this->rectangle.y;
   }
@@ -101,6 +103,9 @@ void ScrollBox::addPanel(std::unique_ptr<Panel> panel) {
 }
 
 void ScrollBox::render() const {
+  if (this->hasBorder) {
+    renderBorder();
+  }
   for (auto& x : this->panels) {
     x->render();
   }

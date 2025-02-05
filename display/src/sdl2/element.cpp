@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <iostream>
 
 #include "element.h"
 
@@ -54,43 +55,47 @@ template <> bool Element::checkCenterHorizontal<SDL_Rect>(SDL_Rect centerWithin)
 
 void Element::setRectangle(SDL_Rect rectangle) { this->rectangle = rectangle; };
 
-/*
-void Element::renderBorder() {
+void Element::addBorder(const int& borderThickness) {
+  this->hasBorder       = true;
+  this->borderThickness = borderThickness;
+}
+
+void Element::renderBorder() const {
+  std::cout << "hello" << std::endl;
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 255, 255, 255, 255);
   // Draw the top border
   for (int i = 0; i < borderThickness; i++) {
-    SDL_RenderDrawLine(renderer,
-                       rect.x - i,          // Start X
-                       rect.y - i,          // Start Y
-                       rect.x + rect.w + i, // End X
-                       rect.y - i);         // End Y
+    SDL_RenderDrawLine(this->displayGlobal.renderer,
+                       this->rectangle.x - i,                     // Start X
+                       this->rectangle.y - i,                     // Start Y
+                       this->rectangle.x + this->rectangle.w + i, // End X
+                       this->rectangle.y - i);                    // End Y
   }
 
   // Draw the bottom border
   for (int i = 0; i < borderThickness; i++) {
-    SDL_RenderDrawLine(renderer,
-                       rect.x - i,           // Start X
-                       rect.y + rect.h + i,  // Start Y
-                       rect.x + rect.w + i,  // End X
-                       rect.y + rect.h + i); // End Y
+    SDL_RenderDrawLine(this->displayGlobal.renderer,
+                       this->rectangle.x - i,                      // Start X
+                       this->rectangle.y + this->rectangle.h + i,  // Start Y
+                       this->rectangle.x + this->rectangle.w + i,  // End X
+                       this->rectangle.y + this->rectangle.h + i); // End Y
   }
 
   // Draw the left border
   for (int i = 0; i < borderThickness; i++) {
-    SDL_RenderDrawLine(renderer,
-                       rect.x - i,           // Start X
-                       rect.y - i,           // Start Y
-                       rect.x - i,           // End X
-                       rect.y + rect.h + i); // End Y
+    SDL_RenderDrawLine(this->displayGlobal.renderer,
+                       this->rectangle.x - i,                      // Start X
+                       this->rectangle.y - i,                      // Start Y
+                       this->rectangle.x - i,                      // End X
+                       this->rectangle.y + this->rectangle.h + i); // End Y
   }
 
   // Draw the right border
   for (int i = 0; i < borderThickness; i++) {
-    SDL_RenderDrawLine(renderer,
-                       rect.x + rect.w + i,  // Start X
-                       rect.y - i,           // Start Y
-                       rect.x + rect.w + i,  // End X
-                       rect.y + rect.h + i); // End Y
+    SDL_RenderDrawLine(this->displayGlobal.renderer,
+                       this->rectangle.x + this->rectangle.w + i,  // Start X
+                       this->rectangle.y - i,                      // Start Y
+                       this->rectangle.x + this->rectangle.w + i,  // End X
+                       this->rectangle.y + this->rectangle.h + i); // End Y
   }
 }
-*/

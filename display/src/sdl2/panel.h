@@ -6,13 +6,17 @@
 #include <vector>
 
 #include "button.h"
+#include "display_global.h"
 #include "element.h"
 #include "text.h"
 
 class Panel : public Element {
 public:
-  Panel(SDL_Rect rect, std::vector<std::unique_ptr<Text>> t);
-  Panel(SDL_Rect rect,
+  Panel(struct DisplayGlobal displayGlobal,
+        SDL_Rect rect,
+        std::vector<std::unique_ptr<Text>> t);
+  Panel(struct DisplayGlobal displayGlobal,
+        SDL_Rect rect,
         std::vector<std::unique_ptr<Text>> t,
         std::vector<std::unique_ptr<Button>> b);
 

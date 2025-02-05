@@ -62,13 +62,14 @@ public:
   virtual void render() const = 0;
   SDL_Rect getRectangle() { return this->rectangle; }
   void setRectangle(SDL_Rect rectangle);
-  bool hasBorder() { return this->border; }
-  void renderBorder();
+  void addBorder(const int& borderThickness);
+  //  bool hasBorder() { return this->border; }
+  void renderBorder() const;
 
 protected:
   struct DisplayGlobal displayGlobal;
   SDL_Rect rectangle;
-  bool border         = false;
+  bool hasBorder      = false;
   int borderThickness = 1;
 };
 

@@ -15,7 +15,7 @@ public:
   ScrollBox(struct DisplayGlobal displayGlobal);
   void setPanelHeight(int panelHeight);
   void updatePanels(std::vector<FoodItem> allFoodItems);
-  void addPanel(std::unique_ptr<Panel> panel);
+  void addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectangle);
   void render() const override;
 
 private:

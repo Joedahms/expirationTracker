@@ -26,7 +26,6 @@ private:
   std::chrono::steady_clock::time_point previousUpdate;
   std::chrono::steady_clock::time_point currentUpdate;
   std::vector<FoodItem> allFoodItems;
-  std::unique_ptr<ScrollBox> scrollBox;
 };
 
 #endif

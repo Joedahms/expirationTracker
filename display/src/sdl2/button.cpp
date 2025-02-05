@@ -101,6 +101,14 @@ void Button::update() {
   else { // Mouse is not hovered over the button
     this->backgroundColor = this->defaultColor;
   }
+
+  if (this->text->checkCenterHorizontal(this->rectangle) == false) {
+    this->text->centerHorizontal(this->rectangle);
+  }
+
+  if (this->text->checkCenterVertical(this->rectangle) == false) {
+    this->text->centerVertical(this->rectangle);
+  }
 }
 
 /**
@@ -111,18 +119,12 @@ void Button::update() {
  * Output: None
  */
 void Button::render() const {
-  if (this->text->checkCenterHorizontal(this->rectangle) == false) {
-    this->text->centerHorizontal(this->rectangle);
-  }
-
-  if (this->text->checkCenterVertical(this->rectangle) == false) {
-    this->text->centerVertical(this->rectangle);
-  }
-
   // Set draw color and fill the button
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, backgroundColor.r,
                          backgroundColor.g, backgroundColor.b, backgroundColor.a);
   SDL_RenderFillRect(this->displayGlobal.renderer, &this->rectangle);
-
   this->text->render();
+  if (this->hasBorder) {
+    renderBorder();
+  }
 }

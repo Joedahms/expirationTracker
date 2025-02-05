@@ -38,9 +38,13 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
   openDatabase(&this->database);
 
   std::unique_ptr<ScrollBox> scrollBox = std::make_unique<ScrollBox>(this->displayGlobal);
-  SDL_Rect scrollBoxRect               = {0, 0, 100, 100};
+  SDL_Rect scrollBoxRect               = {0, 0, 300, 100};
+  int windowWidth, windowHeight;
+  SDL_GetWindowSize(this->displayGlobal.window, &windowWidth, &windowHeight);
+  scrollBoxRect.h = windowHeight - 1;
   scrollBox->setRectangle(scrollBoxRect);
   scrollBox->setPanelHeight(30);
+  scrollBox->addBorder(1);
   this->scrollBoxes.push_back(std::move(scrollBox));
 }
 

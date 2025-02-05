@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "button.h"
+#include "display_global.h"
 #include "element.h"
 #include "panel.h"
 #include "text.h"
@@ -15,9 +16,12 @@
  * @param rect SDL rectangle bounding the panel
  * @param t Vector of text objects to display within the panel
  */
-Panel::Panel(SDL_Rect rect, std::vector<std::unique_ptr<Text>> t) {
-  this->rectangle = rect;
-  this->texts     = std::move(t);
+Panel::Panel(struct DisplayGlobal displayGlobal,
+             SDL_Rect rect,
+             std::vector<std::unique_ptr<Text>> t) {
+  this->displayGlobal = displayGlobal;
+  this->rectangle     = rect;
+  this->texts         = std::move(t);
 }
 
 /**
@@ -28,12 +32,14 @@ Panel::Panel(SDL_Rect rect, std::vector<std::unique_ptr<Text>> t) {
  * @param t Vector of text objects to display within the panel
  * @param b Vector of button objects to display within the panel
  */
-Panel::Panel(SDL_Rect rect,
+Panel::Panel(struct DisplayGlobal displayGlobal,
+             SDL_Rect rect,
              std::vector<std::unique_ptr<Text>> t,
              std::vector<std::unique_ptr<Button>> b) {
-  this->rectangle = rect;
-  this->texts     = std::move(t);
-  this->buttons   = std::move(b);
+  this->displayGlobal = displayGlobal;
+  this->rectangle     = rect;
+  this->texts         = std::move(t);
+  this->buttons       = std::move(b);
 }
 
 /**
