@@ -54,6 +54,7 @@ template <> bool Element::checkCenterHorizontal<SDL_Rect>(SDL_Rect centerWithin)
 
 void Element::setRectangle(SDL_Rect rectangle) { this->rectangle = rectangle; };
 
+/*
 void Element::renderBorder() {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 255, 255, 255, 255);
   // Draw the top border
@@ -92,3 +93,4 @@ void Element::renderBorder() {
                        rect.y + rect.h + i); // End Y
   }
 }
+*/

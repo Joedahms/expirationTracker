@@ -15,7 +15,7 @@ public:
   void setPanelHeight(int panelHeight);
   void updatePanels(std::vector<FoodItem> allFoodItems);
   void addPanel(std::unique_ptr<Panel> panel);
-  void render();
+  void render() const override;
 
 private:
   struct DisplayGlobal displayGlobal;

@@ -6,17 +6,18 @@
 #include <string>
 
 #include "../display_global.h"
+#include "state.h"
 
 /**
  * Scanning state. State entered when user presses scan new item button in main menu.
  */
-class Scanning {
+class Scanning : public State {
 public:
   Scanning(struct DisplayGlobal);
-  int handleEvents(bool*);
+  int handleEvents(bool*) override;
   int checkKeystates();
   void update();
-  void render();
+  void render() const override;
   void enterScanning();
   void initializeTextures();
   bool getStateEntered(); // Check if the state has already been entered

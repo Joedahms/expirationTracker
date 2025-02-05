@@ -4,25 +4,21 @@
 #include <SDL2/SDL_ttf.h>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "../button.h"
 #include "../display_global.h"
 #include "../text.h"
+#include "state.h"
 
 /**
  * Main menu state. This is the state the display enters upon launching.
  */
-class MainMenu {
+class MainMenu : public State {
 public:
   MainMenu(struct DisplayGlobal);
-  int handleEvents(bool*); // Handle SDL events while in the main menu state
-  void render();
-
-private:
-  struct DisplayGlobal displayGlobal;
-  std::unique_ptr<Text> title;              // Title of the display
-  std::unique_ptr<Button> newScanButton;    // Scan a new item
-  std::unique_ptr<Button> viewStoredButton; // View stored items
+  int handleEvents(bool*) override;
+  void render() const override;
 };
 
 #endif

@@ -57,10 +57,11 @@ public:
     return centered;
   }
 
+  virtual void render() const = 0;
   SDL_Rect getRectangle() { return this->rectangle; }
   void setRectangle(SDL_Rect rectangle);
-  bool hasBorder() { return this->border; }
-  void renderBorder();
+  //  bool hasBorder() { return this->border; }
+  //  void renderBorder();
 
 protected:
   SDL_Rect rectangle;

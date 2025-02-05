@@ -10,15 +10,16 @@
 #include "../display_global.h"
 #include "../scroll_box.h"
 #include "../text.h"
+#include "state.h"
 
-class ItemList {
+class ItemList : public State {
 public:
   ItemList(struct DisplayGlobal dg);
   ~ItemList();
-  int handleEvents(bool*); // Handle SDL events while in the item list state
+  int handleEvents(bool*) override;
   int checkKeystates();
   void update();
-  void render();
+  void render() const override;
 
 private:
   struct DisplayGlobal displayGlobal;

@@ -38,6 +38,6 @@ Text::Text(struct DisplayGlobal displayGlobal,
  * Input: None
  * Output: None
  */
-void Text::render() {
+void Text::render() const {
   SDL_RenderCopy(this->displayGlobal.renderer, this->texture, NULL, &this->rectangle);
 }

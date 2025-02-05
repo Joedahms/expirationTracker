@@ -102,10 +102,11 @@ void ItemList::update() {
   }
 }
 
-void ItemList::render() {
+void ItemList::render() const {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background
   SDL_RenderClear(this->displayGlobal.renderer);
   this->placeholderText->render();
+  /*
   if (this->placeholderText->hasBorder()) {
     this->placeholderText->renderBorder();
   }
@@ -113,5 +114,6 @@ void ItemList::render() {
   if (this->scrollBox->hasBorder()) {
     this->scrollBox->renderBorder();
   }
+  */
   SDL_RenderPresent(this->displayGlobal.renderer);
 }

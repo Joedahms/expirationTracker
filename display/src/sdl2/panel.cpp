@@ -66,7 +66,7 @@ void Panel::updateElementPositions() {
  * @param None
  * @return None
  */
-void Panel::render() {
+void Panel::render() const {
   for (auto& x : this->texts) {
     x->render();
   }

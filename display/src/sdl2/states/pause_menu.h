@@ -8,21 +8,16 @@
 #include "../button.h"
 #include "../display_global.h"
 #include "../text.h"
+#include "state.h"
 
 /**
  * Pause menu state. Entered when pausing from gameplay.
  */
-class PauseMenu {
+class PauseMenu : public State {
 public:
   PauseMenu(struct DisplayGlobal);
-  int handleEvents(bool*);
-  void render();
-
-private:
-  struct DisplayGlobal displayGlobal;
-  std::unique_ptr<Text> title;
-  std::unique_ptr<Button> resumeButton;
-  std::unique_ptr<Button> mainMenuButton;
+  int handleEvents(bool*) override;
+  void render() const override;
 };
 
 #endif

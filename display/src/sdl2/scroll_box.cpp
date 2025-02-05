@@ -99,7 +99,7 @@ void ScrollBox::addPanel(std::unique_ptr<Panel> panel) {
   this->panels.push_back(std::move(newPanel));
 }
 
-void ScrollBox::render() {
+void ScrollBox::render() const {
   for (auto& x : this->panels) {
     x->render();
   }

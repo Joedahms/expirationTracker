@@ -12,9 +12,17 @@
 
 class Button : public Element {
 public:
-  Button(struct DisplayGlobal displayGlobal, struct SDL_Rect, const std::string&);
-  bool checkHovered(int mouseXPosition, int mouseYPosition);
-  void render();
+  Button(struct DisplayGlobal dg,
+         const SDL_Rect& rectangle,
+         const std::string& textContent);
+  Button(struct DisplayGlobal dg,
+         const SDL_Rect& rectangle,
+         const std::string& textContent,
+         const int& clickRet);
+  bool checkHovered(const int& mouseXPosition, const int& mouseYPosition);
+  int getClickReturn() const;
+  void update();
+  void render() const override;
 
 private:
   struct DisplayGlobal displayGlobal;
@@ -22,6 +30,7 @@ private:
   SDL_Color backgroundColor;  // Current color
   SDL_Color defaultColor;     // Color when not hovered
   SDL_Color hoveredColor;     // Color when hovered
+  int clickReturn = -1;
 };
 
 #endif

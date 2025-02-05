@@ -19,7 +19,7 @@ public:
        int fontSize,
        SDL_Color color,
        SDL_Rect rectangle);
-  void render();
+  void render() const override;
 
 private:
   struct DisplayGlobal displayGlobal;

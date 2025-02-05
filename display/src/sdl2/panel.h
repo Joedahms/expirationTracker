@@ -17,7 +17,7 @@ public:
         std::vector<std::unique_ptr<Button>> b);
 
   void updateElementPositions();
-  void render();
+  void render() const override;
 
 private:
   std::vector<std::unique_ptr<Text>> texts;

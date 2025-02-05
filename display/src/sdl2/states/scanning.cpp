@@ -79,7 +79,7 @@ void Scanning::update() {
  * @param None
  * @return None
  */
-void Scanning::render() {
+void Scanning::render() const {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background
   SDL_RenderClear(this->displayGlobal.renderer);
   this->progressMessage->render();
