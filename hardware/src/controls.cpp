@@ -1,5 +1,5 @@
 #include "../../food_item.h"
-#include "HX711.h" // library for HX711 weight sensor
+#include "../../../HX711/src/HX711.h" // library for HX711 weight sensor
 #include "hardware_pipe.h"
 #include <fstream>
 #include <glog/logging.h>
