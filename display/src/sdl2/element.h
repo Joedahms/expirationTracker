@@ -57,11 +57,15 @@ public:
     return centered;
   }
 
-  SDL_Rect getRectangle();
+  SDL_Rect getRectangle() { return this->rectangle; }
   void setRectangle(SDL_Rect rectangle);
+  bool hasBorder() { return this->border; }
+  void renderBorder();
 
 protected:
   SDL_Rect rectangle;
+  bool border         = false;
+  int borderThickness = 1;
 };
 
 template <> void Element::centerVertical<SDL_Rect>(SDL_Rect centerWithin);

@@ -52,6 +52,43 @@ template <> bool Element::checkCenterHorizontal<SDL_Rect>(SDL_Rect centerWithin)
   return centered;
 }
 
-SDL_Rect Element::getRectangle() { return this->rectangle; }
-
 void Element::setRectangle(SDL_Rect rectangle) { this->rectangle = rectangle; };
+
+void Element::renderBorder() {
+  SDL_SetRenderDrawColor(this->displayGlobal.renderer, 255, 255, 255, 255);
+  // Draw the top border
+  for (int i = 0; i < borderThickness; i++) {
+    SDL_RenderDrawLine(renderer,
+                       rect.x - i,          // Start X
+                       rect.y - i,          // Start Y
+                       rect.x + rect.w + i, // End X
+                       rect.y - i);         // End Y
+  }
+
+  // Draw the bottom border
+  for (int i = 0; i < borderThickness; i++) {
+    SDL_RenderDrawLine(renderer,
+                       rect.x - i,           // Start X
+                       rect.y + rect.h + i,  // Start Y
+                       rect.x + rect.w + i,  // End X
+                       rect.y + rect.h + i); // End Y
+  }
+
+  // Draw the left border
+  for (int i = 0; i < borderThickness; i++) {
+    SDL_RenderDrawLine(renderer,
+                       rect.x - i,           // Start X
+                       rect.y - i,           // Start Y
+                       rect.x - i,           // End X
+                       rect.y + rect.h + i); // End Y
+  }
+
+  // Draw the right border
+  for (int i = 0; i < borderThickness; i++) {
+    SDL_RenderDrawLine(renderer,
+                       rect.x + rect.w + i,  // Start X
+                       rect.y - i,           // Start Y
+                       rect.x + rect.w + i,  // End X
+                       rect.y + rect.h + i); // End Y
+  }
+}
