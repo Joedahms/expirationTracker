@@ -61,7 +61,6 @@ void Element::addBorder(const int& borderThickness) {
 }
 
 void Element::renderBorder() const {
-  std::cout << "hello" << std::endl;
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 255, 255, 255, 255);
   // Draw the top border
   for (int i = 0; i < borderThickness; i++) {

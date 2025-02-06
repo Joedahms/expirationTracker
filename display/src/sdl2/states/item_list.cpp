@@ -18,21 +18,6 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
   this->displayGlobal        = displayGlobal;
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
 
-  // Placeholder text
-  const char* placeholderTextContent = "Placeholder for item list";
-  SDL_Color placeholderTextColor     = {0, 255, 0, 255}; // Green
-  SDL_Rect placeholderTextRectangle  = {
-      100,
-      100,
-      0,
-      0,
-  }; // x y w h
-  std::unique_ptr<Text> placeholderText = std::make_unique<Text>(
-      this->displayGlobal, this->displayGlobal.futuramFontPath, placeholderTextContent,
-      24, placeholderTextColor, placeholderTextRectangle);
-  placeholderText->centerHorizontal(windowSurface);
-  this->texts.push_back(std::move(placeholderText));
-
   previousUpdate = std::chrono::steady_clock::now();
 
   openDatabase(&this->database);
@@ -58,6 +43,15 @@ int ItemList::handleEvents(bool* displayIsRunning) {
       *displayIsRunning = false;
       break;
       // Touch event here
+    case SDL_MOUSEWHEEL:
+      if (event.wheel.y > 0) {
+        this->scrollBoxes[0]->scrollUp();
+      }
+      else if (event.wheel.y < 0) {
+        this->scrollBoxes[0]->scrollDown();
+      }
+      break;
+
     default:
       break;
     }
@@ -98,7 +92,7 @@ void ItemList::update() {
     int sqlReturn = sqlite3_exec(this->database, selectAll, readFoodItemCallback,
                                  &allFoodItems, &errorMessage);
 
-    this->scrollBoxes[0]->updatePanels(this->allFoodItems);
+    this->scrollBoxes[0]->updatePanelContents(this->allFoodItems);
 
     if (sqlReturn != SQLITE_OK) {
       LOG(FATAL) << "SQL Exec Error: " << errorMessage;

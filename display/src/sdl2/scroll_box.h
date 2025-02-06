@@ -14,13 +14,16 @@ class ScrollBox : public Element {
 public:
   ScrollBox(struct DisplayGlobal displayGlobal);
   void setPanelHeight(int panelHeight);
-  void updatePanels(std::vector<FoodItem> allFoodItems);
+  void updatePanelContents(std::vector<FoodItem> allFoodItems);
   void addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectangle);
+  void scrollUp();
+  void scrollDown();
   void render() const override;
 
 private:
   std::vector<std::unique_ptr<Panel>> panels;
   int panelHeight;
+  int topPanelPosition = 0;
 };
 
 #endif
