@@ -36,6 +36,8 @@ Text::Text(struct DisplayGlobal displayGlobal,
   SDL_QueryTexture(this->texture, NULL, NULL, &this->rectangle.w, &this->rectangle.h);
 }
 
+Text::~Text() { TTF_CloseFont(this->font); }
+
 /**
  * Input: None
  * Output: None

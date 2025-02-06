@@ -19,6 +19,7 @@ public:
        int fontSize,
        SDL_Color color,
        SDL_Rect rectangle);
+  ~Text();
   void render() const override;
 
 private:
