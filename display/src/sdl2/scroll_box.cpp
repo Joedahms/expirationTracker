@@ -104,7 +104,10 @@ void ScrollBox::addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectan
   this->panels.push_back(std::move(newPanel));
 }
 
-void ScrollBox::scrollUp() {
+void ScrollBox::scrollUp(const SDL_Point* mousePosition) {
+  if (SDL_PointInRect(mousePosition, &this->rectangle) == false) {
+    return;
+  }
   this->topPanelPosition -= SCROLL_AMOUNT;
   for (auto& currPanel : this->panels) {
     SDL_Rect currPanelRectangle = currPanel->getRectangle();
@@ -114,7 +117,10 @@ void ScrollBox::scrollUp() {
   }
 }
 
-void ScrollBox::scrollDown() {
+void ScrollBox::scrollDown(const SDL_Point* mousePosition) {
+  if (SDL_PointInRect(mousePosition, &this->rectangle) == false) {
+    return;
+  }
   this->topPanelPosition += SCROLL_AMOUNT;
   for (auto& currPanel : this->panels) {
     SDL_Rect currPanelRectangle = currPanel->getRectangle();

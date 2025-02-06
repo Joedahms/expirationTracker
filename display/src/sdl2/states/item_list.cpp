@@ -12,7 +12,7 @@
 #include "item_list.h"
 
 /**
- * @param dg Global display variables.
+ * @param displayGlobal Global display variables.
  */
 ItemList::ItemList(struct DisplayGlobal displayGlobal) {
   this->displayGlobal        = displayGlobal;
@@ -35,6 +35,9 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
 
 ItemList::~ItemList() { sqlite3_close(database); }
 
+/**
+ * Handle events in the SDL event queue. Check if user wants to quit and if scrolling
+ */
 int ItemList::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
   while (SDL_PollEvent(&event) != 0) { // While events in the queue
@@ -42,13 +45,20 @@ int ItemList::handleEvents(bool* displayIsRunning) {
     case SDL_QUIT: // Quit event
       *displayIsRunning = false;
       break;
+
       // Touch event here
+
+    case SDL_MOUSEMOTION:
+      this->mousePosition.x = event.motion.x;
+      this->mousePosition.y = event.motion.y;
+      break;
+
     case SDL_MOUSEWHEEL:
       if (event.wheel.y > 0) {
-        this->scrollBoxes[0]->scrollUp();
+        this->scrollBoxes[0]->scrollUp(&this->mousePosition);
       }
       else if (event.wheel.y < 0) {
-        this->scrollBoxes[0]->scrollDown();
+        this->scrollBoxes[0]->scrollDown(&this->mousePosition);
       }
       break;
 

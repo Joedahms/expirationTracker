@@ -26,6 +26,7 @@ private:
   std::chrono::steady_clock::time_point previousUpdate;
   std::chrono::steady_clock::time_point currentUpdate;
   std::vector<FoodItem> allFoodItems;
+  SDL_Point mousePosition;
 };
 
 #endif

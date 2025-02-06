@@ -16,8 +16,8 @@ public:
   void setPanelHeight(int panelHeight);
   void updatePanelContents(std::vector<FoodItem> allFoodItems);
   void addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectangle);
-  void scrollUp();
-  void scrollDown();
+  void scrollUp(const SDL_Point* mousePosition);
+  void scrollDown(const SDL_Point* mousePosition);
   void render() const override;
 
 private:
