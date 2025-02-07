@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include "../../food_item.h"
 #include "hardware_entry.h"
-#include "io.h"
+#include "hw_io.h"
 
 /**
  * Entry into the hardware code. Only called from main after hardware child process is
@@ -31,13 +31,25 @@ void hardwareEntry(struct HardwarePipes pipes) {
   // close(pipes.toDisplay[WRITE]);  // Not currently used
   // close(pipes.toVision[WRITE]);   // Not currently used
 
-  // Wait for start signal from Display
+  // Wait for start signal from Display with 0.5sec sleep
   LOG(INFO) << "Waiting for start signal from Display";
-  
   if(receivedStartSignal(pipes.fromDisplay[READ]) == 0) {
-    usleep(500);
+    usleep(500000);
   }
   else {
+    LOG(INFO) << "Checking weight";
+    /**
+     * Function call to scale
+     * 0 - nothing on scale
+     * 1 - valid input, begin scanning
+     */
+
+    LOG(INFO) << "Beginning scan";
+    /**
+     * Function call to controls routine
+     * has a pipe read from vision in loop
+     */
+
     LOG(INFO) << "Sending Images from Hardware to Vision";
     // sendImagesWithinDirectory(pipes.toVision[WRITE], "../images/");
   

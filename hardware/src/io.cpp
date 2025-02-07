@@ -4,12 +4,19 @@
 #include <iostream>
 #include <string>
 #include <sys/select.h>
+#include "../../pipes.h"
 #include "../../food_item.h"
 #include "hardware_entry.h"
-#include "../../pipes.h"
 
 /**
+ * Checks to see if there is any data fromDisplay[READ]
+ * Used to initialize control system and begin scanning
  * 
+ * Input:
+ * @param pipeToRead Pipe to read signal from Display button press
+ * 
+ * Output:
+ * @return Boolean; true or false
  */
 bool receivedStartSignal(int pipeToRead) {
     fd_set readPipeSet;

@@ -1,8 +1,7 @@
-#ifndef IO_H
-#define IO_H
+#ifndef HW_IO_H
+#define HW_IO_H
 
 #include "../../pipes.h"
-#include <string>
 
 bool receivedStartSignal(int pipeToRead);
 
