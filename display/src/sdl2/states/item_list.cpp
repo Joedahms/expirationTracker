@@ -5,6 +5,10 @@
 
 #include "../../../../food_item.h"
 #include "../../sql_food.h"
+#include "../display_global.h"
+#include "../panel.h"
+#include "../scroll_box.h"
+#include "../text.h"
 #include "item_list.h"
 
 /**
@@ -14,27 +18,26 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
   this->displayGlobal        = displayGlobal;
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
 
-  // Placeholder text
-  const char* placeholderTextContent = "Placeholder for item list";
-  SDL_Color placeholderTextColor     = {0, 255, 0, 255}; // Green
-  SDL_Rect placeholderTextRectangle  = {
-      100,
-      100,
-      0,
-      0,
-  }; // x y w h
-  this->placeholderText = std::make_unique<Text>(
-      this->displayGlobal, displayGlobal.futuramFontPath, placeholderTextContent, 24,
-      placeholderTextColor, placeholderTextRectangle);
-  this->placeholderText->centerHorizontal(windowSurface);
-
   previousUpdate = std::chrono::steady_clock::now();
 
   openDatabase(&this->database);
+
+  std::unique_ptr<ScrollBox> scrollBox = std::make_unique<ScrollBox>(this->displayGlobal);
+  SDL_Rect scrollBoxRect               = {0, 0, 300, 100};
+  int windowWidth, windowHeight;
+  SDL_GetWindowSize(this->displayGlobal.window, &windowWidth, &windowHeight);
+  scrollBoxRect.h = windowHeight - 1;
+  scrollBox->setRectangle(scrollBoxRect);
+  scrollBox->setPanelHeight(30);
+  scrollBox->addBorder(1);
+  this->scrollBoxes.push_back(std::move(scrollBox));
 }
 
 ItemList::~ItemList() { sqlite3_close(database); }
 
+/**
+ * Handle events in the SDL event queue. Check if user wants to quit and if scrolling
+ */
 int ItemList::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
   while (SDL_PollEvent(&event) != 0) { // While events in the queue
@@ -42,7 +45,23 @@ int ItemList::handleEvents(bool* displayIsRunning) {
     case SDL_QUIT: // Quit event
       *displayIsRunning = false;
       break;
+
       // Touch event here
+
+    case SDL_MOUSEMOTION:
+      this->mousePosition.x = event.motion.x;
+      this->mousePosition.y = event.motion.y;
+      break;
+
+    case SDL_MOUSEWHEEL:
+      if (event.wheel.y > 0) {
+        this->scrollBoxes[0]->scrollUp(&this->mousePosition);
+      }
+      else if (event.wheel.y < 0) {
+        this->scrollBoxes[0]->scrollDown(&this->mousePosition);
+      }
+      break;
+
     default:
       break;
     }
@@ -79,12 +98,11 @@ void ItemList::update() {
     const char* selectAll = "SELECT * FROM foodItems;";
     this->allFoodItems.clear();
 
+    // All food items
     int sqlReturn = sqlite3_exec(this->database, selectAll, readFoodItemCallback,
                                  &allFoodItems, &errorMessage);
 
-    for (auto& i : allFoodItems) {
-      std::cout << i.name << std::endl;
-    }
+    this->scrollBoxes[0]->updatePanelContents(this->allFoodItems);
 
     if (sqlReturn != SQLITE_OK) {
       LOG(FATAL) << "SQL Exec Error: " << errorMessage;
@@ -93,9 +111,9 @@ void ItemList::update() {
   }
 }
 
-void ItemList::render() {
+void ItemList::render() const {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background
   SDL_RenderClear(this->displayGlobal.renderer);
-  this->placeholderText->render();
+  renderElements();
   SDL_RenderPresent(this->displayGlobal.renderer);
 }
