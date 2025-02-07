@@ -51,7 +51,8 @@ add_executable (expirationTracker
   vision/src/categorizeObjects.cpp
 
   #Hardware process after forked from main
-  hardware/src/hardware_pipe.cpp
+  hardware/src/hardware_entry.cpp
+  hardware/src/io.cpp
 )
 
 target_include_directories(expirationTracker PRIVATE ${OpenCV_INCLUDE_DIRS})

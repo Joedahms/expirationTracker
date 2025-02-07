@@ -1,5 +1,5 @@
-#ifndef HARDWARE_PIPE_H
-#define HARDWARE_PIPE_H
+#ifndef HARDWARE_ENTRY_H
+#define HARDWARE_ENTRY_H
 
 #include "../../pipes.h"
 #include <string>
