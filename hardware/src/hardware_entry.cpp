@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include "../../food_item.h"
 #include "hardware_entry.h"
-#include "hw_io.h"
+#include "io.h"
 
 /**
  * Entry into the hardware code. Only called from main after hardware child process is
