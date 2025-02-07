@@ -23,9 +23,10 @@ public:
   void initializeSdl(SDL_Window*);
 
   void checkState();
-  void handleEvents();   // Handle events depending on current state
-  void checkKeystates(); // Check keyboard key presses depending on state
-  void update();         // Update display depending on state
+  void handleEvents(int* sdlToDisplay,
+                    int* displayToSdl); // Handle events depending on current state
+  void checkKeystates();                // Check keyboard key presses depending on state
+  void update();                        // Update display depending on state
 
   void renderState();
   void clean(); // Clean up upon quit
