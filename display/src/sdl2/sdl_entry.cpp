@@ -8,8 +8,8 @@
 /**
  * Function called when in the new SDL process. Kicks off the SDL "display" loop.
  *
- * Input: None
- * Output: None
+ * @param None
+ * @return None
  */
 void sdlEntry() {
   LOG(INFO) << "SDL display process started successfully";

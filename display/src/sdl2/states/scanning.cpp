@@ -64,12 +64,6 @@ int Scanning::checkKeystates() {
   return SCANNING;
 }
 
-/**
- *
- *
- * @param None
- * @return None
- */
 void Scanning::update() {}
 
 /**

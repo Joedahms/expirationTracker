@@ -6,16 +6,16 @@
 
 #include "display.h"
 #include "display_global.h"
+#include "states/state.h"
 
 /**
  * @param windowTitle Title of the display window
  * @param windowXPosition X position of the display window
  * @param windowYPostition Y position of the display window
- * @param screenWidth Width of the display window
- * @param screenHeight Height of the display window
+ * @param screenWidth Width of the display window in pixels
+ * @param screenHeight Height of the display window in pixels
  * @param fullscreen Whether or not the display window should be fullscreen
  * @param displayGlobal Global display variables
- * @return None
  */
 Display::Display(const char* windowTitle,
                  int windowXPosition,
@@ -70,7 +70,6 @@ SDL_Window* Display::setupWindow(const char* windowTitle,
                             screenHeight, flags);
   } catch (...) {
     LOG(FATAL) << "Error setting up SDL display window";
-    exit(1);
   }
 
   LOG(INFO) << "SDL display window created";
@@ -134,19 +133,19 @@ void Display::initializeSdl(SDL_Window* window) {
  */
 void Display::checkState() {
   switch (this->state) {
-  case 0: // Main menu
+  case MAIN_MENU:
     break;
 
-  case 1: // Scanning
+  case SCANNING:
     if (!this->scanning->getStateEntered()) {
       this->scanning->enterScanning();
     }
     break;
 
-  case 2: // Pause menu
+  case PAUSE_MENU:
     break;
 
-  case 3: // Item list
+  case ITEM_LIST:
     break;
 
   default:
@@ -162,19 +161,19 @@ void Display::checkState() {
  */
 void Display::handleEvents() {
   switch (this->state) {
-  case 0: // Main menu
+  case MAIN_MENU:
     this->state = this->mainMenu->handleEvents(&this->displayIsRunning);
     break;
 
-  case 1: // Scanning
+  case SCANNING:
     this->state = this->scanning->handleEvents(&this->displayIsRunning);
     break;
 
-  case 2: // Pause menu
+  case PAUSE_MENU:
     this->state = this->pauseMenu->handleEvents(&this->displayIsRunning);
     break;
 
-  case 3: // Item List
+  case ITEM_LIST:
     this->state = this->itemList->handleEvents(&this->displayIsRunning);
     break;
   default:
@@ -191,17 +190,17 @@ void Display::handleEvents() {
  */
 void Display::checkKeystates() {
   switch (this->state) {
-  case 0: // Main menu
+  case MAIN_MENU:
     break;
 
-  case 1: // Scanning
+  case SCANNING:
     this->state = this->scanning->checkKeystates();
     break;
 
-  case 2: // Pause menu
+  case PAUSE_MENU:
     break;
 
-  case 3: // Item list
+  case ITEM_LIST:
     this->state = this->itemList->checkKeystates();
     break;
   default:
@@ -210,27 +209,28 @@ void Display::checkKeystates() {
 }
 
 /**
+ * Not implemented but may want to add:
  * First check if it's time to update. If it is, reset the time since last
- * update. Then check the current state and call that state's function to update.
+ * update.
  *
  * @param None
  * @return None
  */
 void Display::update() {
-  switch (this->state) { // Check current state
-  case 0:                // Main menu
+  switch (this->state) {
+  case MAIN_MENU:
     this->mainMenu->update();
     break;
 
-  case 1: // Scanning
+  case SCANNING:
     this->scanning->update();
     break;
 
-  case 2: // Pause menu
+  case PAUSE_MENU:
     this->pauseMenu->update();
     break;
 
-  case 3: // Item list
+  case ITEM_LIST:
     this->itemList->update();
     break;
 
@@ -247,19 +247,19 @@ void Display::update() {
  */
 void Display::renderState() {
   switch (this->state) {
-  case 0: // Main menu
+  case MAIN_MENU:
     this->mainMenu->render();
     break;
 
-  case 1: // Scanning
+  case SCANNING:
     this->scanning->render();
     break;
 
-  case 2: // Pause menu
+  case PAUSE_MENU:
     this->pauseMenu->render();
     break;
 
-  case 3: // Item list
+  case ITEM_LIST:
     this->itemList->render();
     break;
 

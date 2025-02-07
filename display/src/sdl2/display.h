@@ -16,16 +16,26 @@
 
 class Display {
 public:
-  Display(const char*, int, int, int, int, bool, struct DisplayGlobal);
+  Display(const char* windowTitle,
+          int windowXPosition,
+          int windowYPosition,
+          int screenWidth,
+          int screenHeight,
+          bool fullscreen,
+          struct DisplayGlobal displayGlobal);
 
-  SDL_Window* setupWindow(
-      const char*, int, int, int, int, bool); // Setup the SDL display window
-  void initializeSdl(SDL_Window*);
+  SDL_Window* setupWindow(const char* windowTitle,
+                          int windowXPosition,
+                          int windowYPosition,
+                          int screenWidth,
+                          int screenHeight,
+                          bool fullscreen);
+  void initializeSdl(SDL_Window* window);
 
   void checkState();
-  void handleEvents();   // Handle events depending on current state
-  void checkKeystates(); // Check keyboard key presses depending on state
-  void update();         // Update display depending on state
+  void handleEvents();
+  void checkKeystates();
+  void update();
 
   void renderState();
   void clean(); // Clean up upon quit

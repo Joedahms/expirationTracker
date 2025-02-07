@@ -73,6 +73,9 @@ void Panel::updateElementPositions() {
  * @return None
  */
 void Panel::render() const {
+  if (this->hasBorder) {
+    renderBorder();
+  }
   for (auto& x : this->texts) {
     x->render();
   }

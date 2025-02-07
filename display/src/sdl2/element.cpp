@@ -55,11 +55,24 @@ template <> bool Element::checkCenterHorizontal<SDL_Rect>(SDL_Rect centerWithin)
 
 void Element::setRectangle(SDL_Rect rectangle) { this->rectangle = rectangle; };
 
+/**
+ * Add a border to an element.
+ *
+ * @param borderThickness How many pixels thick the border should be
+ * @return None
+ */
 void Element::addBorder(const int& borderThickness) {
   this->hasBorder       = true;
   this->borderThickness = borderThickness;
 }
 
+/**
+ * Render a border around an object. Draws 4 lines on each side of the element's
+ * rectangle.
+ *
+ * @param None
+ * @return None
+ */
 void Element::renderBorder() const {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 255, 255, 255, 255);
   // Draw the top border

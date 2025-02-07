@@ -63,7 +63,6 @@ public:
   SDL_Rect getRectangle() { return this->rectangle; }
   void setRectangle(SDL_Rect rectangle);
   void addBorder(const int& borderThickness);
-  //  bool hasBorder() { return this->border; }
   void renderBorder() const;
 
 protected:

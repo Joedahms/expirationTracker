@@ -33,17 +33,20 @@ void ScrollBox::updatePanelContents(std::vector<FoodItem> allFoodItems) {
     SDL_Color textColor = {0, 255, 0, 255};
     SDL_Rect rect       = {0, 0, 0, 0};
 
+    // Name
     const char* foodItemName = foodItem.name.c_str();
     std::unique_ptr<Text> name =
         std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
                                foodItemName, 24, textColor, rect);
     texts.push_back(std::move(name));
 
+    // Expires
     std::unique_ptr<Text> expiration =
         std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
                                " Expires: ", 24, textColor, rect);
     texts.push_back(std::move(expiration));
 
+    // Month
     std::string expirationDateMonth =
         std::to_string(static_cast<unsigned>(foodItem.expirationDate.month()));
     std::unique_ptr<Text> month =
@@ -51,11 +54,13 @@ void ScrollBox::updatePanelContents(std::vector<FoodItem> allFoodItems) {
                                expirationDateMonth.c_str(), 24, textColor, rect);
     texts.push_back(std::move(month));
 
+    // Slash
     std::unique_ptr<Text> slash =
         std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
                                "/", 24, textColor, rect);
     texts.push_back(std::move(slash));
 
+    // Date
     std::string expirationDateDay =
         std::to_string(static_cast<unsigned>(foodItem.expirationDate.day()));
     std::unique_ptr<Text> day =
@@ -63,11 +68,13 @@ void ScrollBox::updatePanelContents(std::vector<FoodItem> allFoodItems) {
                                expirationDateDay.c_str(), 24, textColor, rect);
     texts.push_back(std::move(day));
 
+    // Slash
     std::unique_ptr<Text> slash2 =
         std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
                                "/", 24, textColor, rect);
     texts.push_back(std::move(slash2));
 
+    // Year
     std::string expirationDateYear =
         std::to_string(static_cast<int>(foodItem.expirationDate.year()));
     std::unique_ptr<Text> year =
@@ -101,9 +108,17 @@ void ScrollBox::addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectan
   }
   newPanel->setRectangle(newPanelRect);
   newPanel->updateElementPositions();
+  newPanel->addBorder(1);
   this->panels.push_back(std::move(newPanel));
 }
 
+/**
+ * Move all panels within the scroll box up.
+ *
+ * @param mousePosition Position of the mouse used to check if the mouse is within the
+ * scrollbox or not
+ * @return None
+ */
 void ScrollBox::scrollUp(const SDL_Point* mousePosition) {
   if (SDL_PointInRect(mousePosition, &this->rectangle) == false) {
     return;
@@ -117,6 +132,13 @@ void ScrollBox::scrollUp(const SDL_Point* mousePosition) {
   }
 }
 
+/**
+ * Move all panels within the scroll box down.
+ *
+ * @param mousePosition Position of the mouse used to check if the mouse is within the
+ * scrollbox or not
+ * @return None
+ */
 void ScrollBox::scrollDown(const SDL_Point* mousePosition) {
   if (SDL_PointInRect(mousePosition, &this->rectangle) == false) {
     return;

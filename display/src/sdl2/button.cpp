@@ -7,12 +7,12 @@
 #include "element.h"
 
 /**
- * Set the properties of the button.
+ * Set basic properties and add/position the text within the button. Most basic button
+ * constructor.
  *
  * @param displayGlobal Global display variables
  * @param rectangle Rectangle to render the button with
  * @param text The text to print in the middle of the button
- * @return None
  */
 Button::Button(struct DisplayGlobal displayGlobal,
                const SDL_Rect& rectangle,
@@ -29,18 +29,19 @@ Button::Button(struct DisplayGlobal displayGlobal,
       std::make_unique<Text>(this->displayGlobal, "../display/fonts/16020_FUTURAM.ttf",
                              textContent.c_str(), 24, textColor, this->rectangle);
 
-  // Center the text within the button
   this->text->centerHorizontal(this->rectangle);
   this->text->centerVertical(this->rectangle);
 }
 
 /**
- * Set the properties of the button.
+ * Set basic properties and add/position the text within the button. Button constructor
+ * overload to assign a click return value so that the button will return a number other
+ * than -1 when clicked.
  *
  * @param displayGlobal Global display variables
  * @param rectangle Rectangle to render the button with
- * @param text The text to print in the middle of the button
- * @return None
+ * @param textContent The text to print in the middle of the button
+ * @param clickRet Value corrosponding to the button being clicked
  */
 Button::Button(struct DisplayGlobal displayGlobal,
                const SDL_Rect& rectangle,
@@ -59,7 +60,6 @@ Button::Button(struct DisplayGlobal displayGlobal,
       std::make_unique<Text>(this->displayGlobal, "../display/fonts/16020_FUTURAM.ttf",
                              textContent.c_str(), 24, textColor, this->rectangle);
 
-  // Center the text within the button
   this->text->centerHorizontal(this->rectangle);
   this->text->centerVertical(this->rectangle);
 }
@@ -72,52 +72,58 @@ Button::Button(struct DisplayGlobal displayGlobal,
  * @return Whether or not the mouse is over the button
  */
 bool Button::checkHovered(const int& mouseXPosition, const int& mouseYPosition) {
-  if (mouseXPosition < this->rectangle.x) { // Outside left edge of button
+  // Outside left edge of button
+  if (mouseXPosition < this->rectangle.x) {
     return false;
   }
-  if (mouseXPosition >
-      this->rectangle.x + this->rectangle.w) { // Outside right edge of button
+
+  // Outside right edge of button
+  if (mouseXPosition > this->rectangle.x + this->rectangle.w) {
     return false;
   }
-  if (mouseYPosition < this->rectangle.y) { // Outside top edge of button
+
+  // Outside top edge of button
+  if (mouseYPosition < this->rectangle.y) {
     return false;
   }
-  if (mouseYPosition >
-      this->rectangle.y + this->rectangle.h) { // Outside bottom edge of button
+
+  // Outside bottom edge of button
+  if (mouseYPosition > this->rectangle.y + this->rectangle.h) {
     return false;
   }
+
   return true;
 }
 
 int Button::getClickReturn() const { return this->clickReturn; }
 
+/**
+ * Button operation to be performed periodically. Changes color if hovered and ensures
+ * text is centered within button.
+ *
+ * @param None
+ * @return None
+ */
 void Button::update() {
   // Change color if hovered
   int mouseXPosition, mouseYPosition;
-  SDL_GetMouseState(&mouseXPosition, &mouseYPosition); // Get the position of the mouse
-  if (checkHovered(mouseXPosition, mouseYPosition)) {  // Mouse is hovered over the button
+  SDL_GetMouseState(&mouseXPosition, &mouseYPosition);
+  if (checkHovered(mouseXPosition, mouseYPosition)) {
     this->backgroundColor = this->hoveredColor;
   }
-  else { // Mouse is not hovered over the button
+  else {
     this->backgroundColor = this->defaultColor;
   }
 
+  // Ensure text is centered
   if (this->text->checkCenterHorizontal(this->rectangle) == false) {
     this->text->centerHorizontal(this->rectangle);
   }
-
   if (this->text->checkCenterVertical(this->rectangle) == false) {
     this->text->centerVertical(this->rectangle);
   }
 }
 
-/**
- * Render the button
- *
- * Input:
- * - None
- * Output: None
- */
 void Button::render() const {
   // Set draw color and fill the button
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, backgroundColor.r,

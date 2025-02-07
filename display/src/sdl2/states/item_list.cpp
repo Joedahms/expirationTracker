@@ -23,7 +23,7 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
   openDatabase(&this->database);
 
   std::unique_ptr<ScrollBox> scrollBox = std::make_unique<ScrollBox>(this->displayGlobal);
-  SDL_Rect scrollBoxRect               = {0, 0, 300, 100};
+  SDL_Rect scrollBoxRect               = {0, 0, 400, 100};
   int windowWidth, windowHeight;
   SDL_GetWindowSize(this->displayGlobal.window, &windowWidth, &windowHeight);
   scrollBoxRect.h = windowHeight - 1;
@@ -37,6 +37,10 @@ ItemList::~ItemList() { sqlite3_close(database); }
 
 /**
  * Handle events in the SDL event queue. Check if user wants to quit and if scrolling
+ *
+ * @param displayIsRunning If the display is still runnning. Eg the user has not quit the
+ * display.
+ * @return The state the display is in after handling all events in the SDL event queue
  */
 int ItemList::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
@@ -86,6 +90,12 @@ int ItemList::checkKeystates() {
   return ITEM_LIST;
 }
 
+/**
+ * Perform operations that need to be done periodically within the state.
+ *
+ * @param None
+ * @return None
+ */
 void ItemList::update() {
   this->currentUpdate = std::chrono::steady_clock::now();
 
@@ -93,7 +103,8 @@ void ItemList::update() {
   updateDifference = std::chrono::duration_cast<std::chrono::seconds>(
       this->currentUpdate - this->previousUpdate);
 
-  if (updateDifference.count() > 5) { // 5 or more seconds since last update
+  // 5 or more seconds since last update
+  if (updateDifference.count() > 5) {
     char* errorMessage    = nullptr;
     const char* selectAll = "SELECT * FROM foodItems;";
     this->allFoodItems.clear();

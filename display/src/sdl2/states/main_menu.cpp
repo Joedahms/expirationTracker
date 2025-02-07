@@ -8,7 +8,6 @@
 
 /**
  * @param displayGlobal Global display variables.
- * @return None
  */
 MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
   this->displayGlobal        = displayGlobal;
@@ -68,6 +67,13 @@ int MainMenu::handleEvents(bool* displayIsRunning) {
   return returnValue;
 }
 
+/**
+ * Perform operations that need to be done periodically within the state. Update all
+ * buttons.
+ *
+ * @param None
+ * @return None
+ */
 void MainMenu::update() {
   for (auto& currentButton : this->buttons) {
     currentButton->update();
@@ -75,7 +81,7 @@ void MainMenu::update() {
 }
 
 /**
- * Render the display title and the start button.
+ * Render all elements.
  *
  * @param None
  * @return None
