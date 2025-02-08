@@ -16,27 +16,34 @@
  * @param pipes Pipes for vision to communicate with the other processes
  * Output: None
  */
-void visionEntry(struct VisionPipes pipes) {
+void visionEntry(struct Pipes pipes) {
   LOG(INFO) << "Within vision process";
 
-  // Close unused ends of the pipes
-  close(pipes.fromDisplay[WRITE]);
-  close(pipes.fromHardware[WRITE]);
-  close(pipes.toDisplay[READ]);
-  close(pipes.toHardware[READ]);
+  // Close write end of read pipes
+  close(pipes.displayToVision[WRITE]);
+  close(pipes.hardwareToVision[WRITE]);
 
-  // Close not currently used ends
-  // close(pipes.fromHardware[READ]); // Not currently used
-  close(pipes.fromDisplay[READ]); // Not currently used
-  //  close(pipes.toDisplay[WRITE]);  // Not currently used
-  close(pipes.toHardware[WRITE]); // Not currently used
+  // Close read end of write pipes
+  close(pipes.visionToDisplay[READ]);
+  close(pipes.visionToHardware[READ]);
 
+  while (1) {
+    redoThisFunctionPlz(pipes);
+  }
+}
+
+void redoThisFunctionPlz(struct Pipes pipes) {
   struct timeval timeout;
   timeout.tv_sec  = 1;
   timeout.tv_usec = 0;
   struct FoodItem foodItem;
-  receiveFoodItem(foodItem, pipes.fromHardware[READ], timeout);
+  bool foodItemReceived = false;
+  foodItemReceived = receiveFoodItem(foodItem, pipes.hardwareToVision[READ], timeout);
+  if (foodItemReceived == false) {
+    return;
+  }
 
+  /*
   std::cout << foodItem.photoPath << std::endl;
   std::cout << foodItem.name << std::endl;
 
@@ -51,8 +58,9 @@ void visionEntry(struct VisionPipes pipes) {
   std::cout << foodItem.catagory << std::endl;
   std::cout << foodItem.weight << std::endl;
   std::cout << foodItem.quantity << std::endl;
+  */
 
-  sendFoodItem(foodItem, pipes.toDisplay[WRITE]);
+  sendFoodItem(foodItem, pipes.visionToDisplay[WRITE]);
 
   LOG(INFO) << "Vision Received all images from hardware";
   LOG(INFO) << "Vision analyzing all images";

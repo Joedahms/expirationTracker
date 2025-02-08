@@ -6,6 +6,7 @@
 #include "../../food_item.h"
 #include "../../pipes.h"
 
-void externalHandler(struct DisplayPipes);
+void externalHandler(struct Pipes pipes);
+bool sdlHandler(struct Pipes pipes, int* sdlToDisplay, int* displayToSdl);
 
 #endif

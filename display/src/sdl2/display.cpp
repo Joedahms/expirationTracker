@@ -4,6 +4,7 @@
 #include <glog/logging.h>
 #include <iostream>
 
+#include "../../../pipes.h"
 #include "display.h"
 #include "display_global.h"
 #include "states/state.h"
@@ -159,10 +160,13 @@ void Display::checkState() {
  * @param None
  * @return None
  */
-void Display::handleEvents() {
+void Display::handleEvents(int* sdlToDisplay, int* displayToSdl) {
   switch (this->state) {
   case MAIN_MENU:
     this->state = this->mainMenu->handleEvents(&this->displayIsRunning);
+    if (this->state == SCANNING) {
+      writeString(sdlToDisplay[WRITE], START_SCAN);
+    }
     break;
 
   case SCANNING:

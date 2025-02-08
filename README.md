@@ -28,13 +28,16 @@ run cmake ..
 run make
 
 # Had to install to run repo:
-
+sudo apt update
+sudo apt upgrade
 sudo apt install make
 sudo apt install g++
 sudo apt install cmake
 sudo apt install libgoogle-glog-dev
 sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev  
-libopencv-dev
+sudo apt install libopencv-dev
+sudo apt install sqlite3
+sudo apt install libsqlite3-dev
 
 
 

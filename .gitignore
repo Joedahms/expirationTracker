@@ -1,3 +1,4 @@
 build/**
 yoloDarknet/yolov4.weights
 *.db
+.vscode

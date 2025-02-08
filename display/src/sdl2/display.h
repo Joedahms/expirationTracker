@@ -33,7 +33,7 @@ public:
   void initializeSdl(SDL_Window* window);
 
   void checkState();
-  void handleEvents();
+  void handleEvents(int* sdlToDisplay, int* displayToSdl);
   void checkKeystates();
   void update();
 

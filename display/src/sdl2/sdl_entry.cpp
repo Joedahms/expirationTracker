@@ -11,7 +11,7 @@
  * @param None
  * @return None
  */
-void sdlEntry() {
+void sdlEntry(int* sdlToDisplay, int* displayToSdl) {
   LOG(INFO) << "SDL display process started successfully";
 
   struct DisplayGlobal displayGlobal;
@@ -22,7 +22,7 @@ void sdlEntry() {
                                 1024, 600, false, displayGlobal);
 
   while (display->running()) {
-    display->handleEvents();
+    display->handleEvents(sdlToDisplay, displayToSdl);
     display->checkState();
     display->checkKeystates();
     display->checkState();
