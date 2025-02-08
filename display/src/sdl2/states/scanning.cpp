@@ -86,7 +86,7 @@ void Scanning::render() const {
  * @return None
  */
 void Scanning::enterScanning() {
-  SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
+  //  SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
   initializeTextures();
 
   // State has been entered once

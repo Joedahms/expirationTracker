@@ -15,8 +15,8 @@
  * @param displayGlobal Global display variables.
  */
 ItemList::ItemList(struct DisplayGlobal displayGlobal) {
-  this->displayGlobal        = displayGlobal;
-  SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
+  this->displayGlobal = displayGlobal;
+  // SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
 
   previousUpdate = std::chrono::steady_clock::now();
 
