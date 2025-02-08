@@ -8,8 +8,8 @@
 
 #include "../../../../food_item.h"
 #include "../display_global.h"
-#include "../scroll_box.h"
-#include "../text.h"
+#include "../elements/scroll_box.h"
+#include "../elements/text.h"
 #include "state.h"
 
 class ItemList : public State {
@@ -19,6 +19,7 @@ public:
   int handleEvents(bool*) override;
   int checkKeystates();
   void update() override;
+  void updateScrollBox();
   void render() const override;
 
 private:

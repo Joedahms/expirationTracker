@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 
-#include "display_global.h"
+#include "../display_global.h"
 #include "element.h"
 #include "text.h"
 

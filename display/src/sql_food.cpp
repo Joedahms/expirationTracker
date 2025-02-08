@@ -140,10 +140,11 @@ int readFoodItemCallback(void* foodItemVector,
     else if (std::string(columnNames[i]) == "weight") {
       foodItem.weight = columns[i];
     }
-    else if (std::string(columnNames[i]) == "quantity") {
-      foodItem.quantity = columns[i];
-    }
     */
+    else if (std::string(columnNames[i]) == "quantity") {
+      foodItem.quantity = stoi(columnValue);
+      std::cout << foodItem.quantity << std::endl;
+    }
   }
   allFoodItems->push_back(foodItem);
   return 0;

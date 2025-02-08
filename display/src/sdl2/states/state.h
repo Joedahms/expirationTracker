@@ -9,10 +9,10 @@
 #include <memory>
 #include <vector>
 
-#include "../button.h"
 #include "../display_global.h"
-#include "../scroll_box.h"
-#include "../text.h"
+#include "../elements/button.h"
+#include "../elements/scroll_box.h"
+#include "../elements/text.h"
 
 class State {
 public:

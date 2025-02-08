@@ -3,7 +3,7 @@
 
 #include <SDL2/SDL.h>
 
-#include "display_global.h"
+#include "../display_global.h"
 
 class Element {
 public:

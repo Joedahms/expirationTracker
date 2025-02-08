@@ -5,7 +5,7 @@
 #include <string>
 
 #include "../display_global.h"
-#include "../text.h"
+#include "../elements/text.h"
 #include "scanning.h"
 
 /**

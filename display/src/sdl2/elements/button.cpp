@@ -2,8 +2,8 @@
 #include <iostream>
 #include <memory>
 
+#include "../display_global.h"
 #include "button.h"
-#include "display_global.h"
 #include "element.h"
 
 /**

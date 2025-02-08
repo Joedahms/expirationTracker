@@ -6,9 +6,9 @@
 #include "../../../../food_item.h"
 #include "../../sql_food.h"
 #include "../display_global.h"
-#include "../panel.h"
-#include "../scroll_box.h"
-#include "../text.h"
+#include "../elements/panel.h"
+#include "../elements/scroll_box.h"
+#include "../elements/text.h"
 #include "item_list.h"
 
 /**
@@ -31,6 +31,7 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
   scrollBox->setPanelHeight(30);
   scrollBox->addBorder(1);
   this->scrollBoxes.push_back(std::move(scrollBox));
+  updateScrollBox();
 }
 
 ItemList::~ItemList() { sqlite3_close(database); }
@@ -105,21 +106,32 @@ void ItemList::update() {
 
   // 5 or more seconds since last update
   if (updateDifference.count() > 5) {
-    char* errorMessage    = nullptr;
-    const char* selectAll = "SELECT * FROM foodItems;";
-    this->allFoodItems.clear();
-
-    // All food items
-    int sqlReturn = sqlite3_exec(this->database, selectAll, readFoodItemCallback,
-                                 &allFoodItems, &errorMessage);
-
-    this->scrollBoxes[0]->updatePanelContents(this->allFoodItems);
-
-    if (sqlReturn != SQLITE_OK) {
-      LOG(FATAL) << "SQL Exec Error: " << errorMessage;
-    }
-    this->previousUpdate = this->currentUpdate;
+    updateScrollBox();
   }
+}
+
+/**
+ * Ensure the panels within the scrollbox are up to date with the information stored in
+ * the database.
+ *
+ * @param None
+ * @return None
+ */
+void ItemList::updateScrollBox() {
+  char* errorMessage    = nullptr;
+  const char* selectAll = "SELECT * FROM foodItems;";
+  this->allFoodItems.clear();
+
+  // All food items
+  int sqlReturn = sqlite3_exec(this->database, selectAll, readFoodItemCallback,
+                               &allFoodItems, &errorMessage);
+
+  this->scrollBoxes[0]->updatePanelContents(this->allFoodItems);
+
+  if (sqlReturn != SQLITE_OK) {
+    LOG(FATAL) << "SQL Exec Error: " << errorMessage;
+  }
+  this->previousUpdate = this->currentUpdate;
 }
 
 void ItemList::render() const {

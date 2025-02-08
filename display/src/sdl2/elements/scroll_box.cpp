@@ -5,9 +5,9 @@
 #include <memory>
 #include <vector>
 
-#include "../../../food_item.h"
-#include "../sql_food.h"
-#include "display_global.h"
+#include "../../../../food_item.h"
+#include "../../sql_food.h"
+#include "../display_global.h"
 #include "panel.h"
 #include "scroll_box.h"
 
@@ -81,6 +81,13 @@ void ScrollBox::updatePanelContents(std::vector<FoodItem> allFoodItems) {
         std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
                                expirationDateYear.c_str(), 24, textColor, rect);
     texts.push_back(std::move(year));
+
+    // Year
+    std::string quantityString = std::to_string(static_cast<int>(foodItem.quantity));
+    std::unique_ptr<Text> quantityText =
+        std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
+                               quantityString.c_str(), 24, textColor, rect);
+    texts.push_back(std::move(quantityText));
 
     std::unique_ptr<Panel> newPanel =
         std::make_unique<Panel>(this->displayGlobal, rect, std::move(texts));

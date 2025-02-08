@@ -3,8 +3,8 @@
 #include <memory>
 #include <vector>
 
+#include "../display_global.h"
 #include "button.h"
-#include "display_global.h"
 #include "element.h"
 #include "panel.h"
 #include "text.h"
