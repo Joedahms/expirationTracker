@@ -16,11 +16,8 @@
  */
 ItemList::ItemList(struct DisplayGlobal displayGlobal) {
   this->displayGlobal = displayGlobal;
-  // SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
 
   previousUpdate = std::chrono::steady_clock::now();
-
-  openDatabase(&this->database);
 
   std::unique_ptr<ScrollBox> scrollBox = std::make_unique<ScrollBox>(this->displayGlobal);
   SDL_Rect scrollBoxRect               = {0, 0, 400, 100};
@@ -31,10 +28,8 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
   scrollBox->setPanelHeight(30);
   scrollBox->addBorder(1);
   this->scrollBoxes.push_back(std::move(scrollBox));
-  updateScrollBox();
+  this->scrollBoxes[0]->update();
 }
-
-ItemList::~ItemList() { sqlite3_close(database); }
 
 /**
  * Handle events in the SDL event queue. Check if user wants to quit and if scrolling
@@ -106,32 +101,9 @@ void ItemList::update() {
 
   // 5 or more seconds since last update
   if (updateDifference.count() > 5) {
-    updateScrollBox();
+    this->scrollBoxes[0]->update();
+    this->previousUpdate = this->currentUpdate;
   }
-}
-
-/**
- * Ensure the panels within the scrollbox are up to date with the information stored in
- * the database.
- *
- * @param None
- * @return None
- */
-void ItemList::updateScrollBox() {
-  char* errorMessage    = nullptr;
-  const char* selectAll = "SELECT * FROM foodItems;";
-  this->allFoodItems.clear();
-
-  // All food items
-  int sqlReturn = sqlite3_exec(this->database, selectAll, readFoodItemCallback,
-                               &allFoodItems, &errorMessage);
-
-  this->scrollBoxes[0]->updatePanelContents(this->allFoodItems);
-
-  if (sqlReturn != SQLITE_OK) {
-    LOG(FATAL) << "SQL Exec Error: " << errorMessage;
-  }
-  this->previousUpdate = this->currentUpdate;
 }
 
 void ItemList::render() const {

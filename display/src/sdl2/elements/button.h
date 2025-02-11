@@ -21,7 +21,7 @@ public:
          const int& clickRet);
   bool checkHovered(const int& mouseXPosition, const int& mouseYPosition);
   int getClickReturn() const;
-  void update();
+  void update() override;
   void render() const override;
 
 private:

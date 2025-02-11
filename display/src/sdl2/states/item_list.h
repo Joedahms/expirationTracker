@@ -15,7 +15,7 @@
 class ItemList : public State {
 public:
   ItemList(struct DisplayGlobal displayGlobal);
-  ~ItemList();
+  //~ItemList();
   int handleEvents(bool*) override;
   int checkKeystates();
   void update() override;
@@ -23,10 +23,8 @@ public:
   void render() const override;
 
 private:
-  sqlite3* database = nullptr;
   std::chrono::steady_clock::time_point previousUpdate;
   std::chrono::steady_clock::time_point currentUpdate;
-  std::vector<FoodItem> allFoodItems;
   SDL_Point mousePosition;
 };
 

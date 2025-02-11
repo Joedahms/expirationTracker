@@ -38,6 +38,8 @@ Text::Text(struct DisplayGlobal displayGlobal,
 
 Text::~Text() { TTF_CloseFont(this->font); }
 
+void Text::update() {}
+
 /**
  * Input: None
  * Output: None

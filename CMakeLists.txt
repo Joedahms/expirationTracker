@@ -40,6 +40,7 @@ add_executable (expirationTracker
   display/src/sdl2/elements/text.cpp
   display/src/sdl2/elements/panel.cpp
   display/src/sdl2/elements/scroll_box.cpp
+  display/src/sdl2/elements/number_setting.cpp
 
   # GUI States
   display/src/sdl2/states/state.cpp

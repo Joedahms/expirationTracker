@@ -8,24 +8,29 @@
 #include "../display_global.h"
 #include "button.h"
 #include "element.h"
+#include "number_setting.h"
 #include "text.h"
 
 class Panel : public Element {
 public:
   Panel(struct DisplayGlobal displayGlobal,
+        int id,
         SDL_Rect rect,
         std::vector<std::unique_ptr<Text>> t);
   Panel(struct DisplayGlobal displayGlobal,
+        int id,
         SDL_Rect rect,
         std::vector<std::unique_ptr<Text>> t,
         std::vector<std::unique_ptr<Button>> b);
 
-  void updateElementPositions();
+  void update() override;
   void render() const override;
 
 private:
+  int foodItemId = 0;
   std::vector<std::unique_ptr<Text>> texts;
   std::vector<std::unique_ptr<Button>> buttons;
+  NumberSetting quantity;
 };
 
 #endif

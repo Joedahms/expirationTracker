@@ -59,6 +59,7 @@ public:
     return centered;
   }
 
+  virtual void update()       = 0;
   virtual void render() const = 0;
   SDL_Rect getRectangle() { return this->rectangle; }
   void setRectangle(SDL_Rect rectangle);

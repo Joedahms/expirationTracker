@@ -16,6 +16,8 @@
  * @return None
  */
 void sendFoodItem(struct FoodItem foodItem, int pipeToWrite) {
+  write(pipeToWrite, &foodItem.id, sizeof(foodItem.id));
+
   writeString(pipeToWrite, foodItem.photoPath);
   writeString(pipeToWrite, foodItem.name);
   writeString(pipeToWrite, foodItem.catagory);
@@ -54,6 +56,8 @@ bool receiveFoodItem(struct FoodItem& foodItem, int pipeToRead, struct timeval t
     return false;
   }
   if (FD_ISSET(pipeToRead, &readPipeSet)) { // Data available
+    read(pipeToRead, &foodItem.id, sizeof(foodItem.id));
+
     foodItem.photoPath = readString(pipeToRead);
     foodItem.name      = readString(pipeToRead);
     foodItem.catagory  = readString(pipeToRead);

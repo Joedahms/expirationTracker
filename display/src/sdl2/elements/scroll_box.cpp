@@ -1,6 +1,7 @@
 #define SCROLL_AMOUNT 4
 
 #include <SDL2/SDL.h>
+#include <glog/logging.h>
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -25,7 +26,9 @@ void ScrollBox::setPanelHeight(int panelHeight) { this->panelHeight = panelHeigh
  * @param allFoodItems A vector of all the food items to put in panels
  * @return None
  */
-void ScrollBox::updatePanelContents(std::vector<FoodItem> allFoodItems) {
+void ScrollBox::update() {
+  std::vector<FoodItem> allFoodItems = readAllFoodItems();
+
   this->panels.clear();
   for (auto& foodItem : allFoodItems) {
     std::vector<std::unique_ptr<Text>> texts;
@@ -90,7 +93,7 @@ void ScrollBox::updatePanelContents(std::vector<FoodItem> allFoodItems) {
     texts.push_back(std::move(quantityText));
 
     std::unique_ptr<Panel> newPanel =
-        std::make_unique<Panel>(this->displayGlobal, rect, std::move(texts));
+        std::make_unique<Panel>(this->displayGlobal, foodItem.id, rect, std::move(texts));
     addPanel(std::move(newPanel), this->rectangle);
   }
 }
@@ -103,10 +106,10 @@ void ScrollBox::updatePanelContents(std::vector<FoodItem> allFoodItems) {
  * @return None
  */
 void ScrollBox::addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectangle) {
-  std::unique_ptr newPanel = std::move(panel);
-  SDL_Rect newPanelRect    = newPanel->getRectangle();
-  newPanelRect.h           = this->panelHeight;
-  newPanelRect.w           = containingRectangle.w;
+  std::unique_ptr<Panel> newPanel = std::move(panel);
+  SDL_Rect newPanelRect           = newPanel->getRectangle();
+  newPanelRect.h                  = this->panelHeight;
+  newPanelRect.w                  = containingRectangle.w;
   if (this->panels.size() == 0) {
     newPanelRect.y = this->topPanelPosition;
   }
@@ -114,7 +117,7 @@ void ScrollBox::addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectan
     newPanelRect.y = this->panels.back()->getRectangle().y + this->panelHeight;
   }
   newPanel->setRectangle(newPanelRect);
-  newPanel->updateElementPositions();
+  newPanel->update();
   newPanel->addBorder(1);
   this->panels.push_back(std::move(newPanel));
 }
@@ -135,7 +138,7 @@ void ScrollBox::scrollUp(const SDL_Point* mousePosition) {
     SDL_Rect currPanelRectangle = currPanel->getRectangle();
     currPanelRectangle.y -= SCROLL_AMOUNT;
     currPanel->setRectangle(currPanelRectangle);
-    currPanel->updateElementPositions();
+    currPanel->update();
   }
 }
 
@@ -155,7 +158,7 @@ void ScrollBox::scrollDown(const SDL_Point* mousePosition) {
     SDL_Rect currPanelRectangle = currPanel->getRectangle();
     currPanelRectangle.y += SCROLL_AMOUNT;
     currPanel->setRectangle(currPanelRectangle);
-    currPanel->updateElementPositions();
+    currPanel->update();
   }
 }
 

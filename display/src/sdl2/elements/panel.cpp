@@ -17,8 +17,10 @@
  * @param t Vector of text objects to display within the panel
  */
 Panel::Panel(struct DisplayGlobal displayGlobal,
+             int id,
              SDL_Rect rect,
-             std::vector<std::unique_ptr<Text>> t) {
+             std::vector<std::unique_ptr<Text>> t)
+    : foodItemId(id) {
   this->displayGlobal = displayGlobal;
   this->rectangle     = rect;
   this->texts         = std::move(t);
@@ -33,9 +35,11 @@ Panel::Panel(struct DisplayGlobal displayGlobal,
  * @param b Vector of button objects to display within the panel
  */
 Panel::Panel(struct DisplayGlobal displayGlobal,
+             int id,
              SDL_Rect rect,
              std::vector<std::unique_ptr<Text>> t,
-             std::vector<std::unique_ptr<Button>> b) {
+             std::vector<std::unique_ptr<Button>> b)
+    : foodItemId(id) {
   this->displayGlobal = displayGlobal;
   this->rectangle     = rect;
   this->texts         = std::move(t);
@@ -50,7 +54,7 @@ Panel::Panel(struct DisplayGlobal displayGlobal,
  * @param None
  * @return None
  */
-void Panel::updateElementPositions() {
+void Panel::update() {
   // Align all text objects right next to each other
   for (int i = 0; i < this->texts.size(); i++) {
     SDL_Rect textRectangle = this->texts[i]->getRectangle();
@@ -64,6 +68,7 @@ void Panel::updateElementPositions() {
     }
     this->texts[i]->setRectangle(textRectangle);
   }
+  this->quantity.update();
 }
 
 /**
@@ -79,4 +84,5 @@ void Panel::render() const {
   for (auto& x : this->texts) {
     x->render();
   }
+  this->quantity.render();
 }

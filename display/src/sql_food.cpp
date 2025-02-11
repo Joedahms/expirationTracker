@@ -53,7 +53,7 @@ void storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
       "scanDateMonth, scanDateDay, expirationDateYear, expirationDateMonth, "
       "expirationDateDay, weight, quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
-  sqlite3_stmt* statement;
+  sqlite3_stmt* statement = nullptr;
   int sqlReturn = sqlite3_prepare_v2(database, insertSql, -1, &statement, nullptr);
   if (sqlReturn != SQLITE_OK) {
     LOG(FATAL) << "Prepare error: " << sqlite3_errmsg(database);
@@ -86,6 +86,48 @@ void storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
   sqlite3_finalize(statement);
 }
 
+std::vector<FoodItem> readAllFoodItems() {
+  sqlite3* database = nullptr;
+  openDatabase(&database);
+
+  char* errorMessage    = nullptr;
+  const char* selectAll = "SELECT * FROM foodItems;";
+
+  std::vector<FoodItem> allFoodItems;
+  int sqlReturn = sqlite3_exec(database, selectAll, readFoodItemCallback, &allFoodItems,
+                               &errorMessage);
+
+  sqlite3_close(database);
+}
+
+FoodItem readFoodItemById(const int& id) {
+  sqlite3* database = nullptr;
+  openDatabase(&database);
+
+  char* errorMessage      = nullptr;
+  sqlite3_stmt* statement = nullptr;
+  const char* selectId    = "SELECT * FROM foodItems WHERE id = ?;";
+
+  int sqlReturn = sqlite3_prepare_v2(database, selectId, -1, &statement, nullptr);
+  if (sqlReturn != SQLITE_OK) {
+    LOG(FATAL) << "Prepare error: " << sqlite3_errmsg(database);
+  }
+
+  sqlite3_bind_int(statement, 1, id);
+
+  sqlReturn = sqlite3_step(statement);
+  if (sqlReturn != SQLITE_DONE) {
+    LOG(FATAL) << "Execution Error: " << sqlite3_errmsg(database);
+  }
+  else {
+    int returnId = sqlite3_column_int(statement, 0);
+  }
+
+  sqlite3_finalize(statement);
+  sqlite3_close(database);
+  return
+}
+
 int readFoodItemCallback(void* foodItemVector,
                          int numColumns,
                          char** columns,
@@ -98,6 +140,9 @@ int readFoodItemCallback(void* foodItemVector,
     std::string columnValue(columns[i], strlen(columns[i]));
     std::string columnName(columnNames[i], strlen(columnNames[i]));
 
+    if (columnName == "id") {
+      foodItem.id = stoi(columnValue);
+    }
     if (columnName == "name") {
       foodItem.name = columnValue;
     }

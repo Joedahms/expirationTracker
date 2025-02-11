@@ -20,6 +20,7 @@ public:
        SDL_Color color,
        SDL_Rect rectangle);
   ~Text();
+  void update() override;
   void render() const override;
 
 private:
