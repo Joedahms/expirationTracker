@@ -1,5 +1,5 @@
-#ifndef HW_IO_H
-#define HW_IO_H
+#ifndef IO_H
+#define IO_H
 
 #include "../../pipes.h"
 
