@@ -5,7 +5,8 @@
 #include <string>
 #include <vector>
 
-void visionEntry(struct VisionPipes);
+void visionEntry(struct Pipes pipes);
+void redoThisFunctionPlz(struct Pipes pipes);
 void receiveImages(int, const std::string&);
 std::vector<std::string> analyzeImages(const std::string&);
 
