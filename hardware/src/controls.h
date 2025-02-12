@@ -6,6 +6,7 @@
 void setup();
 void rotateMotor();
 void takePhotos(int angle);
+void takePic(char* filename);
 void sendDataToVision(const std::string IMAGE_DIR, float weight);
 void rotateAndCapture();
 

@@ -86,7 +86,7 @@ void takePhotos(int angle) {
         LOG(FATAL) << "Error starting top camera process.";
     }
     else if (top_cam == 0) {
-        std::string top_photo = CAMERA1_CMD + IMAGE_DIR + std::to_string(angle) + "_T.jpg";
+        std::string top_photo = CAMERA1_CMD + IMAGE_DIR + std::to_string(angle) + "_T.jpg --nopreview";
         if (system(top_photo.c_str()) == -1) {
             LOG(FATAL) << "Failed to capture image from top camera.";
         }
@@ -98,7 +98,7 @@ void takePhotos(int angle) {
         LOG(FATAL) << "Error starting side camera process.";
     }
     else if (side_cam == 0) {
-        std::string side_photo = CAMERA1_CMD + IMAGE_DIR + std::to_string(angle) + "_S.jpg";
+        std::string side_photo = CAMERA1_CMD + IMAGE_DIR + std::to_string(angle) + "_S.jpg --nopreview";
         if (system(side_photo.c_str()) == -1) {
             LOG(FATAL) << "Failed to capture image from side camera.";
         }
@@ -108,7 +108,29 @@ void takePhotos(int angle) {
   waitpid(top_cam, NULL, 0);
   waitpid(side_cam, NULL, 0);
 
-  LOG(INFO) << "Photos successfull at position " << angle;
+  LOG(INFO) << "Photos successful at position " << angle;
+}
+
+
+/**
+ * Takes a photo using the Raspberry Pi camera module.
+ *
+ * @param filename The name of the file to save the photo to.
+ * @return None
+ */
+void takePic (char* filename) {
+  
+  static pid_t pid =0;
+
+  if((pid = fork()) ==0) {
+    execl("/usr/bin/raspistill",
+          "usr/bin/raspistill",
+          "-n",
+          "-vf",
+          "-o",
+          filename,
+          NULL);
+  }
 }
 
 /**
@@ -147,6 +169,11 @@ void rotateAndCapture() {
 
   for (int angle = 0; angle < 8; angle++) {
     LOG(INFO) << "Capturing at position " << angle;
+    /**
+     * char filename[] = "IMAGE_DIR + std::to_string(angle) + "_S.jpg --nopreview";
+     * takePic(filename);
+     * cout << "Captured image at position " << angle << endl;
+     */
     takePhotos(angle);
     sendDataToVision(IMAGE_DIR, weight);
 
