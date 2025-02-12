@@ -27,7 +27,6 @@ public:
   void render() const override;
 
 private:
-  int foodItemId = 0;
   std::vector<std::unique_ptr<Text>> texts;
   std::vector<std::unique_ptr<Button>> buttons;
   NumberSetting quantity;

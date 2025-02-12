@@ -19,11 +19,11 @@
 Panel::Panel(struct DisplayGlobal displayGlobal,
              int id,
              SDL_Rect rect,
-             std::vector<std::unique_ptr<Text>> t)
-    : foodItemId(id) {
+             std::vector<std::unique_ptr<Text>> t) {
   this->displayGlobal = displayGlobal;
   this->rectangle     = rect;
   this->texts         = std::move(t);
+  this->numberSetting.setSettingId(id);
 }
 
 /**
@@ -38,12 +38,12 @@ Panel::Panel(struct DisplayGlobal displayGlobal,
              int id,
              SDL_Rect rect,
              std::vector<std::unique_ptr<Text>> t,
-             std::vector<std::unique_ptr<Button>> b)
-    : foodItemId(id) {
+             std::vector<std::unique_ptr<Button>> b) {
   this->displayGlobal = displayGlobal;
   this->rectangle     = rect;
   this->texts         = std::move(t);
   this->buttons       = std::move(b);
+  this->numberSetting.setSettingId(id);
 }
 
 /**

@@ -13,7 +13,7 @@
 class ScrollBox : public Element {
 public:
   ScrollBox(struct DisplayGlobal displayGlobal);
-  void setupPanels();
+  void refreshPanels();
   void setPanelHeight(int panelHeight);
   void update() override;
   void addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectangle);

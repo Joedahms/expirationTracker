@@ -10,13 +10,16 @@
 class NumberSetting : public Element {
 public:
   NumberSetting();
+  void setSettingId(const int& newSettingId);
   void update() override;
   void render() const override;
 
 private:
   std::unique_ptr<Button> decreaseButton;
   std::unique_ptr<Button> increaseButton;
-  std::unique_ptr<Text> settingValue;
+  int settingValue;
+  std::unique_ptr<Text> settingValueText;
+  int settingId = -1;
 };
 
 #endif
