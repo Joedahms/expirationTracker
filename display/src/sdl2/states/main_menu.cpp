@@ -4,6 +4,7 @@
 
 #include "../display_global.h"
 #include "main_menu.h"
+#include "state.h"
 
 /**
  * @param displayGlobal Global display variables.
@@ -16,27 +17,26 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
   // Title
   const char* titleContent = "Expiration Tracker";
   SDL_Color titleColor     = {0, 255, 0, 255}; // Green
-  SDL_Rect titleRectangle  = {
-      100,
-      100,
-      0,
-      0,
-  }; // x y w h
-  this->title = std::make_unique<Text>(this->displayGlobal, displayGlobal.futuramFontPath,
-                                       titleContent, 24, titleColor, titleRectangle);
-  this->title->centerHorizontal(windowSurface);
+  SDL_Rect titleRectangle  = {100, 100, 0, 0};
+  std::unique_ptr<Text> title =
+      std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
+                             titleContent, 24, titleColor, titleRectangle);
+  title->centerHorizontal(windowSurface);
+  this->texts.push_back(std::move(title));
 
   // Scan New Item
-  SDL_Rect newScanButtonRectangle = {200, 150, 200, 50};
-  this->newScanButton             = std::make_unique<Button>(this->displayGlobal,
-                                                 newScanButtonRectangle, "Scan New Item");
-  this->newScanButton->centerHorizontal(windowSurface);
+  SDL_Rect newScanButtonRectangle       = {200, 150, 200, 50};
+  std::unique_ptr<Button> newScanButton = std::make_unique<Button>(
+      this->displayGlobal, newScanButtonRectangle, "Scan New Item", SCANNING);
+  newScanButton->centerHorizontal(windowSurface);
+  this->buttons.push_back(std::move(newScanButton));
 
   // View Stored Items
-  SDL_Rect viewStoredButtonRectangle = {200, 210, 200, 50};
-  this->viewStoredButton             = std::make_unique<Button>(
-      this->displayGlobal, viewStoredButtonRectangle, "View Stored Items");
-  this->viewStoredButton->centerHorizontal(windowSurface);
+  SDL_Rect viewStoredButtonRectangle       = {200, 210, 200, 50};
+  std::unique_ptr<Button> viewStoredButton = std::make_unique<Button>(
+      this->displayGlobal, viewStoredButtonRectangle, "View Stored Items", ITEM_LIST);
+  viewStoredButton->centerHorizontal(windowSurface);
+  this->buttons.push_back(std::move(viewStoredButton));
 }
 
 /**
@@ -52,21 +52,13 @@ int MainMenu::handleEvents(bool* displayIsRunning) {
     int mouseX = event.motion.x;
     int mouseY = event.motion.y;
 
-    switch (event.type) { // Check which type of event
+    switch (event.type) {
     case SDL_QUIT:
       *displayIsRunning = false;
       break;
 
-    // Check if mouse was clicked over any buttons
     case SDL_MOUSEBUTTONDOWN:
-      if (this->newScanButton->checkHovered(mouseX, mouseY) == true) {
-        returnValue = SCANNING;
-        break;
-      }
-      else if (this->viewStoredButton->checkHovered(mouseX, mouseY) == true) {
-        returnValue = ITEM_LIST;
-        break;
-      }
+      returnValue = checkButtonsClicked(mouseX, mouseY);
       break;
 
     default:
@@ -76,17 +68,21 @@ int MainMenu::handleEvents(bool* displayIsRunning) {
   return returnValue;
 }
 
+void MainMenu::update() {
+  for (auto& currentButton : this->buttons) {
+    currentButton->update();
+  }
+}
+
 /**
  * Render the display title and the start button.
  *
  * @param None
  * @return None
  */
-void MainMenu::render() {
+void MainMenu::render() const {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background
   SDL_RenderClear(this->displayGlobal.renderer);
-  this->newScanButton->render();
-  this->viewStoredButton->render();
-  this->title->render();
+  renderElements();
   SDL_RenderPresent(this->displayGlobal.renderer);
 }

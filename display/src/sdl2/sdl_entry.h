@@ -1,6 +1,6 @@
 #ifndef SDL_ENTRY_H
 #define SDL_ENTRY_H
 
-void sdlEntry();
+void sdlEntry(int* sdlToDisplay, int* displayToSdl);
 
 #endif

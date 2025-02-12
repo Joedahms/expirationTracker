@@ -1,6 +1,8 @@
 #ifndef FOOD_ITEM_H
 #define FOOD_ITEM_H
 
+#define START_SCAN "start scan"
+
 #include <chrono>
 #include <memory>
 #include <string>

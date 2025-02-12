@@ -38,7 +38,7 @@ void displayEntry(struct DisplayPipes pipes) {
     close(sdlToDisplay[READ]);
     close(displayToSdl[WRITE]);
 
-    sdlEntry();
+    sdlEntry(sdlToDisplay, displayToSdl);
   }
   else {
     // Still in display entry
@@ -46,6 +46,7 @@ void displayEntry(struct DisplayPipes pipes) {
     close(displayToSdl[READ]);
     while (1) {
       externalHandler(pipes);
+      sdlHandler(pipes, sdlToDisplay, displayToSdl);
     }
   }
 }

@@ -28,3 +28,8 @@ void externalHandler(struct DisplayPipes pipes) {
     sqlite3_close(database);
   }
 }
+
+void sdlHandler(struct DisplayPipes displayPipes, int* sdlToDisplay, int* displayToSdl) {
+  std::string sdlString = readString(sdlToDisplay[READ]);
+  writeString(displayPipes.toHardware[WRITE], sdlString);
+}
