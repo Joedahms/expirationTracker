@@ -94,44 +94,95 @@ std::vector<FoodItem> readAllFoodItems() {
   const char* selectAll = "SELECT * FROM foodItems;";
 
   std::vector<FoodItem> allFoodItems;
-  int sqlReturn = sqlite3_exec(database, selectAll, readFoodItemCallback, &allFoodItems,
-                               &errorMessage);
+  int sqlReturn = sqlite3_exec(database, selectAll, readAllFoodItemsCallback,
+                               &allFoodItems, &errorMessage);
 
   sqlite3_close(database);
+  return allFoodItems;
 }
 
 FoodItem readFoodItemById(const int& id) {
   sqlite3* database = nullptr;
   openDatabase(&database);
 
-  char* errorMessage      = nullptr;
-  sqlite3_stmt* statement = nullptr;
-  const char* selectId    = "SELECT * FROM foodItems WHERE id = ?;";
+  char* errorMessage   = nullptr;
+  const char* selectId = "SELECT * FROM foodItems WHERE id = ?;";
 
-  int sqlReturn = sqlite3_prepare_v2(database, selectId, -1, &statement, nullptr);
-  if (sqlReturn != SQLITE_OK) {
-    LOG(FATAL) << "Prepare error: " << sqlite3_errmsg(database);
-  }
+  FoodItem foodItem;
+  int sqlReturn = sqlite3_exec(database, selectId, readFoodItemByIdCallback, &foodItem,
+                               &errorMessage);
 
-  sqlite3_bind_int(statement, 1, id);
-
-  sqlReturn = sqlite3_step(statement);
-  if (sqlReturn != SQLITE_DONE) {
-    LOG(FATAL) << "Execution Error: " << sqlite3_errmsg(database);
-  }
-  else {
-    int returnId = sqlite3_column_int(statement, 0);
-  }
-
-  sqlite3_finalize(statement);
   sqlite3_close(database);
-  return
+  return foodItem;
 }
 
-int readFoodItemCallback(void* foodItemVector,
-                         int numColumns,
-                         char** columns,
-                         char** columnNames) {
+int readFoodItemByIdCallback(void* passedFoodItem,
+                             int numColumns,
+                             char** columns,
+                             char** columnNames) {
+  FoodItem* foodItem = static_cast<FoodItem*>(passedFoodItem);
+
+  for (int i = 0; i < numColumns; i++) {
+    std::string columnValue(columns[i], strlen(columns[i]));
+    std::string columnName(columnNames[i], strlen(columnNames[i]));
+
+    if (columnName == "id") {
+      foodItem->id = stoi(columnValue);
+    }
+    if (columnName == "name") {
+      foodItem->name = columnValue;
+    }
+    else if (columnName == "catagory") {
+      foodItem->catagory = columnValue;
+    }
+    else if (columnName == "scanDateYear") {
+      foodItem->scanDate = std::chrono::year_month_day(
+          std::chrono::year{stoi(columnValue)}, foodItem->scanDate.month(),
+          foodItem->scanDate.day());
+    }
+    else if (columnName == "scanDateMonth") {
+      foodItem->scanDate = std::chrono::year_month_day(
+          foodItem->scanDate.year(),
+          std::chrono::month{static_cast<unsigned>(std::stoi(columnValue))},
+          foodItem->scanDate.day());
+    }
+    else if (columnName == "scanDateDay") {
+      foodItem->scanDate = std::chrono::year_month_day(
+          foodItem->scanDate.year(), foodItem->scanDate.month(),
+          std::chrono::day{static_cast<unsigned>(stoi(columnValue))});
+    }
+    else if (columnName == "expirationDateYear") {
+      foodItem->expirationDate = std::chrono::year_month_day(
+          std::chrono::year{stoi(columnValue)}, foodItem->expirationDate.month(),
+          foodItem->expirationDate.day());
+    }
+    else if (columnName == "expirationDateMonth") {
+      foodItem->expirationDate = std::chrono::year_month_day(
+          foodItem->expirationDate.year(),
+          std::chrono::month{static_cast<unsigned>(stoi(columnValue))},
+          foodItem->expirationDate.day());
+    }
+    else if (columnName == "expirationDateDay") {
+      foodItem->expirationDate = std::chrono::year_month_day(
+          foodItem->expirationDate.year(), foodItem->expirationDate.month(),
+          std::chrono::day{static_cast<unsigned>(stoi(columnValue))});
+    }
+    /*
+    else if (std::string(columnNames[i]) == "weight") {
+      foodItem.weight = columns[i];
+    }
+    */
+    else if (std::string(columnNames[i]) == "quantity") {
+      foodItem->quantity = stoi(columnValue);
+    }
+  }
+  return 0;
+}
+
+int readAllFoodItemsCallback(void* foodItemVector,
+                             int numColumns,
+                             char** columns,
+                             char** columnNames) {
   std::vector<FoodItem>* allFoodItems =
       static_cast<std::vector<FoodItem>*>(foodItemVector);
   struct FoodItem foodItem;
