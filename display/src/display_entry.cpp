@@ -15,14 +15,16 @@
  * - Pipes for display to communicate with the other processes
  * Output: None
  */
-void displayEntry(struct DisplayPipes pipes) {
+void displayEntry(struct Pipes pipes) {
   LOG(INFO) << "Entered display process";
 
-  // Close unused ends of the pipes
-  close(pipes.toVision[READ]);      // Display does not read from toVision
-  close(pipes.toHardware[READ]);    // Display does not read from toHardware
-  close(pipes.fromVision[WRITE]);   // Display does not write to fromVision
-  close(pipes.fromHardware[WRITE]); // Display does not write to fromHardware
+  // Close write end of read pipes
+  close(pipes.hardwareToDisplay[WRITE]);
+  close(pipes.visionToDisplay[WRITE]);
+
+  // Close read end of write pipes
+  close(pipes.displayToHardware[READ]);
+  close(pipes.displayToVision[READ]);
 
   // SDL pipes
   int sdlToDisplay[2];
@@ -35,17 +37,20 @@ void displayEntry(struct DisplayPipes pipes) {
     LOG(FATAL) << "Error starting SDL process";
   }
   else if (sdlPid == 0) {
+    // In SDL
     close(sdlToDisplay[READ]);
     close(displayToSdl[WRITE]);
 
-    sdlEntry();
+    sdlEntry(sdlToDisplay, displayToSdl);
   }
   else {
     // Still in display entry
     close(sdlToDisplay[WRITE]);
     close(displayToSdl[READ]);
     while (1) {
+      bool stringFromSdl = false;
       externalHandler(pipes);
+      stringFromSdl = sdlHandler(pipes, sdlToDisplay, displayToSdl);
     }
   }
 }
