@@ -36,8 +36,11 @@ add_executable (expirationTracker
   display/src/sdl2/button.cpp
   display/src/sdl2/display.cpp
   display/src/sdl2/text.cpp
+  display/src/sdl2/panel.cpp
+  display/src/sdl2/scroll_box.cpp
 
   # GUI States
+  display/src/sdl2/states/state.cpp
   display/src/sdl2/states/main_menu.cpp
   display/src/sdl2/states/scanning.cpp
   display/src/sdl2/states/pause_menu.cpp
@@ -48,7 +51,8 @@ add_executable (expirationTracker
   vision/src/categorizeObjects.cpp
 
   #Hardware process after forked from main
-  hardware/src/hardware_pipe.cpp
+  hardware/src/hardware_entry.cpp
+  hardware/src/io.cpp
 )
 
 target_include_directories(expirationTracker PRIVATE ${OpenCV_INCLUDE_DIRS})

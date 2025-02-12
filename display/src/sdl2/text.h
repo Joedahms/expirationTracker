@@ -13,11 +13,16 @@
  */
 class Text : public Element {
 public:
-  Text(struct DisplayGlobal, const char*, const char*, int, SDL_Color, SDL_Rect);
-  void render();
+  Text(struct DisplayGlobal displayGlobal,
+       const char* fontPath,
+       const char* content,
+       int fontSize,
+       SDL_Color color,
+       SDL_Rect rectangle);
+  ~Text();
+  void render() const override;
 
 private:
-  struct DisplayGlobal displayGlobal;
   TTF_Font* font;
   const char* content;
   int fontSize;

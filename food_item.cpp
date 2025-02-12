@@ -28,8 +28,7 @@ void sendFoodItem(struct FoodItem foodItem, int pipeToWrite) {
 
 /**
  * Receive a food item struct through a pipe. Strings are handled differently due to them
- * being std::strings. Uses select to timeout if no data available on the pipe. Currently
- * waits 1 second.
+ * being std::strings. Uses select to timeout if no data available on the pipe.
  *
  * @param foodItem A food item struct to store the food item being received. Pass in an
  * empty food item. After function completes, the received food item will be in this

@@ -3,9 +3,10 @@
 #include <glog/logging.h>
 #include <iostream>
 #include <string>
-
+#include <unistd.h>
 #include "../../food_item.h"
-#include "hardware_pipe.h"
+#include "hardware_entry.h"
+#include "hw_io.h"
 
 /**
  * Entry into the hardware code. Only called from main after hardware child process is
@@ -24,15 +25,26 @@ void hardwareEntry(struct HardwarePipes pipes) {
   close(pipes.toDisplay[READ]);
   close(pipes.toVision[READ]);
 
-  // Close not currently used ends
-  close(pipes.fromDisplay[READ]); // Not currently used
-  close(pipes.fromVision[READ]);  // Not currently used
-  close(pipes.toDisplay[WRITE]);  // Not currently used
+  // Close unused ends of the pipes
+  // close(pipes.fromDisplay[READ]); // Not currently used
+  // close(pipes.fromVision[READ]);  // Not currently used
+  // close(pipes.toDisplay[WRITE]);  // Not currently used
   // close(pipes.toVision[WRITE]);   // Not currently used
 
-  LOG(INFO) << "Sending Images from Hardware to Vision";
-  // sendImagesWithinDirectory(pipes.toVision[WRITE], "../images/");
+  // Wait for start signal from Display with 0.5sec sleep
+  LOG(INFO) << "Waiting for start signal from Display";
+  if(receivedStartSignal(pipes.fromDisplay[READ]) == 0) {
+    usleep(500000);
+  }
+  else {
+    LOG(INFO) << "Checking weight";
+    /**
+     * Function call to scale
+     * 0 - nothing on scale
+     * 1 - valid input, begin scanning
+     */
 
+<<<<<<< HEAD:hardware/src/hardware_pipe.cpp
   struct FoodItem foodItem;
   foodItem.photoPath = "../images/apple.jpg";
   foodItem.name      = "Apple";
@@ -45,6 +57,32 @@ void hardwareEntry(struct HardwarePipes pipes) {
 
   sendFoodItem(foodItem, pipes.toVision[WRITE]);
   LOG(INFO) << "Done Sending Images from Hardware to Vision";
+=======
+    LOG(INFO) << "Beginning scan";
+    /**
+     * Function call to controls routine
+     * has a pipe read from vision in loop
+     */
+
+    LOG(INFO) << "Sending Images from Hardware to Vision";
+    // sendImagesWithinDirectory(pipes.toVision[WRITE], "../images/");
+  
+    struct FoodItem foodItem;
+    foodItem.photoPath = "../images/apple.jpg";
+    foodItem.name      = "Apple";
+    const std::chrono::time_point now{std::chrono::system_clock::now()};
+    foodItem.scanDate = std::chrono::floor<std::chrono::days>(now);
+  
+    foodItem.expirationDate = std::chrono::floor<std::chrono::days>(now);
+  
+    foodItem.catagory = "fruit";
+    foodItem.weight   = 10.0;
+    foodItem.quantity = 2;
+  
+    sendFoodItem(foodItem, pipes.toVision[WRITE]);
+    LOG(INFO) << "Done Sending Images from Hardware to Vision";
+  }
+>>>>>>> 35-send-start-signal-to-hardware:hardware/src/hardware_entry.cpp
 }
 
 /**

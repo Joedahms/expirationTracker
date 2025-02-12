@@ -1,4 +1,6 @@
 build/**
+yoloDarknet/yolov4.weights
+*.db
 .vscode
 
 YOLO/yolov4-tiny

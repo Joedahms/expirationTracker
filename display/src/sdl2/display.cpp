@@ -4,8 +4,10 @@
 #include <glog/logging.h>
 #include <iostream>
 
+#include "../../../pipes.h"
 #include "display.h"
 #include "display_global.h"
+#include "states/state.h"
 
 /**
  * @param windowTitle Title of the display window
@@ -160,21 +162,24 @@ void Display::checkState() {
  * @param None
  * @return None
  */
-void Display::handleEvents() {
+void Display::handleEvents(int* sdlToDisplay, int* displayToSdl) {
   switch (this->state) {
-  case 0: // Main menu
+  case MAIN_MENU: // Main menu
     this->state = this->mainMenu->handleEvents(&this->displayIsRunning);
+    if (this->state == SCANNING) {
+      writeString(sdlToDisplay[WRITE], START_SCAN);
+    }
     break;
 
-  case 1: // Scanning
+  case SCANNING: // Scanning
     this->state = this->scanning->handleEvents(&this->displayIsRunning);
     break;
 
-  case 2: // Pause menu
+  case PAUSE_MENU: // Pause menu
     this->state = this->pauseMenu->handleEvents(&this->displayIsRunning);
     break;
 
-  case 3: // Item List
+  case ITEM_LIST: // Item List
     this->state = this->itemList->handleEvents(&this->displayIsRunning);
     break;
   default:
@@ -219,6 +224,7 @@ void Display::checkKeystates() {
 void Display::update() {
   switch (this->state) { // Check current state
   case 0:                // Main menu
+    this->mainMenu->update();
     break;
 
   case 1: // Scanning
@@ -226,6 +232,7 @@ void Display::update() {
     break;
 
   case 2: // Pause menu
+    this->pauseMenu->update();
     break;
 
   case 3: // Item list
