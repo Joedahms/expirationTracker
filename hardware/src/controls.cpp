@@ -1,5 +1,5 @@
 #include "../../food_item.h"
-#include "HX711.h" // library for HX711 weight sensor
+#include "../../../HX711/src/HX711.h" // library for HX711 weight sensor
 #include "hardware_pipe.h"
 #include <fstream>
 #include <glog/logging.h>
@@ -81,29 +81,29 @@ void rotateMotor() {
  * @return None
  */
 void takePhotos(int angle) {
-  pid_t top_cam = fork();
-  if (top_cam == -1) {
-    LOG(FATAL) << "Error starting top camera process.";
-  }
-  else if (top_cam == 0) {
-    std::string top_photo = CAMERA1_CMD + IMAGE_DIR + std::to_string(angle) + "_T.jpg";
-    if (system(top_cam.c_str()) == -1) {
-      LOG(FATAL) << "Failed to capture image from top camera.";
+    pid_t top_cam = fork();
+    if (top_cam == -1) {
+        LOG(FATAL) << "Error starting top camera process.";
     }
-    exit(0);
-  }
+    else if (top_cam == 0) {
+        std::string top_photo = CAMERA1_CMD + IMAGE_DIR + std::to_string(angle) + "_T.jpg";
+        if (system(top_photo.c_str()) == -1) {
+            LOG(FATAL) << "Failed to capture image from top camera.";
+        }
+        exit(0);
+    }
 
-  pid_t side_cam = fork();
-  if (side_cam == -1) {
-    LOG(FATAL) << "Error starting side camera process.";
-  }
-  else if (side_cam == 0) {
-    std::string side_photo = CAMERA1_CMD + IMAGE_DIR + std::to_string(angle) + "_S.jpg";
-    if (system(side_cam.c_str()) == -1) {
-      LOG(FATAL) << "Failed to capture image from side camera.";
+    pid_t side_cam = fork();
+    if (side_cam == -1) {
+        LOG(FATAL) << "Error starting side camera process.";
     }
-    exit(0);
-  }
+    else if (side_cam == 0) {
+        std::string side_photo = CAMERA1_CMD + IMAGE_DIR + std::to_string(angle) + "_S.jpg";
+        if (system(side_photo.c_str()) == -1) {
+            LOG(FATAL) << "Failed to capture image from side camera.";
+        }
+        exit(0);
+    }
 
   waitpid(top_cam, NULL, 0);
   waitpid(side_cam, NULL, 0);
@@ -121,15 +121,15 @@ void takePhotos(int angle) {
 void sendDataToVision(const std::string IMAGE_DIR, float weight) {
   LOG(INFO) << "Sending Images from Hardware to Vision";
 
-  struct FoodItem item;
-  item.photoPath      = IMAGE_DIR;
-  item.name           = "";
-  item.scanDate       = std::chrono::floor<std::chrono::days>(now);
-  item.expirationDate = std::chrono::floor<std::chrono::days>(now);
-  item.catagory       = "";
-  item.weight         = weight;
-  item.quantity       = 1;
-  sendFoodItem(item, pipes.toVision[WRITE]);
+    struct FoodItem item;
+    item.photoPath = IMAGE_DIR;
+    item.name = "";
+    item.scanDate = std::chrono::floor<std::chrono::days>(now);
+    item.expirationDate = "year_month_day";
+    item.catagory = "";
+    item.weight = weight;
+    item.quantity = 1;
+    sendFoodItem(item, pipes.toVision[WRITE]);
 
   LOG(INFO) << "Done Sending Images from Hardware to Vision";
 }
