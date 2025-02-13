@@ -1,11 +1,11 @@
+// #include "HX711.h"
 #include "../../food_item.h"
-#include "../../../HX711/src/HX711.h" // library for HX711 weight sensor
-#include "hardware_pipe.h"
+#include "hardware_entry.h"
 #include <fstream>
 #include <glog/logging.h>
 #include <iostream>
 #include <string>
-#include <unistd.h>   // sleep functions
+#include <unistd.h>
 #include <wiringPi.h> // Raspberry Pi 5 library for GPIO in C++
 
 #define MOTOR_IN1      23 // GPIO Pin for L298N IN1
@@ -81,29 +81,31 @@ void rotateMotor() {
  * @return None
  */
 void takePhotos(int angle) {
-    pid_t top_cam = fork();
-    if (top_cam == -1) {
-        LOG(FATAL) << "Error starting top camera process.";
+  pid_t top_cam = fork();
+  if (top_cam == -1) {
+    LOG(FATAL) << "Error starting top camera process.";
+  }
+  else if (top_cam == 0) {
+    std::string top_photo =
+        CAMERA1_CMD + IMAGE_DIR + std::to_string(angle) + "_T.jpg --nopreview";
+    if (system(top_photo.c_str()) == -1) {
+      LOG(FATAL) << "Failed to capture image from top camera.";
     }
-    else if (top_cam == 0) {
-        std::string top_photo = CAMERA1_CMD + IMAGE_DIR + std::to_string(angle) + "_T.jpg --nopreview";
-        if (system(top_photo.c_str()) == -1) {
-            LOG(FATAL) << "Failed to capture image from top camera.";
-        }
-        exit(0);
-    }
+    exit(0);
+  }
 
-    pid_t side_cam = fork();
-    if (side_cam == -1) {
-        LOG(FATAL) << "Error starting side camera process.";
+  pid_t side_cam = fork();
+  if (side_cam == -1) {
+    LOG(FATAL) << "Error starting side camera process.";
+  }
+  else if (side_cam == 0) {
+    std::string side_photo =
+        CAMERA1_CMD + IMAGE_DIR + std::to_string(angle) + "_S.jpg --nopreview";
+    if (system(side_photo.c_str()) == -1) {
+      LOG(FATAL) << "Failed to capture image from side camera.";
     }
-    else if (side_cam == 0) {
-        std::string side_photo = CAMERA1_CMD + IMAGE_DIR + std::to_string(angle) + "_S.jpg --nopreview";
-        if (system(side_photo.c_str()) == -1) {
-            LOG(FATAL) << "Failed to capture image from side camera.";
-        }
-        exit(0);
-    }
+    exit(0);
+  }
 
   waitpid(top_cam, NULL, 0);
   waitpid(side_cam, NULL, 0);
@@ -111,25 +113,17 @@ void takePhotos(int angle) {
   LOG(INFO) << "Photos successful at position " << angle;
 }
 
-
 /**
  * Takes a photo using the Raspberry Pi camera module.
  *
  * @param filename The name of the file to save the photo to.
  * @return None
  */
-void takePic (char* filename) {
-  
-  static pid_t pid =0;
+void takePic(char* filename) {
+  static pid_t pid = 0;
 
-  if((pid = fork()) ==0) {
-    execl("/usr/bin/raspistill",
-          "usr/bin/raspistill",
-          "-n",
-          "-vf",
-          "-o",
-          filename,
-          NULL);
+  if ((pid = fork()) == 0) {
+    execl("/usr/bin/raspistill", "usr/bin/raspistill", "-n", "-vf", "-o", filename, NULL);
   }
 }
 
@@ -143,15 +137,15 @@ void takePic (char* filename) {
 void sendDataToVision(const std::string IMAGE_DIR, float weight) {
   LOG(INFO) << "Sending Images from Hardware to Vision";
 
-    struct FoodItem item;
-    item.photoPath = IMAGE_DIR;
-    item.name = "";
-    item.scanDate = std::chrono::floor<std::chrono::days>(now);
-    item.expirationDate = "year_month_day";
-    item.catagory = "";
-    item.weight = weight;
-    item.quantity = 1;
-    sendFoodItem(item, pipes.toVision[WRITE]);
+  struct FoodItem item;
+  item.photoPath      = IMAGE_DIR;
+  item.name           = "";
+  item.scanDate       = std::chrono::floor<std::chrono::days>(now);
+  item.expirationDate = "year_month_day";
+  item.catagory       = "";
+  item.weight         = weight;
+  item.quantity       = 1;
+  sendFoodItem(item, pipes.toVision[WRITE]);
 
   LOG(INFO) << "Done Sending Images from Hardware to Vision";
 }
