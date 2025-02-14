@@ -29,7 +29,7 @@ public:
 private:
   std::vector<std::unique_ptr<Text>> texts;
   std::vector<std::unique_ptr<Button>> buttons;
-  NumberSetting quantity;
+  NumberSetting itemQuantity;
 };
 
 #endif

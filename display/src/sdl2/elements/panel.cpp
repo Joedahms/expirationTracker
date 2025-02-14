@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "../display_global.h"
+#include "../sdl_debug.h"
 #include "button.h"
 #include "element.h"
 #include "panel.h"
@@ -19,11 +20,11 @@
 Panel::Panel(struct DisplayGlobal displayGlobal,
              int id,
              SDL_Rect rect,
-             std::vector<std::unique_ptr<Text>> t) {
+             std::vector<std::unique_ptr<Text>> t)
+    : itemQuantity(displayGlobal, id) {
   this->displayGlobal = displayGlobal;
   this->rectangle     = rect;
   this->texts         = std::move(t);
-  this->numberSetting.setSettingId(id);
 }
 
 /**
@@ -38,12 +39,12 @@ Panel::Panel(struct DisplayGlobal displayGlobal,
              int id,
              SDL_Rect rect,
              std::vector<std::unique_ptr<Text>> t,
-             std::vector<std::unique_ptr<Button>> b) {
+             std::vector<std::unique_ptr<Button>> b)
+    : itemQuantity(displayGlobal, id) {
   this->displayGlobal = displayGlobal;
   this->rectangle     = rect;
   this->texts         = std::move(t);
   this->buttons       = std::move(b);
-  this->numberSetting.setSettingId(id);
 }
 
 /**
@@ -64,11 +65,17 @@ void Panel::update() {
     }
     else {
       SDL_Rect leftRectangle = this->texts[i - 1]->getRectangle();
-      textRectangle.x        = leftRectangle.x + leftRectangle.w;
+      // printRect(leftRectangle);
+      textRectangle.x = leftRectangle.x + leftRectangle.w;
     }
     this->texts[i]->setRectangle(textRectangle);
   }
-  this->quantity.update();
+  SDL_Rect itemQuantityRect = this->itemQuantity.getRectangle();
+  itemQuantityRect.y        = this->texts.back()->getRectangle().y;
+  itemQuantityRect.x =
+      this->texts.back()->getRectangle().x + this->texts.back()->getRectangle().w;
+  this->itemQuantity.setRectangle(itemQuantityRect);
+  this->itemQuantity.update();
 }
 
 /**
@@ -84,5 +91,5 @@ void Panel::render() const {
   for (auto& x : this->texts) {
     x->render();
   }
-  this->quantity.render();
+  this->itemQuantity.render();
 }

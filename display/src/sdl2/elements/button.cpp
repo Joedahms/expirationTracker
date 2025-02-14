@@ -29,6 +29,12 @@ Button::Button(struct DisplayGlobal displayGlobal,
       std::make_unique<Text>(this->displayGlobal, "../display/fonts/16020_FUTURAM.ttf",
                              textContent.c_str(), 24, textColor, this->rectangle);
 
+  if (this->rectangle.w == 0 && this->rectangle.h == 0) {
+    SDL_Rect textRectangle = this->text->getRectangle();
+    this->rectangle.w      = textRectangle.w + 10;
+    this->rectangle.h      = textRectangle.h + 10;
+  }
+
   this->text->centerHorizontal(this->rectangle);
   this->text->centerVertical(this->rectangle);
 }
@@ -59,6 +65,12 @@ Button::Button(struct DisplayGlobal displayGlobal,
   this->text =
       std::make_unique<Text>(this->displayGlobal, "../display/fonts/16020_FUTURAM.ttf",
                              textContent.c_str(), 24, textColor, this->rectangle);
+
+  if (this->rectangle.w == 0 && this->rectangle.h == 0) {
+    SDL_Rect textRectangle = this->text->getRectangle();
+    this->rectangle.w      = textRectangle.w + 10;
+    this->rectangle.h      = textRectangle.h + 10;
+  }
 
   this->text->centerHorizontal(this->rectangle);
   this->text->centerVertical(this->rectangle);

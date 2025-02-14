@@ -4,8 +4,11 @@
 #include <iostream>
 #include <string>
 
+#include "../sdl_debug.h"
 #include "element.h"
 #include "text.h"
+
+Text::Text() {}
 
 /**
  * @param displayGlobal Global variables

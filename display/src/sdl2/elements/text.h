@@ -13,6 +13,7 @@
  */
 class Text : public Element {
 public:
+  Text();
   Text(struct DisplayGlobal displayGlobal,
        const char* fontPath,
        const char* content,

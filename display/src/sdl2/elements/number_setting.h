@@ -1,3 +1,6 @@
+#define DECREMENT_SETTING 0
+#define INCREMENT_SETTING 1
+
 #ifndef NUMBER_SETTING_H
 #define NUMBER_SETTING_H
 
@@ -9,17 +12,18 @@
 
 class NumberSetting : public Element {
 public:
-  NumberSetting();
+  NumberSetting(struct DisplayGlobal displayGlobal, int settingId);
   void setSettingId(const int& newSettingId);
   void update() override;
   void render() const override;
 
 private:
-  std::unique_ptr<Button> decreaseButton;
-  std::unique_ptr<Button> increaseButton;
-  int settingValue;
-  std::unique_ptr<Text> settingValueText;
-  int settingId = -1;
+  Button decreaseButton;
+  Button increaseButton;
+  Text settingValueText;
+
+  int settingValue = -1;
+  int settingId    = -1;
 };
 
 #endif
