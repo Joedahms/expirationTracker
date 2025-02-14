@@ -93,6 +93,7 @@ int ItemList::checkKeystates() {
  * @return None
  */
 void ItemList::update() {
+  /*
   this->currentUpdate = std::chrono::steady_clock::now();
 
   std::chrono::seconds updateDifference;
@@ -104,6 +105,8 @@ void ItemList::update() {
     this->scrollBoxes[0]->update();
     this->previousUpdate = this->currentUpdate;
   }
+  */
+  this->scrollBoxes[0]->update();
 }
 
 void ItemList::render() const {

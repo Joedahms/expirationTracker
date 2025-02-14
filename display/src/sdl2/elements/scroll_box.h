@@ -2,6 +2,7 @@
 #define SCROLL_BOX_H
 
 #include <SDL2/SDL.h>
+#include <chrono>
 #include <memory>
 #include <vector>
 
@@ -22,6 +23,8 @@ public:
   void render() const override;
 
 private:
+  std::chrono::steady_clock::time_point previousUpdate;
+  std::chrono::steady_clock::time_point currentUpdate;
   std::vector<std::unique_ptr<Panel>> panels;
   int panelHeight;
   int topPanelPosition = 0;

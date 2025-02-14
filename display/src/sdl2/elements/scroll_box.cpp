@@ -14,7 +14,8 @@
 #include "scroll_box.h"
 
 ScrollBox::ScrollBox(struct DisplayGlobal displayGlobal) {
-  this->displayGlobal = displayGlobal;
+  this->displayGlobal  = displayGlobal;
+  this->previousUpdate = std::chrono::steady_clock::now();
 }
 
 void ScrollBox::refreshPanels() {
@@ -103,7 +104,18 @@ void ScrollBox::update() {
   for (auto& currPanel : this->panels) {
     currPanel->update();
   }
-  refreshPanels();
+
+  this->currentUpdate = std::chrono::steady_clock::now();
+
+  std::chrono::seconds updateDifference;
+  updateDifference = std::chrono::duration_cast<std::chrono::seconds>(
+      this->currentUpdate - this->previousUpdate);
+
+  // 5 or more seconds since last update
+  if (updateDifference.count() > 5) {
+    refreshPanels();
+    this->previousUpdate = this->currentUpdate;
+  }
 }
 
 /**
