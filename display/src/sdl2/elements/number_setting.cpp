@@ -44,6 +44,9 @@ void NumberSetting::update() {
   settingValueTextRect.x        = increaseButtonRect.x + increaseButtonRect.w;
   settingValueText.setRectangle(settingValueTextRect);
 
+  this->settingValueText.update();
+  this->increaseButton.update();
+
   FoodItem foodItem = readFoodItemById(this->settingId);
   if (foodItem.quantity != this->settingValue) {
     // update database
@@ -52,6 +55,6 @@ void NumberSetting::update() {
 
 void NumberSetting::render() const {
   this->increaseButton.render();
-  this->decreaseButton.render();
+  //  this->decreaseButton.render();
   this->settingValueText.render();
 }

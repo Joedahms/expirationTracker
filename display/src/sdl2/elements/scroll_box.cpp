@@ -29,11 +29,9 @@ void ScrollBox::refreshPanels() {
 
     // Name
     const char* foodItemName = foodItem.name.c_str();
-    printRect(rect, "rect");
     std::unique_ptr<Text> name =
         std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
                                foodItemName, 24, textColor, rect);
-    printRect(name->getRectangle(), foodItemName);
     texts.push_back(std::move(name));
 
     // Expires
