@@ -1,5 +1,5 @@
-#include "../../../WiringPi/wiringPi/wiringPi.h"
-#include "../../food_item.h"
+#include "../../../../WiringPi/wiringPi/wiringPi.h"
+#include "../../../food_item.h"
 #include "HX711.h"
 #include "hardware_entry.h"
 #include <fstream>
@@ -182,3 +182,37 @@ void rotateAndCapture() {
     }
   }
 }
+
+void redoThis(struct Pipes pipes) {
+  LOG(INFO) << "Checking weight";
+  /**
+   * Function call to scale
+   * 0 - nothing on scale
+   * 1 - valid input, begin scanning
+   */
+
+  LOG(INFO) << "Beginning scan";
+  /**
+   * Function call to controls routine
+   * has a pipe read from vision in loop
+   */
+
+  LOG(INFO) << "Sending Images from Hardware to Vision";
+  // sendImagesWithinDirectory(pipes.toVision[WRITE], "../images/");
+
+  struct FoodItem foodItem;
+  foodItem.photoPath = "../images/apple.jpg";
+  foodItem.name      = "Apple";
+  const std::chrono::time_point now{std::chrono::system_clock::now()};
+  foodItem.scanDate = std::chrono::floor<std::chrono::days>(now);
+
+  foodItem.expirationDate = std::chrono::floor<std::chrono::days>(now);
+
+  foodItem.catagory = "fruit";
+  foodItem.weight   = 10.0;
+  foodItem.quantity = 2;
+
+  sendFoodItem(foodItem, pipes.hardwareToVision[WRITE]);
+  LOG(INFO) << "Done Sending Images from Hardware to Vision";
+}
+

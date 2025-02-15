@@ -8,5 +8,6 @@ void rotateMotor();
 void takePhotos(int angle);
 void sendDataToVision(const std::string IMAGE_DIR, float weight);
 void rotateAndCapture();
+void redoThis(struct Pipes pipes);
 
 #endif
