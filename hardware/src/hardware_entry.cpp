@@ -1,12 +1,13 @@
-#include "hardware_entry.h"
-#include "../../food_item.h"
-#include "io.h"
 #include <filesystem>
 #include <fstream>
 #include <glog/logging.h>
 #include <iostream>
 #include <string>
 #include <unistd.h>
+
+#include "../../food_item.h"
+#include "hardware_entry.h"
+#include "io.h"
 
 /**
  * Entry into the hardware code. Only called from main after hardware child process is
@@ -23,16 +24,19 @@ void hardwareEntry(struct Pipes pipes) {
   close(pipes.displayToHardware[WRITE]);
   close(pipes.visionToHardware[WRITE]);
 
-  // Close unused ends of the pipes
-  // close(pipes.fromDisplay[READ]); // Not currently used
-  // close(pipes.fromVision[READ]);  // Not currently used
-  // close(pipes.toDisplay[WRITE]);  // Not currently used
-  // close(pipes.toVision[WRITE]);   // Not currently used
+  // Close read end of write pipes
+  close(pipes.hardwareToDisplay[READ]);
+  close(pipes.hardwareToVision[READ]);
 
-  // Wait for start signal from Display with 0.5sec sleep
-  LOG(INFO) << "Waiting for start signal from Display";
-  if (receivedStartSignal(pipes.fromDisplay[READ]) == 0) {
-    usleep(500000);
+  while (1) {
+    // Wait for start signal from Display with 0.5sec sleep
+    LOG(INFO) << "Waiting for start signal from Display";
+    if (receivedStartSignal(pipes.displayToHardware[READ])) {
+      redoThis(pipes);
+    }
+    else {
+      usleep(500000);
+    }
   }
 }
 
@@ -57,15 +61,16 @@ void redoThis(struct Pipes pipes) {
   foodItem.photoPath = "../images/apple.jpg";
   foodItem.name      = "Apple";
   const std::chrono::time_point now{std::chrono::system_clock::now()};
-  foodItem.scanDate       = std::chrono::floor<std::chrono::days>(now);
-  foodItem.expirationDate = std::chrono::floor<std::chrono::days>(now);
-  foodItem.catagory       = "fruit";
-  foodItem.weight         = 10.0;
-  foodItem.quantity       = 2;
+  foodItem.scanDate = std::chrono::floor<std::chrono::days>(now);
 
-  sendFoodItem(foodItem, pipes.toVision[WRITE]);
+  foodItem.expirationDate = std::chrono::floor<std::chrono::days>(now);
+
+  foodItem.catagory = "fruit";
+  foodItem.weight   = 10.0;
+  foodItem.quantity = 2;
+
+  sendFoodItem(foodItem, pipes.hardwareToVision[WRITE]);
   LOG(INFO) << "Done Sending Images from Hardware to Vision";
-}
 }
 
 /**
