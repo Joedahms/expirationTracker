@@ -26,57 +26,32 @@ void visionEntry(struct Pipes pipes) {
   // Close read end of write pipes
   close(pipes.visionToDisplay[READ]);
   close(pipes.visionToHardware[READ]);
-
   while (1) {
-    redoThisFunctionPlz(pipes);
+    // Wait for start signal from Display with 0.5sec sleep
+    LOG(INFO) << "Waiting for start signal from Hardware";
+    struct FoodItem foodItemTemplate;
+    // foodItemTemplate.photopath is currently the directory of images to look at
+    if (receiveFoodItem(foodItemTemplate, pipes.hardwareToVision[READ])) {
+      LOG(INFO) << "Vision Received all images from hardware";
+      processFoodItems(pipes, foodItemTemplate.photoPath);
+    }
+    else {
+      usleep(500000);
+    }
   }
 }
 
-void redoThisFunctionPlz(struct Pipes pipes) {
-  struct timeval timeout;
-  timeout.tv_sec  = 1;
-  timeout.tv_usec = 0;
-  struct FoodItem foodItem;
-  bool foodItemReceived = false;
-  foodItemReceived = receiveFoodItem(foodItem, pipes.hardwareToVision[READ], timeout);
-  if (foodItemReceived == false) {
-    return;
-  }
-
-  /*
-  std::cout << foodItem.photoPath << std::endl;
-  std::cout << foodItem.name << std::endl;
-
-  std::cout << static_cast<int>(foodItem.scanDate.year()) << std::endl;
-  std::cout << static_cast<unsigned>(foodItem.scanDate.month()) << std::endl;
-  std::cout << static_cast<unsigned>(foodItem.scanDate.day()) << std::endl;
-
-  std::cout << static_cast<int>(foodItem.expirationDate.year()) << std::endl;
-  std::cout << static_cast<unsigned>(foodItem.expirationDate.month()) << std::endl;
-  std::cout << static_cast<unsigned>(foodItem.expirationDate.day()) << std::endl;
-
-  std::cout << foodItem.catagory << std::endl;
-  std::cout << foodItem.weight << std::endl;
-  std::cout << foodItem.quantity << std::endl;
-  */
-
-  sendFoodItem(foodItem, pipes.visionToDisplay[WRITE]);
-
-  LOG(INFO) << "Vision Received all images from hardware";
+void processFoodItems(struct Pipes pipes, std::string imageDirectory) {
   LOG(INFO) << "Vision analyzing all images";
-
-  const std::string outputDir = "./received_images/";
-  if (!std::filesystem::exists(outputDir)) {
-    std::filesystem::create_directory(outputDir);
-  }
-
-  std::vector<std::string> detections = analyzeImages(outputDir);
+  std::cout << "Analyzing..." << std::endl;
+  std::vector<std::string> detections = analyzeImages(imageDirectory);
   LOG(INFO) << "Vision successfully analyzed all images";
-  std::cout << "The following objects were detected in the images analyzed:" << std::endl;
   for (const auto& detection : detections) {
     std::cout << detection << std::endl;
   }
 }
+
+void sendFoodItems(int pipe) {}
 
 /**
  * Read from the given pipe and create images using the information received. Write
@@ -137,11 +112,15 @@ void receiveImages(int pipeToRead, const std::string& ouputDirectory) {
 
 std::vector<std::string> analyzeImages(const std::string& imageDirectory) {
   std::vector<std::string> detections;
+  if (!std::filesystem::exists(imageDirectory) ||
+      !std::filesystem::is_directory(imageDirectory)) {
+    LOG(FATAL) << "Failed to open image directory" << imageDirectory;
+    return detections;
+  }
   for (const auto& entry : std::filesystem::directory_iterator(imageDirectory)) {
-    // After receiving and saving "received_image.jpg"
-    std::string detection = analyzeImage(
-        entry.path(), "../YOLO/yolov4-tiny/cfg/yolov4-tiny.cfg",
-        "../YOLO/yolov4-tiny/yolov4-tiny.weights", "../YOLO/yolov4-tiny/cfg/coco.names");
+    std::string detection =
+        analyzeImage(entry.path(), "../YOLO/yolov4-tiny.cfg",
+                     "../YOLO/yolov4-tiny_best.weights", "../YOLO/obj.names");
 
     detections.push_back(detection);
   }
