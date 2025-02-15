@@ -30,66 +30,6 @@ void ScrollBox::refreshPanels() {
     newPanel->addFoodItemExpirationDate(foodItem);
 
     addPanel(std::move(newPanel), this->rectangle);
-
-    /*
-    std::vector<std::unique_ptr<Text>> texts;
-
-    SDL_Color textColor = {0, 255, 0, 255};
-    SDL_Rect rect       = {0, 0, 0, 0};
-
-    // Name
-    const char* foodItemName = foodItem.name.c_str();
-    std::unique_ptr<Text> name =
-        std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
-                               foodItemName, 24, textColor, rect);
-    texts.push_back(std::move(name));
-
-    // Expires
-    std::unique_ptr<Text> expiration =
-        std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
-                               " Expires: ", 24, textColor, rect);
-    texts.push_back(std::move(expiration));
-
-    // Month
-    std::string expirationDateMonth =
-        std::to_string(static_cast<unsigned>(foodItem.expirationDate.month()));
-    std::unique_ptr<Text> month =
-        std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
-                               expirationDateMonth.c_str(), 24, textColor, rect);
-    texts.push_back(std::move(month));
-
-    // Slash
-    std::unique_ptr<Text> slash =
-        std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
-                               "/", 24, textColor, rect);
-    texts.push_back(std::move(slash));
-
-    // Date
-    std::string expirationDateDay =
-        std::to_string(static_cast<unsigned>(foodItem.expirationDate.day()));
-    std::unique_ptr<Text> day =
-        std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
-                               expirationDateDay.c_str(), 24, textColor, rect);
-    texts.push_back(std::move(day));
-
-    // Slash
-    std::unique_ptr<Text> slash2 =
-        std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
-                               "/", 24, textColor, rect);
-    texts.push_back(std::move(slash2));
-
-    // Year
-    std::string expirationDateYear =
-        std::to_string(static_cast<int>(foodItem.expirationDate.year()));
-    std::unique_ptr<Text> year =
-        std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
-                               expirationDateYear.c_str(), 24, textColor, rect);
-    texts.push_back(std::move(year));
-
-    std::unique_ptr<Panel> newPanel =
-        std::make_unique<Panel>(this->displayGlobal, foodItem.id, rect, std::move(texts));
-    addPanel(std::move(newPanel), this->rectangle);
-  */
   }
 }
 

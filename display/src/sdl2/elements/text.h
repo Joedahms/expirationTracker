@@ -15,8 +15,8 @@ class Text : public Element {
 public:
   Text();
   Text(struct DisplayGlobal displayGlobal,
-       const char* fontPath,
-       const char* content,
+       const std::string& fontPath,
+       const std::string& content,
        int fontSize,
        SDL_Color color,
        SDL_Rect rectangle);
@@ -26,7 +26,7 @@ public:
 
 private:
   TTF_Font* font;
-  const char* content;
+  std::string content;
   int fontSize;
   SDL_Color color;
   SDL_Texture* texture;

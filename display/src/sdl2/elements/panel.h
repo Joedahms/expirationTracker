@@ -26,6 +26,10 @@ public:
         std::vector<std::unique_ptr<Text>> t,
         std::vector<std::unique_ptr<Button>> b);
 
+  void addText(const std::string& fontPath,
+               const std::string& content,
+               const int& fontSize,
+               const SDL_Color& color);
   void addFoodItemName(const FoodItem& foodItem);
   void addFoodItemExpirationDate(const FoodItem& foodItem);
 

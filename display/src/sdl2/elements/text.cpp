@@ -19,20 +19,21 @@ Text::Text() {}
  * @param rectangle SDL rectangle defining the text
  */
 Text::Text(struct DisplayGlobal displayGlobal,
-           const char* fontPath,
-           const char* content,
+           const std::string& fontPath,
+           const std::string& content,
            int fontSize,
            SDL_Color color,
            SDL_Rect rectangle)
     : content(content), fontSize(fontSize), color(color) {
   this->displayGlobal = displayGlobal;
-  this->font          = TTF_OpenFont(fontPath, this->fontSize);
+  this->font          = TTF_OpenFont(fontPath.c_str(), this->fontSize);
   if (this->font == NULL) {
     LOG(FATAL) << "Text failed to open font";
   }
 
-  this->rectangle          = rectangle;
-  SDL_Surface* textSurface = TTF_RenderText_Solid(this->font, this->content, this->color);
+  this->rectangle = rectangle;
+  SDL_Surface* textSurface =
+      TTF_RenderText_Solid(this->font, this->content.c_str(), this->color);
   this->texture = SDL_CreateTextureFromSurface(this->displayGlobal.renderer, textSurface);
   SDL_FreeSurface(textSurface);
 
