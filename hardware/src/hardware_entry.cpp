@@ -7,7 +7,6 @@
 
 #include "../../food_item.h"
 #include "./controls/controls.h"
-#include "hardware_entry.h"
 #include "io.h"
 
 /**

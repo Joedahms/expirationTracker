@@ -8,6 +8,8 @@
 #include <string>
 #include <sys/select.h>
 
+extern Pipes pipes;
+
 /**
  * Checks to see if there is any data fromDisplay[READ]
  * Used to initialize control system and begin scanning
@@ -46,6 +48,29 @@ bool receivedStartSignal(int pipeToRead) {
 }
 
 /**
+ * Sends the photo directory and weight data to the AI Vision system.
+ *
+ * @param IMAGE_DIR Directory containing captured images.
+ * @param weight The weight of the object on the platform.
+ * @return None
+ */
+void sendDataToVision(const std::string IMAGE_DIR, float weight) {
+  LOG(INFO) << "Sending Images from Hardware to Vision";
+
+  struct FoodItem item;
+  item.photoPath      = IMAGE_DIR;
+  item.name           = "";
+  item.scanDate       = std::chrono::system_clock::now();
+  item.expirationDate = "year_month_day";
+  item.catagory       = "";
+  item.weight         = weight;
+  item.quantity       = 1;
+  sendFoodItem(item, pipes.hardwareToVision[WRITE]);
+
+  LOG(INFO) << "Done Sending Images from Hardware to Vision";
+}
+
+/**
  * Method to send images from a given directory using the pipe provided. It cycles through
  * all .jpg images within the directory and sends them across processes.
  *
@@ -54,7 +79,7 @@ bool receivedStartSignal(int pipeToRead) {
  * @param directory_path Directory path as a string to get images from
  * Output: None
  */
- void sendImagesWithinDirectory(int pipeToWrite, const std::string& directory_path) {
+void sendImagesWithinDirectory(int pipeToWrite, const std::string& directory_path) {
   for (const auto& entry : std::filesystem::directory_iterator(directory_path)) {
     if (entry.is_regular_file()) {
       const std::string file_path = entry.path().string();
