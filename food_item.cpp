@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "food_item.h"
+#include <filesystem>
 
 /**
  * Send a food item struct through a specified pipe. Not all fields have to be populated.
@@ -96,4 +97,16 @@ std::string readString(int pipeToRead) {
   std::string sentString(stringBuffer);
   delete[] stringBuffer;
   return sentString;
+}
+
+/**
+ * Read a string from a pipe. Needed because std::string needs to be sent as a c style
+ * string.
+ *
+ * @param pipeToRead Pipe to read the string from.
+ * @return The string read from the pipe.
+ */
+bool isPathLike(const std::string& str) {
+  std::filesystem::path p(str);
+  return !p.empty() && (p.has_filename() || p.has_parent_path());
 }

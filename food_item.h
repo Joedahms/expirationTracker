@@ -22,5 +22,5 @@ bool receiveFoodItem(struct FoodItem&, int, const struct timeval);
 
 void writeString(int, const std::string&);
 std::string readString(int);
-
+bool isPathLike(const std::string&);
 #endif
