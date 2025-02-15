@@ -96,6 +96,11 @@ void Panel::addText(const std::string& fontPath,
   this->texts.push_back(std::move(text));
 }
 
+void Panel::addFoodItem(const FoodItem& foodItem) {
+  addFoodItemName(foodItem);
+  addFoodItemExpirationDate(foodItem);
+}
+
 /**
  * Add the name of a food item to a panel.
  *

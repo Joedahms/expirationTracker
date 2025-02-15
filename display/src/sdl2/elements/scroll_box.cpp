@@ -26,8 +26,7 @@ void ScrollBox::refreshPanels() {
     std::unique_ptr<Panel> newPanel =
         std::make_unique<Panel>(this->displayGlobal, foodItem.id);
 
-    newPanel->addFoodItemName(foodItem);
-    newPanel->addFoodItemExpirationDate(foodItem);
+    newPanel->addFoodItem(foodItem);
 
     addPanel(std::move(newPanel), this->rectangle);
   }
