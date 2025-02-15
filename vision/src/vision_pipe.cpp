@@ -6,6 +6,7 @@
 
 #include "../../food_item.h"
 #include "categorizeObjects.h"
+#include "handleOCR.h"
 #include "vision_pipe.h"
 
 /**
@@ -33,7 +34,7 @@ void visionEntry(struct Pipes pipes) {
     // foodItemTemplate.photopath is currently the directory of images to look at
     if (receiveFoodItem(foodItemTemplate, pipes.hardwareToVision[READ])) {
       LOG(INFO) << "Vision Received all images from hardware";
-      processFoodItems(pipes, foodItemTemplate.photoPath);
+      processFoodItems(pipes, foodItemTemplate.photoPath, foodItemTemplate);
     }
     else {
       usleep(500000);
@@ -41,7 +42,9 @@ void visionEntry(struct Pipes pipes) {
   }
 }
 
-void processFoodItems(struct Pipes pipes, std::string imageDirectory) {
+void processFoodItems(struct Pipes pipes,
+                      std::string imageDirectory,
+                      struct FoodItem detectedFoodItem) {
   LOG(INFO) << "Vision analyzing all images";
   std::cout << "Analyzing..." << std::endl;
   std::vector<std::string> detections = analyzeImages(imageDirectory);
@@ -49,9 +52,11 @@ void processFoodItems(struct Pipes pipes, std::string imageDirectory) {
   for (const auto& detection : detections) {
     std::cout << detection << std::endl;
   }
+  detectedFoodItem.name = "RABBIT";
+  sendFoodItem(detectedFoodItem, pipes.displayToVision[WRITE]);
 }
 
-void sendFoodItems(int pipe) {}
+void displayFoodItems(int pipe) {}
 
 /**
  * Read from the given pipe and create images using the information received. Write
@@ -117,12 +122,24 @@ std::vector<std::string> analyzeImages(const std::string& imageDirectory) {
     LOG(FATAL) << "Failed to open image directory" << imageDirectory;
     return detections;
   }
+  bool objectDetected = false;
   for (const auto& entry : std::filesystem::directory_iterator(imageDirectory)) {
-    std::string detection =
-        analyzeImage(entry.path(), "../YOLO/yolov4-tiny.cfg",
-                     "../YOLO/yolov4-tiny_best.weights", "../YOLO/obj.names");
+    std::string detection = analyzeImage(entry.path(), "../vision/Models/yolov4-tiny.cfg",
+                                         "../vision/Models/yolov4-tiny_best.weights",
+                                         "../vision/Models/obj.names");
 
     detections.push_back(detection);
+    detection = "No objects detected";
+    if (detection != "No objects detected") {
+      objectDetected = true;
+    }
+  }
+
+  if (!objectDetected && !detections.empty()) {
+    LOG(INFO) << "Running text extraction script";
+    std::string result = runOCR(imageDirectory + "cinnamontoastbox.jpg");
+    std::cout << "TEXT" << std::endl;
+    std::cout << result << std::endl;
   }
   return detections;
 }

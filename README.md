@@ -41,3 +41,14 @@ sudo apt install libsqlite3-dev
 sudo add-apt-repository ppa:kisak/kisak-mesa
 sudo apt update
 sudo apt upgrade
+
+# Using EASYOCR
+### Create the virtual environment
+python3 -m venv ~/easyocr-venv
+
+### Activate it
+source ~/easyocr-venv/bin/activate
+
+### Install EasyOCR inside the virtual environment
+pip install easyocr
+
