@@ -24,15 +24,23 @@ bool receivedStartSignal(int pipeToRead) {
   FD_ZERO(&readPipeSet);
   FD_SET(pipeToRead, &readPipeSet);
 
-  // Check pipe for data
-  int startSignal = select(pipeToRead + 1, &readPipeSet, NULL, NULL, NULL);
+  struct timeval timeout;
+  timeout.tv_sec  = 1;
+  timeout.tv_usec = 0;
 
+  // Check pipe for data
+  int startSignal = select(pipeToRead + 1, &readPipeSet, NULL, NULL, &timeout);
+
+  if (startSignal == -1) {
+    LOG(FATAL) << "Select error when checking for start signal";
+  }
   if (startSignal == 0) {
-    LOG(INFO) << "Received start signal from display";
-    return true;
+    LOG(INFO) << "No start signal received";
+    return false;
   }
   else {
-    LOG(INFO) << "No start signal received: ";
-    return false;
+    LOG(INFO) << "Received start signal from display";
+    std::string startSignal = readString(pipeToRead);
+    return true;
   }
 }

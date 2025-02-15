@@ -16,14 +16,12 @@
  * @param pipes Pipes for hardware to communicate with the other processes
  * Output: None
  */
-void hardwareEntry(struct HardwarePipes pipes) {
+void hardwareEntry(struct Pipes pipes) {
   LOG(INFO) << "Within vision process";
 
-  // Close unused ends of the pipes
-  close(pipes.fromDisplay[WRITE]);
-  close(pipes.fromVision[WRITE]);
-  close(pipes.toDisplay[READ]);
-  close(pipes.toVision[READ]);
+  // Close write end of read pipes
+  close(pipes.displayToHardware[WRITE]);
+  close(pipes.visionToHardware[WRITE]);
 
   // Close unused ends of the pipes
   // close(pipes.fromDisplay[READ]); // Not currently used
@@ -36,19 +34,21 @@ void hardwareEntry(struct HardwarePipes pipes) {
   if (receivedStartSignal(pipes.fromDisplay[READ]) == 0) {
     usleep(500000);
   }
-  else {
-    LOG(INFO) << "Checking weight";
-    /**
-     * Function call to scale
-     * 0 - nothing on scale
-     * 1 - valid input, begin scanning
-     */
+}
 
-    LOG(INFO) << "Beginning scan";
-    /**
-     * Function call to controls routine
-     * has a pipe read from vision in loop
-     */
+void redoThis(struct Pipes pipes) {
+  LOG(INFO) << "Checking weight";
+  /**
+   * Function call to scale
+   * 0 - nothing on scale
+   * 1 - valid input, begin scanning
+   */
+
+  LOG(INFO) << "Beginning scan";
+  /**
+   * Function call to controls routine
+   * has a pipe read from vision in loop
+   */
 
     LOG(INFO) << "Sending Images from Hardware to Vision";
     // sendImagesWithinDirectory(pipes.toVision[WRITE], "../images/");

@@ -11,12 +11,10 @@
 int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
 
-  DisplayPipes displayPipes;
-  VisionPipes visionPipes;
-  HardwarePipes hardwarePipes;
+  Pipes pipes;
 
   // Initialize all pipes
-  initializePipes(displayPipes, visionPipes, hardwarePipes);
+  initializePipes(pipes);
 
   LOG(INFO) << "Starting display process..";
   int displayPid;
@@ -24,7 +22,7 @@ int main(int argc, char* argv[]) {
     LOG(FATAL) << "Error starting display process";
   }
   else if (displayPid == 0) {
-    displayEntry(displayPipes);
+    displayEntry(pipes);
     LOG(INFO) << "Display process";
     return 0;
   }
@@ -38,7 +36,7 @@ int main(int argc, char* argv[]) {
     LOG(FATAL) << "Error starting hardware process";
   }
   else if (hardwarePid == 0) {
-    hardwareEntry(hardwarePipes);
+    hardwareEntry(pipes);
     LOG(INFO) << "Hardware process";
     return 0;
   }
@@ -52,7 +50,7 @@ int main(int argc, char* argv[]) {
     LOG(FATAL) << "Error starting vision process";
   }
   else if (visionPid == 0) {
-    visionEntry(visionPipes);
+    visionEntry(pipes);
     LOG(INFO) << "Vision process";
     return 0;
   }
