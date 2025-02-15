@@ -86,6 +86,13 @@ void storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
   sqlite3_finalize(statement);
 }
 
+/**
+ * Read all food items currently stored in the database.
+ *
+ * @param None
+ * @return Vector of food item objects, each corresponding to a food item read from the
+ * database.
+ */
 std::vector<FoodItem> readAllFoodItems() {
   sqlite3* database = nullptr;
   openDatabase(&database);
@@ -101,6 +108,14 @@ std::vector<FoodItem> readAllFoodItems() {
   return allFoodItems;
 }
 
+/**
+ * Read a food item from the database by its id. Since the ID is the primary key in the
+ * database, only one food item will be returned.
+ *
+ * @param id The id of the food item to be read
+ * database.
+ * @return The food item with the matching id
+ */
 FoodItem readFoodItemById(const int& id) {
   sqlite3* database = nullptr;
   openDatabase(&database);
@@ -116,6 +131,79 @@ FoodItem readFoodItemById(const int& id) {
   return foodItem;
 }
 
+/**
+ * When reading a food item from a database, this function provides an interface between
+ * the columns in the database and the FoodItem type. It gives the ability to assin a food
+ * item field from a column in the database.
+ *
+ * @param foodItem The food item to assign the field of
+ * @param columnValue The value read out of the column
+ * @param columnName The name of the column that columnValue was read from
+ * @return None
+ */
+void setFoodItem(struct FoodItem& foodItem,
+                 const std::string& columnValue,
+                 const std::string& columnName) {
+  if (columnName == "id") {
+    foodItem.id = stoi(columnValue);
+  }
+  if (columnName == "name") {
+    foodItem.name = columnValue;
+  }
+  else if (columnName == "catagory") {
+    foodItem.catagory = columnValue;
+  }
+  else if (columnName == "scanDateYear") {
+    foodItem.scanDate =
+        std::chrono::year_month_day(std::chrono::year{stoi(columnValue)},
+                                    foodItem.scanDate.month(), foodItem.scanDate.day());
+  }
+  else if (columnName == "scanDateMonth") {
+    foodItem.scanDate = std::chrono::year_month_day(
+        foodItem.scanDate.year(),
+        std::chrono::month{static_cast<unsigned>(std::stoi(columnValue))},
+        foodItem.scanDate.day());
+  }
+  else if (columnName == "scanDateDay") {
+    foodItem.scanDate = std::chrono::year_month_day(
+        foodItem.scanDate.year(), foodItem.scanDate.month(),
+        std::chrono::day{static_cast<unsigned>(stoi(columnValue))});
+  }
+  else if (columnName == "expirationDateYear") {
+    foodItem.expirationDate = std::chrono::year_month_day(
+        std::chrono::year{stoi(columnValue)}, foodItem.expirationDate.month(),
+        foodItem.expirationDate.day());
+  }
+  else if (columnName == "expirationDateMonth") {
+    foodItem.expirationDate = std::chrono::year_month_day(
+        foodItem.expirationDate.year(),
+        std::chrono::month{static_cast<unsigned>(stoi(columnValue))},
+        foodItem.expirationDate.day());
+  }
+  else if (columnName == "expirationDateDay") {
+    foodItem.expirationDate = std::chrono::year_month_day(
+        foodItem.expirationDate.year(), foodItem.expirationDate.month(),
+        std::chrono::day{static_cast<unsigned>(stoi(columnValue))});
+  }
+  /*
+  else if (std::string(columnNames[i]) == "weight") {
+    foodItem.weight = columns[i];
+  }
+  */
+  else if (columnName == "quantity") {
+    foodItem.quantity = stoi(columnValue);
+  }
+}
+
+/**
+ * Callback function for reading a food item by its id.
+ *
+ * @param passedFoodItem The food item to put the read out data into
+ * @param numColumns How many columns in the table
+ * @param columns The values stored in the columns
+ * @param columnNames The names of the columns
+ * @return Always 0
+ */
 int readFoodItemByIdCallback(void* passedFoodItem,
                              int numColumns,
                              char** columns,
@@ -125,60 +213,20 @@ int readFoodItemByIdCallback(void* passedFoodItem,
   for (int i = 0; i < numColumns; i++) {
     std::string columnValue(columns[i], strlen(columns[i]));
     std::string columnName(columnNames[i], strlen(columnNames[i]));
-
-    if (columnName == "id") {
-      foodItem->id = stoi(columnValue);
-    }
-    if (columnName == "name") {
-      foodItem->name = columnValue;
-    }
-    else if (columnName == "catagory") {
-      foodItem->catagory = columnValue;
-    }
-    else if (columnName == "scanDateYear") {
-      foodItem->scanDate = std::chrono::year_month_day(
-          std::chrono::year{stoi(columnValue)}, foodItem->scanDate.month(),
-          foodItem->scanDate.day());
-    }
-    else if (columnName == "scanDateMonth") {
-      foodItem->scanDate = std::chrono::year_month_day(
-          foodItem->scanDate.year(),
-          std::chrono::month{static_cast<unsigned>(std::stoi(columnValue))},
-          foodItem->scanDate.day());
-    }
-    else if (columnName == "scanDateDay") {
-      foodItem->scanDate = std::chrono::year_month_day(
-          foodItem->scanDate.year(), foodItem->scanDate.month(),
-          std::chrono::day{static_cast<unsigned>(stoi(columnValue))});
-    }
-    else if (columnName == "expirationDateYear") {
-      foodItem->expirationDate = std::chrono::year_month_day(
-          std::chrono::year{stoi(columnValue)}, foodItem->expirationDate.month(),
-          foodItem->expirationDate.day());
-    }
-    else if (columnName == "expirationDateMonth") {
-      foodItem->expirationDate = std::chrono::year_month_day(
-          foodItem->expirationDate.year(),
-          std::chrono::month{static_cast<unsigned>(stoi(columnValue))},
-          foodItem->expirationDate.day());
-    }
-    else if (columnName == "expirationDateDay") {
-      foodItem->expirationDate = std::chrono::year_month_day(
-          foodItem->expirationDate.year(), foodItem->expirationDate.month(),
-          std::chrono::day{static_cast<unsigned>(stoi(columnValue))});
-    }
-    /*
-    else if (std::string(columnNames[i]) == "weight") {
-      foodItem.weight = columns[i];
-    }
-    */
-    else if (std::string(columnNames[i]) == "quantity") {
-      foodItem->quantity = stoi(columnValue);
-    }
+    setFoodItem(*foodItem, columnValue, columnName);
   }
   return 0;
 }
 
+/**
+ * Callback function for reading a food item by its id.
+ *
+ * @param foodItemVector Vector to store read food items into
+ * @param numColumns How many columns in the table
+ * @param columns The values stored in the columns
+ * @param columnNames The names of the columns
+ * @return Always 0
+ */
 int readAllFoodItemsCallback(void* foodItemVector,
                              int numColumns,
                              char** columns,
@@ -190,57 +238,7 @@ int readAllFoodItemsCallback(void* foodItemVector,
   for (int i = 0; i < numColumns; i++) {
     std::string columnValue(columns[i], strlen(columns[i]));
     std::string columnName(columnNames[i], strlen(columnNames[i]));
-
-    if (columnName == "id") {
-      foodItem.id = stoi(columnValue);
-    }
-    if (columnName == "name") {
-      foodItem.name = columnValue;
-    }
-    else if (columnName == "catagory") {
-      foodItem.catagory = columnValue;
-    }
-    else if (columnName == "scanDateYear") {
-      foodItem.scanDate =
-          std::chrono::year_month_day(std::chrono::year{stoi(columnValue)},
-                                      foodItem.scanDate.month(), foodItem.scanDate.day());
-    }
-    else if (columnName == "scanDateMonth") {
-      foodItem.scanDate = std::chrono::year_month_day(
-          foodItem.scanDate.year(),
-          std::chrono::month{static_cast<unsigned>(std::stoi(columnValue))},
-          foodItem.scanDate.day());
-    }
-    else if (columnName == "scanDateDay") {
-      foodItem.scanDate = std::chrono::year_month_day(
-          foodItem.scanDate.year(), foodItem.scanDate.month(),
-          std::chrono::day{static_cast<unsigned>(stoi(columnValue))});
-    }
-    else if (columnName == "expirationDateYear") {
-      foodItem.expirationDate = std::chrono::year_month_day(
-          std::chrono::year{stoi(columnValue)}, foodItem.expirationDate.month(),
-          foodItem.expirationDate.day());
-    }
-    else if (columnName == "expirationDateMonth") {
-      foodItem.expirationDate = std::chrono::year_month_day(
-          foodItem.expirationDate.year(),
-          std::chrono::month{static_cast<unsigned>(stoi(columnValue))},
-          foodItem.expirationDate.day());
-    }
-    else if (columnName == "expirationDateDay") {
-      foodItem.expirationDate = std::chrono::year_month_day(
-          foodItem.expirationDate.year(), foodItem.expirationDate.month(),
-          std::chrono::day{static_cast<unsigned>(stoi(columnValue))});
-    }
-    /*
-    else if (std::string(columnNames[i]) == "weight") {
-      foodItem.weight = columns[i];
-    }
-    */
-    else if (std::string(columnNames[i]) == "quantity") {
-      foodItem.quantity = stoi(columnValue);
-      std::cout << foodItem.quantity << std::endl;
-    }
+    setFoodItem(foodItem, columnValue, columnName);
   }
   allFoodItems->push_back(foodItem);
   return 0;

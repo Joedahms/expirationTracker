@@ -32,16 +32,19 @@ void NumberSetting::setSettingId(const int& newSettingId) {
 }
 
 void NumberSetting::update() {
+  // Decrease
   SDL_Rect decreaseButtonRect = decreaseButton.getRectangle();
   decreaseButtonRect.y        = this->rectangle.y;
   decreaseButtonRect.x        = this->rectangle.x;
   decreaseButton.setRectangle(decreaseButtonRect);
 
+  // Value
   SDL_Rect settingValueTextRect = settingValueText.getRectangle();
   settingValueTextRect.y        = this->rectangle.y;
   settingValueTextRect.x        = decreaseButtonRect.x + decreaseButtonRect.w;
   settingValueText.setRectangle(settingValueTextRect);
 
+  // Increase
   SDL_Rect increaseButtonRect = increaseButton.getRectangle();
   increaseButtonRect.y        = this->rectangle.y;
   increaseButtonRect.x        = settingValueTextRect.x + settingValueTextRect.w;
