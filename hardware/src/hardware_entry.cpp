@@ -7,6 +7,7 @@
 
 #include "../../food_item.h"
 #include "./controls/controls.h"
+#include "./controls/weight.h"
 #include "io.h"
 
 /**
@@ -15,7 +16,7 @@
  *
  * Input:
  * @param pipes Pipes for hardware to communicate with the other processes
- * Output: None
+ * @return None
  */
 void hardwareEntry(struct Pipes pipes) {
   LOG(INFO) << "Within vision process";
@@ -32,7 +33,25 @@ void hardwareEntry(struct Pipes pipes) {
     // Wait for start signal from Display with 0.5sec sleep
     LOG(INFO) << "Waiting for start signal from Display";
     if (receivedStartSignal(pipes.displayToHardware[READ])) {
-      redoThis(pipes);
+      LOG(INFO) << "Checking if there is weight on the platform";
+      /**
+       * Check if there is weight on the platform
+       *
+       *
+       * @return boolean
+       * 0 - nothing on scale
+       * 1 - valid input, begin scanning
+       */
+      if (getWeight() > 0) {
+        LOG(INFO) << "Weight detected on platform. Beginning scan.";
+        // send 1 to display to indicate weight
+        rotateAndCapture();
+      }
+      else {
+        LOG(INFO) << "No weight detected on platform.";
+        // send 0 to display to indicate no weight
+        continue;
+      }
     }
     else {
       usleep(500000);
