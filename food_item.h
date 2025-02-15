@@ -18,7 +18,7 @@ struct FoodItem {
 };
 
 void sendFoodItem(struct FoodItem, int);
-bool receiveFoodItem(struct FoodItem&, int, const struct timeval);
+bool receiveFoodItem(struct FoodItem&, int);
 
 void writeString(int, const std::string&);
 std::string readString(int);
