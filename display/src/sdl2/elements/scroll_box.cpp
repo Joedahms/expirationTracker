@@ -23,6 +23,15 @@ void ScrollBox::refreshPanels() {
 
   this->panels.clear();
   for (auto& foodItem : allFoodItems) {
+    std::unique_ptr<Panel> newPanel =
+        std::make_unique<Panel>(this->displayGlobal, foodItem.id);
+
+    newPanel->addFoodItemName(foodItem);
+    newPanel->addFoodItemExpirationDate(foodItem);
+
+    addPanel(std::move(newPanel), this->rectangle);
+
+    /*
     std::vector<std::unique_ptr<Text>> texts;
 
     SDL_Color textColor = {0, 255, 0, 255};
@@ -77,20 +86,38 @@ void ScrollBox::refreshPanels() {
                                expirationDateYear.c_str(), 24, textColor, rect);
     texts.push_back(std::move(year));
 
-    // Year
-    std::string quantityString = std::to_string(static_cast<int>(foodItem.quantity));
-    std::unique_ptr<Text> quantityText =
-        std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
-                               quantityString.c_str(), 24, textColor, rect);
-    texts.push_back(std::move(quantityText));
-
     std::unique_ptr<Panel> newPanel =
         std::make_unique<Panel>(this->displayGlobal, foodItem.id, rect, std::move(texts));
     addPanel(std::move(newPanel), this->rectangle);
+  */
   }
 }
 
 void ScrollBox::setPanelHeight(int panelHeight) { this->panelHeight = panelHeight; }
+
+/**
+ * Add a new panel to the scroll box. Adds the new panel directly below the previously
+ * lowest panel.
+ *
+ * @param The new panel to add
+ * @return None
+ */
+void ScrollBox::addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectangle) {
+  std::unique_ptr<Panel> newPanel = std::move(panel);
+  SDL_Rect newPanelRect           = newPanel->getRectangle();
+  newPanelRect.h                  = this->panelHeight;
+  newPanelRect.w                  = containingRectangle.w;
+  if (this->panels.size() == 0) {
+    newPanelRect.y = this->topPanelPosition;
+  }
+  else {
+    newPanelRect.y = this->panels.back()->getRectangle().y + this->panelHeight;
+  }
+  newPanel->setRectangle(newPanelRect);
+  newPanel->update();
+  newPanel->addBorder(1);
+  this->panels.push_back(std::move(newPanel));
+}
 
 /**
  * Update all panels in the scroll box with food item information. Assumed that one panel
@@ -116,30 +143,6 @@ void ScrollBox::update() {
     refreshPanels();
     this->previousUpdate = this->currentUpdate;
   }
-}
-
-/**
- * Add a new panel to the scroll box. Adds the new panel directly below the previously
- * lowest panel.
- *
- * @param The new panel to add
- * @return None
- */
-void ScrollBox::addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectangle) {
-  std::unique_ptr<Panel> newPanel = std::move(panel);
-  SDL_Rect newPanelRect           = newPanel->getRectangle();
-  newPanelRect.h                  = this->panelHeight;
-  newPanelRect.w                  = containingRectangle.w;
-  if (this->panels.size() == 0) {
-    newPanelRect.y = this->topPanelPosition;
-  }
-  else {
-    newPanelRect.y = this->panels.back()->getRectangle().y + this->panelHeight;
-  }
-  newPanel->setRectangle(newPanelRect);
-  newPanel->update();
-  newPanel->addBorder(1);
-  this->panels.push_back(std::move(newPanel));
 }
 
 /**
