@@ -38,28 +38,6 @@ sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev
 sudo apt install libopencv-dev
 sudo apt install sqlite3
 sudo apt install libsqlite3-dev
-
-
-
-MESA: error: ZINK: failed to choose pdev: sudo apt install vulkan-tools
-
-What it means: This error comes from the Zink driver, which is a Mesa driver that translates Vulkan calls to OpenGL. The error suggests that Zink failed to choose a physical device (pdev) for rendering. This typically occurs when:
-
-Vulkan is not properly configured or no Vulkan-compatible GPU is detected.
-There’s a misconfiguration in your graphics driver or Vulkan loader.
-Your system might not have the necessary Vulkan support libraries installed.
-
-
-
-
-glx: failed to create drisw screen: 
-sudo apt install mesa-utils (MAYBE NOT NEEDED)
 sudo add-apt-repository ppa:kisak/kisak-mesa
 sudo apt update
 sudo apt upgrade
-
-What it means: This error comes from the GLX extension, which is used for integrating OpenGL with the X Window System. The error indicates that the driver failed to create a DRI software (drisw) screen, which happens when:
-
-There’s a problem with the Mesa software renderer.
-The system cannot access the GPU or software rendering fallback (DRISW) is misconfigured.
-There’s a mismatch between the SDL backend, OpenGL/GLX, and the Mesa configuration.
