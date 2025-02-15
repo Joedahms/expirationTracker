@@ -1,4 +1,4 @@
-// #include "HX711.h"
+#include "HX711.h"
 #include "../../food_item.h"
 #include "hardware_entry.h"
 #include <fstream>
@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string>
 #include <unistd.h>
-#include <wiringPi.h> // Raspberry Pi 5 library for GPIO in C++
+#include "../../../WiringPi/wiringPi/wiringPi.h"
 
 #define MOTOR_IN1      23 // GPIO Pin for L298N IN1
 #define MOTOR_IN2      24 // GPIO Pin for L298N IN2

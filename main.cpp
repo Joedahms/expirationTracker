@@ -3,9 +3,9 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "pipes.h"
 #include "display/src/display_entry.h"
 #include "hardware/src/hardware_entry.h"
+#include "pipes.h"
 #include "vision/src/vision_pipe.h"
 
 int main(int argc, char* argv[]) {
