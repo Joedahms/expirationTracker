@@ -96,6 +96,12 @@ void Panel::addText(const std::string& fontPath,
   this->texts.push_back(std::move(text));
 }
 
+/**
+ * General way to add a food item to a panel.
+ *
+ * @param foodItem The food item to add to the panel
+ * @return None
+ */
 void Panel::addFoodItem(const FoodItem& foodItem) {
   addFoodItemName(foodItem);
   addFoodItemExpirationDate(foodItem);
@@ -169,11 +175,12 @@ void Panel::update() {
     }
     else {
       SDL_Rect leftRectangle = this->texts[i - 1]->getRectangle();
-      // printRect(leftRectangle);
-      textRectangle.x = leftRectangle.x + leftRectangle.w;
+      textRectangle.x        = leftRectangle.x + leftRectangle.w;
     }
     this->texts[i]->setRectangle(textRectangle);
   }
+
+  // Add quantity
   SDL_Rect itemQuantityRect = this->itemQuantity.getRectangle();
   itemQuantityRect.y        = this->texts.back()->getRectangle().y;
   itemQuantityRect.x =
@@ -189,11 +196,16 @@ void Panel::update() {
  * @return None
  */
 void Panel::render() const {
+  // Border
   if (this->hasBorder) {
     renderBorder();
   }
+
+  // Text
   for (auto& x : this->texts) {
     x->render();
   }
+
+  // Quantity
   this->itemQuantity.render();
 }

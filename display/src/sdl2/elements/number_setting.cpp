@@ -32,20 +32,24 @@ void NumberSetting::setSettingId(const int& newSettingId) {
 }
 
 void NumberSetting::update() {
-  SDL_Rect increaseButtonRect = increaseButton.getRectangle();
-  increaseButtonRect.y        = this->rectangle.y;
-  increaseButtonRect.x        = this->rectangle.x;
-  increaseButton.setRectangle(increaseButtonRect);
-
-  //  printRect(increaseButtonRect);
+  SDL_Rect decreaseButtonRect = decreaseButton.getRectangle();
+  decreaseButtonRect.y        = this->rectangle.y;
+  decreaseButtonRect.x        = this->rectangle.x;
+  decreaseButton.setRectangle(decreaseButtonRect);
 
   SDL_Rect settingValueTextRect = settingValueText.getRectangle();
   settingValueTextRect.y        = this->rectangle.y;
-  settingValueTextRect.x        = increaseButtonRect.x + increaseButtonRect.w;
+  settingValueTextRect.x        = decreaseButtonRect.x + decreaseButtonRect.w;
   settingValueText.setRectangle(settingValueTextRect);
+
+  SDL_Rect increaseButtonRect = increaseButton.getRectangle();
+  increaseButtonRect.y        = this->rectangle.y;
+  increaseButtonRect.x        = settingValueTextRect.x + settingValueTextRect.w;
+  increaseButton.setRectangle(increaseButtonRect);
 
   this->settingValueText.update();
   this->increaseButton.update();
+  this->decreaseButton.update();
 
   FoodItem foodItem = readFoodItemById(this->settingId);
   if (foodItem.quantity != this->settingValue) {
@@ -54,7 +58,7 @@ void NumberSetting::update() {
 }
 
 void NumberSetting::render() const {
-  this->increaseButton.render();
-  //  this->decreaseButton.render();
   this->settingValueText.render();
+  this->increaseButton.render();
+  this->decreaseButton.render();
 }
