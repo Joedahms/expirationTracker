@@ -33,12 +33,14 @@ def preprocess_image(image_path):
     return img_array
 
 def classify_image(image_path):
-    """Runs inference on an image using ImageNet labels and returns top predicted class index."""
+    """Runs inference on an image using ImageNet labels and returns the top predicted class index and probability."""
     img_array = preprocess_image(image_path)
     
     preds = model.predict(img_array, verbose=0)  # Get predictions
     top_class_index = np.argmax(preds)  # Get index of highest probability class
-    return top_class_index  # Return only the class index as an integer
+    top_probability = preds[0, top_class_index]  # Get the probability of the top class
+    
+    return top_class_index, top_probability  # Return class index and probability
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -46,5 +48,5 @@ if __name__ == "__main__":
         sys.exit(1)
 
     image_path = sys.argv[1]  # Get image path from command-line argument
-    output = classify_image(image_path)  # Get result instead of printing
-    print(output)  # Use stdout.write to ensure no extra newlines
+    top_class_index, top_probability = classify_image(image_path)  # Get result instead of printing
+    print(json.dumps({"index": int(top_class_index), "probability": float(top_probability)}))

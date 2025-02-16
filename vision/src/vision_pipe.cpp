@@ -69,8 +69,8 @@ bool analyzeImages(const std::string& imageDirectory, struct FoodItem detectedFo
   // check if the object exists in our object classification
   bool objectDetected = false;
   for (const auto& entry : std::filesystem::directory_iterator(imageDirectory)) {
-    int detectionIndex = runEfficientNet(entry.path());
-    if (isValidClass(detectionIndex)) {
+    auto [detectionIndex, probability] = runEfficientNet(entry.path());
+    if (isValidClass(detectionIndex) && probability > .5) {
       detectedFoodItem.name      = getFoodLabel(detectionIndex);
       detectedFoodItem.category  = "Unpackaged";
       detectedFoodItem.photoPath = entry.path(); // path of photo that classified object
