@@ -52,67 +52,6 @@ void processFoodItems(struct Pipes pipes,
   for (const auto& detection : detections) {
     std::cout << detection << std::endl;
   }
-  detectedFoodItem.name = "RABBIT";
-  sendFoodItem(detectedFoodItem, pipes.displayToVision[WRITE]);
-}
-
-void displayFoodItems(int pipe) {}
-
-/**
- * Read from the given pipe and create images using the information received. Write
- * received images to the given output directory.
- *
- * Input:
- * @param ouputDirectory Directory to write information to
- * @param pipeToRead Pipe to read data from
- * Output: None
- */
-void receiveImages(int pipeToRead, const std::string& ouputDirectory) {
-  uint32_t image_size;
-  int image_count = 0;
-
-  while (true) {
-    // Step 1: Read the header (image size in bytes)
-    if (read(pipeToRead, &image_size, sizeof(image_size)) <= 0) {
-      LOG(FATAL) << "Failed to read header";
-      break;
-    }
-
-    // Step 2: Check for end-of-transmission signal
-    if (image_size == 0) {
-      LOG(INFO) << "End of transmission received";
-      break;
-    }
-
-    // Step 3: Open an output file for the image
-    std::string outputFile =
-        ouputDirectory + "/image_" + std::to_string(image_count++) + ".jpg";
-    std::ofstream file(outputFile, std::ios::binary);
-    if (!file.is_open()) {
-      LOG(FATAL) << "Failed to open output file";
-      continue;
-    }
-
-    // Step 4: Read the image data
-    const int CHUNK_SIZE = 4096;
-    char buffer[CHUNK_SIZE];
-    while (image_size > 0) {
-      ssize_t to_read =
-          std::min(static_cast<ssize_t>(image_size), static_cast<ssize_t>(CHUNK_SIZE));
-      ssize_t bytes_read = read(pipeToRead, buffer, to_read);
-
-      if (bytes_read <= 0) {
-        LOG(FATAL) << "Error reading from pipe";
-        break;
-      }
-
-      file.write(buffer, bytes_read);
-      image_size -= bytes_read;
-    }
-
-    file.close();
-    LOG(INFO) << "Image saved to: " << outputFile;
-  }
 }
 
 std::vector<std::string> analyzeImages(const std::string& imageDirectory) {
@@ -122,6 +61,8 @@ std::vector<std::string> analyzeImages(const std::string& imageDirectory) {
     LOG(FATAL) << "Failed to open image directory" << imageDirectory;
     return detections;
   }
+
+  // check if the object exists in our object classification
   bool objectDetected = false;
   for (const auto& entry : std::filesystem::directory_iterator(imageDirectory)) {
     std::string detection = runEfficientNet(entry.path());
@@ -130,7 +71,7 @@ std::vector<std::string> analyzeImages(const std::string& imageDirectory) {
       objectDetected = true;
     }
   }
-
+  // if not, extract text
   if (!objectDetected && !detections.empty()) {
     LOG(INFO) << "Running text extraction script";
     std::string result = runOCR(imageDirectory + "cinnamontoastbox.jpg");
