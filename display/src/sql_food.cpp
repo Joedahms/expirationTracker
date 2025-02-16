@@ -20,7 +20,7 @@ void openDatabase(sqlite3** database) {
   const char* createSqlTable = "CREATE TABLE IF NOT EXISTS foodItems("
                                "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                                "name TEXT,"
-                               "catagory TEXT,"
+                               "category TEXT,"
                                "scanDateYear INTEGER,"
                                "scanDateMonth INTEGER,"
                                "scanDateDay INTEGER,"
@@ -49,7 +49,7 @@ void openDatabase(sqlite3** database) {
  */
 void storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
   const char* insertSql =
-      "INSERT INTO foodItems (name, catagory, scanDateYear, "
+      "INSERT INTO foodItems (name, category, scanDateYear, "
       "scanDateMonth, scanDateDay, expirationDateYear, expirationDateMonth, "
       "expirationDateDay, weight, quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
@@ -68,7 +68,7 @@ void storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
   unsigned int expirationDateDay = static_cast<unsigned>(foodItem.expirationDate.day());
 
   sqlite3_bind_text(statement, 1, foodItem.name.c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_text(statement, 2, foodItem.catagory.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(statement, 2, foodItem.category.c_str(), -1, SQLITE_TRANSIENT);
   sqlite3_bind_int(statement, 3, scanDateYear);
   sqlite3_bind_int(statement, 4, scanDateMonth);
   sqlite3_bind_int(statement, 5, scanDateDay);
@@ -101,8 +101,8 @@ int readFoodItemCallback(void* foodItemVector,
     if (columnName == "name") {
       foodItem.name = columnValue;
     }
-    else if (columnName == "catagory") {
-      foodItem.catagory = columnValue;
+    else if (columnName == "category") {
+      foodItem.category = columnValue;
     }
     else if (columnName == "scanDateYear") {
       foodItem.scanDate =

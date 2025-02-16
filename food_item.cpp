@@ -19,7 +19,7 @@
 void sendFoodItem(struct FoodItem foodItem, int pipeToWrite) {
   writeString(pipeToWrite, foodItem.photoPath);
   writeString(pipeToWrite, foodItem.name);
-  writeString(pipeToWrite, foodItem.catagory);
+  writeString(pipeToWrite, foodItem.category);
 
   write(pipeToWrite, &foodItem.scanDate, sizeof(foodItem.scanDate));
   write(pipeToWrite, &foodItem.expirationDate, sizeof(foodItem.expirationDate));
@@ -61,7 +61,7 @@ bool receiveFoodItem(struct FoodItem& foodItem, int pipeToRead) {
   if (FD_ISSET(pipeToRead, &readPipeSet)) { // Data available
     foodItem.photoPath = readString(pipeToRead);
     foodItem.name      = readString(pipeToRead);
-    foodItem.catagory  = readString(pipeToRead);
+    foodItem.category  = readString(pipeToRead);
 
     read(pipeToRead, &foodItem.scanDate, sizeof(foodItem.scanDate));
     read(pipeToRead, &foodItem.expirationDate, sizeof(foodItem.expirationDate));

@@ -10,7 +10,7 @@
 struct FoodItem {
   std::string photoPath;
   std::string name;
-  std::string catagory;
+  std::string category;
   std::chrono::year_month_day scanDate;
   std::chrono::year_month_day expirationDate;
   float weight;
