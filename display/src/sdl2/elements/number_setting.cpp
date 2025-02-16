@@ -1,4 +1,5 @@
 #include <glog/logging.h>
+#include <iostream>
 #include <sqlite3.h>
 
 #include "../../../../food_item.h"
@@ -18,6 +19,7 @@ NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal, int settingId)
       settingId(settingId) {
   FoodItem foodItem  = readFoodItemById(this->settingId);
   this->settingValue = foodItem.quantity;
+  this->settingValueText.setContent(std::to_string(this->settingValue));
 }
 
 void NumberSetting::setSettingId(const int& newSettingId) {

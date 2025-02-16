@@ -1,6 +1,7 @@
 #include <glog/logging.h>
 #include <iostream>
 #include <sqlite3.h>
+#include <sstream>
 
 #include "../../food_item.h"
 #include "sql_food.h"
@@ -87,51 +88,6 @@ void storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
 }
 
 /**
- * Read all food items currently stored in the database.
- *
- * @param None
- * @return Vector of food item objects, each corresponding to a food item read from the
- * database.
- */
-std::vector<FoodItem> readAllFoodItems() {
-  sqlite3* database = nullptr;
-  openDatabase(&database);
-
-  char* errorMessage    = nullptr;
-  const char* selectAll = "SELECT * FROM foodItems;";
-
-  std::vector<FoodItem> allFoodItems;
-  int sqlReturn = sqlite3_exec(database, selectAll, readAllFoodItemsCallback,
-                               &allFoodItems, &errorMessage);
-
-  sqlite3_close(database);
-  return allFoodItems;
-}
-
-/**
- * Read a food item from the database by its id. Since the ID is the primary key in the
- * database, only one food item will be returned.
- *
- * @param id The id of the food item to be read
- * database.
- * @return The food item with the matching id
- */
-FoodItem readFoodItemById(const int& id) {
-  sqlite3* database = nullptr;
-  openDatabase(&database);
-
-  char* errorMessage   = nullptr;
-  const char* selectId = "SELECT * FROM foodItems WHERE id = ?;";
-
-  FoodItem foodItem;
-  int sqlReturn = sqlite3_exec(database, selectId, readFoodItemByIdCallback, &foodItem,
-                               &errorMessage);
-
-  sqlite3_close(database);
-  return foodItem;
-}
-
-/**
  * When reading a food item from a database, this function provides an interface between
  * the columns in the database and the FoodItem type. It gives the ability to assin a food
  * item field from a column in the database.
@@ -193,6 +149,67 @@ void setFoodItem(struct FoodItem& foodItem,
   else if (columnName == "quantity") {
     foodItem.quantity = stoi(columnValue);
   }
+}
+
+/**
+ * Read all food items currently stored in the database.
+ *
+ * @param None
+ * @return Vector of food item objects, each corresponding to a food item read from the
+ * database.
+ */
+std::vector<FoodItem> readAllFoodItems() {
+  sqlite3* database = nullptr;
+  openDatabase(&database);
+
+  char* errorMessage    = nullptr;
+  const char* selectAll = "SELECT * FROM foodItems;";
+
+  std::vector<FoodItem> allFoodItems;
+  int sqlReturn = sqlite3_exec(database, selectAll, readAllFoodItemsCallback,
+                               &allFoodItems, &errorMessage);
+
+  sqlite3_close(database);
+  return allFoodItems;
+}
+
+/**
+ * Read a food item from the database by its id. Since the ID is the primary key in the
+ * database, only one food item will be returned.
+ *
+ * @param id The id of the food item to be read
+ * database.
+ * @return The food item with the matching id
+ */
+FoodItem readFoodItemById(const int& id) {
+  sqlite3* database = nullptr;
+  openDatabase(&database);
+
+  char* errorMessage = nullptr;
+
+  std::stringstream selectId;
+  selectId << "SELECT * FROM foodItems WHERE id = " << id << ";";
+
+  FoodItem foodItem;
+  int sqlReturn = sqlite3_exec(database, selectId.str().c_str(), readFoodItemByIdCallback,
+                               &foodItem, &errorMessage);
+
+  sqlite3_close(database);
+  return foodItem;
+}
+
+void updateFoodItemQuantity(const int& id) {
+  sqlite3* database = nullptr;
+  openDatabase(&database);
+
+  char* errorMessage   = nullptr;
+  const char* selectId = "SELECT * FROM foodItems WHERE id = ?;";
+
+  FoodItem foodItem;
+  int sqlReturn = sqlite3_exec(database, selectId, readFoodItemByIdCallback, &foodItem,
+                               &errorMessage);
+
+  sqlite3_close(database);
 }
 
 /**

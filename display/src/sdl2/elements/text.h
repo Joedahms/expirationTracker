@@ -21,6 +21,7 @@ public:
        SDL_Color color,
        SDL_Rect rectangle);
   ~Text();
+  void setContent(const std::string& newContent);
   void update() override;
   void render() const override;
 

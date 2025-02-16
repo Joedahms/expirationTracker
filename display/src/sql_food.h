@@ -6,11 +6,13 @@
 
 void openDatabase(sqlite3**);
 void storeFoodItem(sqlite3*, struct FoodItem);
+
 void setFoodItem(struct FoodItem& foodItem,
                  const std::string& columnValue,
                  const std::string& columnName);
 std::vector<FoodItem> readAllFoodItems();
 FoodItem readFoodItemById(const int& id);
+
 int readFoodItemByIdCallback(void* passedFoodItem,
                              int numColumns,
                              char** columns,

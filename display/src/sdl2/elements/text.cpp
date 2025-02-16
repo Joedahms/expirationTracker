@@ -42,6 +42,15 @@ Text::Text(struct DisplayGlobal displayGlobal,
 
 Text::~Text() { TTF_CloseFont(this->font); }
 
+void Text::setContent(const std::string& newContent) {
+  this->content = newContent;
+
+  SDL_Surface* textSurface =
+      TTF_RenderText_Solid(this->font, this->content.c_str(), this->color);
+  this->texture = SDL_CreateTextureFromSurface(this->displayGlobal.renderer, textSurface);
+  SDL_FreeSurface(textSurface);
+}
+
 void Text::update() {}
 
 /**
