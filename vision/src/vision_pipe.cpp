@@ -124,12 +124,8 @@ std::vector<std::string> analyzeImages(const std::string& imageDirectory) {
   }
   bool objectDetected = false;
   for (const auto& entry : std::filesystem::directory_iterator(imageDirectory)) {
-    std::string detection = analyzeImage(entry.path(), "../vision/Models/yolov4-tiny.cfg",
-                                         "../vision/Models/yolov4-tiny_best.weights",
-                                         "../vision/Models/obj.names");
-
+    std::string detection = runEfficientNet(entry.path());
     detections.push_back(detection);
-    detection = "No objects detected";
     if (detection != "No objects detected") {
       objectDetected = true;
     }
