@@ -47,17 +47,19 @@ void processFoodItems(struct Pipes pipes,
                       struct FoodItem detectedFoodItem) {
   LOG(INFO) << "Vision analyzing all images";
   std::cout << "Analyzing..." << std::endl;
-  bool detectionComplete = analyzeImages(imageDirectory);
+  bool detectionComplete = analyzeImages(imageDirectory, detectedFoodItem);
   if (detectionComplete) {
     // send display the food item
     LOG(INFO) << "Vision successfully analyzed all images";
+    sendFoodItem(detectedFoodItem, pipes.visionToDisplay[WRITE]);
   }
   else {
     // tell hardware to send more images
+    writeString(pipes.visionToHardware[WRITE], "HELPPPPP");
   }
 }
 
-bool analyzeImages(const std::string& imageDirectory) {
+bool analyzeImages(const std::string& imageDirectory, struct FoodItem detectedFoodItem) {
   if (!std::filesystem::exists(imageDirectory) ||
       !std::filesystem::is_directory(imageDirectory)) {
     LOG(FATAL) << "Failed to open image directory" << imageDirectory;
@@ -68,9 +70,26 @@ bool analyzeImages(const std::string& imageDirectory) {
   bool objectDetected = false;
   for (const auto& entry : std::filesystem::directory_iterator(imageDirectory)) {
     int detectionIndex = runEfficientNet(entry.path());
-
     if (isValidClass(detectionIndex)) {
+      detectedFoodItem.name      = getFoodLabel(detectionIndex);
+      detectedFoodItem.category  = "Unpackaged";
+      detectedFoodItem.photoPath = entry.path(); // path of photo that classified object
+      detectedFoodItem.expirationDate =
+          std::chrono::year{2025} / std::chrono::month{2} /
+          std::chrono::day{
+              20}; // hardcode expiration for now. This will have to be pulled from some
+      // sort of database or estimated based on the given class.
+      detectedFoodItem.quantity =
+          1; // default value, in my head this will be updated within the display process
       objectDetected = true;
+      std::cout << detectedFoodItem.category << std::endl;
+      std::cout << detectedFoodItem.expirationDate << std::endl;
+      std::cout << detectedFoodItem.name << std::endl;
+      std::cout << detectedFoodItem.photoPath << std::endl;
+      std::cout << detectedFoodItem.quantity << std::endl;
+      std::cout << detectedFoodItem.scanDate << std::endl;
+      std::cout << detectedFoodItem.weight << std::endl;
+
       return true;
     }
   }

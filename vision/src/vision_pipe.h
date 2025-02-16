@@ -7,6 +7,6 @@
 
 void visionEntry(struct Pipes pipes);
 void processFoodItems(struct Pipes, std::string, struct FoodItem);
-bool analyzeImages(const std::string&);
+bool analyzeImages(const std::string&, struct FoodItem);
 
 #endif
