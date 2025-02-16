@@ -38,7 +38,6 @@ def classify_image(image_path):
     
     preds = model.predict(img_array, verbose=0)  # Get predictions
     top_class_index = np.argmax(preds)  # Get index of highest probability class
-
     return top_class_index  # Return only the class index as an integer
 
 if __name__ == "__main__":
@@ -48,4 +47,4 @@ if __name__ == "__main__":
 
     image_path = sys.argv[1]  # Get image path from command-line argument
     output = classify_image(image_path)  # Get result instead of printing
-    sys.stdout.write(output)  # Use stdout.write to ensure no extra newlines
+    print(output)  # Use stdout.write to ensure no extra newlines

@@ -45,4 +45,4 @@ def perform_ocr(image_path):
 if __name__ == "__main__":
     image_path = sys.argv[1]
     output = perform_ocr(image_path)
-    sys.stdout.write(output)  # Use stdout.write to ensure no extra newlines
+    print(output)  # Use stdout.write to ensure no extra newlines
