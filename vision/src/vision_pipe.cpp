@@ -5,7 +5,7 @@
 #include <memory>
 
 #include "../../food_item.h"
-#include "categorizeObjects.h"
+#include "FoodClasses.h"
 #include "handleOCR.h"
 #include "vision_pipe.h"
 
@@ -47,36 +47,44 @@ void processFoodItems(struct Pipes pipes,
                       struct FoodItem detectedFoodItem) {
   LOG(INFO) << "Vision analyzing all images";
   std::cout << "Analyzing..." << std::endl;
-  std::vector<std::string> detections = analyzeImages(imageDirectory);
-  LOG(INFO) << "Vision successfully analyzed all images";
-  for (const auto& detection : detections) {
-    std::cout << detection << std::endl;
+  bool detectionComplete = analyzeImages(imageDirectory);
+  if (detectionComplete) {
+    // send display the food item
+    LOG(INFO) << "Vision successfully analyzed all images";
+  }
+  else {
+    // tell hardware to send more images
   }
 }
 
-std::vector<std::string> analyzeImages(const std::string& imageDirectory) {
-  std::vector<std::string> detections;
+bool analyzeImages(const std::string& imageDirectory) {
   if (!std::filesystem::exists(imageDirectory) ||
       !std::filesystem::is_directory(imageDirectory)) {
     LOG(FATAL) << "Failed to open image directory" << imageDirectory;
-    return detections;
+    return false;
   }
 
   // check if the object exists in our object classification
   bool objectDetected = false;
   for (const auto& entry : std::filesystem::directory_iterator(imageDirectory)) {
-    std::string detection = runEfficientNet(entry.path());
-    detections.push_back(detection);
-    if (detection != "No objects detected") {
+    int detectionIndex = runEfficientNet(entry.path());
+
+    if (isValidClass(detectionIndex)) {
       objectDetected = true;
+      return true;
     }
   }
   // if not, extract text
-  if (!objectDetected && !detections.empty()) {
+  if (!objectDetected) {
     LOG(INFO) << "Running text extraction script";
     std::string result = runOCR(imageDirectory + "cinnamontoastbox.jpg");
     std::cout << "TEXT" << std::endl;
     std::cout << result << std::endl;
+
+    // if text exists in dictionary
+    //  if text is a date of some kind
+    return true;
   }
-  return detections;
+
+  return false;
 }

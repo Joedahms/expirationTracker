@@ -33,19 +33,13 @@ def preprocess_image(image_path):
     return img_array
 
 def classify_image(image_path):
-    """Runs inference on an image using ImageNet labels and returns top prediction."""
+    """Runs inference on an image using ImageNet labels and returns top predicted class index."""
     img_array = preprocess_image(image_path)
     
-    preds = model.predict(img_array, verbose = 0)  # Get predictions, no output
-    decoded_preds = decode_predictions(preds, top=1)[0]  # Get top 1 prediction
+    preds = model.predict(img_array, verbose=0)  # Get predictions
+    top_class_index = np.argmax(preds)  # Get index of highest probability class
 
-    # Extract best prediction
-    top_prediction = {
-        "label": decoded_preds[0][1],  # Human-readable label
-        "confidence": float(decoded_preds[0][2])  # Confidence score
-    }
-
-    return (json.dumps(top_prediction))  # Print JSON output for C++
+    return top_class_index  # Return only the class index as an integer
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
