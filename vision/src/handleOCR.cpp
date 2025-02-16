@@ -54,8 +54,6 @@ std::pair<int, float> runEfficientNet(const std::string& imagePath) {
   }
   pclose(pipe);
 
-  std::cout << result.str() << std::endl;
-
   // Parse JSON output
   nlohmann::json output = nlohmann::json::parse(result.str());
 

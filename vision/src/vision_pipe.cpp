@@ -47,7 +47,8 @@ void processFoodItems(struct Pipes pipes,
                       struct FoodItem detectedFoodItem) {
   LOG(INFO) << "Vision analyzing all images";
   std::cout << "Analyzing..." << std::endl;
-  bool detectionComplete = analyzeImages(imageDirectory, detectedFoodItem);
+  bool detectionComplete =
+      analyzeImages(imageDirectory + "Strawberry_Package", detectedFoodItem);
   if (detectionComplete) {
     // send display the food item
     LOG(INFO) << "Vision successfully analyzed all images";
@@ -90,20 +91,26 @@ bool analyzeImages(const std::string& imageDirectory, struct FoodItem detectedFo
       std::cout << detectedFoodItem.scanDate << std::endl;
       std::cout << detectedFoodItem.weight << std::endl;
 
-      return true;
+      return objectDetected;
     }
   }
+
   // if not, extract text
+  bool textDetected = false;
   if (!objectDetected) {
     LOG(INFO) << "Running text extraction script";
-    std::string result = runOCR(imageDirectory + "cinnamontoastbox.jpg");
-    std::cout << "TEXT" << std::endl;
-    std::cout << result << std::endl;
 
-    // if text exists in dictionary
-    //  if text is a date of some kind
-    return true;
+    for (const auto& entry : std::filesystem::directory_iterator(imageDirectory)) {
+      std::string result = runOCR(entry.path());
+      std::cout << "TEXT" << std::endl;
+      std::cout << result << std::endl;
+      if (!result.find("error")) {
+        // result is not an error
+        textDetected = true;
+        return textDetected;
+      }
+    }
   }
 
-  return false;
+  return textDetected;
 }
