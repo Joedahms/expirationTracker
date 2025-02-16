@@ -52,3 +52,6 @@ source ~/easyocr-venv/bin/activate
 ### Install EasyOCR inside the virtual environment
 pip install easyocr
 
+### Install Efficientnet within the virtual environment
+pip install efficientnet
+

@@ -44,5 +44,5 @@ def perform_ocr(image_path):
 
 if __name__ == "__main__":
     image_path = sys.argv[1]
-    print(perform_ocr(image_path), end="")  # Ensure no extra newlines
-
+    output = perform_ocr(image_path)
+    sys.stdout.write(output)  # Use stdout.write to ensure no extra newlines
