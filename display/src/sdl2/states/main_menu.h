@@ -6,9 +6,9 @@
 #include <string>
 #include <vector>
 
-#include "../button.h"
 #include "../display_global.h"
-#include "../text.h"
+#include "../elements/button.h"
+#include "../elements/text.h"
 #include "state.h"
 
 /**

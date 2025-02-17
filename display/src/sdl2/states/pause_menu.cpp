@@ -7,8 +7,8 @@
 
 /**
  * Input:
- * - displayGlobal - Global display variables
- * Output: None
+ * @param displayGlobal Global display variables
+ * @return None
  */
 PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
   this->displayGlobal        = displayGlobal;
@@ -42,9 +42,8 @@ PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
 /**
  * Handle SDL events that occur in the pause menu state.
  *
- * Input:
- * - displayIsRunning - Whether or not the display is running.
- * Output: Current state the display is in.
+ * @param displayIsRunning Whether or not the display is running.
+ * @return Current state the display is in.
  */
 int PauseMenu::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
@@ -68,6 +67,13 @@ int PauseMenu::handleEvents(bool* displayIsRunning) {
   return returnValue;
 }
 
+/**
+ * Perform operations that need to be done periodically within the state. Update all
+ * buttons.
+ *
+ * @param None
+ * @return None
+ */
 void PauseMenu::update() {
   for (auto& currentButton : this->buttons) {
     currentButton->update();
@@ -75,10 +81,10 @@ void PauseMenu::update() {
 }
 
 /**
- * Render paused and the button
+ * Render all elements.
  *
- * Input: None
- * Output: None
+ * @param None
+ * @return None
  */
 void PauseMenu::render() const {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background

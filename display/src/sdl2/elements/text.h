@@ -5,7 +5,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <string>
 
-#include "display_global.h"
+#include "../display_global.h"
 #include "element.h"
 
 /**
@@ -13,18 +13,22 @@
  */
 class Text : public Element {
 public:
+  Text();
   Text(struct DisplayGlobal displayGlobal,
-       const char* fontPath,
-       const char* content,
+       const std::string& fontPath,
+       const std::string& content,
        int fontSize,
        SDL_Color color,
        SDL_Rect rectangle);
   ~Text();
+
+  void setContent(const std::string& newContent);
+  void update() override;
   void render() const override;
 
 private:
   TTF_Font* font;
-  const char* content;
+  std::string content;
   int fontSize;
   SDL_Color color;
   SDL_Texture* texture;
