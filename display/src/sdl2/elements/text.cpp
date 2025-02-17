@@ -53,10 +53,6 @@ void Text::setContent(const std::string& newContent) {
 
 void Text::update() {}
 
-/**
- * Input: None
- * Output: None
- */
 void Text::render() const {
   SDL_RenderCopy(this->displayGlobal.renderer, this->texture, NULL, &this->rectangle);
 }

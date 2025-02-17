@@ -95,27 +95,13 @@ int ItemList::checkKeystates() {
 }
 
 /**
- * Perform operations that need to be done periodically within the state.
+ * Perform operations that need to be done periodically within the state. Only update
+ * scrollbox.
  *
  * @param None
  * @return None
  */
-void ItemList::update() {
-  /*
-  this->currentUpdate = std::chrono::steady_clock::now();
-
-  std::chrono::seconds updateDifference;
-  updateDifference = std::chrono::duration_cast<std::chrono::seconds>(
-      this->currentUpdate - this->previousUpdate);
-
-  // 5 or more seconds since last update
-  if (updateDifference.count() > 5) {
-    this->scrollBoxes[0]->update();
-    this->previousUpdate = this->currentUpdate;
-  }
-  */
-  this->scrollBoxes[0]->update();
-}
+void ItemList::update() { this->scrollBoxes[0]->update(); }
 
 void ItemList::render() const {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background

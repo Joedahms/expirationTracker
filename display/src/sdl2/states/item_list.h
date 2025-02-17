@@ -15,7 +15,7 @@
 class ItemList : public State {
 public:
   ItemList(struct DisplayGlobal displayGlobal);
-  //~ItemList();
+
   int handleEvents(bool*) override;
   int checkKeystates();
   void update() override;

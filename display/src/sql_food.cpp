@@ -60,6 +60,7 @@ void storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
     LOG(FATAL) << "Prepare error: " << sqlite3_errmsg(database);
   }
 
+  // Pull date elements out of chrono
   int scanDateYear           = static_cast<int>(foodItem.scanDate.year());
   unsigned int scanDateMonth = static_cast<unsigned>(foodItem.scanDate.month());
   unsigned int scanDateDay   = static_cast<unsigned>(foodItem.scanDate.day());
@@ -68,6 +69,7 @@ void storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
       static_cast<unsigned>(foodItem.expirationDate.month());
   unsigned int expirationDateDay = static_cast<unsigned>(foodItem.expirationDate.day());
 
+  // Bind to query
   sqlite3_bind_text(statement, 1, foodItem.name.c_str(), -1, SQLITE_TRANSIENT);
   sqlite3_bind_text(statement, 2, foodItem.catagory.c_str(), -1, SQLITE_TRANSIENT);
   sqlite3_bind_int(statement, 3, scanDateYear);

@@ -20,10 +20,6 @@ public:
          const std::string& textContent,
          const int& clickRet);
 
-  void setClicked();
-  void unsetClicked();
-  bool getClicked();
-
   bool checkHovered(const int& mouseXPosition, const int& mouseYPosition);
   int getClickReturn() const;
   void update() override;

@@ -57,31 +57,31 @@ Button::Button(struct DisplayGlobal displayGlobal,
   this->displayGlobal = displayGlobal;
   this->rectangle     = rectangle;
 
+  // Colors
   this->backgroundColor = {255, 0, 0, 255}; // Red
   this->hoveredColor    = {0, 255, 0, 255}; // Green
   this->defaultColor    = {255, 0, 0, 255}; // Red
 
+  // Button Text
   SDL_Color textColor = {255, 255, 0, 255}; // Yellow
   this->text =
       std::make_unique<Text>(this->displayGlobal, "../display/fonts/16020_FUTURAM.ttf",
                              textContent.c_str(), 24, textColor, this->rectangle);
 
+  // Size based on text
   if (this->rectangle.w == 0 && this->rectangle.h == 0) {
     SDL_Rect textRectangle = this->text->getRectangle();
     this->rectangle.w      = textRectangle.w + 10;
     this->rectangle.h      = textRectangle.h + 10;
   }
 
+  // Center text
   this->text->centerHorizontal(this->rectangle);
   this->text->centerVertical(this->rectangle);
 }
 
-void Button::setClicked() { this->clicked = true; }
-void Button::unsetClicked() { this->clicked = false; }
-bool Button::getClicked() { return this->clicked; }
-
 /**
- * Check if the mouse is over the button.
+ * Check if the mouse is over the button. Could be improved by using SDL_Point.
  *
  * @param mouseXPosition X position of the mouse
  * @param mouseYPosition Y position of the mouse

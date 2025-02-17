@@ -39,8 +39,7 @@ Panel::Panel(struct DisplayGlobal displayGlobal, int id, SDL_Rect rect)
 }
 
 /**
- * Construct a panel with just a rectangle and some text objects. Currently a temporary
- * function as buttons haven't been integreted into panels yet.
+ * Construct a panel with a rectangle and some text objects.
  *
  * @param displayGlobal
  * @param id ID of the object to be displayed within the panel. Could correspond to an ID
@@ -58,26 +57,6 @@ Panel::Panel(struct DisplayGlobal displayGlobal,
   this->texts         = std::move(t);
 }
 
-/**
- * Construct a panel with a rectangle, some text, and some buttons. This is not currently
- * used as no buttons in panels yet.
- *
- * @param rect SDL rectangle bounding the panel
- * @param t Vector of text objects to display within the panel
- * @param b Vector of button objects to display within the panel
- */
-Panel::Panel(struct DisplayGlobal displayGlobal,
-             int id,
-             SDL_Rect rect,
-             std::vector<std::unique_ptr<Text>> t,
-             std::vector<std::unique_ptr<Button>> b)
-    : itemQuantity(displayGlobal, id) {
-  this->displayGlobal = displayGlobal;
-  this->rectangle     = rect;
-  this->texts         = std::move(t);
-  this->buttons       = std::move(b);
-}
-
 void Panel::handleMouseButtonDown(const SDL_Point& mousePosition) {
   this->itemQuantity.handleMouseButtonDown(mousePosition);
 }
@@ -90,6 +69,7 @@ void Panel::handleMouseButtonDown(const SDL_Point& mousePosition) {
  * @param content The actual string of text to add
  * @param fontSize How big the text font should be
  * @param color RGB value for the text color
+ * @return None
  */
 void Panel::addText(const std::string& fontPath,
                     const std::string& content,
