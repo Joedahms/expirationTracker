@@ -46,6 +46,7 @@ void ScrollBox::addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectan
   SDL_Rect newPanelRect           = newPanel->getRectangle();
   newPanelRect.h                  = this->panelHeight;
   newPanelRect.w                  = containingRectangle.w;
+  newPanelRect.x                  = containingRectangle.x;
   if (this->panels.size() == 0) {
     newPanelRect.y = this->topPanelPosition;
   }
