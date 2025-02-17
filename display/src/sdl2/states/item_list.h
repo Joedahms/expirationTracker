@@ -19,7 +19,6 @@ public:
   int handleEvents(bool*) override;
   int checkKeystates();
   void update() override;
-  void updateScrollBox();
   void render() const override;
 
 private:

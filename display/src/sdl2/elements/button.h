@@ -31,7 +31,6 @@ private:
   SDL_Color defaultColor;
   SDL_Color hoveredColor;
   int clickReturn = -1;
-  bool clicked    = false;
 };
 
 #endif
