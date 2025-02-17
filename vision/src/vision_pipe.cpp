@@ -5,9 +5,8 @@
 #include <memory>
 
 #include "../../food_item.h"
-#include "FoodClasses.h"
-#include "handleOCR.h"
-#include "vision_pipe.h"
+#include "../include/analyzeImages.h"
+#include "../include/vision_pipe.h"
 
 /**
  * Entry into the vision code. Only called from main after vision child process is
@@ -34,7 +33,7 @@ void visionEntry(struct Pipes pipes) {
     // foodItemTemplate.photopath is currently the directory of images to look at
     if (receiveFoodItem(foodItemTemplate, pipes.hardwareToVision[READ])) {
       LOG(INFO) << "Vision Received all images from hardware";
-      processFoodItems(pipes, foodItemTemplate.photoPath, foodItemTemplate);
+      processImages(pipes, foodItemTemplate.photoPath, foodItemTemplate);
     }
     else {
       usleep(500000);
@@ -42,75 +41,27 @@ void visionEntry(struct Pipes pipes) {
   }
 }
 
-void processFoodItems(struct Pipes pipes,
-                      std::string imageDirectory,
-                      struct FoodItem detectedFoodItem) {
+void processImages(struct Pipes pipes,
+                   std::string imageDirectory,
+                   struct FoodItem receivedFoodItem) {
   LOG(INFO) << "Vision analyzing all images";
-  std::cout << "Analyzing..." << std::endl;
-  bool detectionComplete =
-      analyzeImages(imageDirectory + "Strawberry_Package", detectedFoodItem);
-  if (detectionComplete) {
-    // send display the food item
-    LOG(INFO) << "Vision successfully analyzed all images";
-    sendFoodItem(detectedFoodItem, pipes.visionToDisplay[WRITE]);
+  FoodItem detectedFoodItem =
+      analyzeImages(imageDirectory + "Strawberry_Package", receivedFoodItem);
+  if (detectedFoodItem.name == "INVALID PATH") {
+    // pathing received was not valid
+    // tell hardware
+    // return back and wait for another food item to be sent
+    return;
   }
-  else {
-    // tell hardware to send more images
-    writeString(pipes.visionToHardware[WRITE], "HELPPPPP");
-  }
-}
+  LOG(INFO) << "Successfully analyzed all images";
+  std::cout << detectedFoodItem.name << std::endl;
 
-bool analyzeImages(const std::string& imageDirectory, struct FoodItem detectedFoodItem) {
-  if (!std::filesystem::exists(imageDirectory) ||
-      !std::filesystem::is_directory(imageDirectory)) {
-    LOG(FATAL) << "Failed to open image directory" << imageDirectory;
-    return false;
-  }
+  // tell hardware to stop
+  LOG(INFO) << "Sent stop signal to hardware";
+  bool detectionComplete = true;
+  write(pipes.visionToHardware[WRITE], &detectionComplete, sizeof(detectionComplete));
 
-  // check if the object exists in our object classification
-  bool objectDetected = false;
-  for (const auto& entry : std::filesystem::directory_iterator(imageDirectory)) {
-    auto [detectionIndex, probability] = runEfficientNet(entry.path());
-    if (isValidClass(detectionIndex) && probability > .5) {
-      detectedFoodItem.name      = getFoodLabel(detectionIndex);
-      detectedFoodItem.category  = "Unpackaged";
-      detectedFoodItem.photoPath = entry.path(); // path of photo that classified object
-      detectedFoodItem.expirationDate =
-          std::chrono::year{2025} / std::chrono::month{2} /
-          std::chrono::day{
-              20}; // hardcode expiration for now. This will have to be pulled from some
-      // sort of database or estimated based on the given class.
-      detectedFoodItem.quantity =
-          1; // default value, in my head this will be updated within the display process
-      objectDetected = true;
-      std::cout << detectedFoodItem.category << std::endl;
-      std::cout << detectedFoodItem.expirationDate << std::endl;
-      std::cout << detectedFoodItem.name << std::endl;
-      std::cout << detectedFoodItem.photoPath << std::endl;
-      std::cout << detectedFoodItem.quantity << std::endl;
-      std::cout << detectedFoodItem.scanDate << std::endl;
-      std::cout << detectedFoodItem.weight << std::endl;
-
-      return objectDetected;
-    }
-  }
-
-  // if not, extract text
-  bool textDetected = false;
-  if (!objectDetected) {
-    LOG(INFO) << "Running text extraction script";
-
-    for (const auto& entry : std::filesystem::directory_iterator(imageDirectory)) {
-      std::string result = runOCR(entry.path());
-      std::cout << "TEXT" << std::endl;
-      std::cout << result << std::endl;
-      if (!result.find("error")) {
-        // result is not an error
-        textDetected = true;
-        return textDetected;
-      }
-    }
-  }
-
-  return textDetected;
+  // send display the food item
+  LOG(INFO) << "Sent detected food item to display";
+  sendFoodItem(detectedFoodItem, pipes.visionToDisplay[WRITE]);
 }

@@ -1,9 +1,15 @@
-#ifndef FOOD_CLASSES_H
-#define FOOD_CLASSES_H
+#ifndef VALIDATE_DETECTION_H
+#define VALIDATE_DETECTION_H
 
 #include <map>
 #include <string>
 #include <unordered_set>
+
+enum class TextValidationResult {
+  NOT_VALID,
+  POSSIBLE_CLASSIFICATION,
+  POSSIBLE_EXPIRATION_DATE
+};
 
 // Define valid ImageNet food classes using an unordered_set for fast lookup
 const std::unordered_set<int> validFoodClasses = {
@@ -59,10 +65,13 @@ const std::map<int, std::string> foodLabels = {{924, "guacamole"},
                                                {969, "eggnog"}};
 
 // Function to check if a predicted class is a valid food item
-bool isValidClass(int predictedClass) {
-  return validFoodClasses.find(predictedClass) != validFoodClasses.end();
-}
+bool isValidClassification(int);
+TextValidationResult isValidText(const std::string&);
+bool isTextClass(const std::string&);
+bool isExpirationDate(const std::string&);
 
-std::string getFoodLabel(int predictedClass) { return foodLabels.at(predictedClass); }
+inline std::string getFoodLabel(int predictedClass) {
+  return foodLabels.at(predictedClass);
+}
 
 #endif
