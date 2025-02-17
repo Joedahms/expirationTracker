@@ -198,16 +198,21 @@ FoodItem readFoodItemById(const int& id) {
   return foodItem;
 }
 
-void updateFoodItemQuantity(const int& id) {
+void updateFoodItemQuantity(const int& id, const int& newQuantity) {
   sqlite3* database = nullptr;
   openDatabase(&database);
+  char* errorMessage = nullptr;
 
-  char* errorMessage   = nullptr;
-  const char* selectId = "SELECT * FROM foodItems WHERE id = ?;";
+  std::stringstream updateId;
+  updateId << "UPDATE foodItems SET quantity = " << newQuantity << " WHERE id = " << id
+           << ";";
 
   FoodItem foodItem;
-  int sqlReturn = sqlite3_exec(database, selectId, readFoodItemByIdCallback, &foodItem,
-                               &errorMessage);
+  int sqlReturn =
+      sqlite3_exec(database, updateId.str().c_str(), nullptr, nullptr, &errorMessage);
+  if (sqlReturn != SQLITE_OK) {
+    LOG(FATAL) << "Error updating food item";
+  }
 
   sqlite3_close(database);
 }

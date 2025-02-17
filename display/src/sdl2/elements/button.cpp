@@ -76,6 +76,10 @@ Button::Button(struct DisplayGlobal displayGlobal,
   this->text->centerVertical(this->rectangle);
 }
 
+void Button::setClicked() { this->clicked = true; }
+void Button::unsetClicked() { this->clicked = false; }
+bool Button::getClicked() { return this->clicked; }
+
 /**
  * Check if the mouse is over the button.
  *

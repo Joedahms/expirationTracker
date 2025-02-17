@@ -12,6 +12,7 @@ void setFoodItem(struct FoodItem& foodItem,
                  const std::string& columnName);
 std::vector<FoodItem> readAllFoodItems();
 FoodItem readFoodItemById(const int& id);
+void updateFoodItemQuantity(const int& id, const int& newQuantity);
 
 int readFoodItemByIdCallback(void* passedFoodItem,
                              int numColumns,

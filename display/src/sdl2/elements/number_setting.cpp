@@ -8,8 +8,8 @@
 #include "number_setting.h"
 
 NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal, int settingId)
-    : decreaseButton(displayGlobal, SDL_Rect{0, 0, 0, 0}, "-", DECREMENT_SETTING),
-      increaseButton(displayGlobal, SDL_Rect{0, 0, 0, 0}, "+", INCREMENT_SETTING),
+    : decreaseButton(displayGlobal, SDL_Rect{0, 0, 0, 0}, "-", this->DECREMENT_SETTING),
+      increaseButton(displayGlobal, SDL_Rect{0, 0, 0, 0}, "+", this->INCREMENT_SETTING),
       settingValueText(displayGlobal,
                        displayGlobal.futuramFontPath,
                        "0",
@@ -54,11 +54,23 @@ void NumberSetting::update() {
 
   this->settingValueText.update();
   this->increaseButton.update();
+  if (this->increaseButton.getClicked() == true) {
+    std::cout << "increase clicked" << std::endl;
+    this->settingValue++;
+    this->increaseButton.unsetClicked();
+  }
   this->decreaseButton.update();
+  if (this->decreaseButton.getClicked() == true) {
+    this->settingValue--;
+    this->decreaseButton.unsetClicked();
+  }
 
   FoodItem foodItem = readFoodItemById(this->settingId);
   if (foodItem.quantity != this->settingValue) {
-    // update database
+    updateFoodItemQuantity(this->settingId, this->settingValue);
+  }
+  else {
+    this->settingValueText.setContent(std::to_string(this->settingValue));
   }
 }
 

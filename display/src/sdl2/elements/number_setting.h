@@ -1,6 +1,3 @@
-#define DECREMENT_SETTING 0
-#define INCREMENT_SETTING 1
-
 #ifndef NUMBER_SETTING_H
 #define NUMBER_SETTING_H
 
@@ -24,6 +21,9 @@ private:
 
   int settingValue = -1;
   int settingId    = -1;
+
+  const int DECREMENT_SETTING = 0;
+  const int INCREMENT_SETTING = 1;
 };
 
 #endif

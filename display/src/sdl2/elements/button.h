@@ -19,6 +19,11 @@ public:
          const SDL_Rect& rectangle,
          const std::string& textContent,
          const int& clickRet);
+
+  void setClicked();
+  void unsetClicked();
+  bool getClicked();
+
   bool checkHovered(const int& mouseXPosition, const int& mouseYPosition);
   int getClickReturn() const;
   void update() override;
@@ -30,6 +35,7 @@ private:
   SDL_Color defaultColor;
   SDL_Color hoveredColor;
   int clickReturn = -1;
+  bool clicked    = false;
 };
 
 #endif

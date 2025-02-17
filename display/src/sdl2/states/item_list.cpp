@@ -41,6 +41,9 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
 int ItemList::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
   while (SDL_PollEvent(&event) != 0) { // While events in the queue
+    int mouseX = event.motion.x;
+    int mouseY = event.motion.y;
+
     switch (event.type) {
     case SDL_QUIT: // Quit event
       *displayIsRunning = false;
@@ -51,6 +54,11 @@ int ItemList::handleEvents(bool* displayIsRunning) {
     case SDL_MOUSEMOTION:
       this->mousePosition.x = event.motion.x;
       this->mousePosition.y = event.motion.y;
+      break;
+
+    case SDL_MOUSEBUTTONDOWN:
+      checkButtonsClicked(mouseX, mouseY);
+
       break;
 
     case SDL_MOUSEWHEEL:
