@@ -8,6 +8,7 @@
 #include <string>
 
 struct FoodItem {
+  int id;
   std::string photoPath;
   std::string name;
   std::string category;

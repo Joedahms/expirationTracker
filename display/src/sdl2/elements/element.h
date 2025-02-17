@@ -3,7 +3,7 @@
 
 #include <SDL2/SDL.h>
 
-#include "display_global.h"
+#include "../display_global.h"
 
 class Element {
 public:
@@ -59,11 +59,11 @@ public:
     return centered;
   }
 
+  virtual void update()       = 0;
   virtual void render() const = 0;
   SDL_Rect getRectangle() { return this->rectangle; }
   void setRectangle(SDL_Rect rectangle);
   void addBorder(const int& borderThickness);
-  //  bool hasBorder() { return this->border; }
   void renderBorder() const;
 
 protected:

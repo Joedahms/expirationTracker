@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 
-#include "display_global.h"
+#include "../display_global.h"
 #include "element.h"
 #include "text.h"
 
@@ -19,16 +19,17 @@ public:
          const SDL_Rect& rectangle,
          const std::string& textContent,
          const int& clickRet);
+
   bool checkHovered(const int& mouseXPosition, const int& mouseYPosition);
   int getClickReturn() const;
-  void update();
+  void update() override;
   void render() const override;
 
 private:
-  std::unique_ptr<Text> text; // Text within the button
-  SDL_Color backgroundColor;  // Current color
-  SDL_Color defaultColor;     // Color when not hovered
-  SDL_Color hoveredColor;     // Color when hovered
+  std::unique_ptr<Text> text;
+  SDL_Color backgroundColor;
+  SDL_Color defaultColor;
+  SDL_Color hoveredColor;
   int clickReturn = -1;
 };
 

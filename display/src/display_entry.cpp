@@ -11,9 +11,8 @@
  * Entry into the display code. Only called from main after display child process is
  * forked.
  *
- * Input:
- * - Pipes for display to communicate with the other processes
- * Output: None
+ * @param pipes Pipes for display to communicate with the other processes
+ * @return None
  */
 void displayEntry(struct Pipes pipes) {
   LOG(INFO) << "Entered display process";
