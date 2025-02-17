@@ -33,6 +33,20 @@ void NumberSetting::setSettingId(const int& newSettingId) {
   this->settingValue = foodItem.quantity;
 }
 
+void NumberSetting::handleMouseButtonDown(const SDL_Point& mousePosition) {
+  std::cout << "decrease" << std::endl;
+  SDL_Rect increaseRectangle = this->increaseButton.getRectangle();
+  SDL_Rect decreaseRectangle = this->decreaseButton.getRectangle();
+  if (SDL_PointInRect(&mousePosition, &decreaseRectangle) == true) {
+    std::cout << "decrease" << std::endl;
+    this->settingValue--;
+  }
+  else if (SDL_PointInRect(&mousePosition, &increaseRectangle) == true) {
+    std::cout << "increase" << std::endl;
+    this->settingValue++;
+  }
+}
+
 void NumberSetting::update() {
   // Decrease
   SDL_Rect decreaseButtonRect = decreaseButton.getRectangle();

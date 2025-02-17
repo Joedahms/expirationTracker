@@ -58,7 +58,7 @@ int ItemList::handleEvents(bool* displayIsRunning) {
 
     case SDL_MOUSEBUTTONDOWN:
       checkButtonsClicked(mouseX, mouseY);
-
+      this->scrollBoxes[0]->handleMouseButtonDown(this->mousePosition);
       break;
 
     case SDL_MOUSEWHEEL:

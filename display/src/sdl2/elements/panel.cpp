@@ -78,6 +78,10 @@ Panel::Panel(struct DisplayGlobal displayGlobal,
   this->buttons       = std::move(b);
 }
 
+void Panel::handleMouseButtonDown(const SDL_Point& mousePosition) {
+  this->itemQuantity.handleMouseButtonDown(mousePosition);
+}
+
 /**
  * Add some text to a panel. Whatever text is added first will be displayed on the left
  * and any text added after that will be displayed moving right.

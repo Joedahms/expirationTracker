@@ -58,6 +58,16 @@ void ScrollBox::addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectan
   this->panels.push_back(std::move(newPanel));
 }
 
+void ScrollBox::handleMouseButtonDown(const SDL_Point& mousePosition) {
+  for (auto& currPanel : this->panels) {
+    SDL_Rect currPanelRectangle = currPanel->getRectangle();
+    if (SDL_PointInRect(&mousePosition, &currPanelRectangle) == true) {
+      currPanel->handleMouseButtonDown(mousePosition);
+      return;
+    }
+  }
+}
+
 /**
  * Update all panels in the scroll box with food item information. Assumed that one panel
  * corresponds to one food item. Therefore there will be as many panels in the scroll box

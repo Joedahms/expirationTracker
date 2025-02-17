@@ -26,6 +26,7 @@ public:
         std::vector<std::unique_ptr<Text>> t,
         std::vector<std::unique_ptr<Button>> b);
 
+  void handleMouseButtonDown(const SDL_Point& mousePosition);
   void addText(const std::string& fontPath,
                const std::string& content,
                const int& fontSize,

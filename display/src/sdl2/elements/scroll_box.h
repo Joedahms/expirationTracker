@@ -19,6 +19,7 @@ public:
   void setPanelHeight(int panelHeight);
   void addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectangle);
 
+  void handleMouseButtonDown(const SDL_Point& mousePosition);
   void update() override;
   void scrollUp(const SDL_Point* mousePosition);
   void scrollDown(const SDL_Point* mousePosition);

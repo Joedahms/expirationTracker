@@ -11,6 +11,7 @@ class NumberSetting : public Element {
 public:
   NumberSetting(struct DisplayGlobal displayGlobal, int settingId);
   void setSettingId(const int& newSettingId);
+  void handleMouseButtonDown(const SDL_Point& mousePosition);
   void update() override;
   void render() const override;
 
