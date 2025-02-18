@@ -15,9 +15,13 @@
  * @return None
  */
 void externalHandler(struct Pipes pipes) {
+  struct timeval timeout;
+  timeout.tv_sec  = 1;
+  timeout.tv_usec = 0;
+
   struct FoodItem foodItem;
   bool foodItemReceived = false;
-  foodItemReceived      = receiveFoodItem(foodItem, pipes.visionToDisplay[READ]);
+  foodItemReceived      = receiveFoodItem(foodItem, pipes.visionToDisplay[READ], timeout);
   if (foodItemReceived) {
     LOG(INFO) << "Food item received from vision";
     sqlite3* database = nullptr;

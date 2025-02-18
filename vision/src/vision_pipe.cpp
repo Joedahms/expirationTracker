@@ -28,10 +28,13 @@ void visionEntry(struct Pipes pipes) {
   close(pipes.visionToHardware[READ]);
   while (1) {
     // Wait for start signal from Display with 0.5sec sleep
-    LOG(INFO) << "Waiting for start signal from Hardware";
+    struct timeval timeout;
+    timeout.tv_sec  = 1;
+    timeout.tv_usec = 0;
     struct FoodItem foodItemTemplate;
+    LOG(INFO) << "Waiting for start signal from Hardware";
     // foodItemTemplate.photopath is currently the directory of images to look at
-    if (receiveFoodItem(foodItemTemplate, pipes.hardwareToVision[READ])) {
+    if (receiveFoodItem(foodItemTemplate, pipes.hardwareToVision[READ], timeout)) {
       LOG(INFO) << "Vision Received all images from hardware";
       processImages(pipes, foodItemTemplate.photoPath, foodItemTemplate);
     }

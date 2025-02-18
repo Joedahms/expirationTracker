@@ -41,11 +41,7 @@ void sendFoodItem(struct FoodItem foodItem, int pipeToWrite) {
  * @return True if a food item was received and false if no food item was available on the
  * pipe.
  */
-bool receiveFoodItem(struct FoodItem& foodItem, int pipeToRead) {
-  struct timeval timeout;
-  timeout.tv_sec  = 1;
-  timeout.tv_usec = 0;
-
+bool receiveFoodItem(struct FoodItem& foodItem, int pipeToRead, struct timeval timeout) {
   fd_set readPipeSet;
 
   FD_ZERO(&readPipeSet);

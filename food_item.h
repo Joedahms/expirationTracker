@@ -19,7 +19,7 @@ struct FoodItem {
 };
 
 void sendFoodItem(struct FoodItem, int);
-bool receiveFoodItem(struct FoodItem&, int);
+bool receiveFoodItem(struct FoodItem&, int, struct timeval);
 
 void writeString(int, const std::string&);
 std::string readString(int);
