@@ -56,6 +56,7 @@ add_executable (expirationTracker
   vision/src/handleOBJ.cpp
   vision/src/validateDetection.cpp
   vision/src/analyzeImages.cpp
+  vision/src/helperFunctions.cpp
 
   #Hardware process after forked from main
   hardware/src/hardware_entry.cpp

@@ -58,9 +58,9 @@ void redoThis(struct Pipes pipes) {
   const std::chrono::time_point now{std::chrono::system_clock::now()};
 
   struct FoodItem foodItem;
-  foodItem.photoPath = "../images/";
-  foodItem.scanDate  = std::chrono::floor<std::chrono::days>(now);
-  foodItem.weight    = 10.0;
+  foodItem.imageDirectory = std::filesystem::absolute("../images");
+  foodItem.scanDate       = std::chrono::floor<std::chrono::days>(now);
+  foodItem.weight         = 10.0;
 
   sendFoodItem(foodItem, pipes.hardwareToVision[WRITE]);
   LOG(INFO) << "Done Sending Images from Hardware to Vision";
