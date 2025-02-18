@@ -57,8 +57,5 @@ bool analyzeImages(struct FoodItem& foodItem) {
       usleep(500000);
     }
   }
-
-  // if not
-
   return false;
 }
