@@ -60,8 +60,11 @@ void handleTextExtraction(const std::filesystem::path& imagePath,
   for (const auto& text : textDetections) {
     switch (isValidText(text, objectDetected, expirationDateDetected)) {
     case TextValidationResult::POSSIBLE_CLASSIFICATION:
-      objectDetected = true;
-      foodItem.name  = text;
+      objectDetected        = true;
+      foodItem.quantity     = 1;
+      foodItem.absolutePath = std::filesystem::absolute(imagePath);
+      foodItem.category     = FoodCategories::packaged;
+      foodItem.name         = text;
       // Handle classification-specific logic here
       break;
 
