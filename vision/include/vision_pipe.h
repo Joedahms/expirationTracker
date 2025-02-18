@@ -8,5 +8,4 @@
 
 void visionEntry(struct Pipes);
 void processImages(struct Pipes, struct FoodItem&);
-void closeUnusedPipes(struct Pipes);
 #endif

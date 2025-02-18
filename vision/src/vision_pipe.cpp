@@ -6,6 +6,7 @@
 
 #include "../../food_item.h"
 #include "../include/analyzeImages.h"
+#include "../include/helperFunctions.h"
 #include "../include/vision_pipe.h"
 
 /**
@@ -24,7 +25,7 @@ void visionEntry(struct Pipes pipes) {
     // Wait for start signal from Display with 0.5sec sleep
     struct FoodItem foodItem;
     LOG(INFO) << "Waiting for start signal from Hardware";
-    // foodItemTemplate.photopath is currently the directory of images to look at
+    // foodItemTemplate.imageDirectory is currently the directory of images to look at
     if (receiveFoodItem(foodItem, pipes.hardwareToVision[READ], (struct timeval){1, 0})) {
       LOG(INFO) << "Vision Received all images from hardware";
       processImages(pipes, foodItem);
@@ -35,29 +36,26 @@ void visionEntry(struct Pipes pipes) {
   }
 }
 
-void closeUnusedPipes(struct Pipes pipes) {
-  // Close write end of read pipes
-  close(pipes.displayToVision[WRITE]);
-  close(pipes.hardwareToVision[WRITE]);
-
-  // Close read end of write pipes
-  close(pipes.visionToDisplay[READ]);
-  close(pipes.visionToHardware[READ]);
-}
-
+/**
+ * Parent method to all image processing and analyzing
+ *
+ * Input:
+ * @param pipes Pipes for vision to communicate with the other processes
+ * @param foodItem food item struct to update data as we collect it
+ * Output: None
+ */
 void processImages(struct Pipes pipes, struct FoodItem& foodItem) {
   LOG(INFO) << "Vision analyzing all images";
-  FoodItem detectedFoodItem =
-      analyzeImages(foodItem.photoPath + "Strawberry_Package", foodItem);
-  if (detectedFoodItem.name == "INVALID PATH") {
-    // pathing received was not valid
-    // tell hardware
-    // return back and wait for another food item to be sent
+  if (!isValidDirectory(foodItem.imageDirectory)) {
+    LOG(FATAL) << "Failed to open image directory" << foodItem.imageDirectory;
     return;
   }
+  bool detectedFoodItem =
+      analyzeImages(foodItem.imageDirectory /= "Strawberry_Package", foodItem);
   LOG(INFO) << "Successfully analyzed all images";
-  std::cout << detectedFoodItem.name << std::endl;
-
+  if (!detectedFoodItem) {
+    LOG(FATAL) << "SOMETHING WENT HORRIBLY WRONG";
+  }
   // tell hardware to stop
   LOG(INFO) << "Sent stop signal to hardware";
   bool detectionComplete = true;
@@ -65,5 +63,5 @@ void processImages(struct Pipes pipes, struct FoodItem& foodItem) {
 
   // send display the food item
   LOG(INFO) << "Sent detected food item to display";
-  sendFoodItem(detectedFoodItem, pipes.visionToDisplay[WRITE]);
+  sendFoodItem(foodItem, pipes.visionToDisplay[WRITE]);
 }
