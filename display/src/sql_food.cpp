@@ -108,8 +108,8 @@ void setFoodItem(struct FoodItem& foodItem,
   if (columnName == "name") {
     foodItem.name = columnValue;
   }
-  else if (columnName == "catagory") {
-    foodItem.catagory = columnValue;
+  else if (columnName == "category") {
+    foodItem.category = columnValue;
   }
   else if (columnName == "scanDateYear") {
     foodItem.scanDate =
