@@ -71,7 +71,8 @@ void storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
 
   // Bind to query
   sqlite3_bind_text(statement, 1, foodItem.name.c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_text(statement, 2, foodItem.category.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(statement, 2, foodCategoryToString(foodItem.category).c_str(), -1,
+                    SQLITE_TRANSIENT);
   sqlite3_bind_int(statement, 3, scanDateYear);
   sqlite3_bind_int(statement, 4, scanDateMonth);
   sqlite3_bind_int(statement, 5, scanDateDay);
@@ -109,7 +110,7 @@ void setFoodItem(struct FoodItem& foodItem,
     foodItem.name = columnValue;
   }
   else if (columnName == "category") {
-    foodItem.category = columnValue;
+    foodItem.category = foodCategoryFromString(columnValue);
   }
   else if (columnName == "scanDateYear") {
     foodItem.scanDate =

@@ -12,12 +12,14 @@ struct FoodItem {
   int id;
   std::filesystem::path imageDirectory;
   std::string name;
-  std::string category;
+  FoodCategories category;
   std::chrono::year_month_day scanDate;
   std::chrono::year_month_day expirationDate;
   float weight;
   int quantity;
 };
+
+enum class FoodCategories { unknown, unpackaged, packaged };
 
 void sendFoodItem(struct FoodItem, int);
 bool receiveFoodItem(struct FoodItem&, int, struct timeval);
@@ -25,4 +27,6 @@ bool receiveFoodItem(struct FoodItem&, int, struct timeval);
 void writeString(int, const std::string&);
 std::string readString(int);
 bool isPathLike(const std::string&);
+std::string foodCategoryToString(const FoodCategories&);
+FoodCategories foodCategoryFromString(const std::string&);
 #endif

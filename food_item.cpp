@@ -21,7 +21,7 @@ void sendFoodItem(struct FoodItem foodItem, int pipeToWrite) {
 
   writeString(pipeToWrite, foodItem.imageDirectory);
   writeString(pipeToWrite, foodItem.name);
-  writeString(pipeToWrite, foodItem.category);
+  writeString(pipeToWrite, foodCategoryToString(foodItem.category));
 
   write(pipeToWrite, &foodItem.scanDate, sizeof(foodItem.scanDate));
   write(pipeToWrite, &foodItem.expirationDate, sizeof(foodItem.expirationDate));
@@ -61,7 +61,7 @@ bool receiveFoodItem(struct FoodItem& foodItem, int pipeToRead, struct timeval t
 
     foodItem.imageDirectory = readString(pipeToRead);
     foodItem.name           = readString(pipeToRead);
-    foodItem.category       = readString(pipeToRead);
+    foodItem.category       = foodCategoryFromString(readString(pipeToRead));
 
     read(pipeToRead, &foodItem.scanDate, sizeof(foodItem.scanDate));
     read(pipeToRead, &foodItem.expirationDate, sizeof(foodItem.expirationDate));
@@ -113,4 +113,27 @@ std::string readString(int pipeToRead) {
 bool isPathLike(const std::string& str) {
   std::filesystem::path p(str);
   return !p.empty() && (p.has_filename() || p.has_parent_path());
+}
+
+std::string foodCategoryToString(const FoodCategories& category) {
+  switch (category) {
+  case FoodCategories::unknown:
+    return "unknown";
+  case FoodCategories::unpackaged:
+    return "unpackaged";
+  case FoodCategories::packaged:
+    return "packaged";
+  default:
+    return "invalid";
+  }
+}
+
+FoodCategories foodCategoryFromString(const std::string& str) {
+  if (str == "unknown")
+    return FoodCategories::unknown;
+  if (str == "unpackaged")
+    return FoodCategories::unpackaged;
+  if (str == "packaged")
+    return FoodCategories::packaged;
+  return FoodCategories::unknown; // Default case
 }
