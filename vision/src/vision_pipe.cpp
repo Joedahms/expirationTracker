@@ -18,25 +18,16 @@
  */
 void visionEntry(struct Pipes pipes) {
   LOG(INFO) << "Within vision process";
+  closeUnusedPipes(pipes);
 
-  // Close write end of read pipes
-  close(pipes.displayToVision[WRITE]);
-  close(pipes.hardwareToVision[WRITE]);
-
-  // Close read end of write pipes
-  close(pipes.visionToDisplay[READ]);
-  close(pipes.visionToHardware[READ]);
   while (1) {
     // Wait for start signal from Display with 0.5sec sleep
-    struct timeval timeout;
-    timeout.tv_sec  = 1;
-    timeout.tv_usec = 0;
-    struct FoodItem foodItemTemplate;
+    struct FoodItem foodItem;
     LOG(INFO) << "Waiting for start signal from Hardware";
     // foodItemTemplate.photopath is currently the directory of images to look at
-    if (receiveFoodItem(foodItemTemplate, pipes.hardwareToVision[READ], timeout)) {
+    if (receiveFoodItem(foodItem, pipes.hardwareToVision[READ], (struct timeval){1, 0})) {
       LOG(INFO) << "Vision Received all images from hardware";
-      processImages(pipes, foodItemTemplate.photoPath, foodItemTemplate);
+      processImages(pipes, foodItem);
     }
     else {
       usleep(500000);
@@ -44,12 +35,20 @@ void visionEntry(struct Pipes pipes) {
   }
 }
 
-void processImages(struct Pipes pipes,
-                   std::string imageDirectory,
-                   struct FoodItem receivedFoodItem) {
+void closeUnusedPipes(struct Pipes pipes) {
+  // Close write end of read pipes
+  close(pipes.displayToVision[WRITE]);
+  close(pipes.hardwareToVision[WRITE]);
+
+  // Close read end of write pipes
+  close(pipes.visionToDisplay[READ]);
+  close(pipes.visionToHardware[READ]);
+}
+
+void processImages(struct Pipes pipes, struct FoodItem& foodItem) {
   LOG(INFO) << "Vision analyzing all images";
   FoodItem detectedFoodItem =
-      analyzeImages(imageDirectory + "Strawberry_Package", receivedFoodItem);
+      analyzeImages(foodItem.photoPath + "Strawberry_Package", foodItem);
   if (detectedFoodItem.name == "INVALID PATH") {
     // pathing received was not valid
     // tell hardware

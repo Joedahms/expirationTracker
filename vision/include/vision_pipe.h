@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-void visionEntry(struct Pipes pipes);
-void processImages(struct Pipes, std::string, struct FoodItem);
-
+void visionEntry(struct Pipes);
+void processImages(struct Pipes, struct FoodItem&);
+void closeUnusedPipes(struct Pipes);
 #endif
