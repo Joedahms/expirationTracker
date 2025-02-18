@@ -4,12 +4,13 @@
 #define START_SCAN "start scan"
 
 #include <chrono>
+#include <filesystem>
 #include <memory>
 #include <string>
 
 struct FoodItem {
   int id;
-  std::string photoPath;
+  std::filesystem::path imageDirectory;
   std::string name;
   std::string category;
   std::chrono::year_month_day scanDate;
