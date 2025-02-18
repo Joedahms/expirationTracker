@@ -17,6 +17,7 @@ struct FoodItem {
   std::chrono::year_month_day expirationDate;
   float weight;
   int quantity;
+  std::filesystem::path absolutePath;
 };
 
 enum class FoodCategories { unknown, unpackaged, packaged };
