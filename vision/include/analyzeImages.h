@@ -3,5 +3,5 @@
 #include "../../food_item.h"
 #include <string>
 
-struct FoodItem analyzeImages(const std::string&, struct FoodItem);
+bool analyzeImages(const std::string&, struct FoodItem&);
 #endif
