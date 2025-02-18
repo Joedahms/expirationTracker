@@ -1,6 +1,8 @@
 #ifndef PIPES_H
 #define PIPES_H
 
+#include <unistd.h>
+
 // Define constants for readability
 #define READ  0
 #define WRITE 1
