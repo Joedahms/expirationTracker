@@ -42,6 +42,14 @@ bool analyzeImages(struct FoodItem& foodItem) {
     }
     if (imageCounter >= 16) {
       // give up trying to identify
+      if (!objectDetected) {
+        LOG(INFO) << "Object not able to be classified";
+        // tell display
+      }
+      else if (!expirationDateDetected) {
+        LOG(INFO) << "Object expiration date not found";
+        // tell display
+      }
       return false;
     }
     // check if image directory has new files

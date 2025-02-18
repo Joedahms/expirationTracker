@@ -55,9 +55,7 @@ void processImages(struct Pipes pipes, struct FoodItem& foodItem) {
   bool detectedFoodItem = analyzeImages(foodItem);
   LOG(INFO) << "Successfully analyzed all images";
   if (!detectedFoodItem) {
-    LOG(FATAL) << "SOMETHING WENT HORRIBLY WRONG";
-  }
-  if (!detectedFoodItem) {
+    LOG(INFO) << "Item not successfully detected";
     // checked 16 images and failed them all
     //  how to handle?
     return;
