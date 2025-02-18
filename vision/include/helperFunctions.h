@@ -4,6 +4,6 @@
 #include <filesystem>
 
 bool isValidDirectory(const std::filesystem::path&);
-
+bool hasFiles(const std::filesystem::path&);
 void closeUnusedPipes(struct Pipes&);
 #endif

@@ -11,6 +11,11 @@ bool isValidDirectory(const std::filesystem::path& directory) {
   return true;
 }
 
+bool hasFiles(const std::filesystem::path& dirPath) {
+  return std::filesystem::exists(dirPath) && std::filesystem::is_directory(dirPath) &&
+         !std::filesystem::is_empty(dirPath);
+}
+
 void closeUnusedPipes(struct Pipes& pipes) {
   // Close write end of read pipes
   close(pipes.displayToVision[WRITE]);

@@ -2,71 +2,56 @@
 #include "../../food_item.h"
 #include "../include/handleOBJ.h"
 #include "../include/handleOCR.h"
-#include "../include/validateDetection.h"
+#include "../include/helperFunctions.h"
 #include <filesystem>
 #include <glog/logging.h>
 #include <iostream>
 
-struct FoodItem analyzeImages(const std::string& imageDirectory,
-                              struct FoodItem receivedFoodItem) {
-  FoodItem detectedFoodItem;
-  if (!std::filesystem::exists(imageDirectory) ||
-      !std::filesystem::is_directory(imageDirectory)) {
-    LOG(FATAL) << "Failed to open image directory" << imageDirectory;
-    detectedFoodItem.name = "INVALID PATH";
-    return detectedFoodItem;
-  }
-  detectedFoodItem.weight = receivedFoodItem.weight;
-
-  bool objectDetected = false;
-  while (!objectDetected) {
-    for (const auto& entry : std::filesystem::directory_iterator(imageDirectory)) {
+/**
+ * Parent method to all image processing and analyzing
+ *
+ * Input:
+ * @param pipes Pipes for vision to communicate with the other processes
+ * @param foodItem food item struct to update data as we collect it
+ * Output: None
+ */
+bool analyzeImages(struct FoodItem& foodItem) {
+  int imageCounter            = 0;
+  bool objectDetected         = false;
+  bool expirationDateDetected = false;
+  while (!objectDetected && !expirationDateDetected) {
+    for (const auto& entry :
+         std::filesystem::directory_iterator(foodItem.imageDirectory)) {
+      imageCounter++;
       // check if the object exists in our object classification
-      auto [detectionIndex, probability] = runEfficientNet(entry.path());
-      if (isValidClassification(detectionIndex) && probability > .5) {
-        detectedFoodItem.name      = getFoodLabel(detectionIndex);
-        detectedFoodItem.category  = "Unpackaged";
-        detectedFoodItem.photoPath = entry.path(); // path of photo that classified object
-        detectedFoodItem.expirationDate =
-            std::chrono::year{2025} / std::chrono::month{2} /
-            std::chrono::day{
-                20}; // hardcode expiration for now. This will have to be pulled from some
-        // sort of database or estimated based on the given class.
-        detectedFoodItem.quantity = 1; // default value, in my head this will be updated
-                                       // within the display process
-        objectDetected = true;
-        std::cout << "FOUND" << std::endl;
-        return detectedFoodItem;
-      }
-
-      // Run text extraction
-      auto textDetections = runOCR(entry.path());
-      for (const auto& text : textDetections) {
-        switch (isValidText(text)) {
-        case TextValidationResult::POSSIBLE_CLASSIFICATION:
-          objectDetected = true;
-          // Handle classification-specific logic here
-          break;
-
-        case TextValidationResult::POSSIBLE_EXPIRATION_DATE:
-          // Handle expiration-specific logic here
-          break;
-
-        case TextValidationResult::NOT_VALID:
-          // No action needed for invalid text
-          break;
+      if (!objectDetected) {
+        // if object has already been detected no need to run this
+        if (handleObjectClassification(entry.path(), foodItem)) {
+          expirationDateDetected = true;
+          objectDetected         = true;
+          return true;
         }
       }
+      // Run text extraction
+      handleTextExtraction(entry.path(), foodItem, objectDetected,
+                           expirationDateDetected);
 
-      // Neither classification or text extraction worked on that image
+      if (objectDetected && expirationDateDetected) {
+        return true;
+      }
     }
-
+    if (imageCounter >= 16) {
+      // give up trying to identify
+      return false;
+    }
     // check if image directory has new files
-
-    // if not, sleep and wait
+    // directory iterator does not update
+    while (!hasFiles(foodItem.imageDirectory)) {
+      usleep(500000);
+    }
   }
 
   // if not
 
-  return detectedFoodItem;
+  return false;
 }

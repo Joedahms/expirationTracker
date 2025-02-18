@@ -1,4 +1,5 @@
 #include "../include/handleOCR.h"
+#include "../include/validateDetection.h"
 #include <glog/logging.h>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -10,10 +11,10 @@
  * @param imagePath path to the image you wish to extract text from
  * Output: Vector of strings extracted from the image.
  */
-std::vector<std::string> runOCR(const std::string& imagePath) {
+std::vector<std::string> runOCR(const std::filesystem::path& imagePath) {
   std::vector<std::string> detectedText;
   std::string command =
-      "$HOME/easyocr-venv/bin/python3 ../vision/Models/easyOCR.py " + imagePath;
+      "$HOME/easyocr-venv/bin/python3 ../vision/Models/easyOCR.py " + imagePath.string();
   char buffer[256];
   std::string result;
 
@@ -41,4 +42,38 @@ std::vector<std::string> runOCR(const std::string& imagePath) {
   }
 
   return detectedText;
+}
+
+/**
+ * Method to handle text extraction.
+ *
+ * Input:
+ * @param imagePath path to the image you wish to extract text from
+ * @param foodItem food item to update with collected information
+ * Output: Vector of strings extracted from the image.
+ */
+void handleTextExtraction(const std::filesystem::path& imagePath,
+                          struct FoodItem& foodItem,
+                          bool& objectDetected,
+                          bool& expirationDateDetected) {
+  auto textDetections = runOCR(imagePath);
+  for (const auto& text : textDetections) {
+    switch (isValidText(text, objectDetected, expirationDateDetected)) {
+    case TextValidationResult::POSSIBLE_CLASSIFICATION:
+      objectDetected = true;
+      foodItem.name  = text;
+      // Handle classification-specific logic here
+      break;
+
+    case TextValidationResult::POSSIBLE_EXPIRATION_DATE:
+      expirationDateDetected  = true;
+      foodItem.expirationDate = parseExpirationDate(text);
+      // Handle expiration-specific logic here
+      break;
+
+    case TextValidationResult::NOT_VALID:
+      // No action needed for invalid text
+      break;
+    }
+  }
 }

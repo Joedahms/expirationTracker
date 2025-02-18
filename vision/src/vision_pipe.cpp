@@ -51,11 +51,16 @@ void processImages(struct Pipes pipes, struct FoodItem& foodItem) {
     LOG(FATAL) << "Failed to open image directory" << foodItem.imageDirectory;
     return;
   }
-  bool detectedFoodItem =
-      analyzeImages(foodItem.imageDirectory /= "Strawberry_Package", foodItem);
+  foodItem.imageDirectory /= "Strawberry_Package"; // TEMP FOR TESTING
+  bool detectedFoodItem = analyzeImages(foodItem);
   LOG(INFO) << "Successfully analyzed all images";
   if (!detectedFoodItem) {
     LOG(FATAL) << "SOMETHING WENT HORRIBLY WRONG";
+  }
+  if (!detectedFoodItem) {
+    // checked 16 images and failed them all
+    //  how to handle?
+    return;
   }
   // tell hardware to stop
   LOG(INFO) << "Sent stop signal to hardware";
