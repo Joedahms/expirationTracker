@@ -4,6 +4,15 @@
 #include <unordered_map>
 #include <vector>
 
+/**
+ * Determine if extracted text is something valid
+ *
+ * Input:
+ * @param text string to evaluate
+ * @param objectDetected bool to update if object is classified successfully
+ * @param expirationDateDetected bool to update if exp date is identified successfully
+ * Output: Enum listing what occured
+ */
 TextValidationResult isValidText(const std::string& text,
                                  bool& objectDetected,
                                  bool& expirationDateDetected) {
@@ -15,6 +24,14 @@ TextValidationResult isValidText(const std::string& text,
   }
   return TextValidationResult::NOT_VALID;
 }
+
+/**
+ * Determine if text is valid class
+ *
+ * Input:
+ * @param text string to evaluate
+ * Output: Bool if is valid class
+ */
 bool isTextClass(const std::string& text) {
   static const std::vector<std::string> classificationKeywords = {
       "Milk",   "Cheese", "Bread", "Eggs",    "Yogurt",
@@ -29,7 +46,7 @@ bool isTextClass(const std::string& text) {
 }
 
 /**
- * Method to determine if a given text string is an expiration date
+ * Determine if a given text string is an expiration date
  *
  * Date labels (Expires, Best By, Sell By, Use By) are optional.
  * Supports formats:
@@ -40,7 +57,7 @@ bool isTextClass(const std::string& text) {
  *
  * Input:
  * @param text Text string to examine
- * Output: None
+ * Output: Bool on whether or not input is an expiration date
  */
 bool isExpirationDate(const std::string& text) {
   static const std::regex dateRegex(
@@ -51,11 +68,11 @@ bool isExpirationDate(const std::string& text) {
 }
 
 /**
- * Method to convert text string to std::chrono::day_month_year
+ * Convert text string to std::chrono::day_month_year
  *
  * Input:
  * @param text Text string to convert
- * Output: None
+ * Output: expiration date as chrono object
  */
 std::chrono::year_month_day parseExpirationDate(const std::string& text) {
   static const std::regex dateRegex(
@@ -107,12 +124,13 @@ std::chrono::year_month_day parseExpirationDate(const std::string& text) {
   // Should never reach this point since isExpirationDate() guarantees validity
   throw std::runtime_error("Invalid expiration date format");
 }
+
 /**
- * Method to determine if a given index corresponds to a valid class
+ * Determine if a given index corresponds to a valid class
  *
  * Input:
  * @param predictedClass index of the prediction from model
- * Output: None
+ * Output: bool on whether or not the index is a valid class
  */
 bool isValidClassification(int predictedClass) {
   return validFoodClasses.find(predictedClass) != validFoodClasses.end();

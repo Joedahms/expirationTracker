@@ -4,7 +4,7 @@
 #include <nlohmann/json.hpp>
 
 /**
- * Method to handle calling python script to run object classification.
+ * Handle calling python script to run object classification.
  *
  * Input:
  * @param imagePath path to the image you wish to classify
@@ -42,7 +42,7 @@ std::pair<int, float> runEfficientNet(const std::filesystem::path& imagePath) {
 }
 
 /**
- * Method to handle object classification
+ * Handle object classification
  *
  * Input:
  * @param imagePath path to the image you wish to classify

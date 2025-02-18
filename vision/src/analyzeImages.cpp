@@ -8,12 +8,11 @@
 #include <iostream>
 
 /**
- * Parent method to all image processing and analyzing
+ * Conduct the analyzing and model processing
  *
  * Input:
- * @param pipes Pipes for vision to communicate with the other processes
- * @param foodItem food item struct to update data as we collect it
- * Output: None
+ * @param foodItem FoodItem to be updated
+ * Output: bool on success or fail
  */
 bool analyzeImages(struct FoodItem& foodItem) {
   int imageCounter            = 0;

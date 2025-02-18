@@ -27,7 +27,6 @@ bool receiveFoodItem(struct FoodItem&, int, struct timeval);
 
 void writeString(int, const std::string&);
 std::string readString(int);
-bool isPathLike(const std::string&);
 std::string foodCategoryToString(const FoodCategories&);
 FoodCategories foodCategoryFromString(const std::string&);
 #endif

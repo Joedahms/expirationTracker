@@ -106,17 +106,11 @@ std::string readString(int pipeToRead) {
 }
 
 /**
- * Read a string from a pipe. Needed because std::string needs to be sent as a c style
- * string.
+ * Convert a food category enum to string
  *
- * @param pipeToRead Pipe to read the string from.
- * @return The string read from the pipe.
+ * @param category Enum to convert
+ * @return The string version
  */
-bool isPathLike(const std::string& str) {
-  std::filesystem::path p(str);
-  return !p.empty() && (p.has_filename() || p.has_parent_path());
-}
-
 std::string foodCategoryToString(const FoodCategories& category) {
   switch (category) {
   case FoodCategories::unknown:
@@ -130,6 +124,12 @@ std::string foodCategoryToString(const FoodCategories& category) {
   }
 }
 
+/**
+ * Convert a string to food category
+ *
+ * @param str String to convert
+ * @return The enum version
+ */
 FoodCategories foodCategoryFromString(const std::string& str) {
   if (str == "unknown")
     return FoodCategories::unknown;

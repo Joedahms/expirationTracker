@@ -5,7 +5,7 @@
 #include <nlohmann/json.hpp>
 
 /**
- * Method to handle calling python script to run text extraction.
+ * Handle calling python script to run text extraction.
  *
  * Input:
  * @param imagePath path to the image you wish to extract text from
@@ -45,7 +45,7 @@ std::vector<std::string> runOCR(const std::filesystem::path& imagePath) {
 }
 
 /**
- * Method to handle text extraction.
+ * Handle text extraction.
  *
  * Input:
  * @param imagePath path to the image you wish to extract text from
