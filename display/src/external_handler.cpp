@@ -8,13 +8,15 @@
 #include "sql_food.h"
 
 /**
- * Handle communication between the display and other external processes. Communication to
- * the SDL process is not handled in this function.
+ * Handle communication between the display and other external processes. Handle a
+ * successful food item identification.
  *
  * @param pipes Display pipes used to communicate with external processes
+ * @param displayToSdl pipe from display process to SDL process. Used to tell SDL that a
+ * food item was successfully identified
  * @return None
  */
-void externalHandler(struct Pipes pipes) {
+void externalHandler(struct Pipes pipes, int* displayToSdl) {
   struct timeval timeout;
   timeout.tv_sec  = 1;
   timeout.tv_usec = 0;
@@ -28,6 +30,7 @@ void externalHandler(struct Pipes pipes) {
     openDatabase(&database);
 
     storeFoodItem(database, foodItem);
+    writeString(displayToSdl[WRITE], "ID successful");
 
     sqlite3_close(database);
   }

@@ -170,8 +170,14 @@ void Display::handleEvents(int* sdlToDisplay, int* displayToSdl) {
     break;
 
   case SCANNING:
-    this->state = this->scanning->handleEvents(&this->displayIsRunning);
-    break;
+    {
+      this->state = this->scanning->handleEvents(&this->displayIsRunning);
+      std::string fromDisplay;
+      if (fromDisplay == readString(displayToSdl[READ])) {
+        std::cout << "yay" << std::endl;
+      }
+      break;
+    }
 
   case PAUSE_MENU:
     this->state = this->pauseMenu->handleEvents(&this->displayIsRunning);

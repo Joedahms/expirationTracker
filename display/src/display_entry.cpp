@@ -48,7 +48,7 @@ void displayEntry(struct Pipes pipes) {
     close(displayToSdl[READ]);
     while (1) {
       bool stringFromSdl = false;
-      externalHandler(pipes);
+      externalHandler(pipes, displayToSdl);
       stringFromSdl = sdlHandler(pipes, sdlToDisplay, displayToSdl);
     }
   }
