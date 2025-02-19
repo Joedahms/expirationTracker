@@ -43,16 +43,20 @@ sudo apt install nlohmann-json3-dev
 sudo apt update
 sudo apt upgrade
 
-# Using EASYOCR
+# Using Models
+# BE IN BUILD DIRECTORY!!!!!!
 ### Create the virtual environment
-python3 -m venv ~/easyocr-venv
+python3 -m venv models-venv
 
 ### Activate it
-source ~/easyocr-venv/bin/activate
+source models-venv/bin/activate
 
 ### Install EasyOCR inside the virtual environment
 pip install easyocr
 
 ### Install Efficientnet within the virtual environment
 pip install efficientnet
+
+### Install Tensorflow
+pip install tensorflow
 
