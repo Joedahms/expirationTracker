@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "food_item.h"
+#include <filesystem>
 
 /**
  * Send a food item struct through a specified pipe. Not all fields have to be populated.
@@ -16,9 +17,12 @@
  * @return None
  */
 void sendFoodItem(struct FoodItem foodItem, int pipeToWrite) {
-  writeString(pipeToWrite, foodItem.photoPath);
+  write(pipeToWrite, &foodItem.id, sizeof(foodItem.id));
+
+  writeString(pipeToWrite, foodItem.absolutePath);
+  writeString(pipeToWrite, foodItem.imageDirectory);
   writeString(pipeToWrite, foodItem.name);
-  writeString(pipeToWrite, foodItem.catagory);
+  writeString(pipeToWrite, foodCategoryToString(foodItem.category));
 
   write(pipeToWrite, &foodItem.scanDate, sizeof(foodItem.scanDate));
   write(pipeToWrite, &foodItem.expirationDate, sizeof(foodItem.expirationDate));
@@ -54,9 +58,12 @@ bool receiveFoodItem(struct FoodItem& foodItem, int pipeToRead, struct timeval t
     return false;
   }
   if (FD_ISSET(pipeToRead, &readPipeSet)) { // Data available
-    foodItem.photoPath = readString(pipeToRead);
-    foodItem.name      = readString(pipeToRead);
-    foodItem.catagory  = readString(pipeToRead);
+    read(pipeToRead, &foodItem.id, sizeof(foodItem.id));
+
+    foodItem.absolutePath   = readString(pipeToRead);
+    foodItem.imageDirectory = readString(pipeToRead);
+    foodItem.name           = readString(pipeToRead);
+    foodItem.category       = foodCategoryFromString(readString(pipeToRead));
 
     read(pipeToRead, &foodItem.scanDate, sizeof(foodItem.scanDate));
     read(pipeToRead, &foodItem.expirationDate, sizeof(foodItem.expirationDate));
@@ -96,4 +103,39 @@ std::string readString(int pipeToRead) {
   std::string sentString(stringBuffer);
   delete[] stringBuffer;
   return sentString;
+}
+
+/**
+ * Convert a food category enum to string
+ *
+ * @param category Enum to convert
+ * @return The string version
+ */
+std::string foodCategoryToString(const FoodCategories& category) {
+  switch (category) {
+  case FoodCategories::unknown:
+    return "unknown";
+  case FoodCategories::unpackaged:
+    return "unpackaged";
+  case FoodCategories::packaged:
+    return "packaged";
+  default:
+    return "invalid";
+  }
+}
+
+/**
+ * Convert a string to food category
+ *
+ * @param str String to convert
+ * @return The enum version
+ */
+FoodCategories foodCategoryFromString(const std::string& str) {
+  if (str == "unknown")
+    return FoodCategories::unknown;
+  if (str == "unpackaged")
+    return FoodCategories::unpackaged;
+  if (str == "packaged")
+    return FoodCategories::packaged;
+  return FoodCategories::unknown; // Default case
 }

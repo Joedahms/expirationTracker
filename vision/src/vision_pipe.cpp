@@ -5,8 +5,9 @@
 #include <memory>
 
 #include "../../food_item.h"
-#include "categorizeObjects.h"
-#include "vision_pipe.h"
+#include "../include/analyzeImages.h"
+#include "../include/helperFunctions.h"
+#include "../include/vision_pipe.h"
 
 /**
  * Entry into the vision code. Only called from main after vision child process is
@@ -18,132 +19,53 @@
  */
 void visionEntry(struct Pipes pipes) {
   LOG(INFO) << "Within vision process";
-
-  // Close write end of read pipes
-  close(pipes.displayToVision[WRITE]);
-  close(pipes.hardwareToVision[WRITE]);
-
-  // Close read end of write pipes
-  close(pipes.visionToDisplay[READ]);
-  close(pipes.visionToHardware[READ]);
+  closeUnusedPipes(pipes);
 
   while (1) {
-    redoThisFunctionPlz(pipes);
-  }
-}
-
-void redoThisFunctionPlz(struct Pipes pipes) {
-  struct timeval timeout;
-  timeout.tv_sec  = 1;
-  timeout.tv_usec = 0;
-  struct FoodItem foodItem;
-  bool foodItemReceived = false;
-  foodItemReceived = receiveFoodItem(foodItem, pipes.hardwareToVision[READ], timeout);
-  if (foodItemReceived == false) {
-    return;
-  }
-
-  /*
-  std::cout << foodItem.photoPath << std::endl;
-  std::cout << foodItem.name << std::endl;
-
-  std::cout << static_cast<int>(foodItem.scanDate.year()) << std::endl;
-  std::cout << static_cast<unsigned>(foodItem.scanDate.month()) << std::endl;
-  std::cout << static_cast<unsigned>(foodItem.scanDate.day()) << std::endl;
-
-  std::cout << static_cast<int>(foodItem.expirationDate.year()) << std::endl;
-  std::cout << static_cast<unsigned>(foodItem.expirationDate.month()) << std::endl;
-  std::cout << static_cast<unsigned>(foodItem.expirationDate.day()) << std::endl;
-
-  std::cout << foodItem.catagory << std::endl;
-  std::cout << foodItem.weight << std::endl;
-  std::cout << foodItem.quantity << std::endl;
-  */
-
-  sendFoodItem(foodItem, pipes.visionToDisplay[WRITE]);
-
-  LOG(INFO) << "Vision Received all images from hardware";
-  LOG(INFO) << "Vision analyzing all images";
-
-  const std::string outputDir = "./received_images/";
-  if (!std::filesystem::exists(outputDir)) {
-    std::filesystem::create_directory(outputDir);
-  }
-
-  std::vector<std::string> detections = analyzeImages(outputDir);
-  LOG(INFO) << "Vision successfully analyzed all images";
-  std::cout << "The following objects were detected in the images analyzed:" << std::endl;
-  for (const auto& detection : detections) {
-    std::cout << detection << std::endl;
+    // Wait for start signal from Display with 0.5sec sleep
+    struct FoodItem foodItem;
+    LOG(INFO) << "Waiting for start signal from Hardware";
+    std::cout << "Waiting for start signal from Hardware" << std::endl;
+    // foodItemTemplate.imageDirectory is currently the directory of images to look at
+    if (receiveFoodItem(foodItem, pipes.hardwareToVision[READ], (struct timeval){1, 0})) {
+      LOG(INFO) << "Vision Received all images from hardware";
+      processImages(pipes, foodItem);
+    }
+    else {
+      usleep(500000);
+    }
   }
 }
 
 /**
- * Read from the given pipe and create images using the information received. Write
- * received images to the given output directory.
+ * Parent method to all image processing and analyzing
  *
  * Input:
- * @param ouputDirectory Directory to write information to
- * @param pipeToRead Pipe to read data from
+ * @param pipes Pipes for vision to communicate with the other processes
+ * @param foodItem food item struct to update data as we collect it
  * Output: None
  */
-void receiveImages(int pipeToRead, const std::string& ouputDirectory) {
-  uint32_t image_size;
-  int image_count = 0;
-
-  while (true) {
-    // Step 1: Read the header (image size in bytes)
-    if (read(pipeToRead, &image_size, sizeof(image_size)) <= 0) {
-      LOG(FATAL) << "Failed to read header";
-      break;
-    }
-
-    // Step 2: Check for end-of-transmission signal
-    if (image_size == 0) {
-      LOG(INFO) << "End of transmission received";
-      break;
-    }
-
-    // Step 3: Open an output file for the image
-    std::string outputFile =
-        ouputDirectory + "/image_" + std::to_string(image_count++) + ".jpg";
-    std::ofstream file(outputFile, std::ios::binary);
-    if (!file.is_open()) {
-      LOG(FATAL) << "Failed to open output file";
-      continue;
-    }
-
-    // Step 4: Read the image data
-    const int CHUNK_SIZE = 4096;
-    char buffer[CHUNK_SIZE];
-    while (image_size > 0) {
-      ssize_t to_read =
-          std::min(static_cast<ssize_t>(image_size), static_cast<ssize_t>(CHUNK_SIZE));
-      ssize_t bytes_read = read(pipeToRead, buffer, to_read);
-
-      if (bytes_read <= 0) {
-        LOG(FATAL) << "Error reading from pipe";
-        break;
-      }
-
-      file.write(buffer, bytes_read);
-      image_size -= bytes_read;
-    }
-
-    file.close();
-    LOG(INFO) << "Image saved to: " << outputFile;
+void processImages(struct Pipes pipes, struct FoodItem& foodItem) {
+  LOG(INFO) << "Vision analyzing all images";
+  if (!isValidDirectory(foodItem.imageDirectory)) {
+    LOG(FATAL) << "Failed to open image directory" << foodItem.imageDirectory;
+    return;
   }
-}
-
-std::vector<std::string> analyzeImages(const std::string& imageDirectory) {
-  std::vector<std::string> detections;
-  for (const auto& entry : std::filesystem::directory_iterator(imageDirectory)) {
-    // After receiving and saving "received_image.jpg"
-    std::string detection = analyzeImage(
-        entry.path(), "../YOLO/yolov4-tiny/cfg/yolov4-tiny.cfg",
-        "../YOLO/yolov4-tiny/yolov4-tiny.weights", "../YOLO/yolov4-tiny/cfg/coco.names");
-
-    detections.push_back(detection);
+  foodItem.imageDirectory /= "Strawberry_Package"; // TEMP FOR TESTING
+  bool detectedFoodItem = analyzeImages(foodItem);
+  LOG(INFO) << "Successfully analyzed all images";
+  if (!detectedFoodItem) {
+    LOG(INFO) << "Item not successfully detected";
+    // checked 16 images and failed them all
+    //  how to handle?
+    return;
   }
-  return detections;
+  // tell hardware to stop
+  LOG(INFO) << "Sent stop signal to hardware";
+  bool detectionComplete = true;
+  write(pipes.visionToHardware[WRITE], &detectionComplete, sizeof(detectionComplete));
+
+  // send display the food item
+  LOG(INFO) << "Sent detected food item to display";
+  sendFoodItem(foodItem, pipes.visionToDisplay[WRITE]);
 }

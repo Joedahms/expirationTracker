@@ -5,7 +5,7 @@
 #include <string>
 
 #include "../display_global.h"
-#include "../text.h"
+#include "../elements/text.h"
 #include "scanning.h"
 
 /**
@@ -64,12 +64,6 @@ int Scanning::checkKeystates() {
   return SCANNING;
 }
 
-/**
- *
- *
- * @param None
- * @return None
- */
 void Scanning::update() {}
 
 /**
@@ -92,7 +86,7 @@ void Scanning::render() const {
  * @return None
  */
 void Scanning::enterScanning() {
-  SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
+  //  SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
   initializeTextures();
 
   // State has been entered once

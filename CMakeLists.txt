@@ -31,13 +31,17 @@ add_executable (expirationTracker
   # Entry into SDL after forked from displayEntry
   display/src/sdl2/sdl_entry.cpp
 
-  # GUI
-  display/src/sdl2/element.cpp
-  display/src/sdl2/button.cpp
+  # GUI 
   display/src/sdl2/display.cpp
-  display/src/sdl2/text.cpp
-  display/src/sdl2/panel.cpp
-  display/src/sdl2/scroll_box.cpp
+  display/src/sdl2/sdl_debug.cpp
+
+  # GUI Elements
+  display/src/sdl2/elements/element.cpp
+  display/src/sdl2/elements/button.cpp
+  display/src/sdl2/elements/text.cpp
+  display/src/sdl2/elements/panel.cpp
+  display/src/sdl2/elements/scroll_box.cpp
+  display/src/sdl2/elements/number_setting.cpp
 
   # GUI States
   display/src/sdl2/states/state.cpp
@@ -48,7 +52,11 @@ add_executable (expirationTracker
 
   # Vision process after forked from main
   vision/src/vision_pipe.cpp
-  vision/src/categorizeObjects.cpp
+  vision/src/handleOCR.cpp
+  vision/src/handleOBJ.cpp
+  vision/src/validateDetection.cpp
+  vision/src/analyzeImages.cpp
+  vision/src/helperFunctions.cpp
 
   #Hardware process after forked from main
   hardware/src/hardware_entry.cpp
