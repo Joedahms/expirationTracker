@@ -37,6 +37,7 @@ add_executable (expirationTracker
 
   # GUI Elements
   display/src/engine/elements/element.cpp
+  display/src/engine/elements/composite_element.cpp
   display/src/engine/elements/button.cpp
   display/src/engine/elements/text.cpp
   display/src/engine/elements/panel.cpp

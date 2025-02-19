@@ -2,6 +2,7 @@
 #define ELEMENT_H
 
 #include <SDL2/SDL.h>
+#include <memory>
 
 #include "../display_global.h"
 
@@ -59,8 +60,10 @@ public:
     return centered;
   }
 
+  virtual void addElement(std::unique_ptr<Element> element) {}
   virtual void update()       = 0;
   virtual void render() const = 0;
+
   SDL_Rect getRectangle() { return this->rectangle; }
   void setRectangle(SDL_Rect rectangle);
   void addBorder(const int& borderThickness);

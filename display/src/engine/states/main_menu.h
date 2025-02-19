@@ -8,6 +8,7 @@
 
 #include "../display_global.h"
 #include "../elements/button.h"
+#include "../elements/composite_element.h"
 #include "../elements/text.h"
 #include "state.h"
 
@@ -20,6 +21,9 @@ public:
   int handleEvents(bool*) override;
   void update() override;
   void render() const override;
+
+private:
+  std::unique_ptr<CompositeElement> rootElement;
 };
 
 #endif

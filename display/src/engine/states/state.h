@@ -24,6 +24,7 @@ public:
 
 protected:
   struct DisplayGlobal displayGlobal;
+
   std::vector<std::unique_ptr<Text>> texts;
   std::vector<std::unique_ptr<Button>> buttons;
   std::vector<std::unique_ptr<ScrollBox>> scrollBoxes;
