@@ -19,6 +19,8 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
 
   previousUpdate = std::chrono::steady_clock::now();
 
+  this->rootElement = std::make_unique<CompositeElement>();
+
   std::unique_ptr<ScrollBox> scrollBox = std::make_unique<ScrollBox>(this->displayGlobal);
   SDL_Rect scrollBoxRect               = {0, 0, 400, 100};
   int windowWidth, windowHeight;
@@ -27,8 +29,8 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
   scrollBox->setRectangle(scrollBoxRect);
   scrollBox->setPanelHeight(30);
   scrollBox->addBorder(1);
-  this->scrollBoxes.push_back(std::move(scrollBox));
-  this->scrollBoxes[0]->update();
+  this->rootElement->addElement(std::move(scrollBox));
+  this->rootElement->update();
 }
 
 /**
@@ -58,15 +60,15 @@ int ItemList::handleEvents(bool* displayIsRunning) {
 
     case SDL_MOUSEBUTTONDOWN:
       checkButtonsClicked(mouseX, mouseY);
-      this->scrollBoxes[0]->handleMouseButtonDown(this->mousePosition);
+      //      this->scrollBoxes[0]->handleMouseButtonDown(this->mousePosition);
       break;
 
     case SDL_MOUSEWHEEL:
       if (event.wheel.y > 0) {
-        this->scrollBoxes[0]->scrollUp(&this->mousePosition);
+        //       this->scrollBoxes[0]->scrollUp(&this->mousePosition);
       }
       else if (event.wheel.y < 0) {
-        this->scrollBoxes[0]->scrollDown(&this->mousePosition);
+        //      this->scrollBoxes[0]->scrollDown(&this->mousePosition);
       }
       break;
 
@@ -101,11 +103,11 @@ int ItemList::checkKeystates() {
  * @param None
  * @return None
  */
-void ItemList::update() { this->scrollBoxes[0]->update(); }
+void ItemList::update() { this->rootElement->update(); }
 
 void ItemList::render() const {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background
   SDL_RenderClear(this->displayGlobal.renderer);
-  renderElements();
+  this->rootElement->render();
   SDL_RenderPresent(this->displayGlobal.renderer);
 }

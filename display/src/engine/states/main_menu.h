@@ -21,9 +21,6 @@ public:
   int handleEvents(bool*) override;
   void update() override;
   void render() const override;
-
-private:
-  std::unique_ptr<CompositeElement> rootElement;
 };
 
 #endif

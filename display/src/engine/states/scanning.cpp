@@ -15,6 +15,8 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) {
   this->displayGlobal        = displayGlobal;
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
 
+  this->rootElement = std::make_unique<CompositeElement>();
+
   const char* fontPath               = "../display/fonts/16020_FUTURAM.ttf";
   const char* progressMessageContent = "Scanning In Progress";
   SDL_Color progressMessageColor     = {0, 255, 0, 255}; // Green
@@ -23,7 +25,8 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) {
       std::make_unique<Text>(this->displayGlobal, fontPath, progressMessageContent, 24,
                              progressMessageColor, progressMessageRectangle);
   progressMessage->centerHorizontal(windowSurface);
-  this->texts.push_back(std::move(progressMessage));
+  this->rootElement->addElement(std::move(progressMessage));
+  // this->texts.push_back(std::move(progressMessage));
 }
 
 /**
@@ -75,7 +78,7 @@ void Scanning::update() {}
 void Scanning::render() const {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background
   SDL_RenderClear(this->displayGlobal.renderer);
-  renderElements();
+  this->rootElement->render();
   SDL_RenderPresent(this->displayGlobal.renderer);
 }
 

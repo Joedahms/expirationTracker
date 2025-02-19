@@ -36,34 +36,6 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
       this->displayGlobal, viewStoredButtonRectangle, "View Stored Items", ITEM_LIST);
   viewStoredButton->centerHorizontal(windowSurface);
   rootElement->addElement(std::move(viewStoredButton));
-
-  /*
-  // Title
-  const char* titleContent = "Expiration Tracker";
-  SDL_Color titleColor     = {0, 255, 0, 255}; // Green
-  SDL_Rect titleRectangle  = {100, 100, 0, 0};
-  std::unique_ptr<Text> title =
-      std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
-                             titleContent, 24, titleColor, titleRectangle);
-  title->centerHorizontal(windowSurface);
-  this->texts.push_back(std::move(title));
-  */
-
-  /*
-  // Scan New Item
-  SDL_Rect newScanButtonRectangle       = {200, 150, 200, 50};
-  std::unique_ptr<Button> newScanButton = std::make_unique<Button>(
-      this->displayGlobal, newScanButtonRectangle, "Scan New Item", SCANNING);
-  newScanButton->centerHorizontal(windowSurface);
-  this->buttons.push_back(std::move(newScanButton));
-
-  // View Stored Items
-  SDL_Rect viewStoredButtonRectangle       = {200, 210, 200, 50};
-  std::unique_ptr<Button> viewStoredButton = std::make_unique<Button>(
-      this->displayGlobal, viewStoredButtonRectangle, "View Stored Items", ITEM_LIST);
-  viewStoredButton->centerHorizontal(windowSurface);
-  this->buttons.push_back(std::move(viewStoredButton));
-  */
 }
 
 /**
@@ -102,11 +74,7 @@ int MainMenu::handleEvents(bool* displayIsRunning) {
  * @param None
  * @return None
  */
-void MainMenu::update() {
-  for (auto& currentButton : this->buttons) {
-    currentButton->update();
-  }
-}
+void MainMenu::update() { this->rootElement->update(); }
 
 /**
  * Render all elements.
@@ -117,6 +85,6 @@ void MainMenu::update() {
 void MainMenu::render() const {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background
   SDL_RenderClear(this->displayGlobal.renderer);
-  renderElements();
+  this->rootElement->render();
   SDL_RenderPresent(this->displayGlobal.renderer);
 }
