@@ -12,7 +12,7 @@
 
 HX711 scale;
 
-/**
+/*
  * Initializes GPIO, hardware and sensors.
  * If compiled with gcc needs link
  *      Ex: gcc -o myapp myapp.c -l wiringPi
@@ -31,7 +31,14 @@ void weightSetup() {
    * scale.tare();         // Zero the scale
    */
 }
-
+/*
+ * Check if there is weight on the platform.
+ *
+ *
+ * @return boolean
+ * 0 - nothing on scale
+ * 1 - valid input, begin scanning
+ */
 int getWeight() {
   float weight = scale.get_units(10);
   LOG(INFO) << "Reading Weight: " << weight << " g";

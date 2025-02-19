@@ -50,22 +50,18 @@ bool receivedStartSignal(int pipeToRead) {
 /**
  * Sends the photo directory and weight data to the AI Vision system.
  *
- * @param IMAGE_DIR Directory containing captured images.
  * @param weight The weight of the object on the platform.
  * @return None
  */
-void sendDataToVision(const std::string IMAGE_DIR, float weight) {
+void sendDataToVision(float weight) {
   LOG(INFO) << "Sending Images from Hardware to Vision";
+  const std::chrono::time_point now{std::chrono::system_clock::now()};
 
-  struct FoodItem item;
-  item.photoPath      = IMAGE_DIR;
-  item.name           = "";
-  item.scanDate       = std::chrono::system_clock::now();
-  item.expirationDate = "year_month_day";
-  item.catagory       = "";
-  item.weight         = weight;
-  item.quantity       = 1;
-  sendFoodItem(item, pipes.hardwareToVision[WRITE]);
+  struct FoodItem foodItem;
+  foodItem.imageDirectory = std::filesystem::absolute("../images");
+  foodItem.scanDate       = std::chrono::floor<std::chrono::days>(now);
+  foodItem.weight         = weight;
+  sendFoodItem(foodItem, pipes.hardwareToVision[WRITE]);
 
   LOG(INFO) << "Done Sending Images from Hardware to Vision";
 }

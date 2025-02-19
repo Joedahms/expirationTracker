@@ -10,7 +10,6 @@
  * Sample command. rpicam-apps allows bulding customized behavior
  * run libcamera-hello --list-cameras to get camera names
  */
-#define IMAGE_DIR   "../../images/image_"
 #define CAMERA1_CMD "rpicam-still --camera 0 -o "
 #define CAMERA2_CMD "rpicam-still --camera 1 -o "
 

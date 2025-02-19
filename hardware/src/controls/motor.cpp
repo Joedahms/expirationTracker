@@ -39,7 +39,7 @@ void setupMotor() {
  * Controls platform rotation with L298N motor driver.
  * Rotates for a fixed duration.
  * According to current calculations in hardware-chat:
- * 10RPM = 4RPM -> ~ 2 sec for 45 degrees || 15 sec for full rotation.
+ * 10RPM = 4RPM -> ~ 1.875 sec for 45 degrees || 15 sec for full rotation.
  *
  * @return None
  */
@@ -47,7 +47,7 @@ void rotateMotor() {
   digitalWrite(MOTOR_IN1, HIGH); // HIGH,LOW == forward LOW,HIGH == backwards
   digitalWrite(MOTOR_IN2, LOW);
   analogWrite(MOTOR_ENA, 255); // Adjust speed
-  usleep(2000000);             // Rotate for 2 sec (roughly 45 degrees)
+  usleep(1875000);             // Rotate for 1.875sec (roughly 45 degrees)
   digitalWrite(MOTOR_IN1, LOW);
   digitalWrite(MOTOR_IN2, LOW); // HIGH,HIGH || LOW,LOW == off
 }

@@ -10,7 +10,7 @@
 #include "./controls/weight.h"
 #include "io.h"
 
-/**
+/*
  * Entry into the hardware code. Only called from main after hardware child process is
  * forked.
  *
@@ -29,23 +29,19 @@ void hardwareEntry(struct Pipes pipes) {
   close(pipes.hardwareToDisplay[READ]);
   close(pipes.hardwareToVision[READ]);
 
+  /*
+   * Wait for start signal from Display with 0.5sec sleep.
+   */
   while (1) {
-    // Wait for start signal from Display with 0.5sec sleep
     LOG(INFO) << "Waiting for start signal from Display";
     if (receivedStartSignal(pipes.displayToHardware[READ])) {
       LOG(INFO) << "Checking if there is weight on the platform";
-      /**
-       * Check if there is weight on the platform
-       *
-       *
-       * @return boolean
-       * 0 - nothing on scale
-       * 1 - valid input, begin scanning
-       */
-      if (getWeight() > 0) {
+      weightSetup();
+      float weight = getWeight();
+      if (weight > 0) {
         LOG(INFO) << "Weight detected on platform. Beginning scan.";
         // send 1 to display to indicate weight
-        rotateAndCapture();
+        rotateAndCapture(weight);
       }
       else {
         LOG(INFO) << "No weight detected on platform.";

@@ -3,7 +3,7 @@
 
 #include <string>
 
-void rotateAndCapture();
+void rotateAndCapture(float weight);
 void redoThis(struct Pipes pipes);
 
 #endif
