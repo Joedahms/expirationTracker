@@ -26,7 +26,7 @@ void sendFoodItem(struct FoodItem, int);
 bool receiveFoodItem(struct FoodItem&, int, struct timeval);
 
 void writeString(int, const std::string&);
-std::string readString(int);
+std::string readString(int pipeToRead);
 std::string foodCategoryToString(const FoodCategories&);
 FoodCategories foodCategoryFromString(const std::string&);
 #endif

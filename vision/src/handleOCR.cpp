@@ -14,7 +14,7 @@
 std::vector<std::string> runOCR(const std::filesystem::path& imagePath) {
   std::vector<std::string> detectedText;
   std::string command =
-      "$HOME/easyocr-venv/bin/python3 ../vision/Models/easyOCR.py " + imagePath.string();
+      "./models-venv/bin/python3 ../vision/Models/easyOCR.py " + imagePath.string();
   char buffer[256];
   std::string result;
 
