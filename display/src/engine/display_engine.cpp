@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include "../../../pipes.h"
-#include "display.h"
+#include "display_engine.h"
 #include "display_global.h"
 #include "states/state.h"
 
@@ -18,19 +18,19 @@
  * @param fullscreen Whether or not the display window should be fullscreen
  * @param displayGlobal Global display variables
  */
-Display::Display(const char* windowTitle,
-                 int windowXPosition,
-                 int windowYPosition,
-                 int screenWidth,
-                 int screenHeight,
-                 bool fullscreen,
-                 struct DisplayGlobal displayGlobal) {
+DisplayEngine::DisplayEngine(const char* windowTitle,
+                             int windowXPosition,
+                             int windowYPosition,
+                             int screenWidth,
+                             int screenHeight,
+                             bool fullscreen,
+                             struct DisplayGlobal displayGlobal) {
   this->displayGlobal = displayGlobal;
   this->displayGlobal.window =
       setupWindow(windowTitle, windowXPosition, windowYPosition, screenWidth,
                   screenHeight, fullscreen); // Setup the SDL display window
 
-  initializeSdl(this->displayGlobal.window);
+  initializeEngine(this->displayGlobal.window);
 
   // Initialize states
   this->mainMenu  = std::make_unique<MainMenu>(this->displayGlobal);
@@ -53,12 +53,12 @@ Display::Display(const char* windowTitle,
  * @param fullscreen Whether or not the display window should be fullscreen.
  * @return Pointer to the SDL display window.
  */
-SDL_Window* Display::setupWindow(const char* windowTitle,
-                                 int windowXPosition,
-                                 int windowYPosition,
-                                 int screenWidth,
-                                 int screenHeight,
-                                 bool fullscreen) {
+SDL_Window* DisplayEngine::setupWindow(const char* windowTitle,
+                                       int windowXPosition,
+                                       int windowYPosition,
+                                       int screenWidth,
+                                       int screenHeight,
+                                       bool fullscreen) {
   LOG(INFO) << "Creating SDL display window";
 
   int flags = 0;
@@ -82,19 +82,18 @@ SDL_Window* Display::setupWindow(const char* windowTitle,
  * @param window The SDL display window
  * @return None
  */
-void Display::initializeSdl(SDL_Window* window) {
-  // Initialize SDL
-  LOG(INFO) << "Initializing SDL";
+void DisplayEngine::initializeEngine(SDL_Window* window) {
+  LOG(INFO) << "Initializing engine";
   try {
     int sdlInitReturn = SDL_Init(SDL_INIT_EVERYTHING);
     if (sdlInitReturn != 0) {
       throw;
     }
   } catch (...) {
-    LOG(FATAL) << "Failed to initialize SDL";
+    LOG(FATAL) << "Failed to initialize engine";
     exit(1);
   }
-  LOG(INFO) << "SDL initialized";
+  LOG(INFO) << "engine initialized";
 
   // Create renderer
   LOG(INFO) << "Creating renderer";
@@ -132,7 +131,7 @@ void Display::initializeSdl(SDL_Window* window) {
  * @param None
  * @return None
  */
-void Display::checkState() {
+void DisplayEngine::checkState() {
   switch (this->state) {
   case MAIN_MENU:
     break;
@@ -160,7 +159,7 @@ void Display::checkState() {
  * @param None
  * @return None
  */
-void Display::handleEvents(int* sdlToDisplay, int* displayToSdl) {
+void DisplayEngine::handleEvents(int* sdlToDisplay, int* displayToSdl) {
   switch (this->state) {
   case MAIN_MENU:
     this->state = this->mainMenu->handleEvents(&this->displayIsRunning);
@@ -198,7 +197,7 @@ void Display::handleEvents(int* sdlToDisplay, int* displayToSdl) {
  * @param None
  * @return None
  */
-void Display::checkKeystates() {
+void DisplayEngine::checkKeystates() {
   switch (this->state) {
   case MAIN_MENU:
     break;
@@ -226,7 +225,7 @@ void Display::checkKeystates() {
  * @param None
  * @return None
  */
-void Display::update() {
+void DisplayEngine::update() {
   switch (this->state) {
   case MAIN_MENU:
     this->mainMenu->update();
@@ -255,7 +254,7 @@ void Display::update() {
  * @param None
  * @return None
  */
-void Display::renderState() {
+void DisplayEngine::renderState() {
   switch (this->state) {
   case MAIN_MENU:
     this->mainMenu->render();
@@ -284,9 +283,9 @@ void Display::renderState() {
  * @param None
  * @return None
  */
-void Display::clean() {
+void DisplayEngine::clean() {
   SDL_DestroyWindow(this->displayGlobal.window);
   SDL_DestroyRenderer(this->displayGlobal.renderer);
   SDL_Quit();
-  LOG(INFO) << "Display cleaned";
+  LOG(INFO) << "DisplayEngine cleaned";
 }

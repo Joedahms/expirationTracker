@@ -29,26 +29,26 @@ add_executable (expirationTracker
   display/src/sql_food.cpp
 
   # Entry into SDL after forked from displayEntry
-  display/src/sdl2/sdl_entry.cpp
+  display/src/engine/sdl_entry.cpp
 
   # GUI 
-  display/src/sdl2/display.cpp
-  display/src/sdl2/sdl_debug.cpp
+  display/src/engine/display_engine.cpp
+  display/src/engine/sdl_debug.cpp
 
   # GUI Elements
-  display/src/sdl2/elements/element.cpp
-  display/src/sdl2/elements/button.cpp
-  display/src/sdl2/elements/text.cpp
-  display/src/sdl2/elements/panel.cpp
-  display/src/sdl2/elements/scroll_box.cpp
-  display/src/sdl2/elements/number_setting.cpp
+  display/src/engine/elements/element.cpp
+  display/src/engine/elements/button.cpp
+  display/src/engine/elements/text.cpp
+  display/src/engine/elements/panel.cpp
+  display/src/engine/elements/scroll_box.cpp
+  display/src/engine/elements/number_setting.cpp
 
   # GUI States
-  display/src/sdl2/states/state.cpp
-  display/src/sdl2/states/main_menu.cpp
-  display/src/sdl2/states/scanning.cpp
-  display/src/sdl2/states/pause_menu.cpp
-  display/src/sdl2/states/item_list.cpp
+  display/src/engine/states/state.cpp
+  display/src/engine/states/main_menu.cpp
+  display/src/engine/states/scanning.cpp
+  display/src/engine/states/pause_menu.cpp
+  display/src/engine/states/item_list.cpp
 
   # Vision process after forked from main
   vision/src/vision_pipe.cpp
