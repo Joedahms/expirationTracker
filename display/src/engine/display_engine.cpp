@@ -149,6 +149,7 @@ void DisplayEngine::checkState() {
     break;
 
   default:
+    LOG(FATAL) << "Invalid state";
     break;
   }
 }
@@ -165,6 +166,7 @@ void DisplayEngine::handleEvents(int* engineToDisplay, int* displayToEngine) {
   case MAIN_MENU:
     this->state = this->mainMenu->handleEvents(&this->displayIsRunning);
     if (this->state == SCANNING) {
+      LOG(INFO) << "Scan initialized, engine switching to scanning state";
       writeString(engineToDisplay[WRITE], START_SCAN);
     }
     break;
@@ -193,8 +195,9 @@ void DisplayEngine::handleEvents(int* engineToDisplay, int* displayToEngine) {
       }
       if (FD_ISSET(pipeToRead, &readPipeSet)) { // Data available
         std::string fromDisplay = readString(displayToEngine[READ]);
-        if (fromDisplay == "ID surccessful") {
-          std::cout << "yay" << std::endl;
+        if (fromDisplay == "ID successful") {
+          LOG(INFO) << "New item received, switching to item list state";
+          this->state = ITEM_LIST;
         }
       }
       break;
@@ -207,7 +210,9 @@ void DisplayEngine::handleEvents(int* engineToDisplay, int* displayToEngine) {
   case ITEM_LIST:
     this->state = this->itemList->handleEvents(&this->displayIsRunning);
     break;
+
   default:
+    LOG(FATAL) << "Invalid state";
     break;
   }
 }
@@ -234,7 +239,9 @@ void DisplayEngine::checkKeystates() {
   case ITEM_LIST:
     this->state = this->itemList->checkKeystates();
     break;
+
   default:
+    LOG(FATAL) << "Invalid state";
     break;
   }
 }
@@ -266,6 +273,7 @@ void DisplayEngine::update() {
     break;
 
   default:
+    LOG(FATAL) << "Invalid state";
     break;
   }
 }
@@ -295,6 +303,7 @@ void DisplayEngine::renderState() {
     break;
 
   default:
+    LOG(FATAL) << "Invalid state";
     break;
   }
 }

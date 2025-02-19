@@ -37,6 +37,9 @@ void displayEntry(struct Pipes externalPipes) {
     LOG(FATAL) << "Error starting SDL process";
   }
   else if (sdlPid == 0) {
+    google::ShutdownGoogleLogging();
+    google::InitGoogleLogging("display_engine");
+
     // In engine
     close(engineToDisplay[READ]);
     close(displayToEngine[WRITE]);
