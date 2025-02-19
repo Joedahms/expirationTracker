@@ -1,5 +1,5 @@
-#ifndef DISPLAY_H
-#define DISPLAY_H
+#ifndef DISPLAY_ENGINE_H
+#define DISPLAY_ENGINE_H
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -14,15 +14,15 @@
 
 #include "display_global.h"
 
-class Display {
+class DisplayEngine {
 public:
-  Display(const char* windowTitle,
-          int windowXPosition,
-          int windowYPosition,
-          int screenWidth,
-          int screenHeight,
-          bool fullscreen,
-          struct DisplayGlobal displayGlobal);
+  DisplayEngine(const char* windowTitle,
+                int windowXPosition,
+                int windowYPosition,
+                int screenWidth,
+                int screenHeight,
+                bool fullscreen,
+                struct DisplayGlobal displayGlobal);
 
   SDL_Window* setupWindow(const char* windowTitle,
                           int windowXPosition,
@@ -30,10 +30,10 @@ public:
                           int screenWidth,
                           int screenHeight,
                           bool fullscreen);
-  void initializeSdl(SDL_Window* window);
+  void initializeEngine(SDL_Window* window);
 
   void checkState();
-  void handleEvents(int* sdlToDisplay, int* displayToSdl);
+  void handleEvents(int* engineToDisplay, int* displayToEngine);
   void checkKeystates();
   void update();
 
