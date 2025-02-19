@@ -1,4 +1,5 @@
 #include "../include/validateDetection.h"
+#include "../include/helperFunctions.h"
 #include <chrono>
 #include <regex>
 #include <unordered_map>
@@ -33,15 +34,92 @@ TextValidationResult isValidText(const std::string& text,
  * Output: Bool if is valid class
  */
 bool isTextClass(const std::string& text) {
-  static const std::vector<std::string> classificationKeywords = {
-      "Milk",   "Cheese", "Bread", "Eggs",    "Yogurt",
-      "Butter", "Juice",  "Meat",  "Chicken", "Fish"};
+  static const std::vector<std::string> classificationKeywords = {"milk",
+                                                                  "cheese",
+                                                                  "bread",
+                                                                  "eggs",
+                                                                  "yogurt",
+                                                                  "butter",
+                                                                  "juice",
+                                                                  "meat",
+                                                                  "chicken",
+                                                                  "fish",
+                                                                  "cereal",
+                                                                  "pasta",
+                                                                  "rice",
+                                                                  "flour",
+                                                                  "sugar",
+                                                                  "salt",
+                                                                  "pepper",
+                                                                  "coffee",
+                                                                  "tea",
+                                                                  "honey",
+                                                                  "jam",
+                                                                  "peanut butter",
+                                                                  "chocolate",
+                                                                  "candy",
+                                                                  "cookies",
+                                                                  "crackers",
+                                                                  "granola",
+                                                                  "oats",
+                                                                  "popcorn",
+                                                                  "chips",
+                                                                  "pancake mix",
+                                                                  "syrup",
+                                                                  "canned beans",
+                                                                  "canned corn",
+                                                                  "canned tomatoes",
+                                                                  "canned tuna",
+                                                                  "canned soup",
+                                                                  "canned fruit",
+                                                                  "frozen vegetables",
+                                                                  "frozen meals",
+                                                                  "frozen pizza",
+                                                                  "frozen fries",
+                                                                  "ice cream",
+                                                                  "energy bars",
+                                                                  "protein powder",
+                                                                  "baby formula",
+                                                                  "instant noodles",
+                                                                  "ketchup",
+                                                                  "mayonnaise",
+                                                                  "mustard",
+                                                                  "soy sauce",
+                                                                  "hot sauce",
+                                                                  "salad dressing",
+                                                                  "cooking oil",
+                                                                  "vinegar",
+                                                                  "pudding",
+                                                                  "whipped cream",
+                                                                  "sour cream",
+                                                                  "deli meat",
+                                                                  "tofu",
+                                                                  "bacon"};
+
+  std::string lowerText = toLowerCase(text);
 
   for (const auto& keyword : classificationKeywords) {
-    if (text.find(keyword) != std::string::npos) {
+    std::string lowerKeyword = toLowerCase(keyword);
+
+    // **1. Exact Substring Match** (e.g., "Organic Milk" → "milk")
+    if (lowerText.find(lowerKeyword) != std::string::npos) {
       return true;
     }
+
+    // **2. Approximate Matching (Levenshtein Distance ≤ 2)**
+    if (levenshteinDistance(lowerText, lowerKeyword) <= 2) {
+      return true;
+    }
+
+    // **3. Word Containment Matching** (e.g., "Milkkk" contains "Milk")
+    if (lowerKeyword.size() >= 3) { // Ensure keywords are meaningful enough
+      if (lowerText.find(lowerKeyword.substr(0, lowerKeyword.size() - 1)) !=
+          std::string::npos) {
+        return true;
+      }
+    }
   }
+
   return false;
 }
 
