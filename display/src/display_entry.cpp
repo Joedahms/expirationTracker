@@ -3,53 +3,56 @@
 
 #include "../../pipes.h"
 #include "display_entry.h"
-#include "engine/sdl_entry.h"
-#include "external_handler.h"
+#include "display_handler.h"
+#include "engine/engine_entry.h"
 #include "sql_food.h"
 
 /**
  * Entry into the display code. Only called from main after display child process is
  * forked.
  *
- * @param pipes Pipes for display to communicate with the other processes
+ * @param externalPipes Pipes for display to communicate with the other external processes
+ * (vision and hardware).
  * @return None
  */
-void displayEntry(struct Pipes pipes) {
+void displayEntry(struct Pipes externalPipes) {
   LOG(INFO) << "Entered display process";
 
   // Close write end of read pipes
-  close(pipes.hardwareToDisplay[WRITE]);
-  close(pipes.visionToDisplay[WRITE]);
+  close(externalPipes.hardwareToDisplay[WRITE]);
+  close(externalPipes.visionToDisplay[WRITE]);
 
   // Close read end of write pipes
-  close(pipes.displayToHardware[READ]);
-  close(pipes.displayToVision[READ]);
+  close(externalPipes.displayToHardware[READ]);
+  close(externalPipes.displayToVision[READ]);
 
   // SDL pipes
-  int sdlToDisplay[2];
-  int displayToSdl[2];
-  pipe(sdlToDisplay);
-  pipe(displayToSdl);
+  int engineToDisplay[2];
+  int displayToEngine[2];
+  pipe(engineToDisplay);
+  pipe(displayToEngine);
 
   int sdlPid;
   if ((sdlPid = fork()) == -1) {
     LOG(FATAL) << "Error starting SDL process";
   }
   else if (sdlPid == 0) {
-    // In SDL
-    close(sdlToDisplay[READ]);
-    close(displayToSdl[WRITE]);
+    // In engine
+    close(engineToDisplay[READ]);
+    close(displayToEngine[WRITE]);
 
-    sdlEntry(sdlToDisplay, displayToSdl);
+    engineEntry(engineToDisplay, displayToEngine);
   }
   else {
     // Still in display entry
-    close(sdlToDisplay[WRITE]);
-    close(displayToSdl[READ]);
+    close(engineToDisplay[WRITE]);
+    close(displayToEngine[READ]);
+    DisplayHandler displayHandler(externalPipes, displayToEngine, engineToDisplay);
+
     while (1) {
       bool stringFromSdl = false;
-      externalHandler(pipes, displayToSdl);
-      stringFromSdl = sdlHandler(pipes, sdlToDisplay, displayToSdl);
+      displayHandler.handleExternal();
+      displayHandler.handleEngine();
     }
   }
 }

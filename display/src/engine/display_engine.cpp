@@ -156,24 +156,46 @@ void DisplayEngine::checkState() {
 /**
  * Check the current state, and call that state's handle events method.
  *
- * @param None
+ * @param engineToDisplay Pipe from the display engine to the display
+ * @param displayToEngine Pipe from the display to the displayEngine
  * @return None
  */
-void DisplayEngine::handleEvents(int* sdlToDisplay, int* displayToSdl) {
+void DisplayEngine::handleEvents(int* engineToDisplay, int* displayToEngine) {
   switch (this->state) {
   case MAIN_MENU:
     this->state = this->mainMenu->handleEvents(&this->displayIsRunning);
     if (this->state == SCANNING) {
-      writeString(sdlToDisplay[WRITE], START_SCAN);
+      writeString(engineToDisplay[WRITE], START_SCAN);
     }
     break;
 
   case SCANNING:
     {
       this->state = this->scanning->handleEvents(&this->displayIsRunning);
-      std::string fromDisplay;
-      if (fromDisplay == readString(displayToSdl[READ])) {
-        std::cout << "yay" << std::endl;
+
+      struct timeval timeout;
+      timeout.tv_sec  = 0;
+      timeout.tv_usec = 100;
+
+      int pipeToRead = displayToEngine[READ];
+      fd_set readPipeSet;
+      FD_ZERO(&readPipeSet);
+      FD_SET(pipeToRead, &readPipeSet);
+
+      // Check pipe for data
+      int pipeReady = select(pipeToRead + 1, &readPipeSet, NULL, NULL, &timeout);
+
+      if (pipeReady == -1) {
+        LOG(FATAL) << "Select error";
+      }
+      else if (pipeReady == 0) { // No data available
+        break;
+      }
+      if (FD_ISSET(pipeToRead, &readPipeSet)) { // Data available
+        std::string fromDisplay = readString(displayToEngine[READ]);
+        if (fromDisplay == "ID surccessful") {
+          std::cout << "yay" << std::endl;
+        }
       }
       break;
     }
