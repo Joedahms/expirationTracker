@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
   }
   else if (displayPid == 0) {
     google::ShutdownGoogleLogging();
-    google::InitGoogleLogging("Display");
+    google::InitGoogleLogging("display");
 
     displayEntry(pipes);
     LOG(INFO) << "Display process";
@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
   }
   else if (hardwarePid == 0) {
     google::ShutdownGoogleLogging();
-    google::InitGoogleLogging("Hardware");
+    google::InitGoogleLogging("hardware");
 
     hardwareEntry(pipes);
     LOG(INFO) << "Hardware process";
@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
   }
   else if (visionPid == 0) {
     google::ShutdownGoogleLogging();
-    google::InitGoogleLogging("Vision");
+    google::InitGoogleLogging("vision");
 
     visionEntry(pipes);
     LOG(INFO) << "Vision process";
