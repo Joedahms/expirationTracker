@@ -11,7 +11,7 @@
  * Output: Returns the class index of the identified class (currently from imageNet).
  */
 std::pair<int, float> runEfficientNet(const std::filesystem::path& imagePath) {
-  std::string command = "TF_CPP_MIN_LOG_LEVEL=3 $HOME/easyocr-venv/bin/python3 "
+  std::string command = "TF_CPP_MIN_LOG_LEVEL=3 ./models-venv/bin/python3 "
                         "../vision/Models/efficientNet.py " +
                         imagePath.string() + " 2>/dev/null";
 
@@ -32,7 +32,7 @@ std::pair<int, float> runEfficientNet(const std::filesystem::path& imagePath) {
   nlohmann::json output = nlohmann::json::parse(result.str());
 
   if (output.contains("error")) {
-    throw std::runtime_error(output["error"]); // Handle error
+    LOG(FATAL) << (output["error"]); // Handle error
   }
 
   int index         = output["index"];
