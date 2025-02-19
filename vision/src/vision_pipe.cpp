@@ -25,7 +25,6 @@ void visionEntry(struct Pipes pipes) {
     // Wait for start signal from Display with 0.5sec sleep
     struct FoodItem foodItem;
     LOG(INFO) << "Waiting for start signal from Hardware";
-    std::cout << "Waiting for start signal from Hardware" << std::endl;
     // foodItemTemplate.imageDirectory is currently the directory of images to look at
     if (receiveFoodItem(foodItem, pipes.hardwareToVision[READ], (struct timeval){1, 0})) {
       LOG(INFO) << "Vision Received all images from hardware";
