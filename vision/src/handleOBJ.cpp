@@ -11,8 +11,7 @@
  * Output: Returns the class index of the identified class (currently from imageNet).
  */
 std::pair<int, float> runEfficientNet(const std::filesystem::path& imagePath) {
-  std::string command = "TF_CPP_MIN_LOG_LEVEL=3 ./models-venv/bin/python3 "
-                        "../vision/Models/efficientNet.py " +
+  std::string command = "./models-venv/bin/python3 ../vision/Models/efficientNet.py " +
                         imagePath.string() + " 2>/dev/null";
 
   std::ostringstream result;
