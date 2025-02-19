@@ -193,8 +193,8 @@ void DisplayEngine::handleEvents(int* engineToDisplay, int* displayToEngine) {
       }
       if (FD_ISSET(pipeToRead, &readPipeSet)) { // Data available
         std::string fromDisplay = readString(displayToEngine[READ]);
+
         if (fromDisplay == "ID surccessful") {
-          std::cout << "yay" << std::endl;
         }
       }
       break;

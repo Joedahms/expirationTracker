@@ -22,6 +22,9 @@ int main(int argc, char* argv[]) {
     LOG(FATAL) << "Error starting display process";
   }
   else if (displayPid == 0) {
+    google::ShutdownGoogleLogging();
+    google::InitGoogleLogging("Display");
+
     displayEntry(pipes);
     LOG(INFO) << "Display process";
     return 0;
@@ -36,6 +39,9 @@ int main(int argc, char* argv[]) {
     LOG(FATAL) << "Error starting hardware process";
   }
   else if (hardwarePid == 0) {
+    google::ShutdownGoogleLogging();
+    google::InitGoogleLogging("Hardware");
+
     hardwareEntry(pipes);
     LOG(INFO) << "Hardware process";
     return 0;
@@ -50,6 +56,9 @@ int main(int argc, char* argv[]) {
     LOG(FATAL) << "Error starting vision process";
   }
   else if (visionPid == 0) {
+    google::ShutdownGoogleLogging();
+    google::InitGoogleLogging("Vision");
+
     visionEntry(pipes);
     LOG(INFO) << "Vision process";
     return 0;
