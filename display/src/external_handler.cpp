@@ -7,47 +7,58 @@
 #include "external_handler.h"
 #include "sql_food.h"
 
+DisplayHandler::DisplayHandler(struct Pipes externalPipes,
+                               int* displayToEngine,
+                               int* engineToDisplay)
+    : externalPipes(externalPipes), displayToEngine(displayToEngine),
+      engineToDisplay(engineToDisplay) {}
+
 /**
- * Handle communication between the display and other external processes. Handle a
- * successful food item identification.
+ * Handle communication between display and the other major components of the system
+ * (vision and hardware).
  *
- * @param pipes Display pipes used to communicate with external processes
- * @param displayToSdl pipe from display process to SDL process. Used to tell SDL that a
- * food item was successfully identified
+ * @param None
  * @return None
  */
-void externalHandler(struct Pipes pipes, int* displayToSdl) {
+void DisplayHandler::handleExternal() {
   struct timeval timeout;
   timeout.tv_sec  = 1;
   timeout.tv_usec = 0;
 
   struct FoodItem foodItem;
   bool foodItemReceived = false;
-  foodItemReceived      = receiveFoodItem(foodItem, pipes.visionToDisplay[READ], timeout);
+  foodItemReceived =
+      receiveFoodItem(foodItem, this->externalPipes.visionToDisplay[READ], timeout);
+
   if (foodItemReceived) {
     LOG(INFO) << "Food item received from vision";
     sqlite3* database = nullptr;
     openDatabase(&database);
 
     storeFoodItem(database, foodItem);
-    writeString(displayToSdl[WRITE], "ID successful");
+    writeString(this->displayToEngine[WRITE], "ID successful");
 
     sqlite3_close(database);
   }
 }
 
-bool sdlHandler(struct Pipes pipes, int* sdlToDisplay, int* displayToSdl) {
-  bool stringFromSdl = false;
-
+/**
+ * Handle communication between the main display process and the engine process.
+ *
+ * @param None
+ * @param None
+ */
+void DisplayHandler::handleEngine() {
   fd_set readPipeSet;
 
   FD_ZERO(&readPipeSet);
-  FD_SET(sdlToDisplay[READ], &readPipeSet);
+  FD_SET(this->engineToDisplay[READ], &readPipeSet);
 
   struct timeval timeout;
   timeout.tv_sec  = 1;
   timeout.tv_usec = 0;
-  int pipeReady   = select(sdlToDisplay[READ] + 1, &readPipeSet, NULL, NULL, &timeout);
+  int pipeReady =
+      select(this->engineToDisplay[READ] + 1, &readPipeSet, NULL, NULL, &timeout);
 
   if (pipeReady == -1) {
     LOG(FATAL) << "Select error when receiving food item";
@@ -55,11 +66,19 @@ bool sdlHandler(struct Pipes pipes, int* sdlToDisplay, int* displayToSdl) {
   else if (pipeReady == 0) { // No data available
     ;
   }
-  if (FD_ISSET(sdlToDisplay[READ], &readPipeSet)) { // Data available
-    LOG(INFO) << "Sending start signal to hardware";
-    std::string sdlString = readString(sdlToDisplay[READ]);
-    writeString(pipes.displayToHardware[WRITE], sdlString);
-    stringFromSdl = true;
+  if (FD_ISSET(this->engineToDisplay[READ], &readPipeSet)) { // Data available
+    sendStartSignal();
   }
-  return stringFromSdl;
+}
+
+/**
+ * Signify to hardware that the user would like to scan in an item.
+ *
+ * @param None
+ * @return None
+ */
+void DisplayHandler::sendStartSignal() {
+  LOG(INFO) << "Sending start signal to hardware";
+  std::string sdlString = readString(this->engineToDisplay[READ]);
+  writeString(this->externalPipes.displayToHardware[WRITE], sdlString);
 }

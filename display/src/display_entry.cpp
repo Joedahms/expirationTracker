@@ -14,42 +14,44 @@
  * @param pipes Pipes for display to communicate with the other processes
  * @return None
  */
-void displayEntry(struct Pipes pipes) {
+void displayEntry(struct Pipes externalPipes) {
   LOG(INFO) << "Entered display process";
 
   // Close write end of read pipes
-  close(pipes.hardwareToDisplay[WRITE]);
-  close(pipes.visionToDisplay[WRITE]);
+  close(externalPipes.hardwareToDisplay[WRITE]);
+  close(externalPipes.visionToDisplay[WRITE]);
 
   // Close read end of write pipes
-  close(pipes.displayToHardware[READ]);
-  close(pipes.displayToVision[READ]);
+  close(externalPipes.displayToHardware[READ]);
+  close(externalPipes.displayToVision[READ]);
 
   // SDL pipes
-  int sdlToDisplay[2];
-  int displayToSdl[2];
-  pipe(sdlToDisplay);
-  pipe(displayToSdl);
+  int engineToDisplay[2];
+  int displayToEngine[2];
+  pipe(engineToDisplay);
+  pipe(displayToEngine);
 
   int sdlPid;
   if ((sdlPid = fork()) == -1) {
     LOG(FATAL) << "Error starting SDL process";
   }
   else if (sdlPid == 0) {
-    // In SDL
-    close(sdlToDisplay[READ]);
-    close(displayToSdl[WRITE]);
+    // In engine
+    close(engineToDisplay[READ]);
+    close(displayToEngine[WRITE]);
 
-    sdlEntry(sdlToDisplay, displayToSdl);
+    sdlEntry(engineToDisplay, displayToEngine);
   }
   else {
     // Still in display entry
-    close(sdlToDisplay[WRITE]);
-    close(displayToSdl[READ]);
+    close(engineToDisplay[WRITE]);
+    close(displayToEngine[READ]);
+    DisplayHandler displayHandler(externalPipes, displayToEngine, engineToDisplay);
+
     while (1) {
       bool stringFromSdl = false;
-      externalHandler(pipes, displayToSdl);
-      stringFromSdl = sdlHandler(pipes, sdlToDisplay, displayToSdl);
+      displayHandler.handleExternal();
+      displayHandler.handleEngine();
     }
   }
 }

@@ -6,7 +6,18 @@
 #include "../../food_item.h"
 #include "../../pipes.h"
 
-void externalHandler(struct Pipes pipes, int* displayToSdl);
-bool sdlHandler(struct Pipes pipes, int* sdlToDisplay, int* displayToSdl);
+class DisplayHandler {
+public:
+  DisplayHandler(struct Pipes externalPipes, int* displayToEngine, int* engineToDisplay);
+  void handleExternal();
+  void handleEngine();
+
+private:
+  struct Pipes externalPipes;
+  int* displayToEngine;
+  int* engineToDisplay;
+
+  void sendStartSignal();
+};
 
 #endif
