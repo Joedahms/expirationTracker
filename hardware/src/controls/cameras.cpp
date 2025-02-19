@@ -1,8 +1,8 @@
 #include <fstream>
 #include <glog/logging.h>
 #include <iostream>
-#include <signal.h>
 #include <string>
+#include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -10,8 +10,7 @@
  * Sample command. rpicam-apps allows bulding customized behavior
  * run libcamera-hello --list-cameras to get camera names
  */
-#define CAMERA1_CMD "rpicam-still --camera 0 -o "
-#define CAMERA2_CMD "rpicam-still --camera 1 -o "
+#define IMAGE_DIR "/home/pi/Desktop/Project/raspi-yolo/images/";
 
 /**
  * Takes photos from both camera modules simultaneously using separate processes.
@@ -22,35 +21,58 @@
  * @return None
  */
 void takePhotos(int angle) {
-  pid_t top_cam = fork();
-  if (top_cam == -1) {
-    LOG(FATAL) << "Error starting top camera process.";
+  pid_t topCam = fork();
+  if (topCam == -1) {
+    LOG(FATAL) << "Error starting top camera.";
   }
-  else if (top_cam == 0) {
-    std::string top_photo =
-        std::string(IMAGE_DIR) + std::to_string(angle) + "_T.jpg --nopreview";
-    if (system(top_photo.c_str()) == -1) {
+  else if (topCam == 0) {
+    std::string filepath = std::string(IMAGE_DIR) + std::to_string(angle) + "_T.jpg";
+    execl("/usr/bin/rpicam-still", "rpicam-still",
+          // Full resolution
+          "--width", "4056", "--height", "3040",
+          "--nopreview",                // Disable preview
+          "--autofocus",                // Auto-focus enabled
+          "--exposure", "auto",         // Auto exposure
+          "--output", filepath.c_str(), // Save location
+          "--timeout", "1000",          // 1 second timeout
+          // "--roi 0.25,0.25,0.5,0.5",    // Zoom into the center 50%
+          (char*)NULL);
+
+    std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
+    exit(1);
+    if (system(filepath.c_str()) == -1) {
       LOG(FATAL) << "Failed to capture image from top camera.";
     }
     exit(0);
   }
 
-  pid_t side_cam = fork();
-  if (side_cam == -1) {
+  pid_t sideCam = fork();
+  if (sideCam == -1) {
     LOG(FATAL) << "Error starting side camera process.";
   }
-  else if (side_cam == 0) {
-    std::string side_photo =
-        std::string(IMAGE_DIR) + std::to_string(angle) + "_S.jpg --nopreview";
-    if (system(side_photo.c_str()) == -1) {
-      LOG(FATAL) << "Failed to capture image from side camera.";
+  else if (sideCam == 0) {
+    std::string filepath = std::string(IMAGE_DIR) + std::to_string(angle) + "_T.jpg";
+    execl("/usr/bin/rpicam-still", "rpicam-still",
+          // Full resolution
+          "--width", "4056", "--height", "3040",
+          "--nopreview",                // Disable preview
+          "--autofocus",                // Auto-focus enabled
+          "--exposure", "auto",         // Auto exposure
+          "--output", filepath.c_str(), // Save location
+          "--timeout", "1000",          // 1 second timeout
+          // "--roi 0.25,0.25,0.5,0.5",    // Zoom into the center 50%
+          (char*)NULL);
+
+    std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
+    exit(1);
+    if (system(filepath.c_str()) == -1) {
+      LOG(FATAL) << "Failed to capture image from top camera.";
     }
     exit(0);
   }
 
-  waitpid(top_cam, NULL, 0);
-  waitpid(side_cam, NULL, 0);
-
+  waitpid(topCam, NULL, 0);
+  waitpid(sideCam, NULL, 0);
   LOG(INFO) << "Photos successful at position " << angle;
 }
 
@@ -65,7 +87,6 @@ static pid_t pid = 0;
 
 void takePic(char* filename) {
   if ((pid = fork()) == 0) {
-    execl("/usr/bin/raspistill", "/usr/bin/raspistill", "-n", "-vf", "-o", filename,
-          NULL);
+    execl("/usr/bin/raspistill", "/usr/bin/raspistill", "-n", "-o", filename, NULL);
   }
 }

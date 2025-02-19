@@ -28,8 +28,10 @@ run cmake ..
 run make
 
 # Had to install to run repo:
-sudo apt update
-sudo apt upgrade
+```plaintext
+sudo apt update && sudo apt upgrade -y
+```
+```plaintext
 sudo apt install make
 sudo apt install g++
 sudo apt install cmake
@@ -42,17 +44,25 @@ sudo add-apt-repository ppa:kisak/kisak-mesa
 sudo apt install nlohmann-json3-dev
 sudo apt update
 sudo apt upgrade
+```
 
 # Using EASYOCR
 ### Create the virtual environment
+```plaintext
 python3 -m venv ~/easyocr-venv
+```
 
 ### Activate it
+```plaintext
 source ~/easyocr-venv/bin/activate
+```
 
 ### Install EasyOCR inside the virtual environment
+```plaintext
 pip install easyocr
+```
 
 ### Install Efficientnet within the virtual environment
+```plaintext
 pip install efficientnet
-
+```
