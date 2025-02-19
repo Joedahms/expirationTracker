@@ -3,7 +3,7 @@
 
 #include "display_engine.h"
 #include "display_global.h"
-#include "sdl_entry.h"
+#include "engine_entry.h"
 
 /**
  * Function called when in the new SDL process. Kicks off the SDL "display" loop.
@@ -11,7 +11,7 @@
  * @param None
  * @return None
  */
-void sdlEntry(int* sdlToDisplay, int* displayToSdl) {
+void engineEntry(int* engineToDisplay, int* displayToEngine) {
   LOG(INFO) << "SDL display process started successfully";
 
   struct DisplayGlobal displayGlobal;
@@ -21,7 +21,7 @@ void sdlEntry(int* sdlToDisplay, int* displayToSdl) {
                               1024, 600, false, displayGlobal);
 
   while (displayEngine.running()) {
-    displayEngine.handleEvents(sdlToDisplay, displayToSdl);
+    displayEngine.handleEvents(engineToDisplay, displayToEngine);
     displayEngine.checkState();
     displayEngine.checkKeystates();
     displayEngine.checkState();

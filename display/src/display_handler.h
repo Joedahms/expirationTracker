@@ -1,5 +1,5 @@
-#ifndef EXTERNAL_HANDLER_H
-#define EXTERNAL_HANDLER_H
+#ifndef DISPLAY_HANDLER_H
+#define DISPLAY_HANDLER_H
 
 #include <sqlite3.h>
 

@@ -3,15 +3,16 @@
 
 #include "../../pipes.h"
 #include "display_entry.h"
-#include "engine/sdl_entry.h"
-#include "external_handler.h"
+#include "display_handler.h"
+#include "engine/engine_entry.h"
 #include "sql_food.h"
 
 /**
  * Entry into the display code. Only called from main after display child process is
  * forked.
  *
- * @param pipes Pipes for display to communicate with the other processes
+ * @param externalPipes Pipes for display to communicate with the other external processes
+ * (vision and hardware).
  * @return None
  */
 void displayEntry(struct Pipes externalPipes) {
@@ -40,7 +41,7 @@ void displayEntry(struct Pipes externalPipes) {
     close(engineToDisplay[READ]);
     close(displayToEngine[WRITE]);
 
-    sdlEntry(engineToDisplay, displayToEngine);
+    engineEntry(engineToDisplay, displayToEngine);
   }
   else {
     // Still in display entry

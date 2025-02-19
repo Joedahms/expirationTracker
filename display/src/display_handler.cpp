@@ -4,7 +4,7 @@
 
 #include "../../food_item.h"
 #include "../../pipes.h"
-#include "external_handler.h"
+#include "display_handler.h"
 #include "sql_food.h"
 
 DisplayHandler::DisplayHandler(struct Pipes externalPipes,
