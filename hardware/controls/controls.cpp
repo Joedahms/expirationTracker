@@ -9,8 +9,8 @@
 #include "../src/hardware_entry.h"
 #include "../src/io.h"
 #include "cameras.h"
-#include "motor.h"
-#include "weight.h"
+// #include "motor.h"
+// #include "weight.h"
 
 extern Pipes pipes;
 
@@ -36,7 +36,7 @@ void rotateAndCapture(float weight) {
       sendDataToVision(weight);
     }
     LOG(INFO) << "Rotating platform...";
-    rotateMotor();
+//    rotateMotor();
     usleep(200);
 
     bool stopSignal = false;
