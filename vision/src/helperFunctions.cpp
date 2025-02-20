@@ -51,11 +51,13 @@ void closeUnusedPipes(struct Pipes& pipes) {
 }
 
 /**
- * Wrapper method to close pipes for vision
+ * perform levenshtein distancing
  *
  * Input:
- * @param pipes pipe struct to close from
+ * @param s1 string 1
+ * @param s2 string 2
  * Output: none
+ * @return the difference between the strings
  */
 int levenshteinDistance(const std::string& s1, const std::string& s2) {
   const size_t len1 = s1.size(), len2 = s2.size();
@@ -78,14 +80,50 @@ int levenshteinDistance(const std::string& s1, const std::string& s2) {
 }
 
 /**
- * Wrapper method to close pipes for vision
+ * convert string to all lowercase
  *
  * Input:
- * @param pipes pipe struct to close from
- * Output: none
+ * @param str string to convert
+ * @return lowercase string
  */
 std::string toLowerCase(std::string str) {
   std::transform(str.begin(), str.end(), str.begin(),
                  [](unsigned char c) { return std::tolower(c); });
   return str;
+}
+
+/**
+ * split long strings into individual words
+ *
+ * Input:
+ * @param text text to split apart
+ * Output:
+ * @return vector of strings
+ */
+std::vector<std::string> splitWords(const std::string& text) {
+  std::vector<std::string> words;
+  std::istringstream iss(text);
+  std::string word;
+  while (iss >> word) {
+    words.push_back(word);
+  }
+  return words;
+}
+
+/**
+ * Remove special characters
+ *
+ * Input:
+ * @param text text clean
+ * Output:
+ * @return cleaned text
+ */
+std::string cleanText(const std::string& text) {
+  std::string result;
+  for (char c : text) {
+    if (std::isalnum(c) || std::isspace(c)) {
+      result += c;
+    }
+  }
+  return result;
 }

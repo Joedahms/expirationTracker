@@ -139,3 +139,26 @@ FoodCategories foodCategoryFromString(const std::string& str) {
     return FoodCategories::packaged;
   return FoodCategories::unknown; // Default case
 }
+
+/**
+ * Print out FoodItem
+ *
+ * @param item food item to print
+ */
+void printFoodItem(const FoodItem& item) {
+  std::cout << "Food Item Details:\n";
+  std::cout << "ID: " << item.id << "\n";
+  std::cout << "Name: " << item.name << "\n";
+  std::cout << "Category: " << static_cast<int>(item.category)
+            << "\n"; // Adjust based on enum to string conversion
+  std::cout << "Scan Date: " << static_cast<int>(item.scanDate.year()) << "-"
+            << static_cast<unsigned>(item.scanDate.month()) << "-"
+            << static_cast<unsigned>(item.scanDate.day()) << "\n";
+  std::cout << "Expiration Date: " << static_cast<int>(item.expirationDate.year()) << "-"
+            << static_cast<unsigned>(item.expirationDate.month()) << "-"
+            << static_cast<unsigned>(item.expirationDate.day()) << "\n";
+  std::cout << "Weight: " << item.weight << " grams\n";
+  std::cout << "Quantity: " << item.quantity << "\n";
+  std::cout << "Image Directory: " << item.imageDirectory.string() << "\n";
+  std::cout << "Absolute Path: " << item.absolutePath.string() << "\n";
+}

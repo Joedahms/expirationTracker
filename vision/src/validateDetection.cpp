@@ -33,34 +33,12 @@ TextValidationResult isValidText(const std::string& text,
   return TextValidationResult::NOT_VALID;
 }
 
-// Function to remove special characters from a string
-std::string cleanText(const std::string& text) {
-  std::string result;
-  for (char c : text) {
-    if (std::isalnum(c) || std::isspace(c)) {
-      result += c;
-    }
-  }
-  return result;
-}
-
-// Function to split a string into words
-std::vector<std::string> splitWords(const std::string& text) {
-  std::vector<std::string> words;
-  std::istringstream iss(text);
-  std::string word;
-  while (iss >> word) {
-    words.push_back(word);
-  }
-  return words;
-}
-
 /**
  * Determine if text is valid class
  *
  * Input:
  * @param text string to evaluate
- * Output: Bool if is valid class
+ * @return pair of bool,string bool: is it a class, string: the class
  */
 std::pair<bool, std::string> isTextClass(const std::string& text) {
   static const std::vector<std::string> classificationKeywords = {
@@ -88,25 +66,8 @@ std::pair<bool, std::string> isTextClass(const std::string& text) {
       std::string lowerKeyword = toLowerCase(keyword);
 
       if (word == lowerKeyword) {
-        std::cout << "KEYWORD " << lowerKeyword << std::endl;
-        std::cout << "TESTING " << word << std::endl;
         return {true, lowerKeyword}; // Exact match
       }
-
-      if (lowerKeyword.find(word) != std::string::npos) {
-        std::cout << "KEYWORD " << lowerKeyword << std::endl;
-        std::cout << "TESTING " << word << std::endl;
-        return {true, lowerKeyword};
-      }
-      // Apply **dynamic Levenshtein threshold**
-      // int maxDist = (lowerKeyword.size() >= 5) ? 3 : 2;
-      // if (levenshteinDistance(word, lowerKeyword) <= maxDist)
-      //  return true;
-
-      // **Loosen partial match rules for words ≥ 4 characters**
-      // if (lowerKeyword.size() >= 4 && word.find(lowerKeyword) != std::string::npos) {
-      //  return true;
-      //}
     }
   }
 

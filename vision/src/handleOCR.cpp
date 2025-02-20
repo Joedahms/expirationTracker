@@ -69,7 +69,6 @@ void handleTextExtraction(const std::filesystem::path& imagePath,
     switch (isValidText(text, objectDetected, expirationDateDetected, detectedObject,
                         detectedExpDate)) {
     case TextValidationResult::POSSIBLE_CLASSIFICATION:
-      std::cout << detectedObject << std::endl;
       objectDetected        = true;
       foodItem.quantity     = 1;
       foodItem.absolutePath = std::filesystem::absolute(imagePath);
