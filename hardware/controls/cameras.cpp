@@ -10,7 +10,7 @@
  * Sample command. rpicam-apps allows bulding customized behavior
  * run libcamera-hello --list-cameras to get camera names
  */
-#define IMAGE_DIR "/home/pi/Desktop/Project/raspi-yolo/images/";
+#define IMAGE_DIR "/home/pi/Desktop/Project/raspi-yolo/images/"
 
 /**
  * Takes photos from both camera modules simultaneously using separate processes.
