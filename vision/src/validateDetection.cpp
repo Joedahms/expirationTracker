@@ -1,6 +1,7 @@
 #include "../include/validateDetection.h"
 #include "../include/helperFunctions.h"
 #include <chrono>
+#include <iostream>
 #include <regex>
 #include <unordered_map>
 #include <vector>
@@ -16,14 +17,42 @@
  */
 TextValidationResult isValidText(const std::string& text,
                                  bool& objectDetected,
-                                 bool& expirationDateDetected) {
-  if (!objectDetected && isTextClass(text)) {
+                                 bool& expirationDateDetected,
+                                 std::string& detectedClassName,
+                                 std::string& detectedExpirationDate) {
+  auto detectedClass = isTextClass(text);
+  if (!objectDetected && detectedClass.first) {
+    detectedClassName = detectedClass.second;
     return TextValidationResult::POSSIBLE_CLASSIFICATION;
   }
+  /*
   if (!expirationDateDetected && isExpirationDate(text)) {
     return TextValidationResult::POSSIBLE_EXPIRATION_DATE;
   }
+  */
   return TextValidationResult::NOT_VALID;
+}
+
+// Function to remove special characters from a string
+std::string cleanText(const std::string& text) {
+  std::string result;
+  for (char c : text) {
+    if (std::isalnum(c) || std::isspace(c)) {
+      result += c;
+    }
+  }
+  return result;
+}
+
+// Function to split a string into words
+std::vector<std::string> splitWords(const std::string& text) {
+  std::vector<std::string> words;
+  std::istringstream iss(text);
+  std::string word;
+  while (iss >> word) {
+    words.push_back(word);
+  }
+  return words;
 }
 
 /**
@@ -33,94 +62,55 @@ TextValidationResult isValidText(const std::string& text,
  * @param text string to evaluate
  * Output: Bool if is valid class
  */
-bool isTextClass(const std::string& text) {
-  static const std::vector<std::string> classificationKeywords = {"milk",
-                                                                  "cheese",
-                                                                  "bread",
-                                                                  "eggs",
-                                                                  "yogurt",
-                                                                  "butter",
-                                                                  "juice",
-                                                                  "meat",
-                                                                  "chicken",
-                                                                  "fish",
-                                                                  "cereal",
-                                                                  "pasta",
-                                                                  "rice",
-                                                                  "flour",
-                                                                  "sugar",
-                                                                  "salt",
-                                                                  "pepper",
-                                                                  "coffee",
-                                                                  "tea",
-                                                                  "honey",
-                                                                  "jam",
-                                                                  "peanut butter",
-                                                                  "chocolate",
-                                                                  "candy",
-                                                                  "cookies",
-                                                                  "crackers",
-                                                                  "granola",
-                                                                  "oats",
-                                                                  "popcorn",
-                                                                  "chips",
-                                                                  "pancake mix",
-                                                                  "syrup",
-                                                                  "canned beans",
-                                                                  "canned corn",
-                                                                  "canned tomatoes",
-                                                                  "canned tuna",
-                                                                  "canned soup",
-                                                                  "canned fruit",
-                                                                  "frozen vegetables",
-                                                                  "frozen meals",
-                                                                  "frozen pizza",
-                                                                  "frozen fries",
-                                                                  "ice cream",
-                                                                  "energy bars",
-                                                                  "protein powder",
-                                                                  "baby formula",
-                                                                  "instant noodles",
-                                                                  "ketchup",
-                                                                  "mayonnaise",
-                                                                  "mustard",
-                                                                  "soy sauce",
-                                                                  "hot sauce",
-                                                                  "salad dressing",
-                                                                  "cooking oil",
-                                                                  "vinegar",
-                                                                  "pudding",
-                                                                  "whipped cream",
-                                                                  "sour cream",
-                                                                  "deli meat",
-                                                                  "tofu",
-                                                                  "bacon"};
+std::pair<bool, std::string> isTextClass(const std::string& text) {
+  static const std::vector<std::string> classificationKeywords = {
+      "milk",          "cheese",        "bread",      "eggs",        "yogurt",
+      "butter",        "juice",         "meat",       "chicken",     "fish",
+      "cereal",        "pasta",         "rice",       "flour",       "sugar",
+      "salt",          "pepper",        "coffee",     "tea",         "honey",
+      "jam",           "peanut butter", "chocolate",  "candy",       "cookies",
+      "crackers",      "granola",       "oats",       "popcorn",     "chips",
+      "pancake mix",   "syrup",         "beans",      "corn",        "tomatoes",
+      "tuna",          "soup",          "fruit",      "vegetables",  "meals",
+      "pizza",         "fries",         "ice cream",  "energy bars", "protein powder",
+      "noodles",       "ketchup",       "mayonnaise", "mustard",     "soy sauce",
+      "hot sauce",     "dressing",      "oil",        "vinegar",     "pudding",
+      "whipped cream", "sour cream",    "tofu",       "bacon"};
 
-  std::string lowerText = toLowerCase(text);
+  std::string lowerText          = toLowerCase(cleanText(text));
+  std::vector<std::string> words = splitWords(lowerText);
 
-  for (const auto& keyword : classificationKeywords) {
-    std::string lowerKeyword = toLowerCase(keyword);
+  for (const std::string& word : words) {
+    if (word.size() <= 2)
+      continue; // Ignore words ≤ 2 characters
 
-    // **1. Exact Substring Match** (e.g., "Organic Milk" → "milk")
-    if (lowerText.find(lowerKeyword) != std::string::npos) {
-      return true;
-    }
+    for (const std::string& keyword : classificationKeywords) {
+      std::string lowerKeyword = toLowerCase(keyword);
 
-    // **2. Approximate Matching (Levenshtein Distance ≤ 2)**
-    if (levenshteinDistance(lowerText, lowerKeyword) <= 2) {
-      return true;
-    }
-
-    // **3. Word Containment Matching** (e.g., "Milkkk" contains "Milk")
-    if (lowerKeyword.size() >= 3) { // Ensure keywords are meaningful enough
-      if (lowerText.find(lowerKeyword.substr(0, lowerKeyword.size() - 1)) !=
-          std::string::npos) {
-        return true;
+      if (word == lowerKeyword) {
+        std::cout << "KEYWORD " << lowerKeyword << std::endl;
+        std::cout << "TESTING " << word << std::endl;
+        return {true, lowerKeyword}; // Exact match
       }
+
+      if (lowerKeyword.find(word) != std::string::npos) {
+        std::cout << "KEYWORD " << lowerKeyword << std::endl;
+        std::cout << "TESTING " << word << std::endl;
+        return {true, lowerKeyword};
+      }
+      // Apply **dynamic Levenshtein threshold**
+      // int maxDist = (lowerKeyword.size() >= 5) ? 3 : 2;
+      // if (levenshteinDistance(word, lowerKeyword) <= maxDist)
+      //  return true;
+
+      // **Loosen partial match rules for words ≥ 4 characters**
+      // if (lowerKeyword.size() >= 4 && word.find(lowerKeyword) != std::string::npos) {
+      //  return true;
+      //}
     }
   }
 
-  return false;
+  return {false, ""};
 }
 
 /**

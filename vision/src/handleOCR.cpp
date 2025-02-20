@@ -15,27 +15,33 @@ std::vector<std::string> runOCR(const std::filesystem::path& imagePath) {
   std::vector<std::string> detectedText;
   std::string command =
       "./models-venv/bin/python3 ../vision/Models/easyOCR.py " + imagePath.string();
-  char buffer[256];
-  std::string result;
 
   FILE* pipe = popen(command.c_str(), "r");
   if (!pipe) {
     return {"ERROR"};
   }
 
+  std::ostringstream output;
+  char buffer[256];
   while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
-    result += buffer;
+    output << buffer;
   }
+  std::string result = output.str();
   pclose(pipe);
 
   try {
-    // Parse JSON output
     nlohmann::json jsonData = nlohmann::json::parse(result);
 
-    if (jsonData.is_array()) {
-      for (const auto& text : jsonData) {
+    if (jsonData.contains("error")) {
+      detectedText.push_back("ERROR: " + jsonData["error"].get<std::string>());
+    }
+    else if (jsonData.contains("text") && jsonData["text"].is_array()) {
+      for (const auto& text : jsonData["text"]) {
         detectedText.push_back(text.get<std::string>());
       }
+    }
+    else {
+      detectedText.push_back("UNEXPECTED_JSON_FORMAT");
     }
   } catch (const nlohmann::json::parse_error& e) {
     detectedText.push_back("JSON_PARSE_ERROR: " + std::string(e.what()));
@@ -56,21 +62,25 @@ void handleTextExtraction(const std::filesystem::path& imagePath,
                           struct FoodItem& foodItem,
                           bool& objectDetected,
                           bool& expirationDateDetected) {
+  std::string detectedObject;
+  std::string detectedExpDate;
   auto textDetections = runOCR(imagePath);
   for (const auto& text : textDetections) {
-    switch (isValidText(text, objectDetected, expirationDateDetected)) {
+    switch (isValidText(text, objectDetected, expirationDateDetected, detectedObject,
+                        detectedExpDate)) {
     case TextValidationResult::POSSIBLE_CLASSIFICATION:
+      std::cout << detectedObject << std::endl;
       objectDetected        = true;
       foodItem.quantity     = 1;
       foodItem.absolutePath = std::filesystem::absolute(imagePath);
       foodItem.category     = FoodCategories::packaged;
-      foodItem.name         = text;
+      foodItem.name         = detectedObject;
       // Handle classification-specific logic here
       break;
 
     case TextValidationResult::POSSIBLE_EXPIRATION_DATE:
       expirationDateDetected  = true;
-      foodItem.expirationDate = parseExpirationDate(text);
+      foodItem.expirationDate = parseExpirationDate(detectedExpDate);
       // Handle expiration-specific logic here
       break;
 

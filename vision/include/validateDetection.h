@@ -67,8 +67,9 @@ const std::map<int, std::string> foodLabels = {{924, "guacamole"},
 
 // Function to check if a predicted class is a valid food item
 bool isValidClassification(int);
-TextValidationResult isValidText(const std::string&, bool&, bool&);
-bool isTextClass(const std::string&);
+TextValidationResult isValidText(
+    const std::string&, bool&, bool&, std::string&, std::string&);
+std::pair<bool, std::string> isTextClass(const std::string&);
 bool isExpirationDate(const std::string&);
 std::chrono::year_month_day parseExpirationDate(const std::string&);
 inline std::string getFoodLabel(int predictedClass) {

@@ -26,6 +26,7 @@ bool analyzeImages(struct FoodItem& foodItem) {
       if (!objectDetected) {
         // if object has already been detected no need to run this
         if (handleObjectClassification(entry.path(), foodItem)) {
+          std::cout << "POSSIBLE CLASS: " << foodItem.name << std::endl;
           expirationDateDetected = true;
           objectDetected         = true;
           return true;
@@ -34,6 +35,10 @@ bool analyzeImages(struct FoodItem& foodItem) {
       // Run text extraction
       handleTextExtraction(entry.path(), foodItem, objectDetected,
                            expirationDateDetected);
+      if (objectDetected) {
+        std::cout << "POSSIBLE CLASS: " << foodItem.name << std::endl;
+        return true;
+      }
 
       if (objectDetected && expirationDateDetected) {
         return true;
