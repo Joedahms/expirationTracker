@@ -6,7 +6,7 @@
 
 #include "../../food_item.h"
 #include "../../pipes.h"
-#include "../src/hardware_entry.h"
+#include "../src/hardware_entry.cpp"
 #include "../src/io.h"
 #include "cameras.h"
 // #include "motor.h"
