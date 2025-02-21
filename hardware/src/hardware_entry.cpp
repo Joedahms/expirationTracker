@@ -43,7 +43,7 @@ void hardwareEntry(struct Pipes pipes) {
       if (weight > 0) {
         LOG(INFO) << "Weight detected on platform. Beginning scan.";
         // send 1 to display to indicate weight
-        rotateAndCapture(weight);
+        rotateAndCapture(pipes, weight);
       }
       else {
         LOG(INFO) << "No weight detected on platform.";

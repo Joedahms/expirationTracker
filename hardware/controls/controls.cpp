@@ -12,6 +12,8 @@
 // #include "motor.h"
 // #include "weight.h"
 
+extern Pipes pipes;
+
 /**
  * Rotates platform in 45-degree increments, captures images, and sends the
  * data to the AI Vision system until a full 360-degree rotation is complete.
@@ -20,8 +22,7 @@
  *
  * @return None
  */
-void rotateAndCapture(float weight) {
-  extern Pipes pipes;
+void rotateAndCapture(struct Pipes pipes, float weight) {
   for (int angle = 0; angle < 8; angle++) {
     /**
      * char filename[] = "IMAGE_DIR + std::to_string(angle) + "_S.jpg --nopreview";
@@ -32,7 +33,7 @@ void rotateAndCapture(float weight) {
     // takePhotos(angle);    // This function is for both cameras
     takePhoto(angle); // This function is for one camera/testing
     if (angle == 0) {
-      sendDataToVision(weight);
+      sendDataToVision(pipes.displayToVision[WRITE], weight);
     }
     LOG(INFO) << "Rotating platform...";
     //    rotateMotor();
