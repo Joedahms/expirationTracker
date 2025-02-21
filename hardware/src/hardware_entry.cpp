@@ -20,7 +20,7 @@
  * @return None
  */
 void hardwareEntry(struct Pipes pipes) {
-  LOG(INFO) << "Within vision process";
+  LOG(INFO) << "Within hardware process";
 
   // Close write end of read pipes
   close(pipes.displayToHardware[WRITE]);
