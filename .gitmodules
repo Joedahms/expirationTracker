@@ -1,0 +1,3 @@
+[submodule "YOLO/yolov4-tiny"]
+	path = YOLO/yolov4-tiny
+	url = http://github.com/lpelkey23/yolov4-tiny
