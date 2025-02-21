@@ -6,6 +6,7 @@
 #include <unistd.h>
 
 #include "../../food_item.h"
+#include "../../pipes.h"
 #include "../controls/controls.h"
 // #include "../controls/weight.h"
 #include "io.h"

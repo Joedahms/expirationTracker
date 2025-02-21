@@ -6,13 +6,10 @@
 
 #include "../../food_item.h"
 #include "../../pipes.h"
-#include "../src/hardware_entry.cpp"
 #include "../src/io.h"
 #include "cameras.h"
 // #include "motor.h"
 // #include "weight.h"
-
-extern Pipes pipes;
 
 /**
  * Rotates platform in 45-degree increments, captures images, and sends the
