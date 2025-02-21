@@ -6,8 +6,8 @@
 #include <unistd.h>
 
 #include "../../food_item.h"
-#include "./controls/controls.h"
-#include "./controls/weight.h"
+#include "../controls/controls.h"
+// #include "../controls/weight.h"
 #include "io.h"
 
 /*
@@ -38,6 +38,7 @@ void hardwareEntry(struct Pipes pipes) {
       LOG(INFO) << "Checking if there is weight on the platform";
       //      weightSetup();
       //      float weight = getWeight();
+      float weight = 1;
       if (weight > 0) {
         LOG(INFO) << "Weight detected on platform. Beginning scan.";
         // send 1 to display to indicate weight
