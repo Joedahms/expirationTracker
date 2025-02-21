@@ -36,8 +36,8 @@ void hardwareEntry(struct Pipes pipes) {
     LOG(INFO) << "Waiting for start signal from Display";
     if (receivedStartSignal(pipes.displayToHardware[READ])) {
       LOG(INFO) << "Checking if there is weight on the platform";
-//      weightSetup();
-//      float weight = getWeight();
+      //      weightSetup();
+      //      float weight = getWeight();
       if (weight > 0) {
         LOG(INFO) << "Weight detected on platform. Beginning scan.";
         // send 1 to display to indicate weight
