@@ -32,10 +32,12 @@ add_executable (expirationTracker
   display/src/engine/engine_entry.cpp
 
   # GUI 
+  display/src/engine/engine_state.cpp
   display/src/engine/display_engine.cpp
   display/src/engine/sdl_debug.cpp
 
   # GUI Elements
+  display/src/engine/elements/container.cpp
   display/src/engine/elements/element.cpp
   display/src/engine/elements/composite_element.cpp
   display/src/engine/elements/button.cpp

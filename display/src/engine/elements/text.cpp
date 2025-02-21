@@ -56,3 +56,5 @@ void Text::update() {}
 void Text::render() const {
   SDL_RenderCopy(this->displayGlobal.renderer, this->texture, NULL, &this->rectangle);
 }
+
+void Text::handleEvent(const SDL_Event& event) {}

@@ -16,8 +16,8 @@ class ItemList : public State {
 public:
   ItemList(struct DisplayGlobal displayGlobal);
 
-  int handleEvents(bool*) override;
-  int checkKeystates();
+  EngineState handleEvents(bool*) override;
+  EngineState checkKeystates();
   void update() override;
   void render() const override;
 

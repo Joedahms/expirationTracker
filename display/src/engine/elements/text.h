@@ -25,6 +25,7 @@ public:
   void setContent(const std::string& newContent);
   void update() override;
   void render() const override;
+  void handleEvent(const SDL_Event& event);
 
 private:
   TTF_Font* font;

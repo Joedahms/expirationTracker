@@ -61,8 +61,9 @@ public:
   }
 
   virtual void addElement(std::unique_ptr<Element> element) {}
-  virtual void update()       = 0;
-  virtual void render() const = 0;
+  virtual void update()                            = 0;
+  virtual void render() const                      = 0;
+  virtual void handleEvent(const SDL_Event& event) = 0;
 
   SDL_Rect getRectangle() { return this->rectangle; }
   void setRectangle(SDL_Rect rectangle);

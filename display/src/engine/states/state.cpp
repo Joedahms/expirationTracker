@@ -3,6 +3,12 @@
 #include "../display_global.h"
 #include "state.h"
 
+EngineState State::getCurrentState() { return this->currentState; }
+
+void State::setCurrentState(EngineState currentState) {
+  this->currentState = currentState;
+}
+
 /**
  * Check if any of the buttons in a state have been moused over and clicked by the user.
  *
@@ -10,7 +16,7 @@
  * @param mouseY The y coordinate of the mouse when the mouse button was clicked
  * @return The return value of the button after it was clicked
  */
-int State::checkButtonsClicked(const int& mouseX, const int& mouseY) const {
+EngineState State::checkButtonsClicked(const int& mouseX, const int& mouseY) const {
   /*
   int returnValue = -1;
   for (auto& currButton : this->buttons) {

@@ -11,11 +11,14 @@
  * @param displayGlobal Global display variables.
  */
 MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
+  this->currentState = EngineState::MAIN_MENU;
+
   this->displayGlobal        = displayGlobal;
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
 
-  this->rootElement = std::make_unique<CompositeElement>();
+  this->rootElement = std::make_unique<Container>();
 
+  // Title
   const char* titleContent = "Expiration Tracker";
   SDL_Color titleColor     = {0, 255, 0, 255}; // Green
   SDL_Rect titleRectangle  = {100, 100, 0, 0};
@@ -25,15 +28,19 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
   title->centerHorizontal(windowSurface);
   rootElement->addElement(std::move(title));
 
+  // Start Scan
   SDL_Rect newScanButtonRectangle       = {200, 150, 200, 50};
   std::unique_ptr<Button> newScanButton = std::make_unique<Button>(
-      this->displayGlobal, newScanButtonRectangle, "Scan New Item", SCANNING);
+      this->displayGlobal, newScanButtonRectangle, "Scan New Item",
+      [this]() { this->currentState = EngineState::SCANNING; });
   newScanButton->centerHorizontal(windowSurface);
   rootElement->addElement(std::move(newScanButton));
 
+  // View Stored
   SDL_Rect viewStoredButtonRectangle       = {200, 210, 200, 50};
   std::unique_ptr<Button> viewStoredButton = std::make_unique<Button>(
-      this->displayGlobal, viewStoredButtonRectangle, "View Stored Items", ITEM_LIST);
+      this->displayGlobal, viewStoredButtonRectangle, "View Stored Items",
+      [this]() { this->currentState = EngineState::ITEM_LIST; });
   viewStoredButton->centerHorizontal(windowSurface);
   rootElement->addElement(std::move(viewStoredButton));
 }
@@ -44,9 +51,9 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
  * @param displayIsRunning Whether or not the display is running.
  * @return Current state the display is in.
  */
-int MainMenu::handleEvents(bool* displayIsRunning) {
+EngineState MainMenu::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
-  int returnValue = MAIN_MENU;
+  EngineState returnValue = EngineState::MAIN_MENU;
   while (SDL_PollEvent(&event) != 0) { // While there are events in the queue
     int mouseX = event.motion.x;
     int mouseY = event.motion.y;
@@ -57,7 +64,7 @@ int MainMenu::handleEvents(bool* displayIsRunning) {
       break;
 
     case SDL_MOUSEBUTTONDOWN:
-      returnValue = checkButtonsClicked(mouseX, mouseY);
+      // returnValue = checkButtonsClicked(mouseX, mouseY);
       break;
 
     default:

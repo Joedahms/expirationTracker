@@ -13,10 +13,12 @@
 #include "panel.h"
 #include "scroll_box.h"
 
+/*
 ScrollBox::ScrollBox(struct DisplayGlobal displayGlobal) {
   this->displayGlobal  = displayGlobal;
   this->previousUpdate = std::chrono::steady_clock::now();
 }
+*/
 
 /**
  * Ensure that all panels have data consistent with what is in the database. Destroys all
@@ -25,6 +27,7 @@ ScrollBox::ScrollBox(struct DisplayGlobal displayGlobal) {
  * @param None
  * @return None
  */
+/*
 void ScrollBox::refreshPanels() {
   std::vector<FoodItem> allFoodItems = readAllFoodItems();
 
@@ -37,8 +40,9 @@ void ScrollBox::refreshPanels() {
     addPanel(std::move(newPanel), this->rectangle);
   }
 }
+*/
 
-void ScrollBox::setPanelHeight(int panelHeight) { this->panelHeight = panelHeight; }
+// void ScrollBox::setPanelHeight(int panelHeight) { this->panelHeight = panelHeight; }
 
 /**
  * Add a new panel to the scroll box. Adds the new panel directly below the previously
@@ -48,6 +52,7 @@ void ScrollBox::setPanelHeight(int panelHeight) { this->panelHeight = panelHeigh
  * @param The rectangle of the element that the panel is being added within
  * @return None
  */
+/*
 void ScrollBox::addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectangle) {
   std::unique_ptr<Panel> newPanel = std::move(panel);
   SDL_Rect newPanelRect           = newPanel->getRectangle();
@@ -68,6 +73,7 @@ void ScrollBox::addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectan
   newPanel->addBorder(1);
   this->panels.push_back(std::move(newPanel));
 }
+*/
 
 /**
  * Handle SDL_MOUSEBUTTONDOWN. If the mouse was clicked within a panel, tell that panel to
@@ -76,6 +82,7 @@ void ScrollBox::addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectan
  * @param mousePosition x,y position of the mouse when it was clicked
  * @return None
  */
+/*
 void ScrollBox::handleMouseButtonDown(const SDL_Point& mousePosition) {
   for (auto& currPanel : this->panels) {
     SDL_Rect currPanelRectangle = currPanel->getRectangle();
@@ -85,6 +92,7 @@ void ScrollBox::handleMouseButtonDown(const SDL_Point& mousePosition) {
     }
   }
 }
+*/
 
 /**
  * Update all panels in the scroll box with food item information. Assumed that one panel
@@ -95,6 +103,7 @@ void ScrollBox::handleMouseButtonDown(const SDL_Point& mousePosition) {
  * @param allFoodItems A vector of all the food items to put in panels
  * @return None
  */
+/*
 void ScrollBox::update() {
   for (auto& currPanel : this->panels) {
     currPanel->update();
@@ -112,6 +121,7 @@ void ScrollBox::update() {
     this->previousUpdate = this->currentUpdate;
   }
 }
+*/
 
 /**
  * Move all panels within the scroll box up.
@@ -120,6 +130,7 @@ void ScrollBox::update() {
  * scrollbox or not
  * @return None
  */
+/*
 void ScrollBox::scrollUp(const SDL_Point* mousePosition) {
   if (SDL_PointInRect(mousePosition, &this->rectangle) == false) {
     return;
@@ -132,6 +143,7 @@ void ScrollBox::scrollUp(const SDL_Point* mousePosition) {
     currPanel->update();
   }
 }
+*/
 
 /**
  * Move all panels within the scroll box down.
@@ -140,6 +152,7 @@ void ScrollBox::scrollUp(const SDL_Point* mousePosition) {
  * scrollbox or not
  * @return None
  */
+/*
 void ScrollBox::scrollDown(const SDL_Point* mousePosition) {
   if (SDL_PointInRect(mousePosition, &this->rectangle) == false) {
     return;
@@ -161,3 +174,4 @@ void ScrollBox::render() const {
     x->render();
   }
 }
+*/

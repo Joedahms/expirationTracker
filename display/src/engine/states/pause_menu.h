@@ -8,6 +8,7 @@
 #include "../display_global.h"
 #include "../elements/button.h"
 #include "../elements/text.h"
+#include "../engine_state.h"
 #include "state.h"
 
 /**
@@ -16,7 +17,7 @@
 class PauseMenu : public State {
 public:
   PauseMenu(struct DisplayGlobal);
-  int handleEvents(bool*) override;
+  EngineState handleEvents(bool*) override;
   void update() override;
   void render() const override;
 };

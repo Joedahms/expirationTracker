@@ -125,30 +125,39 @@ void DisplayEngine::initializeEngine(SDL_Window* window) {
 }
 
 /**
- * Check which state the display is in. If there was a state switch and the current
- * state has not been entered before, run its enter method.
+ *
  *
  * @param None
  * @return None
  */
 void DisplayEngine::checkState() {
-  switch (this->state) {
-  case MAIN_MENU:
+  std::cout << engineStateToString(this->engineState) << std::endl;
+  switch (this->engineState) {
+  case EngineState::MAIN_MENU:
+    this->engineState = this->mainMenu->getCurrentState();
+    this->mainMenu->setCurrentState(EngineState::MAIN_MENU);
     break;
 
-  case SCANNING:
+  case EngineState::SCANNING:
     if (!this->scanning->getStateEntered()) {
       this->scanning->enterScanning();
     }
+    this->engineState = this->mainMenu->getCurrentState();
+    this->scanning->setCurrentState(EngineState::SCANNING);
     break;
 
-  case PAUSE_MENU:
+  case EngineState::PAUSE_MENU:
+    this->engineState = this->mainMenu->getCurrentState();
+    this->pauseMenu->setCurrentState(EngineState::PAUSE_MENU);
     break;
 
-  case ITEM_LIST:
+  case EngineState::ITEM_LIST:
+    this->engineState = this->mainMenu->getCurrentState();
+    this->itemList->setCurrentState(EngineState::ITEM_LIST);
     break;
 
   default:
+    std::cout << engineStateToString(this->engineState) << std::endl;
     LOG(FATAL) << "Invalid state";
     break;
   }
@@ -162,18 +171,19 @@ void DisplayEngine::checkState() {
  * @return None
  */
 void DisplayEngine::handleEvents(int* engineToDisplay, int* displayToEngine) {
-  switch (this->state) {
-  case MAIN_MENU:
-    this->state = this->mainMenu->handleEvents(&this->displayIsRunning);
-    if (this->state == SCANNING) {
+  switch (this->engineState) {
+  case EngineState::MAIN_MENU:
+    this->engineState = this->mainMenu->handleEvents(&this->displayIsRunning);
+
+    if (this->engineState == EngineState::SCANNING) {
       LOG(INFO) << "Scan initialized, engine switching to scanning state";
       writeString(engineToDisplay[WRITE], START_SCAN);
     }
     break;
 
-  case SCANNING:
+  case EngineState::SCANNING:
     {
-      this->state = this->scanning->handleEvents(&this->displayIsRunning);
+      this->engineState = this->scanning->handleEvents(&this->displayIsRunning);
 
       struct timeval timeout;
       timeout.tv_sec  = 0;
@@ -197,18 +207,18 @@ void DisplayEngine::handleEvents(int* engineToDisplay, int* displayToEngine) {
         std::string fromDisplay = readString(displayToEngine[READ]);
         if (fromDisplay == "ID successful") {
           LOG(INFO) << "New item received, switching to item list state";
-          this->state = ITEM_LIST;
+          this->engineState = EngineState::ITEM_LIST;
         }
       }
       break;
     }
 
-  case PAUSE_MENU:
-    this->state = this->pauseMenu->handleEvents(&this->displayIsRunning);
+  case EngineState::PAUSE_MENU:
+    //    this->engineState = this->pauseMenu->handleEvents(&this->displayIsRunning);
     break;
 
-  case ITEM_LIST:
-    this->state = this->itemList->handleEvents(&this->displayIsRunning);
+  case EngineState::ITEM_LIST:
+    //   this->engineState = this->itemList->handleEvents(&this->displayIsRunning);
     break;
 
   default:
@@ -225,19 +235,19 @@ void DisplayEngine::handleEvents(int* engineToDisplay, int* displayToEngine) {
  * @return None
  */
 void DisplayEngine::checkKeystates() {
-  switch (this->state) {
-  case MAIN_MENU:
+  switch (this->engineState) {
+  case EngineState::MAIN_MENU:
     break;
 
-  case SCANNING:
-    this->state = this->scanning->checkKeystates();
+  case EngineState::SCANNING:
+    this->engineState = this->scanning->checkKeystates();
     break;
 
-  case PAUSE_MENU:
+  case EngineState::PAUSE_MENU:
     break;
 
-  case ITEM_LIST:
-    this->state = this->itemList->checkKeystates();
+  case EngineState::ITEM_LIST:
+    this->engineState = this->itemList->checkKeystates();
     break;
 
   default:
@@ -255,20 +265,20 @@ void DisplayEngine::checkKeystates() {
  * @return None
  */
 void DisplayEngine::update() {
-  switch (this->state) {
-  case MAIN_MENU:
+  switch (this->engineState) {
+  case EngineState::MAIN_MENU:
     this->mainMenu->update();
     break;
 
-  case SCANNING:
+  case EngineState::SCANNING:
     this->scanning->update();
     break;
 
-  case PAUSE_MENU:
+  case EngineState::PAUSE_MENU:
     this->pauseMenu->update();
     break;
 
-  case ITEM_LIST:
+  case EngineState::ITEM_LIST:
     this->itemList->update();
     break;
 
@@ -285,20 +295,20 @@ void DisplayEngine::update() {
  * @return None
  */
 void DisplayEngine::renderState() {
-  switch (this->state) {
-  case MAIN_MENU:
+  switch (this->engineState) {
+  case EngineState::MAIN_MENU:
     this->mainMenu->render();
     break;
 
-  case SCANNING:
+  case EngineState::SCANNING:
     this->scanning->render();
     break;
 
-  case PAUSE_MENU:
+  case EngineState::PAUSE_MENU:
     this->pauseMenu->render();
     break;
 
-  case ITEM_LIST:
+  case EngineState::ITEM_LIST:
     this->itemList->render();
     break;
 

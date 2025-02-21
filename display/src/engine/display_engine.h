@@ -13,6 +13,7 @@
 #include "states/scanning.h"
 
 #include "display_global.h"
+#include "engine_state.h"
 
 class DisplayEngine {
 public:
@@ -45,7 +46,7 @@ private:
   struct DisplayGlobal displayGlobal;
 
   // State the display is currently in
-  int state = 0;
+  EngineState engineState = EngineState::MAIN_MENU;
 
   // States
   std::unique_ptr<MainMenu> mainMenu; // State entered when the display boots

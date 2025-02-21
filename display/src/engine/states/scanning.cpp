@@ -12,10 +12,11 @@
  * @param displayGlobal Global variables
  */
 Scanning::Scanning(struct DisplayGlobal displayGlobal) {
+  this->currentState         = EngineState::SCANNING;
   this->displayGlobal        = displayGlobal;
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
 
-  this->rootElement = std::make_unique<CompositeElement>();
+  this->rootElement = std::make_unique<Container>();
 
   const char* fontPath               = "../display/fonts/16020_FUTURAM.ttf";
   const char* progressMessageContent = "Scanning In Progress";
@@ -26,7 +27,6 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) {
                              progressMessageColor, progressMessageRectangle);
   progressMessage->centerHorizontal(windowSurface);
   this->rootElement->addElement(std::move(progressMessage));
-  // this->texts.push_back(std::move(progressMessage));
 }
 
 /**
@@ -35,7 +35,7 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) {
  * @param displayIsRunning Whether or not the display is running
  * @return The current state of the display after updating scanning
  */
-int Scanning::handleEvents(bool* displayIsRunning) {
+EngineState Scanning::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
   while (SDL_PollEvent(&event) != 0) { // While events in the queue
     switch (event.type) {
@@ -48,7 +48,7 @@ int Scanning::handleEvents(bool* displayIsRunning) {
     }
   }
 
-  return SCANNING;
+  return EngineState::SCANNING;
 }
 
 /**
@@ -57,14 +57,14 @@ int Scanning::handleEvents(bool* displayIsRunning) {
  * @param None
  * @return The state the display is in after checking if any keys have been pressed
  */
-int Scanning::checkKeystates() {
+EngineState Scanning::checkKeystates() {
   const Uint8* keystates = SDL_GetKeyboardState(NULL);
 
   if (keystates[SDL_SCANCODE_ESCAPE]) {
-    return PAUSE_MENU;
+    return EngineState::PAUSE_MENU;
   }
 
-  return SCANNING;
+  return EngineState::SCANNING;
 }
 
 void Scanning::update() {}

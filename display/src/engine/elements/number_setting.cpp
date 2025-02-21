@@ -15,18 +15,23 @@
  * @param settingId The primary key of the food item corresponding to this object
  */
 NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal, int settingId)
-    : decreaseButton(displayGlobal, SDL_Rect{0, 0, 0, 0}, "-", this->DECREMENT_SETTING),
-      increaseButton(displayGlobal, SDL_Rect{0, 0, 0, 0}, "+", this->INCREMENT_SETTING),
-      settingValueText(displayGlobal,
-                       displayGlobal.futuramFontPath,
-                       "0",
-                       24,
-                       SDL_Color{0, 255, 0, 255},
-                       SDL_Rect{0, 0, 0, 0}),
-      settingId(settingId) {
+    : settingId(settingId) {
+  std::unique_ptr<Button> decreaseButton =
+      std::make_unique<Button>(displayGlobal, SDL_Rect{0, 0, 0, 0}, "-", [this]() { ; });
+  addElement(std::move(decreaseButton));
+
+  std::unique_ptr<Button> increaseButton =
+      std::make_unique<Button>(displayGlobal, SDL_Rect{0, 0, 0, 0}, "+", [this]() { ; });
+  addElement(std::move(increaseButton));
+
+  std::unique_ptr<Text> text =
+      std::make_unique<Text>(displayGlobal, displayGlobal.futuramFontPath, "0", 24,
+                             SDL_Color{0, 255, 0, 255}, SDL_Rect{0, 0, 0, 0});
+  addElement(std::move(text));
+
   FoodItem foodItem  = readFoodItemById(this->settingId);
   this->settingValue = foodItem.quantity;
-  this->settingValueText.setContent(std::to_string(this->settingValue));
+  //  this->settingValueText.setContent(std::to_string(this->settingValue));
 }
 
 /**
@@ -36,6 +41,7 @@ NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal, int settingId)
  * @return None
  */
 void NumberSetting::setSettingId(const int& newSettingId) {
+  /*
   if (newSettingId < 0) {
     LOG(FATAL) << "Attempt to set number setting id to invalid id";
   }
@@ -44,6 +50,7 @@ void NumberSetting::setSettingId(const int& newSettingId) {
   }
   FoodItem foodItem  = readFoodItemById(this->settingId);
   this->settingValue = foodItem.quantity;
+  */
 }
 
 /**
@@ -53,6 +60,7 @@ void NumberSetting::setSettingId(const int& newSettingId) {
  * @return None
  */
 void NumberSetting::handleMouseButtonDown(const SDL_Point& mousePosition) {
+  /*
   SDL_Rect increaseRectangle = this->increaseButton.getRectangle();
   SDL_Rect decreaseRectangle = this->decreaseButton.getRectangle();
 
@@ -62,6 +70,7 @@ void NumberSetting::handleMouseButtonDown(const SDL_Point& mousePosition) {
   else if (SDL_PointInRect(&mousePosition, &increaseRectangle) == true) {
     this->settingValue++;
   }
+  */
 }
 
 /**
@@ -72,40 +81,48 @@ void NumberSetting::handleMouseButtonDown(const SDL_Point& mousePosition) {
  * @param None
  * @return None
  */
-void NumberSetting::update() {
-  // Decrease
-  SDL_Rect decreaseButtonRect = decreaseButton.getRectangle();
-  decreaseButtonRect.y        = this->rectangle.y;
-  decreaseButtonRect.x        = this->rectangle.x;
-  decreaseButton.setRectangle(decreaseButtonRect);
+// void NumberSetting::update() {
+/*
+// Decrease
+SDL_Rect decreaseButtonRect = decreaseButton.getRectangle();
+decreaseButtonRect.y        = this->rectangle.y;
+decreaseButtonRect.x        = this->rectangle.x;
+decreaseButton.setRectangle(decreaseButtonRect);
 
-  // Value
-  SDL_Rect settingValueTextRect = settingValueText.getRectangle();
-  settingValueTextRect.y        = this->rectangle.y;
-  settingValueTextRect.x        = decreaseButtonRect.x + decreaseButtonRect.w;
-  settingValueText.setRectangle(settingValueTextRect);
+// Value
+SDL_Rect settingValueTextRect = settingValueText.getRectangle();
+settingValueTextRect.y        = this->rectangle.y;
+settingValueTextRect.x        = decreaseButtonRect.x + decreaseButtonRect.w;
+settingValueText.setRectangle(settingValueTextRect);
 
-  // Increase
-  SDL_Rect increaseButtonRect = increaseButton.getRectangle();
-  increaseButtonRect.y        = this->rectangle.y;
-  increaseButtonRect.x        = settingValueTextRect.x + settingValueTextRect.w;
-  increaseButton.setRectangle(increaseButtonRect);
+// Increase
+SDL_Rect increaseButtonRect = increaseButton.getRectangle();
+increaseButtonRect.y        = this->rectangle.y;
+increaseButtonRect.x        = settingValueTextRect.x + settingValueTextRect.w;
+increaseButton.setRectangle(increaseButtonRect);
 
-  this->settingValueText.update();
-  this->increaseButton.update();
-  this->decreaseButton.update();
+this->settingValueText.update();
+this->increaseButton.update();
+this->decreaseButton.update();
 
-  FoodItem foodItem = readFoodItemById(this->settingId);
-  if (foodItem.quantity != this->settingValue) {
-    updateFoodItemQuantity(this->settingId, this->settingValue);
-  }
-  else {
-    this->settingValueText.setContent(std::to_string(this->settingValue));
-  }
+FoodItem foodItem = readFoodItemById(this->settingId);
+if (foodItem.quantity != this->settingValue) {
+  updateFoodItemQuantity(this->settingId, this->settingValue);
 }
-
-void NumberSetting::render() const {
-  this->settingValueText.render();
-  this->increaseButton.render();
-  this->decreaseButton.render();
+else {
+  this->settingValueText.setContent(std::to_string(this->settingValue));
 }
+*/
+//}
+
+// void NumberSetting::render() const {
+/*
+this->settingValueText.render();
+this->increaseButton.render();
+this->decreaseButton.render();
+*/
+//}
+
+void NumberSetting::updateSelf() {}
+void NumberSetting::renderSelf() const {}
+void NumberSetting::handleEventSelf(const SDL_Event& event) {}

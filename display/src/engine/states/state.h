@@ -1,36 +1,30 @@
 #ifndef STATE_H
 #define STATE_H
 
-#define MAIN_MENU  0
-#define SCANNING   1
-#define PAUSE_MENU 2
-#define ITEM_LIST  3
-
 #include <memory>
 #include <vector>
 
 #include "../display_global.h"
 #include "../elements/button.h"
 #include "../elements/composite_element.h"
+#include "../elements/container.h"
 #include "../elements/scroll_box.h"
 #include "../elements/text.h"
+#include "../engine_state.h"
 
 class State {
 public:
-  virtual int handleEvents(bool*) = 0;
-  virtual void update()           = 0;
-  virtual void render() const     = 0;
-  int checkButtonsClicked(const int& mouseX, const int& mouseY) const;
+  virtual EngineState handleEvents(bool*) = 0;
+  virtual void update()                   = 0;
+  virtual void render() const             = 0;
+  EngineState getCurrentState();
+  void setCurrentState(EngineState currentState);
+  EngineState checkButtonsClicked(const int& mouseX, const int& mouseY) const;
 
 protected:
+  EngineState currentState;
   struct DisplayGlobal displayGlobal;
-  std::unique_ptr<CompositeElement> rootElement;
-
-  /*
-  std::vector<std::unique_ptr<Text>> texts;
-  std::vector<std::unique_ptr<Button>> buttons;
-  std::vector<std::unique_ptr<ScrollBox>> scrollBoxes;
-*/
+  std::unique_ptr<Container> rootElement;
 };
 
 #endif

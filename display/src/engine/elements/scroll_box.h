@@ -11,6 +11,7 @@
 #include "element.h"
 #include "panel.h"
 
+/*
 class ScrollBox : public Element {
 public:
   ScrollBox(struct DisplayGlobal displayGlobal);
@@ -32,5 +33,6 @@ private:
   int panelHeight;
   int topPanelPosition = 0;
 };
+*/
 
 #endif

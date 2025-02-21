@@ -7,24 +7,26 @@
 #include "element.h"
 #include "text.h"
 
-class NumberSetting : public Element {
+class NumberSetting : public CompositeElement {
 public:
   NumberSetting(struct DisplayGlobal displayGlobal, int settingId);
   void setSettingId(const int& newSettingId);
   void handleMouseButtonDown(const SDL_Point& mousePosition);
-  void update() override;
-  void render() const override;
+
+  void updateSelf() override;
+  void renderSelf() const override;
+  void handleEventSelf(const SDL_Event& event) override;
 
 private:
-  Button decreaseButton;
-  Button increaseButton;
-  Text settingValueText;
+  //  Button decreaseButton;
+  //  Button increaseButton;
+  //  Text settingValueText;
 
   int settingValue = -1;
   int settingId    = -1;
 
-  const int DECREMENT_SETTING = 0;
-  const int INCREMENT_SETTING = 1;
+  // const int DECREMENT_SETTING = 0;
+  // const int INCREMENT_SETTING = 1;
 };
 
 #endif

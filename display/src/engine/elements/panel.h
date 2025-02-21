@@ -12,7 +12,7 @@
 #include "number_setting.h"
 #include "text.h"
 
-class Panel : public Element {
+class Panel : public CompositeElement {
 public:
   Panel(struct DisplayGlobal displayGlobal, int id);
   Panel(struct DisplayGlobal displayGlobal, int id, SDL_Rect rect);
@@ -30,13 +30,13 @@ public:
   void addFoodItemName(const FoodItem& foodItem);
   void addFoodItemExpirationDate(const FoodItem& foodItem);
 
-  void update() override;
-  void render() const override;
+  void updateSelf() override;
+  void renderSelf() const override;
+  void handleEventSelf(const SDL_Event& event) override;
 
 private:
-  std::vector<std::unique_ptr<Text>> texts;
-  std::vector<std::unique_ptr<Button>> buttons;
-  NumberSetting itemQuantity;
+  //  std::vector<std::unique_ptr<Text>> texts;
+  // NumberSetting itemQuantity;
 };
 
 #endif

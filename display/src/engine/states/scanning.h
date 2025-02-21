@@ -6,6 +6,7 @@
 #include <string>
 
 #include "../display_global.h"
+#include "../engine_state.h"
 #include "state.h"
 
 /**
@@ -14,8 +15,8 @@
 class Scanning : public State {
 public:
   Scanning(struct DisplayGlobal displayGlobal);
-  int handleEvents(bool*) override;
-  int checkKeystates();
+  EngineState handleEvents(bool*) override;
+  EngineState checkKeystates();
   void update() override;
   void render() const override;
   void enterScanning();

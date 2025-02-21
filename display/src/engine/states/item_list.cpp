@@ -15,12 +15,15 @@
  * @param displayGlobal Global display variables.
  */
 ItemList::ItemList(struct DisplayGlobal displayGlobal) {
+  this->currentState = EngineState::ITEM_LIST;
+
   this->displayGlobal = displayGlobal;
 
   previousUpdate = std::chrono::steady_clock::now();
 
-  this->rootElement = std::make_unique<CompositeElement>();
+  this->rootElement = std::make_unique<Container>();
 
+  /*
   std::unique_ptr<ScrollBox> scrollBox = std::make_unique<ScrollBox>(this->displayGlobal);
   SDL_Rect scrollBoxRect               = {0, 0, 400, 100};
   int windowWidth, windowHeight;
@@ -31,6 +34,7 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
   scrollBox->addBorder(1);
   this->rootElement->addElement(std::move(scrollBox));
   this->rootElement->update();
+  */
 }
 
 /**
@@ -40,7 +44,7 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
  * display.
  * @return The state the display is in after handling all events in the SDL event queue
  */
-int ItemList::handleEvents(bool* displayIsRunning) {
+EngineState ItemList::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
   while (SDL_PollEvent(&event) != 0) { // While events in the queue
     int mouseX = event.motion.x;
@@ -77,7 +81,7 @@ int ItemList::handleEvents(bool* displayIsRunning) {
     }
   }
 
-  return ITEM_LIST;
+  return EngineState::ITEM_LIST;
 }
 
 /**
@@ -86,14 +90,14 @@ int ItemList::handleEvents(bool* displayIsRunning) {
  * @param None
  * @return The state the display is in after checking if any keys have been pressed
  */
-int ItemList::checkKeystates() {
+EngineState ItemList::checkKeystates() {
   const Uint8* keystates = SDL_GetKeyboardState(NULL);
 
   if (keystates[SDL_SCANCODE_ESCAPE]) {
-    return PAUSE_MENU;
+    return EngineState::PAUSE_MENU;
   }
 
-  return ITEM_LIST;
+  return EngineState::ITEM_LIST;
 }
 
 /**

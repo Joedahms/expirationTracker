@@ -11,10 +11,11 @@
  * @return None
  */
 PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
+  this->currentState         = EngineState::PAUSE_MENU;
   this->displayGlobal        = displayGlobal;
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
 
-  this->rootElement = std::make_unique<CompositeElement>();
+  this->rootElement = std::make_unique<Container>();
 
   // Title text
   const char* titleContent = "Paused";
@@ -29,14 +30,14 @@ PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
   // Resume button
   SDL_Rect resumeButtonRectangle       = {200, 150, 200, 50};
   std::unique_ptr<Button> resumeButton = std::make_unique<Button>(
-      this->displayGlobal, resumeButtonRectangle, "Resume", SCANNING);
+      this->displayGlobal, resumeButtonRectangle, "Resume", [this]() { ; });
   resumeButton->centerHorizontal(windowSurface);
   this->rootElement->addElement(std::move(resumeButton));
 
   // Main menu button
   SDL_Rect mainMenuButtonRectangle       = {200, 225, 200, 50};
   std::unique_ptr<Button> mainMenuButton = std::make_unique<Button>(
-      this->displayGlobal, mainMenuButtonRectangle, "Main Menu", MAIN_MENU);
+      this->displayGlobal, mainMenuButtonRectangle, "Main Menu", [this]() { ; });
   mainMenuButton->centerHorizontal(windowSurface);
   this->rootElement->addElement(std::move(mainMenuButton));
 }
@@ -47,9 +48,9 @@ PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
  * @param displayIsRunning Whether or not the display is running.
  * @return Current state the display is in.
  */
-int PauseMenu::handleEvents(bool* displayIsRunning) {
+EngineState PauseMenu::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
-  int returnValue = 2;
+  EngineState returnValue = EngineState::PAUSE_MENU;
   while (SDL_PollEvent(&event) != 0) { // While there are events in the queue
     int mouseX = event.motion.x;
     int mouseY = event.motion.y;
@@ -59,7 +60,7 @@ int PauseMenu::handleEvents(bool* displayIsRunning) {
       break;
 
     case SDL_MOUSEBUTTONDOWN:
-      returnValue = checkButtonsClicked(mouseX, mouseY);
+      //      returnValue = checkButtonsClicked(mouseX, mouseY);
       break;
 
     default:

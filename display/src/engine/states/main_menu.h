@@ -10,6 +10,7 @@
 #include "../elements/button.h"
 #include "../elements/composite_element.h"
 #include "../elements/text.h"
+#include "../engine_state.h"
 #include "state.h"
 
 /**
@@ -18,7 +19,7 @@
 class MainMenu : public State {
 public:
   MainMenu(struct DisplayGlobal);
-  int handleEvents(bool*) override;
+  EngineState handleEvents(bool*) override;
   void update() override;
   void render() const override;
 };
