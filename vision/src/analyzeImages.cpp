@@ -34,6 +34,9 @@ bool analyzeImages(struct FoodItem& foodItem) {
       // Run text extraction
       handleTextExtraction(entry.path(), foodItem, objectDetected,
                            expirationDateDetected);
+      if (objectDetected) {
+        return true;
+      }
 
       if (objectDetected && expirationDateDetected) {
         return true;
