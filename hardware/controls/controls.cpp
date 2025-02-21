@@ -36,7 +36,7 @@ void rotateAndCapture(float weight) {
       sendDataToVision(weight);
     }
     LOG(INFO) << "Rotating platform...";
-//    rotateMotor();
+    //    rotateMotor();
     usleep(200);
 
     bool stopSignal = false;
