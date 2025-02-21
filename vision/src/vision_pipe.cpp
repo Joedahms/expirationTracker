@@ -50,14 +50,14 @@ void processImages(struct Pipes pipes, struct FoodItem& foodItem) {
     LOG(FATAL) << "Failed to open image directory" << foodItem.imageDirectory;
     return;
   }
-  foodItem.imageDirectory /= "Strawberry_Package"; // TEMP FOR TESTING
+  foodItem.imageDirectory /= "Rice_Box";
   bool detectedFoodItem = analyzeImages(foodItem);
   LOG(INFO) << "Successfully analyzed all images";
   if (!detectedFoodItem) {
     LOG(INFO) << "Item not successfully detected";
     // checked 16 images and failed them all
     //  how to handle?
-    return;
+    // Still send whatever information we do have to the display
   }
   // tell hardware to stop
   LOG(INFO) << "Sent stop signal to hardware";
@@ -66,5 +66,6 @@ void processImages(struct Pipes pipes, struct FoodItem& foodItem) {
 
   // send display the food item
   LOG(INFO) << "Sent detected food item to display";
+  printFoodItem(foodItem);
   sendFoodItem(foodItem, pipes.visionToDisplay[WRITE]);
 }

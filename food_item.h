@@ -29,4 +29,5 @@ void writeString(int, const std::string&);
 std::string readString(int pipeToRead);
 std::string foodCategoryToString(const FoodCategories&);
 FoodCategories foodCategoryFromString(const std::string&);
+void printFoodItem(const FoodItem&);
 #endif

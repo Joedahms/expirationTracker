@@ -1,5 +1,7 @@
 #include "../include/validateDetection.h"
+#include "../include/helperFunctions.h"
 #include <chrono>
+#include <iostream>
 #include <regex>
 #include <unordered_map>
 #include <vector>
@@ -15,13 +17,19 @@
  */
 TextValidationResult isValidText(const std::string& text,
                                  bool& objectDetected,
-                                 bool& expirationDateDetected) {
-  if (!objectDetected && isTextClass(text)) {
+                                 bool& expirationDateDetected,
+                                 std::string& detectedClassName,
+                                 std::string& detectedExpirationDate) {
+  auto detectedClass = isTextClass(text);
+  if (!objectDetected && detectedClass.first) {
+    detectedClassName = detectedClass.second;
     return TextValidationResult::POSSIBLE_CLASSIFICATION;
   }
+  /*
   if (!expirationDateDetected && isExpirationDate(text)) {
     return TextValidationResult::POSSIBLE_EXPIRATION_DATE;
   }
+  */
   return TextValidationResult::NOT_VALID;
 }
 
@@ -30,19 +38,40 @@ TextValidationResult isValidText(const std::string& text,
  *
  * Input:
  * @param text string to evaluate
- * Output: Bool if is valid class
+ * @return pair of bool,string bool: is it a class, string: the class
  */
-bool isTextClass(const std::string& text) {
+std::pair<bool, std::string> isTextClass(const std::string& text) {
   static const std::vector<std::string> classificationKeywords = {
-      "Milk",   "Cheese", "Bread", "Eggs",    "Yogurt",
-      "Butter", "Juice",  "Meat",  "Chicken", "Fish"};
+      "milk",          "cheese",        "bread",      "eggs",        "yogurt",
+      "butter",        "juice",         "meat",       "chicken",     "fish",
+      "cereal",        "pasta",         "rice",       "flour",       "sugar",
+      "salt",          "pepper",        "coffee",     "tea",         "honey",
+      "jam",           "peanut butter", "chocolate",  "candy",       "cookies",
+      "crackers",      "granola",       "oats",       "popcorn",     "chips",
+      "pancake mix",   "syrup",         "beans",      "corn",        "tomatoes",
+      "tuna",          "soup",          "fruit",      "vegetables",  "meals",
+      "pizza",         "fries",         "ice cream",  "energy bars", "protein powder",
+      "noodles",       "ketchup",       "mayonnaise", "mustard",     "soy sauce",
+      "hot sauce",     "dressing",      "oil",        "vinegar",     "pudding",
+      "whipped cream", "sour cream",    "tofu",       "bacon"};
 
-  for (const auto& keyword : classificationKeywords) {
-    if (text.find(keyword) != std::string::npos) {
-      return true;
+  std::string lowerText          = toLowerCase(cleanText(text));
+  std::vector<std::string> words = splitWords(lowerText);
+
+  for (const std::string& word : words) {
+    if (word.size() <= 2)
+      continue; // Ignore words ≤ 2 characters
+
+    for (const std::string& keyword : classificationKeywords) {
+      std::string lowerKeyword = toLowerCase(keyword);
+
+      if (word == lowerKeyword) {
+        return {true, lowerKeyword}; // Exact match
+      }
     }
   }
-  return false;
+
+  return {false, ""};
 }
 
 /**
