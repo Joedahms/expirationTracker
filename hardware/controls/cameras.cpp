@@ -82,7 +82,7 @@ void takePhoto(int angle) {
     execl("/usr/bin/rpicam-still", "rpicam-still", "--width", "4056", "--height", "3040",
           "--nopreview", "--autofocus-on-capture", "on", "--autofocus-speed", "fast",
           //      "--autofocus-rang", "full",   // Full autofocus range
-          "--exposure", "noraml", "--output", fileName.c_str(), // Save location
+          "--exposure", "normal", "--output", fileName.c_str(), // Save location
           "--timeout", "500", (char*)NULL);
 
     std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
