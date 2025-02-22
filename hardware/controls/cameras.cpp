@@ -1,4 +1,3 @@
-#include <fstream>
 #include <glog/logging.h>
 #include <iostream>
 #include <string>
@@ -74,24 +73,26 @@ void takePhotos(int angle) {
  */
 void takePhoto(int angle) {
   pid_t pid = fork();
-  if (pid == -1) {
-    LOG(FATAL) << "Error starting camera process.";
+  if (pid < 0) {
+    LOG(FATAL) << "Error: Failed to fork process for capturing image.";
+    return;
   }
   else if (pid == 0) {
-    LOG(INFO) << "Capturing at position " << angle;
-    std::string fileName = std::string(IMAGE_DIR) + std::to_string(angle) + "_test.jpg";
-    std::string command =
-        "/usr/bin/rpicam-still --width 4056 --height 3040 --nopreview "
-        "--autofocus-on-capture on --autofocus-speed fast --exposure normal --output " +
-        fileName + " --timeout 500";
+    // Child process executes rpicam-still
+    std::string filePath = std::string(IMAGE_DIR) + std::to_string(angle) + "_test.jpg";
+    execl("/usr/bin/rpicam-still", "rpicam-still", "--width", "4056", "--height", "3040",
+          "--nopreview", "--autofocus-on-capture", "on", "--autofocus-speed", "fast",
+          "--exposure", "normal", "--output", filePath.c_str(), "--timeout", "1000",
+          (char*)NULL);
 
-    int ret = system(command.c_str());
-    if (ret == -1) {
-      LOG(FATAL) << "Failed to capture image from camera.";
-    }
-    exit(0);
+    // If execl() fails:
+    std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
+    _exit(1); // Immediately exit child if execl() fails
   }
-  LOG(INFO) << "Waiting for photo taking process to complete...";
-  waitpid(pid, NULL, 0);
-  LOG(INFO) << "Photo successful at position " << angle;
+  else {
+    // Parent process waits for the child to finish
+    LOG(INFO) << "Waiting for photo at angle " << angle << " to complete...";
+    waitpid(pid, NULL, 0);
+    LOG(INFO) << "Photo successful at position " << angle;
+  }
 }
