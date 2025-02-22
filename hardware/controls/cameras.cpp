@@ -29,7 +29,7 @@ void takePhotos(int angle) {
     execl("/usr/bin/rpicam-still", "rpicam-still", "--width", "4056", "--height", "3040",
           "--nopreview", "--autofocus-on-capture", "on", "--autofocus-speed", "fast",
           //      "--autofocus-rang", "full",   // Full autofocus range
-          "--exposure", "noraml", "--output", filePath.c_str(), // Save location
+          "--exposure", "normal", "--output", filePath.c_str(), // Save location
           "--timeout", "500", (char*)NULL);
 
     std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
@@ -49,7 +49,7 @@ void takePhotos(int angle) {
     execl("/usr/bin/rpicam-still", "rpicam-still", "--width", "4056", "--height", "3040",
           "--nopreview", "--autofocus-on-capture", "on", "--autofocus-speed", "fast",
           //      "--autofocus-rang", "full",   // Full autofocus range
-          "--exposure", "noraml", "--output", filePath.c_str(), // Save location
+          "--exposure", "normal", "--output", filePath.c_str(), // Save location
           "--timeout", "500", (char*)NULL);
 
     std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
@@ -75,6 +75,55 @@ void takePhoto(int angle) {
   pid_t pid = fork();
   if (pid == -1) {
     LOG(FATAL) << "Error starting camera process.";
+    return;
+  }
+  else if (pid == 0) { // Child process
+    LOG(INFO) << "Capturing at position " << angle;
+    std::string fileName = std::string(IMAGE_DIR) + std::to_string(angle) + "_test.jpg";
+
+    // Build argument vector for execle()
+    char* const args[] = {(char*)"rpicam-still",
+                          (char*)"--width",
+                          (char*)"4056",
+                          (char*)"--height",
+                          (char*)"3040",
+                          (char*)"--nopreview",
+                          (char*)"--autofocus-on-capture",
+                          (char*)"on",
+                          (char*)"--autofocus-speed",
+                          (char*)"fast",
+                          (char*)"--exposure",
+                          (char*)"normal",
+                          (char*)"--output",
+                          (char*)fileName.c_str(),
+                          (char*)"--timeout",
+                          (char*)"500",
+                          NULL};
+
+    // Build a custom environment; you can add more environment variables if needed.
+    char* const env[] = {(char*)"LIBCAMERA_LOG_LEVEL=INFO", NULL};
+
+    // Use execle() to execute rpicam-still with the arguments and custom environment.
+    execle("/usr/bin/rpicam-still", args[0], args[1], args[2], args[3], args[4], args[5],
+           args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13],
+           args[14], args[15], (char*)NULL, env);
+
+    std::cerr << "Error: Failed to execute rpicam-still at position " << angle
+              << std::endl;
+    _exit(1); // Immediately exit child if execle() fails
+  }
+  else { // Parent process
+    LOG(INFO) << "Waiting for photo taking process to complete...";
+    waitpid(pid, NULL, 0);
+    LOG(INFO) << "Photo successful at position " << angle;
+  }
+}
+
+/*
+void takePhoto(int angle) {
+  pid_t pid = fork();
+  if (pid == -1) {
+    LOG(FATAL) << "Error starting camera process.";
   }
   else if (pid == 0) {
     LOG(INFO) << "Capturing at position " << angle;
@@ -94,3 +143,4 @@ void takePhoto(int angle) {
     LOG(INFO) << "Photo successful at position " << angle;
   }
 }
+*/
