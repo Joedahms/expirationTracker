@@ -27,3 +27,30 @@ void CompositeElement::handleEvent(const SDL_Event& event) {
     element->handleEvent(event);
   }
 }
+
+void CompositeElement::updateSelf() {
+  if (parent) {
+    if (this->centerWithinParent) {
+      if (checkCenterVertical() == false) {
+        centerVertical();
+      }
+      if (checkCenterHorizontal() == false) {
+        centerHorizontal();
+      }
+    }
+    if (this->centerVerticalWithinParent) {
+      if (checkCenterVertical() == false) {
+        centerVertical();
+      }
+    }
+    else if (this->centerHorizontalWithinParent) {
+      if (checkCenterHorizontal() == false) {
+        centerHorizontal();
+      }
+    }
+
+    SDL_Rect parentBoundaryRectangle = parent->getBoundaryRectangle();
+    boundaryRectangle.x = parentBoundaryRectangle.x + positionRelativeToParent.x;
+    boundaryRectangle.y = parentBoundaryRectangle.y + positionRelativeToParent.y;
+  }
+}

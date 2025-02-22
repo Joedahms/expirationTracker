@@ -19,7 +19,6 @@ public:
          const std::string& textContent,
          std::function<void()> callback);
 
-  void update() override;
   void updateSelf() override;
   void renderSelf() const override;
   void handleEventSelf(const SDL_Event& event) override;

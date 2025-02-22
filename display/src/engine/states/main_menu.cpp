@@ -16,16 +16,21 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
   this->displayGlobal        = displayGlobal;
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
 
-  this->rootElement = std::make_unique<Container>();
+  SDL_Rect rootRectangle = {0, 0, 0, 0};
+  rootRectangle.w        = windowSurface->w;
+  rootRectangle.h        = windowSurface->h;
+  std::cout << rootRectangle.w << std::endl;
+  this->rootElement = std::make_unique<Container>(rootRectangle);
 
   // Title
   const char* titleContent = "Expiration Tracker";
   SDL_Color titleColor     = {0, 255, 0, 255}; // Green
-  SDL_Rect titleRectangle  = {100, 100, 0, 0};
+  SDL_Rect titleRect       = {0, 0, 0, 0};
+  SDL_Point titleOffset    = {0, 100};
   std::unique_ptr<Text> title =
       std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
-                             titleContent, 24, titleColor, titleRectangle);
-  title->centerHorizontal(windowSurface);
+                             titleContent, 24, titleColor, titleRect, titleOffset);
+  title->setCenteredHorizontal();
   rootElement->addElement(std::move(title));
 
   // Start Scan
@@ -33,7 +38,7 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
   std::unique_ptr<Button> newScanButton = std::make_unique<Button>(
       this->displayGlobal, newScanButtonRectangle, "Scan New Item",
       [this]() { this->currentState = EngineState::SCANNING; });
-  newScanButton->centerHorizontal(windowSurface);
+  newScanButton->setCenteredHorizontal();
   rootElement->addElement(std::move(newScanButton));
 
   // View Stored
@@ -41,7 +46,7 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
   std::unique_ptr<Button> viewStoredButton = std::make_unique<Button>(
       this->displayGlobal, viewStoredButtonRectangle, "View Stored Items",
       [this]() { this->currentState = EngineState::ITEM_LIST; });
-  viewStoredButton->centerHorizontal(windowSurface);
+  viewStoredButton->setCenteredHorizontal();
   rootElement->addElement(std::move(viewStoredButton));
 }
 

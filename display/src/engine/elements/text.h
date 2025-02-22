@@ -20,10 +20,16 @@ public:
        int fontSize,
        SDL_Color color,
        SDL_Rect rectangle);
+  Text(struct DisplayGlobal displayGlobal,
+       const std::string& fontPath,
+       const std::string& content,
+       int fontSize,
+       SDL_Color color,
+       SDL_Rect rectangle,
+       SDL_Point positionRelativeToParent);
   ~Text();
 
   void setContent(const std::string& newContent);
-  void update() override;
   void render() const override;
   void handleEvent(const SDL_Event& event);
 

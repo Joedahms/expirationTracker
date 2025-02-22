@@ -19,8 +19,13 @@ Button::Button(struct DisplayGlobal displayGlobal,
                const std::string& textContent,
                std::function<void()> callback)
     : onClick(callback) {
-  this->displayGlobal     = displayGlobal;
-  this->boundaryRectangle = boundaryRectangle;
+  this->displayGlobal              = displayGlobal;
+  this->positionRelativeToParent.x = boundaryRectangle.x;
+  this->positionRelativeToParent.y = boundaryRectangle.y;
+
+  this->boundaryRectangle   = boundaryRectangle;
+  this->boundaryRectangle.x = 0;
+  this->boundaryRectangle.y = 0;
 
   // Colors
   this->backgroundColor = {255, 0, 0, 255}; // Red
@@ -28,10 +33,12 @@ Button::Button(struct DisplayGlobal displayGlobal,
   this->defaultColor    = {255, 0, 0, 255}; // Red
 
   // Button Text
-  SDL_Color textColor = {255, 255, 0, 255}; // Yellow
-  std::unique_ptr<Text> text =
-      std::make_unique<Text>(this->displayGlobal, "../display/fonts/16020_FUTURAM.ttf",
-                             textContent.c_str(), 24, textColor, this->boundaryRectangle);
+  SDL_Color textColor        = {255, 255, 0, 255}; // Yellow
+  SDL_Point textOffset       = {10, 10};
+  std::unique_ptr<Text> text = std::make_unique<Text>(
+      this->displayGlobal, "../display/fonts/16020_FUTURAM.ttf", textContent.c_str(), 24,
+      textColor, this->boundaryRectangle, textOffset);
+  text->setCentered();
 
   // Size based on text
   if (this->boundaryRectangle.w == 0 && this->boundaryRectangle.h == 0) {
@@ -40,24 +47,7 @@ Button::Button(struct DisplayGlobal displayGlobal,
     this->boundaryRectangle.h      = textboundaryRectangle.h + 10;
   }
 
-  // Center text
-  text->centerHorizontal(this->boundaryRectangle);
-  text->centerVertical(this->boundaryRectangle);
-
   addElement(std::move(text));
-}
-
-void Button::update() {
-  updateSelf();
-  for (const auto& element : this->children) {
-    element->update();
-    if (element->checkCenterHorizontal(this->boundaryRectangle) == false) {
-      element->centerHorizontal(this->boundaryRectangle);
-    }
-    if (element->checkCenterVertical(this->boundaryRectangle) == false) {
-      element->centerVertical(this->boundaryRectangle);
-    }
-  }
 }
 
 /**
@@ -68,6 +58,33 @@ void Button::update() {
  * @return None
  */
 void Button::updateSelf() {
+  if (parent) {
+    if (this->centerWithinParent) {
+      if (checkCenterVertical() == false) {
+        centerVertical();
+      }
+      if (checkCenterHorizontal() == false) {
+        centerHorizontal();
+      }
+    }
+    if (this->centerVerticalWithinParent) {
+      if (checkCenterVertical() == false) {
+        centerVertical();
+      }
+    }
+    else if (this->centerHorizontalWithinParent) {
+      if (checkCenterHorizontal() == false) {
+        centerHorizontal();
+      }
+    }
+
+    SDL_Rect parentBoundaryRectangle = parent->getBoundaryRectangle();
+    this->boundaryRectangle.x =
+        parentBoundaryRectangle.x + this->positionRelativeToParent.x;
+    this->boundaryRectangle.y =
+        parentBoundaryRectangle.y + this->positionRelativeToParent.y;
+  }
+
   // Change color if hovered
   int mouseXPosition, mouseYPosition;
   SDL_GetMouseState(&mouseXPosition, &mouseYPosition);

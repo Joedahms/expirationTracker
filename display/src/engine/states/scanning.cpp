@@ -25,7 +25,7 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) {
   std::unique_ptr<Text> progressMessage =
       std::make_unique<Text>(this->displayGlobal, fontPath, progressMessageContent, 24,
                              progressMessageColor, progressMessageRectangle);
-  progressMessage->centerHorizontal(windowSurface);
+  progressMessage->setCenteredHorizontal();
   this->rootElement->addElement(std::move(progressMessage));
 }
 

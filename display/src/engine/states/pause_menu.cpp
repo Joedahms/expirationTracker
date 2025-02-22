@@ -24,7 +24,7 @@ PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
   std::unique_ptr<Text> title =
       std::make_unique<Text>(this->displayGlobal, displayGlobal.futuramFontPath,
                              titleContent, 24, titleColor, titleRectangle);
-  title->centerHorizontal(windowSurface);
+  title->setCenteredHorizontal();
   this->rootElement->addElement(std::move(title));
 
   // Resume button
@@ -32,7 +32,7 @@ PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
   std::unique_ptr<Button> resumeButton =
       std::make_unique<Button>(this->displayGlobal, resumeButtonRectangle, "Resume",
                                [this]() { this->currentState = EngineState::SCANNING; });
-  resumeButton->centerHorizontal(windowSurface);
+  resumeButton->setCenteredHorizontal();
   this->rootElement->addElement(std::move(resumeButton));
 
   // Main menu button
@@ -40,7 +40,7 @@ PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
   std::unique_ptr<Button> mainMenuButton =
       std::make_unique<Button>(this->displayGlobal, mainMenuButtonRectangle, "Main Menu",
                                [this]() { this->currentState = EngineState::MAIN_MENU; });
-  mainMenuButton->centerHorizontal(windowSurface);
+  mainMenuButton->setCenteredHorizontal();
   this->rootElement->addElement(std::move(mainMenuButton));
 }
 

@@ -3,63 +3,6 @@
 
 #include "element.h"
 
-/**
- * Template specialization for centering vertically within an SDL_Rect.
- *
- * @param centerWithin The SDL_Rect to center within
- * @return None
- */
-template <> void Element::centerVertical<SDL_Rect>(SDL_Rect centerWithin) {
-  this->boundaryRectangle.y =
-      (centerWithin.h / 2 - this->boundaryRectangle.h / 2) + centerWithin.y;
-}
-
-/**
- * Template specialization for centering horizontally within an SDL_Rect.
- *
- * @param centerWithin The SDL_Rect to center within
- * @return None
- */
-template <> void Element::centerHorizontal<SDL_Rect>(SDL_Rect centerWithin) {
-  this->boundaryRectangle.x =
-      (centerWithin.w / 2 - this->boundaryRectangle.w / 2) + centerWithin.x;
-}
-
-/**
- * Template specialization for checking if centered vertically within an SDL_Rect.
- *
- * @param centerWithin The SDL_Rect to center within
- * @return None
- */
-template <> bool Element::checkCenterVertical<SDL_Rect>(SDL_Rect centerWithin) {
-  bool centered = false;
-  if (this->boundaryRectangle.y ==
-      (centerWithin.h / 2 - this->boundaryRectangle.h / 2) + centerWithin.y) {
-    centered = true;
-  }
-  return centered;
-}
-
-/**
- * Template specialization for checking if centered horizontally within an SDL_Rect.
- *
- * @param centerWithin The SDL_Rect to center within
- * @return None
- */
-template <> bool Element::checkCenterHorizontal<SDL_Rect>(SDL_Rect centerWithin) {
-  bool centered = false;
-  if (this->boundaryRectangle.x ==
-      (centerWithin.w / 2 - this->boundaryRectangle.w / 2) + centerWithin.x) {
-    centered = true;
-  }
-  return centered;
-}
-
-/*
-Element::Element()
-    : boundaryRectangle{0, 0, 0, 0}, parent(nullptr), positionRelativeToParent{0, 0} {}
-    */
-
 void Element::setboundaryRectangle(SDL_Rect boundaryRectangle) {
   this->boundaryRectangle = boundaryRectangle;
 };
@@ -70,10 +13,72 @@ void Element::setPositionRelativeToParent(const SDL_Point& relativePostion) {
 
 void Element::setParent(Element* parent) { this->parent = parent; }
 
+void Element::setCentered() { this->centerWithinParent = true; }
+void Element::setCenteredVertical() { this->centerVerticalWithinParent = true; }
+void Element::setCenteredHorizontal() { this->centerHorizontalWithinParent = true; }
+
+bool Element::checkCenterVertical() {
+  bool centered = false;
+  if (this->positionRelativeToParent.y ==
+      (this->parent->boundaryRectangle.h / 2 - this->boundaryRectangle.h / 2) +
+          this->parent->boundaryRectangle.y) {
+    centered = true;
+  }
+  return centered;
+}
+
+void Element::centerVertical() {
+  this->positionRelativeToParent.y =
+      (this->parent->boundaryRectangle.h / 2 - this->boundaryRectangle.h / 2) +
+      this->parent->boundaryRectangle.y;
+}
+
+bool Element::checkCenterHorizontal() {
+  bool centered = false;
+  if (this->positionRelativeToParent.x ==
+      (this->parent->boundaryRectangle.w / 2 - this->boundaryRectangle.w / 2) +
+          this->parent->boundaryRectangle.x) {
+    centered = true;
+  }
+  return centered;
+}
+
+void Element::centerHorizontal() {
+  this->positionRelativeToParent.x =
+      ((this->parent->boundaryRectangle.w - this->boundaryRectangle.w) / 2) +
+      this->parent->boundaryRectangle.x;
+  /*
+  this->positionRelativeToParent.x =
+      (this->parent->boundaryRectangle.w / 2 - this->boundaryRectangle.w / 2) +
+      this->parent->boundaryRectangle.x;
+      */
+}
+
 void Element::update() {
   if (parent) {
-    boundaryRectangle.x = parent->boundaryRectangle.x + positionRelativeToParent.x;
-    boundaryRectangle.y = parent->boundaryRectangle.y + positionRelativeToParent.y;
+    if (this->centerWithinParent) {
+      if (checkCenterVertical() == false) {
+        centerVertical();
+      }
+      if (checkCenterHorizontal() == false) {
+        centerHorizontal();
+      }
+    }
+    else if (this->centerVerticalWithinParent) {
+      if (checkCenterVertical() == false) {
+        centerVertical();
+      }
+    }
+    else if (this->centerHorizontalWithinParent) {
+      if (checkCenterHorizontal() == false) {
+        centerHorizontal();
+      }
+    }
+
+    this->boundaryRectangle.x =
+        this->parent->boundaryRectangle.x + this->positionRelativeToParent.x;
+    this->boundaryRectangle.y =
+        this->parent->boundaryRectangle.y + this->positionRelativeToParent.y;
   }
 }
 

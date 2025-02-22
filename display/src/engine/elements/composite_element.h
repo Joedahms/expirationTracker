@@ -13,7 +13,7 @@ public:
   void handleEvent(const SDL_Event& event) override;
 
 private:
-  virtual void updateSelf()                            = 0;
+  virtual void updateSelf();
   virtual void renderSelf() const                      = 0;
   virtual void handleEventSelf(const SDL_Event& event) = 0;
 
