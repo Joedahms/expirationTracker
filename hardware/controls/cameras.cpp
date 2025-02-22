@@ -92,6 +92,7 @@ void takePhoto(int angle) {
     }
     exit(0);
   }
+  LOG(INFO) << "Waiting for photo taking process to complete...";
   waitpid(pid, NULL, 0);
   LOG(INFO) << "Photo successful at position " << angle;
 }
