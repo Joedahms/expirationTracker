@@ -78,6 +78,7 @@ void takePhoto(int angle) {
     LOG(FATAL) << "Error starting camera process.";
   }
   else if (pid == 0) {
+    LOG(INFO) << "Capturing at position " << angle;
     std::string fileName = std::string(IMAGE_DIR) + std::to_string(angle) + "_test.jpg";
     execl("/usr/bin/rpicam-still", "rpicam-still", "--width", "4056", "--height", "3040",
           "--nopreview", "--autofocus-on-capture", "on", "--autofocus-speed", "fast",
