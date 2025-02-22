@@ -19,7 +19,6 @@
 class MainMenu : public State {
 public:
   MainMenu(struct DisplayGlobal);
-  void update() override;
   void render() const override;
 };
 

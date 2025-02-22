@@ -15,11 +15,10 @@
 class State {
 public:
   virtual void handleEvents(bool* displayIsRunning);
-  virtual void update()       = 0;
+  virtual void update();
   virtual void render() const = 0;
   EngineState getCurrentState();
   void setCurrentState(EngineState currentState);
-  EngineState checkButtonsClicked(const int& mouseX, const int& mouseY) const;
 
 protected:
   EngineState currentState;

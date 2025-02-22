@@ -19,8 +19,7 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
   SDL_Rect rootRectangle = {0, 0, 0, 0};
   rootRectangle.w        = windowSurface->w;
   rootRectangle.h        = windowSurface->h;
-  std::cout << rootRectangle.w << std::endl;
-  this->rootElement = std::make_unique<Container>(rootRectangle);
+  this->rootElement      = std::make_unique<Container>(rootRectangle);
 
   // Title
   const char* titleContent = "Expiration Tracker";
@@ -31,7 +30,7 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
       std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
                              titleContent, 24, titleColor, titleRect, titleOffset);
   title->setCenteredHorizontal();
-  rootElement->addElement(std::move(title));
+  this->rootElement->addElement(std::move(title));
 
   // Start Scan
   SDL_Rect newScanButtonRectangle       = {200, 150, 200, 50};
@@ -49,15 +48,6 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
   viewStoredButton->setCenteredHorizontal();
   rootElement->addElement(std::move(viewStoredButton));
 }
-
-/**
- * Perform operations that need to be done periodically within the state. Update all
- * buttons.
- *
- * @param None
- * @return None
- */
-void MainMenu::update() { this->rootElement->update(); }
 
 /**
  * Render all elements.

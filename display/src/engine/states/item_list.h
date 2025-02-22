@@ -17,7 +17,6 @@ public:
   ItemList(struct DisplayGlobal displayGlobal);
 
   EngineState checkKeystates();
-  void update() override;
   void render() const override;
 
 private:

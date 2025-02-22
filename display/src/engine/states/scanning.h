@@ -17,7 +17,6 @@ public:
   Scanning(struct DisplayGlobal displayGlobal);
   void handleEvents(bool*) override;
   EngineState checkKeystates();
-  void update() override;
   void render() const override;
   void enterScanning();
   void initializeTextures();

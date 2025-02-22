@@ -16,17 +16,19 @@ public:
   void setPositionRelativeToParent(const SDL_Point& relativePosition);
   void setParent(Element* parent);
 
-  bool checkCenterVertical();
-  bool checkCenterHorizontal();
-  void centerVertical();
-  void centerHorizontal();
-
-  void setCentered();
-  void setCenteredVertical();
-  void setCenteredHorizontal();
-
   SDL_Rect getBoundaryRectangle() { return this->boundaryRectangle; }
   void setboundaryRectangle(SDL_Rect boundaryRectangle);
+
+  void setCentered();
+
+  void setCenteredVertical();
+  bool checkCenterVertical();
+  void centerVertical();
+
+  void setCenteredHorizontal();
+  bool checkCenterHorizontal();
+  void centerHorizontal();
+
   void addBorder(const int& borderThickness);
   void renderBorder() const;
 

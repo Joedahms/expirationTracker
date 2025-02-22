@@ -16,15 +16,19 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) {
   this->displayGlobal        = displayGlobal;
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
 
-  this->rootElement = std::make_unique<Container>();
+  SDL_Rect rootRectangle = {0, 0, 0, 0};
+  rootRectangle.w        = windowSurface->w;
+  rootRectangle.h        = windowSurface->h;
+  this->rootElement      = std::make_unique<Container>(rootRectangle);
 
-  const char* fontPath               = "../display/fonts/16020_FUTURAM.ttf";
-  const char* progressMessageContent = "Scanning In Progress";
-  SDL_Color progressMessageColor     = {0, 255, 0, 255}; // Green
-  SDL_Rect progressMessageRectangle  = {100, 100, 0, 0}; // x y w h
-  std::unique_ptr<Text> progressMessage =
-      std::make_unique<Text>(this->displayGlobal, fontPath, progressMessageContent, 24,
-                             progressMessageColor, progressMessageRectangle);
+  const char* fontPath                  = "../display/fonts/16020_FUTURAM.ttf";
+  const char* progressMessageContent    = "Scanning In Progress";
+  SDL_Color progressMessageColor        = {0, 255, 0, 255}; // Green
+  SDL_Rect progressMessageRectangle     = {0, 0, 0, 0};     // x y w h
+  SDL_Point progressMessageOffset       = {0, 100};
+  std::unique_ptr<Text> progressMessage = std::make_unique<Text>(
+      this->displayGlobal, fontPath, progressMessageContent, 24, progressMessageColor,
+      progressMessageRectangle, progressMessageOffset);
   progressMessage->setCenteredHorizontal();
   this->rootElement->addElement(std::move(progressMessage));
 }
@@ -64,8 +68,6 @@ EngineState Scanning::checkKeystates() {
 
   return EngineState::SCANNING;
 }
-
-void Scanning::update() {}
 
 /**
  * Render all scanning elements.

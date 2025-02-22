@@ -19,9 +19,14 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
 
   this->displayGlobal = displayGlobal;
 
-  previousUpdate = std::chrono::steady_clock::now();
+  SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
+  previousUpdate             = std::chrono::steady_clock::now();
 
-  this->rootElement = std::make_unique<Container>();
+  SDL_Rect rootRectangle = {0, 0, 0, 0};
+  rootRectangle.w        = windowSurface->w;
+  rootRectangle.h        = windowSurface->h;
+  std::cout << rootRectangle.w << std::endl;
+  this->rootElement = std::make_unique<Container>(rootRectangle);
 
   SDL_Rect scrollBoxRect = {0, 0, 400, 100};
   int windowWidth, windowHeight;
@@ -97,15 +102,6 @@ EngineState ItemList::checkKeystates() {
 
   return EngineState::ITEM_LIST;
 }
-
-/**
- * Perform operations that need to be done periodically within the state. Only update
- * scrollbox.
- *
- * @param None
- * @return None
- */
-void ItemList::update() { this->rootElement->update(); }
 
 void ItemList::render() const {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background
