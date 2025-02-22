@@ -48,9 +48,8 @@ PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
  * @param displayIsRunning Whether or not the display is running.
  * @return Current state the display is in.
  */
-EngineState PauseMenu::handleEvents(bool* displayIsRunning) {
+void PauseMenu::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
-  EngineState returnValue = EngineState::PAUSE_MENU;
   while (SDL_PollEvent(&event) != 0) { // While there are events in the queue
     int mouseX = event.motion.x;
     int mouseY = event.motion.y;
@@ -67,7 +66,6 @@ EngineState PauseMenu::handleEvents(bool* displayIsRunning) {
       break;
     }
   }
-  return returnValue;
 }
 
 /**

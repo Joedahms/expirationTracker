@@ -19,7 +19,7 @@
 class MainMenu : public State {
 public:
   MainMenu(struct DisplayGlobal);
-  EngineState handleEvents(bool*) override;
+  void handleEvents(bool*);
   void update() override;
   void render() const override;
 };

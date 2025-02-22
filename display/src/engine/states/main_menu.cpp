@@ -51,9 +51,8 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
  * @param displayIsRunning Whether or not the display is running.
  * @return Current state the display is in.
  */
-EngineState MainMenu::handleEvents(bool* displayIsRunning) {
+void MainMenu::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
-  EngineState returnValue = EngineState::MAIN_MENU;
   while (SDL_PollEvent(&event) != 0) { // While there are events in the queue
     int mouseX = event.motion.x;
     int mouseY = event.motion.y;
@@ -63,15 +62,15 @@ EngineState MainMenu::handleEvents(bool* displayIsRunning) {
       *displayIsRunning = false;
       break;
 
-    case SDL_MOUSEBUTTONDOWN:
-      // returnValue = checkButtonsClicked(mouseX, mouseY);
-      break;
+      // case SDL_MOUSEBUTTONDOWN:
+      //  returnValue = checkButtonsClicked(mouseX, mouseY);
+      // break;
 
     default:
+      this->rootElement->handleEvent(event);
       break;
     }
   }
-  return returnValue;
 }
 
 /**

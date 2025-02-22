@@ -86,7 +86,13 @@ void Button::renderSelf() const {
   SDL_RenderFillRect(this->displayGlobal.renderer, &this->rectangle);
 }
 
-void Button::handleEventSelf(const SDL_Event& event) {}
+void Button::handleEventSelf(const SDL_Event& event) {
+  if (event.type == SDL_MOUSEBUTTONDOWN) {
+    if (checkHovered(event.motion.x, event.motion.y) == true) {
+      onClick();
+    }
+  }
+}
 
 /**
  * Check if the mouse is over the button. Could be improved by using SDL_Point.

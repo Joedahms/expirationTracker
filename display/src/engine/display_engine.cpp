@@ -131,7 +131,6 @@ void DisplayEngine::initializeEngine(SDL_Window* window) {
  * @return None
  */
 void DisplayEngine::checkState() {
-  std::cout << engineStateToString(this->engineState) << std::endl;
   switch (this->engineState) {
   case EngineState::MAIN_MENU:
     this->engineState = this->mainMenu->getCurrentState();
@@ -142,17 +141,17 @@ void DisplayEngine::checkState() {
     if (!this->scanning->getStateEntered()) {
       this->scanning->enterScanning();
     }
-    this->engineState = this->mainMenu->getCurrentState();
+    this->engineState = this->scanning->getCurrentState();
     this->scanning->setCurrentState(EngineState::SCANNING);
     break;
 
   case EngineState::PAUSE_MENU:
-    this->engineState = this->mainMenu->getCurrentState();
+    this->engineState = this->pauseMenu->getCurrentState();
     this->pauseMenu->setCurrentState(EngineState::PAUSE_MENU);
     break;
 
   case EngineState::ITEM_LIST:
-    this->engineState = this->mainMenu->getCurrentState();
+    this->engineState = this->itemList->getCurrentState();
     this->itemList->setCurrentState(EngineState::ITEM_LIST);
     break;
 
@@ -173,7 +172,7 @@ void DisplayEngine::checkState() {
 void DisplayEngine::handleEvents(int* engineToDisplay, int* displayToEngine) {
   switch (this->engineState) {
   case EngineState::MAIN_MENU:
-    this->engineState = this->mainMenu->handleEvents(&this->displayIsRunning);
+    this->mainMenu->handleEvents(&this->displayIsRunning);
 
     if (this->engineState == EngineState::SCANNING) {
       LOG(INFO) << "Scan initialized, engine switching to scanning state";
@@ -183,7 +182,7 @@ void DisplayEngine::handleEvents(int* engineToDisplay, int* displayToEngine) {
 
   case EngineState::SCANNING:
     {
-      this->engineState = this->scanning->handleEvents(&this->displayIsRunning);
+      this->scanning->handleEvents(&this->displayIsRunning);
 
       struct timeval timeout;
       timeout.tv_sec  = 0;
@@ -235,6 +234,7 @@ void DisplayEngine::handleEvents(int* engineToDisplay, int* displayToEngine) {
  * @return None
  */
 void DisplayEngine::checkKeystates() {
+  std::cout << engineStateToString(this->engineState) << std::endl;
   switch (this->engineState) {
   case EngineState::MAIN_MENU:
     break;

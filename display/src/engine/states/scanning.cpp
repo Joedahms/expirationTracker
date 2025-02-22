@@ -35,7 +35,7 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) {
  * @param displayIsRunning Whether or not the display is running
  * @return The current state of the display after updating scanning
  */
-EngineState Scanning::handleEvents(bool* displayIsRunning) {
+void Scanning::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
   while (SDL_PollEvent(&event) != 0) { // While events in the queue
     switch (event.type) {
@@ -47,8 +47,6 @@ EngineState Scanning::handleEvents(bool* displayIsRunning) {
       break;
     }
   }
-
-  return EngineState::SCANNING;
 }
 
 /**

@@ -44,7 +44,7 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
  * display.
  * @return The state the display is in after handling all events in the SDL event queue
  */
-EngineState ItemList::handleEvents(bool* displayIsRunning) {
+void ItemList::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
   while (SDL_PollEvent(&event) != 0) { // While events in the queue
     int mouseX = event.motion.x;
@@ -80,8 +80,6 @@ EngineState ItemList::handleEvents(bool* displayIsRunning) {
       break;
     }
   }
-
-  return EngineState::ITEM_LIST;
 }
 
 /**
