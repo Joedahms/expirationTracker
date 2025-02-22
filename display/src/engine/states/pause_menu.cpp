@@ -28,44 +28,20 @@ PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
   this->rootElement->addElement(std::move(title));
 
   // Resume button
-  SDL_Rect resumeButtonRectangle       = {200, 150, 200, 50};
-  std::unique_ptr<Button> resumeButton = std::make_unique<Button>(
-      this->displayGlobal, resumeButtonRectangle, "Resume", [this]() { ; });
+  SDL_Rect resumeButtonRectangle = {200, 150, 200, 50};
+  std::unique_ptr<Button> resumeButton =
+      std::make_unique<Button>(this->displayGlobal, resumeButtonRectangle, "Resume",
+                               [this]() { this->currentState = EngineState::SCANNING; });
   resumeButton->centerHorizontal(windowSurface);
   this->rootElement->addElement(std::move(resumeButton));
 
   // Main menu button
-  SDL_Rect mainMenuButtonRectangle       = {200, 225, 200, 50};
-  std::unique_ptr<Button> mainMenuButton = std::make_unique<Button>(
-      this->displayGlobal, mainMenuButtonRectangle, "Main Menu", [this]() { ; });
+  SDL_Rect mainMenuButtonRectangle = {200, 225, 200, 50};
+  std::unique_ptr<Button> mainMenuButton =
+      std::make_unique<Button>(this->displayGlobal, mainMenuButtonRectangle, "Main Menu",
+                               [this]() { this->currentState = EngineState::MAIN_MENU; });
   mainMenuButton->centerHorizontal(windowSurface);
   this->rootElement->addElement(std::move(mainMenuButton));
-}
-
-/**
- * Handle SDL events that occur in the pause menu state.
- *
- * @param displayIsRunning Whether or not the display is running.
- * @return Current state the display is in.
- */
-void PauseMenu::handleEvents(bool* displayIsRunning) {
-  SDL_Event event;
-  while (SDL_PollEvent(&event) != 0) { // While there are events in the queue
-    int mouseX = event.motion.x;
-    int mouseY = event.motion.y;
-    switch (event.type) { // Check which type of event
-    case SDL_QUIT:
-      *displayIsRunning = false;
-      break;
-
-    case SDL_MOUSEBUTTONDOWN:
-      //      returnValue = checkButtonsClicked(mouseX, mouseY);
-      break;
-
-    default:
-      break;
-    }
-  }
 }
 
 /**

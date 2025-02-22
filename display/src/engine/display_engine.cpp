@@ -213,11 +213,11 @@ void DisplayEngine::handleEvents(int* engineToDisplay, int* displayToEngine) {
     }
 
   case EngineState::PAUSE_MENU:
-    //    this->engineState = this->pauseMenu->handleEvents(&this->displayIsRunning);
+    this->pauseMenu->handleEvents(&this->displayIsRunning);
     break;
 
   case EngineState::ITEM_LIST:
-    //   this->engineState = this->itemList->handleEvents(&this->displayIsRunning);
+    this->itemList->handleEvents(&this->displayIsRunning);
     break;
 
   default:
