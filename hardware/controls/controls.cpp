@@ -24,11 +24,6 @@ extern Pipes pipes;
  */
 void rotateAndCapture(struct Pipes pipes, float weight) {
   for (int angle = 0; angle < 8; angle++) {
-    /**
-     * char filename[] = "IMAGE_DIR + std::to_string(angle) + "_S.jpg --nopreview";
-     * takePic(filename);
-     * cout << "Captured image at position " << angle << endl;
-     */
     LOG(INFO) << "Capturing at position " << angle;
     // takePhotos(angle);    // This function is for both cameras
     takePhoto(angle); // This function is for one camera/testing
