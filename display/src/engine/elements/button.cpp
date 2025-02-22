@@ -10,17 +10,17 @@
  *
  *
  * @param displayGlobal Global display variables
- * @param rectangle Rectangle to render the button with
+ * @param boundaryRectangle boundaryRectangle to render the button with
  * @param textContent The text to print in the middle of the button
  * @param clickRet Value corrosponding to the button being clicked
  */
 Button::Button(struct DisplayGlobal displayGlobal,
-               const SDL_Rect& rectangle,
+               const SDL_Rect& boundaryRectangle,
                const std::string& textContent,
                std::function<void()> callback)
     : onClick(callback) {
-  this->displayGlobal = displayGlobal;
-  this->rectangle     = rectangle;
+  this->displayGlobal     = displayGlobal;
+  this->boundaryRectangle = boundaryRectangle;
 
   // Colors
   this->backgroundColor = {255, 0, 0, 255}; // Red
@@ -31,18 +31,18 @@ Button::Button(struct DisplayGlobal displayGlobal,
   SDL_Color textColor = {255, 255, 0, 255}; // Yellow
   std::unique_ptr<Text> text =
       std::make_unique<Text>(this->displayGlobal, "../display/fonts/16020_FUTURAM.ttf",
-                             textContent.c_str(), 24, textColor, this->rectangle);
+                             textContent.c_str(), 24, textColor, this->boundaryRectangle);
 
   // Size based on text
-  if (this->rectangle.w == 0 && this->rectangle.h == 0) {
-    SDL_Rect textRectangle = text->getRectangle();
-    this->rectangle.w      = textRectangle.w + 10;
-    this->rectangle.h      = textRectangle.h + 10;
+  if (this->boundaryRectangle.w == 0 && this->boundaryRectangle.h == 0) {
+    SDL_Rect textboundaryRectangle = text->getBoundaryRectangle();
+    this->boundaryRectangle.w      = textboundaryRectangle.w + 10;
+    this->boundaryRectangle.h      = textboundaryRectangle.h + 10;
   }
 
   // Center text
-  text->centerHorizontal(this->rectangle);
-  text->centerVertical(this->rectangle);
+  text->centerHorizontal(this->boundaryRectangle);
+  text->centerVertical(this->boundaryRectangle);
 
   addElement(std::move(text));
 }
@@ -51,11 +51,11 @@ void Button::update() {
   updateSelf();
   for (const auto& element : this->children) {
     element->update();
-    if (element->checkCenterHorizontal(this->rectangle) == false) {
-      element->centerHorizontal(this->rectangle);
+    if (element->checkCenterHorizontal(this->boundaryRectangle) == false) {
+      element->centerHorizontal(this->boundaryRectangle);
     }
-    if (element->checkCenterVertical(this->rectangle) == false) {
-      element->centerVertical(this->rectangle);
+    if (element->checkCenterVertical(this->boundaryRectangle) == false) {
+      element->centerVertical(this->boundaryRectangle);
     }
   }
 }
@@ -83,7 +83,7 @@ void Button::renderSelf() const {
   // Set draw color and fill the button
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, backgroundColor.r,
                          backgroundColor.g, backgroundColor.b, backgroundColor.a);
-  SDL_RenderFillRect(this->displayGlobal.renderer, &this->rectangle);
+  SDL_RenderFillRect(this->displayGlobal.renderer, &this->boundaryRectangle);
 }
 
 void Button::handleEventSelf(const SDL_Event& event) {
@@ -103,22 +103,22 @@ void Button::handleEventSelf(const SDL_Event& event) {
  */
 bool Button::checkHovered(const int& mouseXPosition, const int& mouseYPosition) {
   // Outside left edge of button
-  if (mouseXPosition < this->rectangle.x) {
+  if (mouseXPosition < this->boundaryRectangle.x) {
     return false;
   }
 
   // Outside right edge of button
-  if (mouseXPosition > this->rectangle.x + this->rectangle.w) {
+  if (mouseXPosition > this->boundaryRectangle.x + this->boundaryRectangle.w) {
     return false;
   }
 
   // Outside top edge of button
-  if (mouseYPosition < this->rectangle.y) {
+  if (mouseYPosition < this->boundaryRectangle.y) {
     return false;
   }
 
   // Outside bottom edge of button
-  if (mouseYPosition > this->rectangle.y + this->rectangle.h) {
+  if (mouseYPosition > this->boundaryRectangle.y + this->boundaryRectangle.h) {
     return false;
   }
 

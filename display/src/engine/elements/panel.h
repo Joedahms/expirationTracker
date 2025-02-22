@@ -14,12 +14,12 @@
 
 class Panel : public CompositeElement {
 public:
-  Panel(struct DisplayGlobal displayGlobal, int id);
-  Panel(struct DisplayGlobal displayGlobal, int id, SDL_Rect rect);
   Panel(struct DisplayGlobal displayGlobal,
         int id,
-        SDL_Rect rect,
+        SDL_Rect boundaryRectangle,
+        SDL_Point positionRelativeToParent,
         std::vector<std::unique_ptr<Text>> t);
+  Panel(struct DisplayGlobal displayGlobal, int id, SDL_Point positionRelativeToParent);
 
   void handleMouseButtonDown(const SDL_Point& mousePosition);
   void addText(const std::string& fontPath,
@@ -27,14 +27,17 @@ public:
                const int& fontSize,
                const SDL_Color& color);
   void addFoodItem(const FoodItem& foodItem);
-  void addFoodItemName(const FoodItem& foodItem);
-  void addFoodItemExpirationDate(const FoodItem& foodItem);
 
   void updateSelf() override;
   void renderSelf() const override;
   void handleEventSelf(const SDL_Event& event) override;
 
 private:
+  int id = 0;
+
+  void addFoodItemName(const FoodItem& foodItem);
+  void addFoodItemExpirationDate(const FoodItem& foodItem);
+
   //  std::vector<std::unique_ptr<Text>> texts;
   // NumberSetting itemQuantity;
 };

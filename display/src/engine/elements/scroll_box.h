@@ -11,28 +11,28 @@
 #include "element.h"
 #include "panel.h"
 
-/*
-class ScrollBox : public Element {
+class ScrollBox : public CompositeElement {
 public:
-  ScrollBox(struct DisplayGlobal displayGlobal);
+  ScrollBox(struct DisplayGlobal displayGlobal, const SDL_Rect& boundaryRectangle);
 
   void refreshPanels();
   void setPanelHeight(int panelHeight);
   void addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectangle);
 
   void handleMouseButtonDown(const SDL_Point& mousePosition);
-  void update() override;
   void scrollUp(const SDL_Point* mousePosition);
   void scrollDown(const SDL_Point* mousePosition);
-  void render() const override;
+
+  void updateSelf() override;
+  void renderSelf() const override;
+  void handleEventSelf(const SDL_Event& event);
 
 private:
   std::chrono::steady_clock::time_point previousUpdate;
   std::chrono::steady_clock::time_point currentUpdate;
-  std::vector<std::unique_ptr<Panel>> panels;
+  // std::vector<std::unique_ptr<Panel>> panels;
   int panelHeight;
   int topPanelPosition = 0;
 };
-*/
 
 #endif

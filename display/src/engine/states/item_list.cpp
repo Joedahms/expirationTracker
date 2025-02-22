@@ -23,18 +23,16 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
 
   this->rootElement = std::make_unique<Container>();
 
-  /*
-  std::unique_ptr<ScrollBox> scrollBox = std::make_unique<ScrollBox>(this->displayGlobal);
-  SDL_Rect scrollBoxRect               = {0, 0, 400, 100};
+  SDL_Rect scrollBoxRect = {0, 0, 400, 100};
   int windowWidth, windowHeight;
   SDL_GetWindowSize(this->displayGlobal.window, &windowWidth, &windowHeight);
   scrollBoxRect.h = windowHeight - 1;
-  scrollBox->setRectangle(scrollBoxRect);
+  std::unique_ptr<ScrollBox> scrollBox =
+      std::make_unique<ScrollBox>(this->displayGlobal, scrollBoxRect);
   scrollBox->setPanelHeight(30);
   scrollBox->addBorder(1);
   this->rootElement->addElement(std::move(scrollBox));
   this->rootElement->update();
-  */
 }
 
 /**
@@ -44,6 +42,7 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
  * display.
  * @return The state the display is in after handling all events in the SDL event queue
  */
+/*
 void ItemList::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
   while (SDL_PollEvent(&event) != 0) { // While events in the queue
@@ -81,6 +80,7 @@ void ItemList::handleEvents(bool* displayIsRunning) {
     }
   }
 }
+*/
 
 /**
  * Perform the appropriate action depending on which keyboard key has been pressed.

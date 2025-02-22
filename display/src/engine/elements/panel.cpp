@@ -11,65 +11,52 @@
 #include "text.h"
 
 /**
- * Most basic way to construct a panel. Only need the id of the object to be displayed
- * within the panel.
+ * Construct a panel with a boundaryRectangle and some text objects.
  *
  * @param displayGlobal
  * @param id ID of the object to be displayed within the panel. Could correspond to an ID
  * of an item in a database.
- */
-/*
-Panel::Panel(struct DisplayGlobal displayGlobal, int id)
-    : itemQuantity(displayGlobal, id) {
-  this->displayGlobal = displayGlobal;
-}
-*/
-
-/**
- * Construct a panel with an id and a rectangle. Used to define an explicit rectangle for
- * the panel.
- *
- * @param displayGlobal
- * @param id ID of the object to be displayed within the panel. Could correspond to an ID
- * of an item in a database.
- * @param rect SDL rectangle defining the position and size of the panel.
- */
-/*
-Panel::Panel(struct DisplayGlobal displayGlobal, int id, SDL_Rect rect)
-    : itemQuantity(displayGlobal, id) {
-  this->displayGlobal = displayGlobal;
-  this->rectangle     = rect;
-}
-*/
-
-/**
- * Construct a panel with a rectangle and some text objects.
- *
- * @param displayGlobal
- * @param id ID of the object to be displayed within the panel. Could correspond to an ID
- * of an item in a database.
- * @param rect SDL rectangle defining the position and size of the panel.
+ * @param rect SDL boundaryRectangle defining the position and size of the panel.
  * @param t A vector of texts to be displayed within the panel.
  */
 Panel::Panel(struct DisplayGlobal displayGlobal,
              int id,
-             SDL_Rect rect,
+             SDL_Rect boundaryRectangle,
+             SDL_Point positionRelativeToParent,
              std::vector<std::unique_ptr<Text>> t) {
+  this->boundaryRectangle        = boundaryRectangle;
+  this->positionRelativeToParent = positionRelativeToParent;
+  // Add text
   for (auto& currText : t) {
     addElement(std::move(currText));
   }
 
+  // Add quantity setting
   std::unique_ptr<NumberSetting> itemQuantity =
       std::make_unique<NumberSetting>(displayGlobal, id);
   addElement(std::move(itemQuantity));
 
   this->displayGlobal = displayGlobal;
-  this->rectangle     = rect;
 }
 
-void Panel::handleMouseButtonDown(const SDL_Point& mousePosition) {
-  //  this->itemQuantity.handleMouseButtonDown(mousePosition);
+Panel::Panel(struct DisplayGlobal displayGlobal,
+             int id,
+             SDL_Point positionRelativeToParent) {
+  this->positionRelativeToParent = positionRelativeToParent;
+
+  // Add quantity setting
+  std::unique_ptr<NumberSetting> itemQuantity =
+      std::make_unique<NumberSetting>(displayGlobal, id);
+  addElement(std::move(itemQuantity));
+
+  this->displayGlobal = displayGlobal;
 }
+
+/*
+void Panel::handleMouseButtonDown(const SDL_Point& mousePosition) {
+  this->itemQuantity.handleMouseButtonDown(mousePosition);
+}
+*/
 
 /**
  * Add some text to a panel. Whatever text is added first will be displayed on the left
@@ -85,11 +72,9 @@ void Panel::addText(const std::string& fontPath,
                     const std::string& content,
                     const int& fontSize,
                     const SDL_Color& color) {
-  /*
   std::unique_ptr<Text> text = std::make_unique<Text>(
       this->displayGlobal, fontPath, content, fontSize, color, SDL_Rect{0, 0, 0, 0});
-  this->texts.push_back(std::move(text));
-  */
+  this->children.push_back(std::move(text));
 }
 
 /**
@@ -102,6 +87,42 @@ void Panel::addFoodItem(const FoodItem& foodItem) {
   addFoodItemName(foodItem);
   addFoodItemExpirationDate(foodItem);
 }
+
+/**
+ * Currently this function only updates the text objects, it will need to be expanded to
+ * update buttons in the future when they are added. It ensures that all of the text
+ * objects are aligned as desired within the panel.
+ *
+ * @param None
+ * @return None
+ */
+void Panel::updateSelf() {
+  // Align all children right next to each other
+  for (int i = 0; i < this->children.size(); i++) {
+    SDL_Rect childboundaryRectangle = this->children[i]->getBoundaryRectangle();
+    childboundaryRectangle.y        = this->boundaryRectangle.y;
+    if (i == 0) {
+      childboundaryRectangle.x = 0;
+    }
+    else {
+      SDL_Rect leftboundaryRectangle = this->children[i - 1]->getBoundaryRectangle();
+      childboundaryRectangle.x       = leftboundaryRectangle.x + leftboundaryRectangle.w;
+    }
+    this->children[i]->setboundaryRectangle(childboundaryRectangle);
+  }
+
+  /*
+  SDL_Rect itemQuantityRect = this->itemQuantity.getBoundaryRectangle();
+  itemQuantityRect.y        = this->texts.back()->getBoundaryRectangle().y;
+  itemQuantityRect.x        = this->texts.back()->getBoundaryRectangle().x +
+                       this->texts.back()->getBoundaryRectangle().w;
+  this->itemQuantity.setBoundaryRectangle(itemQuantityRect);
+  this->itemQuantity.update();
+  */
+}
+
+void Panel::renderSelf() const {}
+void Panel::handleEventSelf(const SDL_Event& event) {}
 
 /**
  * Add the name of a food item to a panel.
@@ -152,42 +173,3 @@ void Panel::addFoodItemExpirationDate(const FoodItem& foodItem) {
       std::to_string(static_cast<int>(foodItem.expirationDate.year()));
   addText(fontPath, expirationDateYear, fontSize, textColor);
 }
-
-/**
- * Currently this function only updates the text objects, it will need to be expanded to
- * update buttons in the future when they are added. It ensures that all of the text
- * objects are aligned as desired within the panel.
- *
- * @param None
- * @return None
- */
-// void Panel::update() {
-/*
-// Align all text objects right next to each other
-for (int i = 0; i < this->texts.size(); i++) {
-  SDL_Rect textRectangle = this->texts[i]->getRectangle();
-  textRectangle.y        = this->rectangle.y;
-  if (i == 0) {
-    textRectangle.x = 0;
-  }
-  else {
-    SDL_Rect leftRectangle = this->texts[i - 1]->getRectangle();
-    textRectangle.x        = leftRectangle.x + leftRectangle.w;
-  }
-  this->texts[i]->setRectangle(textRectangle);
-}
-
-// Add quantity
-SDL_Rect itemQuantityRect = this->itemQuantity.getRectangle();
-itemQuantityRect.y        = this->texts.back()->getRectangle().y;
-itemQuantityRect.x =
-    this->texts.back()->getRectangle().x + this->texts.back()->getRectangle().w;
-this->itemQuantity.setRectangle(itemQuantityRect);
-this->itemQuantity.update();
-*/
-//}
-//
-//
-void Panel::updateSelf() {}
-void Panel::renderSelf() const {}
-void Panel::handleEventSelf(const SDL_Event& event) {}

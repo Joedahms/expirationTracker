@@ -16,7 +16,7 @@ public:
    * @return None
    */
   template <typename T> void centerVertical(T centerWithin) {
-    this->rectangle.y = (centerWithin->h / 2 - this->rectangle.h / 2);
+    this->boundaryRectangle.y = (centerWithin->h / 2 - this->boundaryRectangle.h / 2);
   }
 
   /**
@@ -27,7 +27,7 @@ public:
    * @return None
    */
   template <typename T> void centerHorizontal(T centerWithin) {
-    this->rectangle.x = (centerWithin->w / 2 - this->rectangle.w / 2);
+    this->boundaryRectangle.x = (centerWithin->w / 2 - this->boundaryRectangle.w / 2);
   }
 
   /**
@@ -39,7 +39,8 @@ public:
    */
   template <typename T> bool checkCenterVertical(T centerWithin) {
     bool centered = false;
-    if (this->rectangle.y == (centerWithin->h / 2 - this->rectangle.h / 2)) {
+    if (this->boundaryRectangle.y ==
+        (centerWithin->h / 2 - this->boundaryRectangle.h / 2)) {
       centered = true;
     }
     return centered;
@@ -54,27 +55,33 @@ public:
    */
   template <typename T> bool checkCenterHorizontal(T centerWithin) {
     bool centered = false;
-    if (this->rectangle.x == (centerWithin->w / 2 - this->rectangle.w / 2)) {
+    if (this->boundaryRectangle.x ==
+        (centerWithin->w / 2 - this->boundaryRectangle.w / 2)) {
       centered = true;
     }
     return centered;
   }
 
   virtual void addElement(std::unique_ptr<Element> element) {}
-  virtual void update()                            = 0;
+  virtual void update();
   virtual void render() const                      = 0;
   virtual void handleEvent(const SDL_Event& event) = 0;
 
-  SDL_Rect getRectangle() { return this->rectangle; }
-  void setRectangle(SDL_Rect rectangle);
+  void setPositionRelativeToParent(const SDL_Point& relativePosition);
+  void setParent(Element* parent);
+
+  SDL_Rect getBoundaryRectangle() { return this->boundaryRectangle; }
+  void setboundaryRectangle(SDL_Rect boundaryRectangle);
   void addBorder(const int& borderThickness);
   void renderBorder() const;
 
 protected:
   struct DisplayGlobal displayGlobal;
-  SDL_Rect rectangle;
-  bool hasBorder      = false;
-  int borderThickness = 1;
+  SDL_Rect boundaryRectangle         = {0, 0, 0, 0};
+  SDL_Point positionRelativeToParent = {0, 0};
+  Element* parent                    = nullptr;
+  bool hasBorder                     = false;
+  int borderThickness                = 1;
 };
 
 template <> void Element::centerVertical<SDL_Rect>(SDL_Rect centerWithin);

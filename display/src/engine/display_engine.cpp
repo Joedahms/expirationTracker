@@ -234,7 +234,6 @@ void DisplayEngine::handleEvents(int* engineToDisplay, int* displayToEngine) {
  * @return None
  */
 void DisplayEngine::checkKeystates() {
-  std::cout << engineStateToString(this->engineState) << std::endl;
   switch (this->engineState) {
   case EngineState::MAIN_MENU:
     break;

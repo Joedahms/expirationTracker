@@ -13,12 +13,12 @@
 #include "panel.h"
 #include "scroll_box.h"
 
-/*
-ScrollBox::ScrollBox(struct DisplayGlobal displayGlobal) {
-  this->displayGlobal  = displayGlobal;
-  this->previousUpdate = std::chrono::steady_clock::now();
+ScrollBox::ScrollBox(struct DisplayGlobal displayGlobal,
+                     const SDL_Rect& boundaryRectangle) {
+  this->displayGlobal     = displayGlobal;
+  this->previousUpdate    = std::chrono::steady_clock::now();
+  this->boundaryRectangle = boundaryRectangle;
 }
-*/
 
 /**
  * Ensure that all panels have data consistent with what is in the database. Destroys all
@@ -27,53 +27,22 @@ ScrollBox::ScrollBox(struct DisplayGlobal displayGlobal) {
  * @param None
  * @return None
  */
-/*
 void ScrollBox::refreshPanels() {
   std::vector<FoodItem> allFoodItems = readAllFoodItems();
 
-  this->panels.clear();
+  this->children.clear();
+  SDL_Point relativePosition = {0, 0};
   for (auto& foodItem : allFoodItems) {
     std::unique_ptr<Panel> newPanel =
-        std::make_unique<Panel>(this->displayGlobal, foodItem.id);
+        std::make_unique<Panel>(this->displayGlobal, foodItem.id, relativePosition);
+    relativePosition.y += panelHeight;
 
     newPanel->addFoodItem(foodItem);
-    addPanel(std::move(newPanel), this->rectangle);
+    addElement(std::move(newPanel));
   }
 }
-*/
 
-// void ScrollBox::setPanelHeight(int panelHeight) { this->panelHeight = panelHeight; }
-
-/**
- * Add a new panel to the scroll box. Adds the new panel directly below the previously
- * lowest panel.
- *
- * @param The new panel to add
- * @param The rectangle of the element that the panel is being added within
- * @return None
- */
-/*
-void ScrollBox::addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectangle) {
-  std::unique_ptr<Panel> newPanel = std::move(panel);
-  SDL_Rect newPanelRect           = newPanel->getRectangle();
-  newPanelRect.h                  = this->panelHeight;
-  newPanelRect.w                  = containingRectangle.w;
-  newPanelRect.x                  = containingRectangle.x;
-
-  // Set Y position. Could be broken out into positionPanel function.
-  if (this->panels.size() == 0) {
-    newPanelRect.y = this->topPanelPosition;
-  }
-  else {
-    newPanelRect.y = this->panels.back()->getRectangle().y + this->panelHeight;
-  }
-
-  newPanel->setRectangle(newPanelRect);
-  newPanel->update();
-  newPanel->addBorder(1);
-  this->panels.push_back(std::move(newPanel));
-}
-*/
+void ScrollBox::setPanelHeight(int panelHeight) { this->panelHeight = panelHeight; }
 
 /**
  * Handle SDL_MOUSEBUTTONDOWN. If the mouse was clicked within a panel, tell that panel to
@@ -109,6 +78,10 @@ void ScrollBox::update() {
     currPanel->update();
   }
 
+  */
+//}
+
+void ScrollBox::updateSelf() {
   // Get time since last update
   this->currentUpdate = std::chrono::steady_clock::now();
   std::chrono::seconds updateDifference;
@@ -121,7 +94,9 @@ void ScrollBox::update() {
     this->previousUpdate = this->currentUpdate;
   }
 }
-*/
+
+void ScrollBox::renderSelf() const {}
+void ScrollBox::handleEventSelf(const SDL_Event& event) {}
 
 /**
  * Move all panels within the scroll box up.
@@ -165,7 +140,9 @@ void ScrollBox::scrollDown(const SDL_Point* mousePosition) {
     currPanel->update();
   }
 }
+*/
 
+/*
 void ScrollBox::render() const {
   if (this->hasBorder) {
     renderBorder();

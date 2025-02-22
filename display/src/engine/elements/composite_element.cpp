@@ -9,7 +9,9 @@ void CompositeElement::update() {
 }
 
 void CompositeElement::addElement(std::unique_ptr<Element> element) {
+  Element* childPointer = element.get();
   this->children.push_back(std::move(element));
+  childPointer->setParent(this);
 }
 
 void CompositeElement::render() const {
