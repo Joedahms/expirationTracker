@@ -22,7 +22,7 @@
  */
 void rotateAndCapture(struct Pipes pipes, float weight) {
   for (int angle = 0; angle < 8; angle++) {
-    LOG(INFO) << "Capturing at position " << angle;
+    LOG(INFO) << "At " << angle;
     // takePhotos(angle);    // This function is for both cameras
     takePhoto(angle); // This function is for one camera/testing
 
