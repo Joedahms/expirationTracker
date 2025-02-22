@@ -50,7 +50,9 @@ void CompositeElement::updateSelf() {
     }
 
     SDL_Rect parentBoundaryRectangle = parent->getBoundaryRectangle();
-    boundaryRectangle.x = parentBoundaryRectangle.x + positionRelativeToParent.x;
-    boundaryRectangle.y = parentBoundaryRectangle.y + positionRelativeToParent.y;
+    this->boundaryRectangle.x =
+        parentBoundaryRectangle.x + this->positionRelativeToParent.x;
+    this->boundaryRectangle.y =
+        parentBoundaryRectangle.y + this->positionRelativeToParent.y;
   }
 }

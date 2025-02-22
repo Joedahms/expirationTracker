@@ -21,7 +21,7 @@ bool Element::checkCenterVertical() {
   bool centered = false;
   if (this->positionRelativeToParent.y ==
       (this->parent->boundaryRectangle.h / 2 - this->boundaryRectangle.h / 2) +
-          this->parent->boundaryRectangle.y) {
+          this->parent->positionRelativeToParent.y) {
     centered = true;
   }
   return centered;
@@ -30,14 +30,14 @@ bool Element::checkCenterVertical() {
 void Element::centerVertical() {
   this->positionRelativeToParent.y =
       (this->parent->boundaryRectangle.h / 2 - this->boundaryRectangle.h / 2) +
-      this->parent->boundaryRectangle.y;
+      this->parent->positionRelativeToParent.y;
 }
 
 bool Element::checkCenterHorizontal() {
   bool centered = false;
   if (this->positionRelativeToParent.x ==
       (this->parent->boundaryRectangle.w / 2 - this->boundaryRectangle.w / 2) +
-          this->parent->boundaryRectangle.x) {
+          this->parent->positionRelativeToParent.x) {
     centered = true;
   }
   return centered;
@@ -46,12 +46,7 @@ bool Element::checkCenterHorizontal() {
 void Element::centerHorizontal() {
   this->positionRelativeToParent.x =
       ((this->parent->boundaryRectangle.w - this->boundaryRectangle.w) / 2) +
-      this->parent->boundaryRectangle.x;
-  /*
-  this->positionRelativeToParent.x =
-      (this->parent->boundaryRectangle.w / 2 - this->boundaryRectangle.w / 2) +
-      this->parent->boundaryRectangle.x;
-      */
+      this->parent->positionRelativeToParent.x;
 }
 
 void Element::update() {
@@ -75,10 +70,25 @@ void Element::update() {
       }
     }
 
+    std::cout << "parent x: " << this->parent->boundaryRectangle.x << std::endl;
+    std::cout << "parent y: " << this->parent->boundaryRectangle.y << std::endl;
+    std::cout << "parent w: " << this->parent->boundaryRectangle.w << std::endl;
+    std::cout << "parent h: " << this->parent->boundaryRectangle.h << std::endl;
+
+    std::cout << "me rel x: " << this->positionRelativeToParent.x << std::endl;
+    std::cout << "me rel y: " << this->positionRelativeToParent.y << std::endl;
+
+    /*
     this->boundaryRectangle.x =
-        this->parent->boundaryRectangle.x + this->positionRelativeToParent.x;
-    this->boundaryRectangle.y =
-        this->parent->boundaryRectangle.y + this->positionRelativeToParent.y;
+        this->parent->positionRelativeToParent.x + this->positionRelativeToParent.x;
+*/
+    this->boundaryRectangle.x = this->positionRelativeToParent.x;
+    this->boundaryRectangle.y = this->positionRelativeToParent.y;
+
+    std::cout << "me x: " << this->boundaryRectangle.x << std::endl;
+    std::cout << "me y: " << this->boundaryRectangle.y << std::endl;
+    std::cout << "me w: " << this->boundaryRectangle.w << std::endl;
+    std::cout << "me h: " << this->boundaryRectangle.h << std::endl;
   }
 }
 

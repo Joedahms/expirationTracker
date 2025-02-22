@@ -33,19 +33,22 @@ Button::Button(struct DisplayGlobal displayGlobal,
   this->defaultColor    = {255, 0, 0, 255}; // Red
 
   // Button Text
-  SDL_Color textColor        = {255, 255, 0, 255}; // Yellow
-  SDL_Point textOffset       = {10, 10};
-  std::unique_ptr<Text> text = std::make_unique<Text>(
-      this->displayGlobal, "../display/fonts/16020_FUTURAM.ttf", textContent.c_str(), 24,
-      textColor, this->boundaryRectangle, textOffset);
+  SDL_Color textColor  = {255, 255, 0, 255}; // Yellow
+  SDL_Point textOffset = {10, 10};
+  SDL_Rect textRect    = {0, 0, 0, 0};
+  std::unique_ptr<Text> text =
+      std::make_unique<Text>(this->displayGlobal, "../display/fonts/16020_FUTURAM.ttf",
+                             textContent.c_str(), 24, textColor, textRect, textOffset);
   text->setCentered();
 
+  /*
   // Size based on text
   if (this->boundaryRectangle.w == 0 && this->boundaryRectangle.h == 0) {
     SDL_Rect textboundaryRectangle = text->getBoundaryRectangle();
     this->boundaryRectangle.w      = textboundaryRectangle.w + 10;
     this->boundaryRectangle.h      = textboundaryRectangle.h + 10;
   }
+  */
 
   addElement(std::move(text));
 }
@@ -67,7 +70,7 @@ void Button::updateSelf() {
         centerHorizontal();
       }
     }
-    if (this->centerVerticalWithinParent) {
+    else if (this->centerVerticalWithinParent) {
       if (checkCenterVertical() == false) {
         centerVertical();
       }
@@ -78,7 +81,7 @@ void Button::updateSelf() {
       }
     }
 
-    SDL_Rect parentBoundaryRectangle = parent->getBoundaryRectangle();
+    SDL_Rect parentBoundaryRectangle = this->parent->getBoundaryRectangle();
     this->boundaryRectangle.x =
         parentBoundaryRectangle.x + this->positionRelativeToParent.x;
     this->boundaryRectangle.y =
