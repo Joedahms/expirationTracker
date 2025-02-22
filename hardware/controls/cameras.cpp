@@ -72,25 +72,30 @@ void takePhotos(int angle) {
  * @return None - can add a 0 or -1 for success/failure
  */
 void takePhoto(int angle) {
+  LOG(INFO) << "Inside takePhoto at angle " << angle;
   pid_t pid = fork();
   if (pid < 0) {
     LOG(FATAL) << "Error: Failed to fork process for capturing image.";
     return;
   }
   else if (pid == 0) {
-    // Child process executes rpicam-still
+    // Child process calls system() to execute rpicam-still
     std::string filePath = std::string(IMAGE_DIR) + std::to_string(angle) + "_test.jpg";
-    execl("/usr/bin/rpicam-still", "rpicam-still", "--width", "4056", "--height", "3040",
-          "--nopreview", "--autofocus-on-capture", "on", "--autofocus-speed", "fast",
-          "--exposure", "normal", "--output", filePath.c_str(), "--timeout", "1000",
-          (char*)NULL);
 
-    // If execl() fails:
-    std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
-    _exit(1); // Immediately exit child if execl() fails
+    std::string command = "/usr/bin/rpicam-still --width 4056 --height 3040 "
+                          "--nopreview --autofocus-on-capture on "
+                          "--autofocus-speed fast --exposure normal "
+                          "--output " +
+                          filePath + " --timeout 1000";
+
+    int ret = system(command.c_str());
+    if (ret == -1) {
+      LOG(FATAL) << "Failed to capture image with rpicam-still";
+    }
+    _exit(0);
   }
   else {
-    // Parent process waits for the child to finish
+    // Parent process waits for child
     LOG(INFO) << "Waiting for photo at angle " << angle << " to complete...";
     waitpid(pid, NULL, 0);
     LOG(INFO) << "Photo successful at position " << angle;
