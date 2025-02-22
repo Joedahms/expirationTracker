@@ -20,14 +20,14 @@ NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal, int settingId)
       std::make_unique<Button>(displayGlobal, SDL_Rect{0, 0, 0, 0}, "-", [this]() { ; });
   addElement(std::move(decreaseButton));
 
-  std::unique_ptr<Button> increaseButton =
-      std::make_unique<Button>(displayGlobal, SDL_Rect{0, 0, 0, 0}, "+", [this]() { ; });
-  addElement(std::move(increaseButton));
-
   std::unique_ptr<Text> text =
       std::make_unique<Text>(displayGlobal, displayGlobal.futuramFontPath, "0", 24,
                              SDL_Color{0, 255, 0, 255}, SDL_Rect{0, 0, 0, 0});
   addElement(std::move(text));
+
+  std::unique_ptr<Button> increaseButton =
+      std::make_unique<Button>(displayGlobal, SDL_Rect{0, 0, 0, 0}, "+", [this]() { ; });
+  addElement(std::move(increaseButton));
 
   FoodItem foodItem  = readFoodItemById(this->settingId);
   this->settingValue = foodItem.quantity;
@@ -123,6 +123,26 @@ this->decreaseButton.render();
 */
 //}
 
-void NumberSetting::updateSelf() {}
+void NumberSetting::updateSelf() {
+  for (int i = 0; i < this->children.size(); i++) {
+    SDL_Point childRelativePosition = this->children[i]->getPositionRelativeToParent();
+    childRelativePosition.y         = this->positionRelativeToParent.y;
+    if (i == 0) {
+      childRelativePosition.x = 0;
+    }
+    else {
+      SDL_Point leftRelativePosition =
+          this->children[i - 1]->getPositionRelativeToParent();
+      SDL_Rect leftBoundaryRectangle = this->children[i - 1]->getBoundaryRectangle();
+      std::cout << "lw: " << leftBoundaryRectangle.w << std::endl;
+      childRelativePosition.x = leftRelativePosition.x + leftBoundaryRectangle.w;
+    }
+    this->children[i]->setPositionRelativeToParent(childRelativePosition);
+
+    std::cout << "x: " << this->children[i]->getPositionRelativeToParent().x << std::endl;
+    std::cout << "y: " << this->children[i]->getPositionRelativeToParent().y << std::endl;
+  }
+}
+
 void NumberSetting::renderSelf() const {}
 void NumberSetting::handleEventSelf(const SDL_Event& event) {}

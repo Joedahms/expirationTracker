@@ -14,6 +14,7 @@ public:
   virtual void handleEvent(const SDL_Event& event) = 0;
 
   void setPositionRelativeToParent(const SDL_Point& relativePosition);
+  SDL_Point getPositionRelativeToParent() { return this->positionRelativeToParent; }
   void setParent(Element* parent);
 
   SDL_Rect getBoundaryRectangle() { return this->boundaryRectangle; }

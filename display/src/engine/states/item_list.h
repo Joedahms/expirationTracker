@@ -15,7 +15,6 @@
 class ItemList : public State {
 public:
   ItemList(struct DisplayGlobal displayGlobal);
-
   EngineState checkKeystates();
   void render() const override;
 

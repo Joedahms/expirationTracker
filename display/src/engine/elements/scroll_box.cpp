@@ -37,7 +37,7 @@ void ScrollBox::refreshPanels() {
         std::make_unique<Panel>(this->displayGlobal, foodItem.id, relativePosition);
     relativePosition.y += panelHeight;
 
-    newPanel->addFoodItem(foodItem);
+    newPanel->addFoodItem(foodItem, relativePosition);
     addElement(std::move(newPanel));
   }
 }

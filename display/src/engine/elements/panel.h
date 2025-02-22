@@ -25,8 +25,9 @@ public:
   void addText(const std::string& fontPath,
                const std::string& content,
                const int& fontSize,
-               const SDL_Color& color);
-  void addFoodItem(const FoodItem& foodItem);
+               const SDL_Color& color,
+               const SDL_Point& relativePosition);
+  void addFoodItem(const FoodItem& foodItem, const SDL_Point& relativePosition);
 
   void updateSelf() override;
   void renderSelf() const override;
@@ -35,11 +36,9 @@ public:
 private:
   int id = 0;
 
-  void addFoodItemName(const FoodItem& foodItem);
-  void addFoodItemExpirationDate(const FoodItem& foodItem);
-
-  //  std::vector<std::unique_ptr<Text>> texts;
-  // NumberSetting itemQuantity;
+  void addFoodItemName(const FoodItem& foodItem, const SDL_Point& relativePosition);
+  void addFoodItemExpirationDate(const FoodItem& foodItem,
+                                 const SDL_Point& relativePosition);
 };
 
 #endif

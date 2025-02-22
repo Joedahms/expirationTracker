@@ -18,15 +18,8 @@ public:
   void handleEventSelf(const SDL_Event& event) override;
 
 private:
-  //  Button decreaseButton;
-  //  Button increaseButton;
-  //  Text settingValueText;
-
   int settingValue = -1;
   int settingId    = -1;
-
-  // const int DECREMENT_SETTING = 0;
-  // const int INCREMENT_SETTING = 1;
 };
 
 #endif

@@ -71,10 +71,12 @@ void Panel::handleMouseButtonDown(const SDL_Point& mousePosition) {
 void Panel::addText(const std::string& fontPath,
                     const std::string& content,
                     const int& fontSize,
-                    const SDL_Color& color) {
-  std::unique_ptr<Text> text = std::make_unique<Text>(
-      this->displayGlobal, fontPath, content, fontSize, color, SDL_Rect{0, 0, 0, 0});
-  this->children.push_back(std::move(text));
+                    const SDL_Color& color,
+                    const SDL_Point& relativePosition) {
+  std::unique_ptr<Text> text =
+      std::make_unique<Text>(this->displayGlobal, fontPath, content, fontSize, color,
+                             SDL_Rect{0, 0, 0, 0}, relativePosition);
+  addElement(std::move(text));
 }
 
 /**
@@ -83,9 +85,9 @@ void Panel::addText(const std::string& fontPath,
  * @param foodItem The food item to add to the panel
  * @return None
  */
-void Panel::addFoodItem(const FoodItem& foodItem) {
-  addFoodItemName(foodItem);
-  addFoodItemExpirationDate(foodItem);
+void Panel::addFoodItem(const FoodItem& foodItem, const SDL_Point& relativePosition) {
+  addFoodItemName(foodItem, relativePosition);
+  addFoodItemExpirationDate(foodItem, relativePosition);
 }
 
 /**
@@ -99,16 +101,19 @@ void Panel::addFoodItem(const FoodItem& foodItem) {
 void Panel::updateSelf() {
   // Align all children right next to each other
   for (int i = 0; i < this->children.size(); i++) {
-    SDL_Rect childboundaryRectangle = this->children[i]->getBoundaryRectangle();
-    childboundaryRectangle.y        = this->boundaryRectangle.y;
+    SDL_Point childRelativePosition = this->children[i]->getPositionRelativeToParent();
+    childRelativePosition.y         = this->positionRelativeToParent.y;
     if (i == 0) {
-      childboundaryRectangle.x = 0;
+      childRelativePosition.x = 0;
     }
     else {
-      SDL_Rect leftboundaryRectangle = this->children[i - 1]->getBoundaryRectangle();
-      childboundaryRectangle.x       = leftboundaryRectangle.x + leftboundaryRectangle.w;
+      SDL_Point leftRelativePosition =
+          this->children[i - 1]->getPositionRelativeToParent();
+      SDL_Rect leftBoundaryRectangle = this->children[i - 1]->getBoundaryRectangle();
+      std::cout << "ahhhh lw: " << leftBoundaryRectangle.w << std::endl;
+      childRelativePosition.x = leftRelativePosition.x + leftBoundaryRectangle.w;
     }
-    this->children[i]->setboundaryRectangle(childboundaryRectangle);
+    this->children[i]->setPositionRelativeToParent(childRelativePosition);
   }
 
   /*
@@ -130,12 +135,12 @@ void Panel::handleEventSelf(const SDL_Event& event) {}
  * @param foodItem The food item to take the name from
  * @return None
  */
-void Panel::addFoodItemName(const FoodItem& foodItem) {
+void Panel::addFoodItemName(const FoodItem& foodItem, const SDL_Point& relativePosition) {
   std::string fontPath = this->displayGlobal.futuramFontPath;
   int fontSize         = 24;
   SDL_Color textColor  = {0, 255, 0, 255}; // Green
 
-  addText(fontPath, foodItem.name, fontSize, textColor);
+  addText(fontPath, foodItem.name, fontSize, textColor, relativePosition);
 }
 
 /**
@@ -144,32 +149,33 @@ void Panel::addFoodItemName(const FoodItem& foodItem) {
  * @param foodItem The food item to take the expiration date from
  * @return None
  */
-void Panel::addFoodItemExpirationDate(const FoodItem& foodItem) {
+void Panel::addFoodItemExpirationDate(const FoodItem& foodItem,
+                                      const SDL_Point& relativePosition) {
   std::string fontPath = this->displayGlobal.futuramFontPath;
   int fontSize         = 24;
   SDL_Color textColor  = {0, 255, 0, 255}; // Green
 
   // Expires
-  addText(fontPath, " Expires: ", fontSize, textColor);
+  addText(fontPath, " Expires: ", fontSize, textColor, relativePosition);
 
   // Month
   std::string expirationDateMonth =
       std::to_string(static_cast<unsigned>(foodItem.expirationDate.month()));
-  addText(fontPath, expirationDateMonth, fontSize, textColor);
+  addText(fontPath, expirationDateMonth, fontSize, textColor, relativePosition);
 
   // Slash
-  addText(fontPath, "/", fontSize, textColor);
+  addText(fontPath, "/", fontSize, textColor, relativePosition);
 
   // Date
   std::string expirationDateDay =
       std::to_string(static_cast<unsigned>(foodItem.expirationDate.day()));
-  addText(fontPath, expirationDateDay, fontSize, textColor);
+  addText(fontPath, expirationDateDay, fontSize, textColor, relativePosition);
 
   // Slash
-  addText(fontPath, "/", fontSize, textColor);
+  addText(fontPath, "/", fontSize, textColor, relativePosition);
 
   // Year
   std::string expirationDateYear =
       std::to_string(static_cast<int>(foodItem.expirationDate.year()));
-  addText(fontPath, expirationDateYear, fontSize, textColor);
+  addText(fontPath, expirationDateYear, fontSize, textColor, relativePosition);
 }
