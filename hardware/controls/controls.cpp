@@ -42,7 +42,6 @@ void rotateAndCapture(struct Pipes pipes, float weight) {
     }
     else {
       LOG(INFO) << "AI Vision did not identify item. Continuing process.";
-      continue;
     }
   }
 }
