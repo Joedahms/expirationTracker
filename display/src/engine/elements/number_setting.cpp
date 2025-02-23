@@ -128,7 +128,10 @@ void NumberSetting::updateSelf() {
     SDL_Point childRelativePosition = this->children[i]->getPositionRelativeToParent();
     childRelativePosition.y         = this->positionRelativeToParent.y;
     if (i == 0) {
-      childRelativePosition.x = 0;
+      // childRelativePosition.x = 0;
+      //      std::cout << "relative x: " << this->positionRelativeToParent.x <<
+      //      std::endl;
+      childRelativePosition.x = this->positionRelativeToParent.x;
     }
     else {
       SDL_Point leftRelativePosition =
@@ -139,9 +142,12 @@ void NumberSetting::updateSelf() {
     }
     this->children[i]->setPositionRelativeToParent(childRelativePosition);
 
-    // std::cout << "x: " << this->children[i]->getPositionRelativeToParent().x <<
-    // std::endl; std::cout << "y: " << this->children[i]->getPositionRelativeToParent().y
-    // << std::endl;
+    //   std::cout << "x after update: " <<
+    //   this->children[i]->getPositionRelativeToParent().x
+    //            << std::endl;
+    // std::cout << "y after update: " <<
+    // this->children[i]->getPositionRelativeToParent().y
+    //          << std::endl;
   }
 }
 

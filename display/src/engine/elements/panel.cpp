@@ -23,7 +23,8 @@ Panel::Panel(struct DisplayGlobal displayGlobal,
              int id,
              SDL_Rect boundaryRectangle,
              SDL_Point positionRelativeToParent,
-             std::vector<std::unique_ptr<Text>> t) {
+             std::vector<std::unique_ptr<Text>> t)
+    : id(id) {
   this->boundaryRectangle        = boundaryRectangle;
   this->positionRelativeToParent = positionRelativeToParent;
   // Add text
@@ -41,13 +42,16 @@ Panel::Panel(struct DisplayGlobal displayGlobal,
 
 Panel::Panel(struct DisplayGlobal displayGlobal,
              int id,
-             SDL_Point positionRelativeToParent) {
+             SDL_Point positionRelativeToParent)
+    : id(id) {
   this->positionRelativeToParent = positionRelativeToParent;
 
+  /*
   // Add quantity setting
   std::unique_ptr<NumberSetting> itemQuantity =
       std::make_unique<NumberSetting>(displayGlobal, id);
   addElement(std::move(itemQuantity));
+  */
 
   this->displayGlobal = displayGlobal;
 }
@@ -82,6 +86,10 @@ void Panel::addText(const std::string& fontPath,
 void Panel::addFoodItem(const FoodItem& foodItem, const SDL_Point& relativePosition) {
   addFoodItemName(foodItem, relativePosition);
   addFoodItemExpirationDate(foodItem, relativePosition);
+
+  std::unique_ptr<NumberSetting> itemQuantity =
+      std::make_unique<NumberSetting>(this->displayGlobal, this->id);
+  addElement(std::move(itemQuantity));
 }
 
 /**
@@ -107,14 +115,18 @@ void Panel::updateSelf() {
       // std::cout << "ahhhh lw: " << leftBoundaryRectangle.w << std::endl;
       childRelativePosition.x = leftRelativePosition.x + leftBoundaryRectangle.w;
     }
+    std::cout << "child relative x: " << childRelativePosition.x << std::endl;
+    std::cout << "child relative y: " << childRelativePosition.y << std::endl
+              << std::endl;
     this->children[i]->setPositionRelativeToParent(childRelativePosition);
   }
 
+  // std::cout << std::endl;
   /*
   SDL_Rect itemQuantityRect = this->itemQuantity.getBoundaryRectangle();
-  itemQuantityRect.y        = this->texts.back()->getBoundaryRectangle().y;
-  itemQuantityRect.x        = this->texts.back()->getBoundaryRectangle().x +
-                       this->texts.back()->getBoundaryRectangle().w;
+  itemQuantityRect.y        = this->children.back()->getBoundaryRectangle().y;
+  itemQuantityRect.x        = this->children.back()->getBoundaryRectangle().x +
+                       this->children.back()->getBoundaryRectangle().w;
   this->itemQuantity.setBoundaryRectangle(itemQuantityRect);
   this->itemQuantity.update();
   */

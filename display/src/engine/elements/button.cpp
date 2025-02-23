@@ -41,14 +41,12 @@ Button::Button(struct DisplayGlobal displayGlobal,
                              textContent.c_str(), 24, textColor, textRect, textOffset);
   text->setCentered();
 
-  /*
   // Size based on text
   if (this->boundaryRectangle.w == 0 && this->boundaryRectangle.h == 0) {
     SDL_Rect textboundaryRectangle = text->getBoundaryRectangle();
     this->boundaryRectangle.w      = textboundaryRectangle.w + 10;
     this->boundaryRectangle.h      = textboundaryRectangle.h + 10;
   }
-  */
 
   addElement(std::move(text));
 }

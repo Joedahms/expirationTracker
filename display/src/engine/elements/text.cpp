@@ -66,10 +66,7 @@ Text::Text(struct DisplayGlobal displayGlobal,
                    &this->boundaryRectangle.h);
 }
 
-Text::~Text() {
-  std::cout << "bye bye" << std::endl;
-  TTF_CloseFont(this->font);
-}
+Text::~Text() { TTF_CloseFont(this->font); }
 
 void Text::setContent(const std::string& newContent) {
   this->content = newContent;
