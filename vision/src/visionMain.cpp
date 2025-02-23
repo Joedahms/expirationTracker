@@ -50,7 +50,6 @@ void processImages(struct Pipes pipes, struct FoodItem& foodItem) {
     LOG(FATAL) << "Failed to open image directory" << foodItem.imageDirectory;
     return;
   }
-  foodItem.imageDirectory /= "Rice_Box";
   bool detectedFoodItem = analyzeImages(foodItem);
   LOG(INFO) << "Successfully analyzed all images";
   if (!detectedFoodItem) {
