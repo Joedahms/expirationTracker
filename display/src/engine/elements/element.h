@@ -14,6 +14,9 @@ public:
   virtual void render() const                      = 0;
   virtual void handleEvent(const SDL_Event& event) = 0;
 
+  virtual void setContent(const std::string& content) {}
+  virtual std::string getContent() const { return "no content"; }
+
   void setPositionRelativeToParent(const SDL_Point& relativePosition);
   SDL_Point getPositionRelativeToParent() { return this->positionRelativeToParent; }
   void setParent(Element* parent);

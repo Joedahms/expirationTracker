@@ -29,7 +29,9 @@ public:
        SDL_Point positionRelativeToParent);
   ~Text();
 
-  void setContent(const std::string& newContent);
+  void setContent(const std::string& content) override;
+  std::string getContent() const override { return this->content; }
+
   void render() const override;
   void handleEvent(const SDL_Event& event);
 

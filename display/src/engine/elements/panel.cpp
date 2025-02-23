@@ -45,15 +45,7 @@ Panel::Panel(struct DisplayGlobal displayGlobal,
              SDL_Point positionRelativeToParent)
     : id(id) {
   this->positionRelativeToParent = positionRelativeToParent;
-
-  /*
-  // Add quantity setting
-  std::unique_ptr<NumberSetting> itemQuantity =
-      std::make_unique<NumberSetting>(displayGlobal, id);
-  addElement(std::move(itemQuantity));
-  */
-
-  this->displayGlobal = displayGlobal;
+  this->displayGlobal            = displayGlobal;
 }
 
 /**
@@ -112,24 +104,10 @@ void Panel::updateSelf() {
       SDL_Point leftRelativePosition =
           this->children[i - 1]->getPositionRelativeToParent();
       SDL_Rect leftBoundaryRectangle = this->children[i - 1]->getBoundaryRectangle();
-      // std::cout << "ahhhh lw: " << leftBoundaryRectangle.w << std::endl;
-      childRelativePosition.x = leftRelativePosition.x + leftBoundaryRectangle.w;
+      childRelativePosition.x        = leftRelativePosition.x + leftBoundaryRectangle.w;
     }
-    std::cout << "child relative x: " << childRelativePosition.x << std::endl;
-    std::cout << "child relative y: " << childRelativePosition.y << std::endl
-              << std::endl;
     this->children[i]->setPositionRelativeToParent(childRelativePosition);
   }
-
-  // std::cout << std::endl;
-  /*
-  SDL_Rect itemQuantityRect = this->itemQuantity.getBoundaryRectangle();
-  itemQuantityRect.y        = this->children.back()->getBoundaryRectangle().y;
-  itemQuantityRect.x        = this->children.back()->getBoundaryRectangle().x +
-                       this->children.back()->getBoundaryRectangle().w;
-  this->itemQuantity.setBoundaryRectangle(itemQuantityRect);
-  this->itemQuantity.update();
-  */
 }
 
 void Panel::renderSelf() const {}

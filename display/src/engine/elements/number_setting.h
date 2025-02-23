@@ -11,7 +11,6 @@ class NumberSetting : public CompositeElement {
 public:
   NumberSetting(struct DisplayGlobal displayGlobal, int settingId);
   void setSettingId(const int& newSettingId);
-  void handleMouseButtonDown(const SDL_Point& mousePosition);
 
   void updateSelf() override;
   void renderSelf() const override;
