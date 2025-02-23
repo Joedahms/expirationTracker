@@ -40,6 +40,7 @@ Text::Text(struct DisplayGlobal displayGlobal,
  * @param fontSize Size of the font
  * @param color Color of the font
  * @param boundaryRectangle SDL boundaryRectangle defining the text
+ * @param positionRelativeToParent Position of the text relative to its parent element
  */
 Text::Text(struct DisplayGlobal displayGlobal,
            const std::string& fontPath,

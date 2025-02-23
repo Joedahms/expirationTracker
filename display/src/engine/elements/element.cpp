@@ -3,6 +3,14 @@
 
 #include "element.h"
 
+/**
+ * Ensure that the positioning of the element is correct. Make sure that if need be, it is
+ * centered with respect to its parent (if it has one) and that it is in the correct
+ * position relative to its parent (if it has one).
+ *
+ * @param None
+ * @return None
+ */
 void Element::update() {
   if (parent) {
     if (this->centerWithinParent) {
@@ -29,20 +37,26 @@ void Element::update() {
   }
 }
 
+void Element::setParent(Element* parent) { this->parent = parent; }
+
 void Element::setPositionRelativeToParent(const SDL_Point& relativePostion) {
   this->positionRelativeToParent = relativePostion;
 }
+SDL_Point Element::getPositionRelativeToParent() {
+  return this->positionRelativeToParent;
+}
 
-void Element::setParent(Element* parent) { this->parent = parent; }
-
+SDL_Rect Element::getBoundaryRectangle() { return this->boundaryRectangle; }
 void Element::setboundaryRectangle(SDL_Rect boundaryRectangle) {
   this->boundaryRectangle = boundaryRectangle;
 };
 
 void Element::setCentered() { this->centerWithinParent = true; }
 
+/**
+ * Centering vertically means centering on the y axis.
+ */
 void Element::setCenteredVertical() { this->centerVerticalWithinParent = true; }
-
 bool Element::checkCenterVertical() {
   bool centered = false;
   if (this->positionRelativeToParent.y ==
@@ -52,15 +66,16 @@ bool Element::checkCenterVertical() {
   }
   return centered;
 }
-
 void Element::centerVertical() {
   this->positionRelativeToParent.y =
       (this->parent->boundaryRectangle.h / 2 - this->boundaryRectangle.h / 2) +
       this->parent->positionRelativeToParent.y;
 }
 
+/**
+ * Centering horizontally means centering on the x axis.
+ */
 void Element::setCenteredHorizontal() { this->centerHorizontalWithinParent = true; }
-
 bool Element::checkCenterHorizontal() {
   bool centered = false;
   if (this->positionRelativeToParent.x ==
@@ -70,7 +85,6 @@ bool Element::checkCenterHorizontal() {
   }
   return centered;
 }
-
 void Element::centerHorizontal() {
   this->positionRelativeToParent.x =
       ((this->parent->boundaryRectangle.w - this->boundaryRectangle.w) / 2) +

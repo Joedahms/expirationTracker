@@ -6,6 +6,10 @@
 
 #include "../display_global.h"
 
+/**
+ * Defines the interface for an SDL element. This is any basic shape or texture to be
+ * rendered to the screen.
+ */
 class Element {
 public:
   virtual ~Element() = default;
@@ -14,14 +18,15 @@ public:
   virtual void render() const                      = 0;
   virtual void handleEvent(const SDL_Event& event) = 0;
 
-  virtual void setContent(const std::string& content) {}
   virtual std::string getContent() const { return "no content"; }
+  virtual void setContent(const std::string& content) {}
 
-  void setPositionRelativeToParent(const SDL_Point& relativePosition);
-  SDL_Point getPositionRelativeToParent() { return this->positionRelativeToParent; }
   void setParent(Element* parent);
 
-  SDL_Rect getBoundaryRectangle() { return this->boundaryRectangle; }
+  SDL_Point getPositionRelativeToParent();
+  void setPositionRelativeToParent(const SDL_Point& relativePosition);
+
+  SDL_Rect getBoundaryRectangle();
   void setboundaryRectangle(SDL_Rect boundaryRectangle);
 
   void setCentered();

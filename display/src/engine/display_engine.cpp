@@ -125,7 +125,7 @@ void DisplayEngine::initializeEngine(SDL_Window* window) {
 }
 
 /**
- *
+ * Check if the current state has requested a state switch.
  *
  * @param None
  * @return None
@@ -138,9 +138,6 @@ void DisplayEngine::checkState() {
     break;
 
   case EngineState::SCANNING:
-    if (!this->scanning->getStateEntered()) {
-      this->scanning->enterScanning();
-    }
     this->engineState = this->scanning->getCurrentState();
     this->scanning->setCurrentState(EngineState::SCANNING);
     break;

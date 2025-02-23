@@ -10,36 +10,6 @@
 #include "panel.h"
 #include "text.h"
 
-/**
- * Construct a panel with a boundaryRectangle and some text objects.
- *
- * @param displayGlobal
- * @param id ID of the object to be displayed within the panel. Could correspond to an ID
- * of an item in a database.
- * @param rect SDL boundaryRectangle defining the position and size of the panel.
- * @param t A vector of texts to be displayed within the panel.
- */
-Panel::Panel(struct DisplayGlobal displayGlobal,
-             int id,
-             SDL_Rect boundaryRectangle,
-             SDL_Point positionRelativeToParent,
-             std::vector<std::unique_ptr<Text>> t)
-    : id(id) {
-  this->boundaryRectangle        = boundaryRectangle;
-  this->positionRelativeToParent = positionRelativeToParent;
-  // Add text
-  for (auto& currText : t) {
-    addElement(std::move(currText));
-  }
-
-  // Add quantity setting
-  std::unique_ptr<NumberSetting> itemQuantity =
-      std::make_unique<NumberSetting>(displayGlobal, id);
-  addElement(std::move(itemQuantity));
-
-  this->displayGlobal = displayGlobal;
-}
-
 Panel::Panel(struct DisplayGlobal displayGlobal,
              int id,
              SDL_Point positionRelativeToParent)
@@ -56,6 +26,7 @@ Panel::Panel(struct DisplayGlobal displayGlobal,
  * @param content The actual string of text to add
  * @param fontSize How big the text font should be
  * @param color RGB value for the text color
+ * @param relativePosition The position of the text in relation to its parent.
  * @return None
  */
 void Panel::addText(const std::string& fontPath,
@@ -70,9 +41,10 @@ void Panel::addText(const std::string& fontPath,
 }
 
 /**
- * General way to add a food item to a panel.
+ * Adds relevent food item information.
  *
  * @param foodItem The food item to add to the panel
+ * @param relativePosition The position of the Element to be added relative to its parent
  * @return None
  */
 void Panel::addFoodItem(const FoodItem& foodItem, const SDL_Point& relativePosition) {
@@ -85,9 +57,7 @@ void Panel::addFoodItem(const FoodItem& foodItem, const SDL_Point& relativePosit
 }
 
 /**
- * Currently this function only updates the text objects, it will need to be expanded to
- * update buttons in the future when they are added. It ensures that all of the text
- * objects are aligned as desired within the panel.
+ * Ensures that all of the elements within the panel are aligned as desired.
  *
  * @param None
  * @return None
@@ -117,6 +87,7 @@ void Panel::handleEventSelf(const SDL_Event& event) {}
  * Add the name of a food item to a panel.
  *
  * @param foodItem The food item to take the name from
+ * @param relativePosition Position of the food item name relative to its parent
  * @return None
  */
 void Panel::addFoodItemName(const FoodItem& foodItem, const SDL_Point& relativePosition) {
@@ -128,9 +99,10 @@ void Panel::addFoodItemName(const FoodItem& foodItem, const SDL_Point& relativeP
 }
 
 /**
- * Add the expiration date of a food item to a panel. Expires: then mm/dd/yyyy
+ * Add the expiration date of a food item to a panel. Expires: mm/dd/yyyy.
  *
  * @param foodItem The food item to take the expiration date from
+ * @param relativePosition Position of the expiration date relative to its parent
  * @return None
  */
 void Panel::addFoodItemExpirationDate(const FoodItem& foodItem,

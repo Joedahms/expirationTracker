@@ -1,6 +1,7 @@
 #include "container.h"
 
 Container::Container() {}
+
 Container::Container(const SDL_Rect& boundaryRectangle) {
   this->boundaryRectangle = boundaryRectangle;
 }

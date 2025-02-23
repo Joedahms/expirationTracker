@@ -5,6 +5,9 @@
 
 #include "element.h"
 
+/**
+ * An element that contains other elements within it.
+ */
 class CompositeElement : public Element {
 public:
   void addElement(std::unique_ptr<Element> element) override;

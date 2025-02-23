@@ -15,15 +15,8 @@
 class Scanning : public State {
 public:
   Scanning(struct DisplayGlobal displayGlobal);
-  void handleEvents(bool*) override;
   EngineState checkKeystates();
   void render() const override;
-  void enterScanning();
-  void initializeTextures();
-  bool getStateEntered(); // Check if the state has already been entered
-
-private:
-  bool stateEntered = false; // Has the state been entered before
 };
 
 #endif

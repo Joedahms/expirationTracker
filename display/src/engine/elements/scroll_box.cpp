@@ -45,42 +45,11 @@ void ScrollBox::refreshPanels() {
 void ScrollBox::setPanelHeight(int panelHeight) { this->panelHeight = panelHeight; }
 
 /**
- * Handle SDL_MOUSEBUTTONDOWN. If the mouse was clicked within a panel, tell that panel to
- * handle the click event.
- *
- * @param mousePosition x,y position of the mouse when it was clicked
- * @return None
- */
-/*
-void ScrollBox::handleMouseButtonDown(const SDL_Point& mousePosition) {
-  for (auto& currPanel : this->panels) {
-    SDL_Rect currPanelRectangle = currPanel->getRectangle();
-    if (SDL_PointInRect(&mousePosition, &currPanelRectangle) == true) {
-      currPanel->handleMouseButtonDown(mousePosition);
-      return;
-    }
-  }
-}
-*/
-
-/**
  * Update all panels in the scroll box with food item information. Assumed that one panel
  * corresponds to one food item. Therefore there will be as many panels in the scroll box
  * as there are food items passed. Don't want to refresh panels constantly (will cause
  * program to crash), so only refresh on a set interval.
- *
- * @param allFoodItems A vector of all the food items to put in panels
- * @return None
  */
-/*
-void ScrollBox::update() {
-  for (auto& currPanel : this->panels) {
-    currPanel->update();
-  }
-
-  */
-//}
-
 void ScrollBox::updateSelf() {
   // Get time since last update
   this->currentUpdate = std::chrono::steady_clock::now();
@@ -138,17 +107,6 @@ void ScrollBox::scrollDown(const SDL_Point* mousePosition) {
     currPanelRectangle.y += SCROLL_AMOUNT;
     currPanel->setRectangle(currPanelRectangle);
     currPanel->update();
-  }
-}
-*/
-
-/*
-void ScrollBox::render() const {
-  if (this->hasBorder) {
-    renderBorder();
-  }
-  for (auto& x : this->panels) {
-    x->render();
   }
 }
 */

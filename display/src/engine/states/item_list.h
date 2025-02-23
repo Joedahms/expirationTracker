@@ -12,6 +12,9 @@
 #include "../elements/text.h"
 #include "state.h"
 
+/**
+ * State where all stored food items are displayed.
+ */
 class ItemList : public State {
 public:
   ItemList(struct DisplayGlobal displayGlobal);

@@ -15,6 +15,9 @@
 #include "display_global.h"
 #include "engine_state.h"
 
+/**
+ * Class containing all objects related to the engine.
+ */
 class DisplayEngine {
 public:
   DisplayEngine(const char* windowTitle,
@@ -39,20 +42,19 @@ public:
   void update();
 
   void renderState();
-  void clean(); // Clean up upon quit
+  void clean();
   bool running() { return displayIsRunning; }
 
 private:
   struct DisplayGlobal displayGlobal;
 
-  // State the display is currently in
   EngineState engineState = EngineState::MAIN_MENU;
 
   // States
-  std::unique_ptr<MainMenu> mainMenu; // State entered when the display boots
-  std::unique_ptr<Scanning> scanning; // State entered when an item is being scanned
+  std::unique_ptr<MainMenu> mainMenu;
+  std::unique_ptr<Scanning> scanning;
   std::unique_ptr<PauseMenu> pauseMenu;
-  std::unique_ptr<ItemList> itemList; // Display all items stored
+  std::unique_ptr<ItemList> itemList;
 
   bool displayIsRunning = false;
 };

@@ -8,8 +8,7 @@
 #include "number_setting.h"
 
 /**
- * Initialize the setting buttons and the text between them. Get the current value of the
- * setting from the database and set class members accordingly.
+ * Get the current value of the setting from the database and set the content to it.
  *
  * @param displayGlobal
  * @param settingId The primary key of the food item corresponding to this object
@@ -34,6 +33,16 @@ NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal, int settingId)
   this->children[1]->setContent(std::to_string(this->settingValue));
 }
 
+/**
+ * Position all children so that they are right next to each other. Children will be
+ * ordered from left to right corresponding to lower to higher indicies in the children
+ * vector. In other words, children[0] will be positioned all the way to the left and the
+ * following elements will be positioned to its right. Also ensure that the value of the
+ * setting between the buttons corresponds to what is stored in the database.
+ *
+ * @param None
+ * @return None
+ */
 void NumberSetting::updateSelf() {
   for (int i = 0; i < this->children.size(); i++) {
     SDL_Point childRelativePosition = this->children[i]->getPositionRelativeToParent();

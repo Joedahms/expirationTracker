@@ -7,6 +7,10 @@
 #include "element.h"
 #include "text.h"
 
+/**
+ * Element that contains two buttons with some text sandwiched between them.
+ * Used to display a setting and allow the user to change said setting.
+ */
 class NumberSetting : public CompositeElement {
 public:
   NumberSetting(struct DisplayGlobal displayGlobal, int settingId);

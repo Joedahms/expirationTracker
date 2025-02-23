@@ -12,6 +12,9 @@
 #include "element.h"
 #include "text.h"
 
+/**
+ * Clickable button containing centered text. Can be set to perform an action upon click.
+ */
 class Button : public CompositeElement {
 public:
   Button(struct DisplayGlobal dg,

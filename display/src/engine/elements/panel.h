@@ -12,6 +12,12 @@
 #include "number_setting.h"
 #include "text.h"
 
+/**
+ * At the moment this is an element specially designed for use within the scrollbox. It is
+ * also specific to displaying information about a food item.
+ *
+ * @see ScrollBox
+ */
 class Panel : public CompositeElement {
 public:
   Panel(struct DisplayGlobal displayGlobal,

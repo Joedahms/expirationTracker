@@ -3,6 +3,10 @@
 
 #include "composite_element.h"
 
+/**
+ * A simple composite element that just contains other elements without adding any of its
+ * own functionality. Useful as a root element of an element heirarchy.
+ */
 class Container : public CompositeElement {
 public:
   Container();

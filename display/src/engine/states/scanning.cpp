@@ -34,26 +34,6 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) {
 }
 
 /**
- * Handle all events in the SDL event queue.
- *
- * @param displayIsRunning Whether or not the display is running
- * @return The current state of the display after updating scanning
- */
-void Scanning::handleEvents(bool* displayIsRunning) {
-  SDL_Event event;
-  while (SDL_PollEvent(&event) != 0) { // While events in the queue
-    switch (event.type) {
-    case SDL_QUIT: // Quit event
-      *displayIsRunning = false;
-      break;
-      // Touch event here
-    default:
-      break;
-    }
-  }
-}
-
-/**
  * Perform the appropriate action depending on which keyboard key has been pressed.
  *
  * @param None
@@ -81,41 +61,3 @@ void Scanning::render() const {
   this->rootElement->render();
   SDL_RenderPresent(this->displayGlobal.renderer);
 }
-
-/**
- * Perform necessary actions when the scanning state is entered for the first.
- *
- * @param None
- * @return None
- */
-void Scanning::enterScanning() {
-  //  SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
-  initializeTextures();
-
-  // State has been entered once
-  this->stateEntered = true;
-}
-
-/**
- * Initialize all textures in the scanning state.
- *
- * @param None
- * @return None
- */
-void Scanning::initializeTextures() {
-  LOG(INFO) << "Initializing textures";
-  /*
-  SDL_Surface* tmp_surface = IMG_Load("sprites/selected.png");
-  selectedTexture = SDL_CreateTextureFromSurface(this->displayGlobal.renderer,
-  tmp_surface); SDL_FreeSurface(tmp_surface);
-  */
-  LOG(INFO) << "Textures initialized";
-}
-
-/**
- * Check if the scanning state has been entered before.
- *
- * @param None
- * @return None
- */
-bool Scanning::getStateEntered() { return this->stateEntered; }

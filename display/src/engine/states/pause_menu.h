@@ -12,7 +12,8 @@
 #include "state.h"
 
 /**
- * Pause menu state. Entered when pausing from gameplay.
+ * Pause menu state. Entered when pausing from gameplay. Allows resuming of scanning or
+ * return to main menu.
  */
 class PauseMenu : public State {
 public:

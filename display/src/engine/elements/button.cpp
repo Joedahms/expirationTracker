@@ -7,12 +7,12 @@
 #include "element.h"
 
 /**
- *
- *
  * @param displayGlobal Global display variables
- * @param boundaryRectangle boundaryRectangle to render the button with
+ * @param boundaryRectangle Rectangle to describe the position relative to parent element
+ * as well as the width and height. The x and y parameters of the rectangle are used as
+ * the position relative to the parent.
  * @param textContent The text to print in the middle of the button
- * @param clickRet Value corrosponding to the button being clicked
+ * @param callback The callback function to execute when the button is clicked
  */
 Button::Button(struct DisplayGlobal displayGlobal,
                const SDL_Rect& boundaryRectangle,
@@ -52,8 +52,7 @@ Button::Button(struct DisplayGlobal displayGlobal,
 }
 
 /**
- * Button operation to be performed periodically. Changes color if hovered and ensures
- * text is centered within button.
+ * Change color if the cursor is hovered over the button.
  *
  * @param None
  * @return None
@@ -97,6 +96,12 @@ void Button::updateSelf() {
   }
 }
 
+/**
+ * Render the background color
+ *
+ * @param None
+ * @return None
+ */
 void Button::renderSelf() const {
   // Set draw color and fill the button
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, backgroundColor.r,
@@ -104,6 +109,13 @@ void Button::renderSelf() const {
   SDL_RenderFillRect(this->displayGlobal.renderer, &this->boundaryRectangle);
 }
 
+/**
+ * If the user is hovered over the button when a click event occurs, call the callback
+ * function.
+ *
+ * @param event An SDL event that has occured.
+ * @return None
+ */
 void Button::handleEventSelf(const SDL_Event& event) {
   if (event.type == SDL_MOUSEBUTTONDOWN) {
     if (checkHovered(event.motion.x, event.motion.y) == true) {
