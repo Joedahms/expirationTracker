@@ -52,12 +52,6 @@ Panel::Panel(struct DisplayGlobal displayGlobal,
   this->displayGlobal = displayGlobal;
 }
 
-/*
-void Panel::handleMouseButtonDown(const SDL_Point& mousePosition) {
-  this->itemQuantity.handleMouseButtonDown(mousePosition);
-}
-*/
-
 /**
  * Add some text to a panel. Whatever text is added first will be displayed on the left
  * and any text added after that will be displayed moving right.
@@ -110,7 +104,7 @@ void Panel::updateSelf() {
       SDL_Point leftRelativePosition =
           this->children[i - 1]->getPositionRelativeToParent();
       SDL_Rect leftBoundaryRectangle = this->children[i - 1]->getBoundaryRectangle();
-      std::cout << "ahhhh lw: " << leftBoundaryRectangle.w << std::endl;
+      // std::cout << "ahhhh lw: " << leftBoundaryRectangle.w << std::endl;
       childRelativePosition.x = leftRelativePosition.x + leftBoundaryRectangle.w;
     }
     this->children[i]->setPositionRelativeToParent(childRelativePosition);

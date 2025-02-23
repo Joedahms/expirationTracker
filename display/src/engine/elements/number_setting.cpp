@@ -134,13 +134,14 @@ void NumberSetting::updateSelf() {
       SDL_Point leftRelativePosition =
           this->children[i - 1]->getPositionRelativeToParent();
       SDL_Rect leftBoundaryRectangle = this->children[i - 1]->getBoundaryRectangle();
-      std::cout << "lw: " << leftBoundaryRectangle.w << std::endl;
+      // std::cout << "lw: " << leftBoundaryRectangle.w << std::endl;
       childRelativePosition.x = leftRelativePosition.x + leftBoundaryRectangle.w;
     }
     this->children[i]->setPositionRelativeToParent(childRelativePosition);
 
-    std::cout << "x: " << this->children[i]->getPositionRelativeToParent().x << std::endl;
-    std::cout << "y: " << this->children[i]->getPositionRelativeToParent().y << std::endl;
+    // std::cout << "x: " << this->children[i]->getPositionRelativeToParent().x <<
+    // std::endl; std::cout << "y: " << this->children[i]->getPositionRelativeToParent().y
+    // << std::endl;
   }
 }
 

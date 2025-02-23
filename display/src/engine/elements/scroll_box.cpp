@@ -31,6 +31,7 @@ void ScrollBox::refreshPanels() {
   std::vector<FoodItem> allFoodItems = readAllFoodItems();
 
   this->children.clear();
+  std::cout << "cleared" << std::endl;
   SDL_Point relativePosition = {0, 0};
   for (auto& foodItem : allFoodItems) {
     std::unique_ptr<Panel> newPanel =

@@ -30,7 +30,6 @@ public:
 private:
   std::chrono::steady_clock::time_point previousUpdate;
   std::chrono::steady_clock::time_point currentUpdate;
-  // std::vector<std::unique_ptr<Panel>> panels;
   int panelHeight;
   int topPanelPosition = 0;
 };

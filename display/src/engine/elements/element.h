@@ -8,6 +8,7 @@
 
 class Element {
 public:
+  virtual ~Element() = default;
   virtual void addElement(std::unique_ptr<Element> element) {}
   virtual void update();
   virtual void render() const                      = 0;

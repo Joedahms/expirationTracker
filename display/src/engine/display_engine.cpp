@@ -285,7 +285,6 @@ void DisplayEngine::update() {
     LOG(FATAL) << "Invalid state";
     break;
   }
-  std::cout << std::endl;
 }
 
 /**
