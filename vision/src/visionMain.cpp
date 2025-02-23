@@ -7,7 +7,7 @@
 #include "../../food_item.h"
 #include "../include/analyzeImages.h"
 #include "../include/helperFunctions.h"
-#include "../include/vision_pipe.h"
+#include "../include/visionMain.h"
 
 /**
  * Entry into the vision code. Only called from main after vision child process is
