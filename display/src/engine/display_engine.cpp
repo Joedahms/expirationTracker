@@ -130,10 +130,16 @@ void DisplayEngine::initializeEngine(SDL_Window* window) {
  * @param None
  * @return None
  */
-void DisplayEngine::checkState() {
+void DisplayEngine::checkState(int* engineToDisplay, int* displayToEngine) {
   switch (this->engineState) {
   case EngineState::MAIN_MENU:
     this->engineState = this->mainMenu->getCurrentState();
+
+    if (this->engineState == EngineState::SCANNING) {
+      LOG(INFO) << "Scan initialized, engine switching to scanning state";
+      writeString(engineToDisplay[WRITE], START_SCAN);
+    }
+
     this->mainMenu->setCurrentState(EngineState::MAIN_MENU);
     break;
 
@@ -171,10 +177,12 @@ void DisplayEngine::handleEvents(int* engineToDisplay, int* displayToEngine) {
   case EngineState::MAIN_MENU:
     this->mainMenu->handleEvents(&this->displayIsRunning);
 
-    if (this->engineState == EngineState::SCANNING) {
-      LOG(INFO) << "Scan initialized, engine switching to scanning state";
-      writeString(engineToDisplay[WRITE], START_SCAN);
-    }
+    /*
+  if (this->engineState == EngineState::SCANNING) {
+    LOG(INFO) << "Scan initialized, engine switching to scanning state";
+    writeString(engineToDisplay[WRITE], START_SCAN);
+  }
+  */
     break;
 
   case EngineState::SCANNING:

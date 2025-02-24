@@ -36,7 +36,7 @@ public:
                           bool fullscreen);
   void initializeEngine(SDL_Window* window);
 
-  void checkState();
+  void checkState(int* engineToDisplay, int* displayToEngine);
   void handleEvents(int* engineToDisplay, int* displayToEngine);
   void checkKeystates();
   void update();
