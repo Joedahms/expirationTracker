@@ -27,21 +27,19 @@ cd ../../build
 run cmake ..
 run make
 
-# Had to install to run repo:
-sudo apt update
-sudo apt upgrade
-sudo apt install make
-sudo apt install g++
-sudo apt install cmake
-sudo apt install libgoogle-glog-dev
-sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev  
-sudo apt install libopencv-dev
-sudo apt install sqlite3
-sudo apt install libsqlite3-dev
-sudo add-apt-repository ppa:kisak/kisak-mesa
-sudo apt install nlohmann-json3-dev
-sudo apt update
-sudo apt upgrade
+# Setup Instructions:
+
+1. sudo apt update
+3. sudo apt install make
+4. sudo apt install g++
+5. sudo apt install cmake
+6. sudo apt install libgoogle-glog-dev
+7. sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev  
+8. sudo apt install libopencv-dev
+9. sudo apt install sqlite3
+10. sudo apt install libsqlite3-dev
+11. sudo add-apt-repository ppa:kisak/kisak-mesa
+12. sudo apt install nlohmann-json3-dev
 
 # Using Models
 # BE IN BUILD DIRECTORY!!!!!!
