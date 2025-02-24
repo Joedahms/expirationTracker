@@ -3,8 +3,9 @@
 
 #include "../../food_item.h"
 #include "../../pipes.h"
-#include <string>
-#include <vector>
+#include "../include/ImageProcessor.h"
+#include "../include/helperFunctions.h"
+#include <iostream>
 
 void visionEntry(struct Pipes);
 #endif

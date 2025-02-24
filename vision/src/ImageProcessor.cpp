@@ -1,8 +1,5 @@
 #include "../include/ImageProcessor.h"
 
-#include "../include/handleOBJ.h"
-#include "../include/handleOCR.h"
-
 /**
  * ImageProcessor Constructor. This class handles all image operations.
  * @param pipes Pipe struct for communication with other processes.
@@ -44,49 +41,41 @@ void ImageProcessor::process() const {
  * @return whether FoodItem is successfully identified
  */
 bool ImageProcessor::analyze() const {
-  int imageCounter            = 0;
-  bool objectDetected         = false;
-  bool expirationDateDetected = false;
-  while (!objectDetected && !expirationDateDetected) {
+  constexpr int MAX_IMAGE_COUNT = 16;
+  int imageCounter              = 0;
+  bool objectDetected           = false;
+  while (!objectDetected) {
     for (const auto& entry :
          std::filesystem::directory_iterator(foodItem.imageDirectory)) {
-      imageCounter++;
+      if (toLowerCase(entry.path().extension()) != ".jpg") {
+        continue;
+      }
+      if (++imageCounter > MAX_IMAGE_COUNT) {
+        LOG(INFO) << (objectDetected ? "Object expiration date not found"
+                                     : "Object not able to be classified");
+        return false;
+      }
       // check if the object exists in our object classification
       if (!objectDetected) {
         // if object has already been detected no need to run this
-        if (handleObjectClassification(entry.path(), foodItem)) {
-          expirationDateDetected = true;
-          objectDetected         = true;
+        if (this->modelHandler.handleObjectClassification(entry.path(), foodItem)) {
+          objectDetected = true;
           return true;
         }
       }
-      // Run text extraction
-      handleTextExtraction(entry.path(), foodItem, objectDetected,
-                           expirationDateDetected);
-      if (objectDetected) {
-        return true;
+      // delete bad image
+      try {
+        std::filesystem::remove(entry.path());
+        LOG(INFO) << "Deleted unclassified image: " << entry.path();
+      } catch (const std::filesystem::filesystem_error& e) {
+        LOG(ERROR) << "Failed to delete image: " << entry.path() << " - " << e.what();
       }
-
-      if (objectDetected && expirationDateDetected) {
-        return true;
+      // check if image directory has new files
+      // directory iterator does not update
+      // Wait if the directory is empty
+      while (!hasFiles(foodItem.imageDirectory)) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
       }
-    }
-    if (imageCounter >= 16) {
-      // give up trying to identify
-      if (!objectDetected) {
-        LOG(INFO) << "Object not able to be classified";
-        // tell display
-      }
-      else if (!expirationDateDetected) {
-        LOG(INFO) << "Object expiration date not found";
-        // tell display
-      }
-      return false;
-    }
-    // check if image directory has new files
-    // directory iterator does not update
-    while (!hasFiles(foodItem.imageDirectory)) {
-      usleep(500000);
     }
   }
   return false;

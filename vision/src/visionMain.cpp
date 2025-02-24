@@ -1,13 +1,3 @@
-#include <filesystem>
-#include <fstream>
-#include <glog/logging.h>
-#include <iostream>
-#include <memory>
-
-#include "../../food_item.h"
-#include "../include/ImageProcessor.h"
-#include "../include/analyzeImages.h"
-#include "../include/helperFunctions.h"
 #include "../include/visionMain.h"
 
 /**

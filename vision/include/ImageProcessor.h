@@ -7,6 +7,7 @@
 #include "helperFunctions.h"
 #include <glog/logging.h>
 #include <iostream>
+#include <thread>
 
 class ImageProcessor {
 private:
