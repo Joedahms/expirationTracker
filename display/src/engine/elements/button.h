@@ -31,8 +31,6 @@ private:
   SDL_Color backgroundColor;
   SDL_Color defaultColor;
   SDL_Color hoveredColor;
-
-  bool checkHovered(const int& mouseXPosition, const int& mouseYPosition);
 };
 
 #endif

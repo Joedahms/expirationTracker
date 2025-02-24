@@ -39,6 +39,8 @@ public:
   bool checkCenterHorizontal();
   void centerHorizontal();
 
+  bool checkHovered();
+
   void addBorder(const int& borderThickness);
   void renderBorder() const;
 

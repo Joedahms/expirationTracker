@@ -86,9 +86,7 @@ void Button::updateSelf() {
   }
 
   // Change color if hovered
-  int mouseXPosition, mouseYPosition;
-  SDL_GetMouseState(&mouseXPosition, &mouseYPosition);
-  if (checkHovered(mouseXPosition, mouseYPosition)) {
+  if (checkHovered()) {
     this->backgroundColor = this->hoveredColor;
   }
   else {
@@ -118,39 +116,8 @@ void Button::renderSelf() const {
  */
 void Button::handleEventSelf(const SDL_Event& event) {
   if (event.type == SDL_MOUSEBUTTONDOWN) {
-    if (checkHovered(event.motion.x, event.motion.y) == true) {
+    if (checkHovered() == true) {
       onClick();
     }
   }
-}
-
-/**
- * Check if the mouse is over the button. Could be improved by using SDL_Point.
- *
- * @param mouseXPosition X position of the mouse
- * @param mouseYPosition Y position of the mouse
- * @return Whether or not the mouse is over the button
- */
-bool Button::checkHovered(const int& mouseXPosition, const int& mouseYPosition) {
-  // Outside left edge of button
-  if (mouseXPosition < this->boundaryRectangle.x) {
-    return false;
-  }
-
-  // Outside right edge of button
-  if (mouseXPosition > this->boundaryRectangle.x + this->boundaryRectangle.w) {
-    return false;
-  }
-
-  // Outside top edge of button
-  if (mouseYPosition < this->boundaryRectangle.y) {
-    return false;
-  }
-
-  // Outside bottom edge of button
-  if (mouseYPosition > this->boundaryRectangle.y + this->boundaryRectangle.h) {
-    return false;
-  }
-
-  return true;
 }

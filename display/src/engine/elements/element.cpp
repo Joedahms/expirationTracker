@@ -92,6 +92,39 @@ void Element::centerHorizontal() {
 }
 
 /**
+ * Check if the mouse is over the element.
+ *
+ * @param None
+ * @return Whether or not the mouse is over the button
+ */
+bool Element::checkHovered() {
+  int mouseXPosition, mouseYPosition;
+  SDL_GetMouseState(&mouseXPosition, &mouseYPosition);
+
+  // Outside left edge
+  if (mouseXPosition < this->boundaryRectangle.x) {
+    return false;
+  }
+
+  // Outside right edge
+  if (mouseXPosition > this->boundaryRectangle.x + this->boundaryRectangle.w) {
+    return false;
+  }
+
+  // Outside top edge
+  if (mouseYPosition < this->boundaryRectangle.y) {
+    return false;
+  }
+
+  // Outside bottom edge
+  if (mouseYPosition > this->boundaryRectangle.y + this->boundaryRectangle.h) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
  * Add a border to an element.
  *
  * @param borderThickness How many pixels thick the border should be

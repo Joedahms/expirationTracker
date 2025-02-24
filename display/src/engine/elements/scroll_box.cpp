@@ -20,28 +20,6 @@ ScrollBox::ScrollBox(struct DisplayGlobal displayGlobal,
   this->boundaryRectangle = boundaryRectangle;
 }
 
-/**
- * Ensure that all panels have data consistent with what is in the database. Destroys all
- * panels and makes new ones.
- *
- * @param None
- * @return None
- */
-void ScrollBox::refreshPanels() {
-  std::vector<FoodItem> allFoodItems = readAllFoodItems();
-
-  this->children.clear();
-  SDL_Point relativePosition = {0, 0};
-  for (auto& foodItem : allFoodItems) {
-    std::unique_ptr<Panel> newPanel =
-        std::make_unique<Panel>(this->displayGlobal, foodItem.id, relativePosition);
-    relativePosition.y += panelHeight;
-
-    newPanel->addFoodItem(foodItem, relativePosition);
-    addElement(std::move(newPanel));
-  }
-}
-
 void ScrollBox::setPanelHeight(int panelHeight) { this->panelHeight = panelHeight; }
 
 /**
@@ -64,49 +42,76 @@ void ScrollBox::updateSelf() {
   }
 }
 
+/**
+ * Check if the scrollbox is hovered. If it is hovered and the event is a mousewheel
+ * event, scroll the panels up or down accordingly.
+ *
+ * @param event The SDL event that has occured
+ * @return None
+ */
+void ScrollBox::handleEventSelf(const SDL_Event& event) {
+  if (checkHovered() == false) {
+    return;
+  }
+
+  if (event.type == SDL_MOUSEWHEEL) {
+    if (event.wheel.y > 0) {
+      scrollUp();
+    }
+    else if (event.wheel.y < 0) {
+      scrollDown();
+    }
+  }
+}
+
 void ScrollBox::renderSelf() const {}
-void ScrollBox::handleEventSelf(const SDL_Event& event) {}
 
 /**
- * Move all panels within the scroll box up.
+ * Ensure that all panels have data consistent with what is in the database. Destroys all
+ * panels and makes new ones.
  *
- * @param mousePosition Position of the mouse used to check if the mouse is within the
- * scrollbox or not
+ * @param None
  * @return None
  */
-/*
-void ScrollBox::scrollUp(const SDL_Point* mousePosition) {
-  if (SDL_PointInRect(mousePosition, &this->rectangle) == false) {
-    return;
-  }
-  this->topPanelPosition -= SCROLL_AMOUNT;
-  for (auto& currPanel : this->panels) {
-    SDL_Rect currPanelRectangle = currPanel->getRectangle();
-    currPanelRectangle.y -= SCROLL_AMOUNT;
-    currPanel->setRectangle(currPanelRectangle);
-    currPanel->update();
+void ScrollBox::refreshPanels() {
+  std::vector<FoodItem> allFoodItems = readAllFoodItems();
+
+  this->children.clear();
+  SDL_Point relativePosition = {0, 0};
+  for (auto& foodItem : allFoodItems) {
+    std::unique_ptr<Panel> newPanel =
+        std::make_unique<Panel>(this->displayGlobal, foodItem.id, relativePosition);
+    relativePosition.y += panelHeight;
+
+    newPanel->addFoodItem(foodItem, relativePosition);
+    addElement(std::move(newPanel));
   }
 }
-*/
 
 /**
- * Move all panels within the scroll box down.
+ * Move all panels within the scroll box up. Scroll amount is hardcoded.
  *
- * @param mousePosition Position of the mouse used to check if the mouse is within the
- * scrollbox or not
+ * @param None
  * @return None
  */
-/*
-void ScrollBox::scrollDown(const SDL_Point* mousePosition) {
-  if (SDL_PointInRect(mousePosition, &this->rectangle) == false) {
-    return;
-  }
-  this->topPanelPosition += SCROLL_AMOUNT;
-  for (auto& currPanel : this->panels) {
-    SDL_Rect currPanelRectangle = currPanel->getRectangle();
-    currPanelRectangle.y += SCROLL_AMOUNT;
-    currPanel->setRectangle(currPanelRectangle);
-    currPanel->update();
+void ScrollBox::scrollUp() {
+  for (auto& currPanel : this->children) {
+    SDL_Point currPanelRelativePosition = currPanel->getPositionRelativeToParent();
+    currPanelRelativePosition.y -= this->scrollAmount;
+    currPanel->setPositionRelativeToParent(currPanelRelativePosition);
   }
 }
-*/
+
+/**
+ * Move all panels within the scroll box down. Scroll amount is hardcoded.
+ *
+ * @param None
+ * @return None
+ */
+void ScrollBox::scrollDown() {
+  for (auto& currPanel : this->children) {
+    SDL_Point currPanelRelativePosition = currPanel->getPositionRelativeToParent();
+    currPanelRelativePosition.y += this->scrollAmount;
+    currPanel->setPositionRelativeToParent(currPanelRelativePosition);
+  }
+}
