@@ -62,6 +62,10 @@ bool ImageProcessor::analyze() const {
           objectDetected = true;
           return true;
         }
+        if (this->modelHandler.handleClassificationOCR(entry.path(), foodItem)) {
+          objectDetected = true;
+          return true;
+        }
       }
       // delete bad image
       try {
