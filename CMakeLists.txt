@@ -51,12 +51,12 @@ add_executable (expirationTracker
   display/src/engine/states/item_list.cpp
 
   # Vision process after forked from main
-  vision/src/vision_pipe.cpp
+  vision/src/visionMain.cpp
   vision/src/handleOCR.cpp
   vision/src/handleOBJ.cpp
   vision/src/validateDetection.cpp
-  vision/src/analyzeImages.cpp
   vision/src/helperFunctions.cpp
+  vision/src/ImageProcessor.cpp
 
   #Hardware process after forked from main
   hardware/src/hardware_entry.cpp

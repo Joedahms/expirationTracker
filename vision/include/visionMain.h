@@ -7,5 +7,4 @@
 #include <vector>
 
 void visionEntry(struct Pipes);
-void processImages(struct Pipes, struct FoodItem&);
 #endif
