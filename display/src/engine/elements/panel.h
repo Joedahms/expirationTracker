@@ -27,7 +27,6 @@ public:
         std::vector<std::unique_ptr<Text>> t);
   Panel(struct DisplayGlobal displayGlobal, int id, SDL_Point positionRelativeToParent);
 
-  void handleMouseButtonDown(const SDL_Point& mousePosition);
   void addText(const std::string& fontPath,
                const std::string& content,
                const int& fontSize,
