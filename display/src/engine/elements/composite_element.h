@@ -17,7 +17,7 @@ public:
 
 private:
   virtual void updateSelf();
-  virtual void renderSelf() const                      = 0;
+  virtual void renderSelf() const;
   virtual void handleEventSelf(const SDL_Event& event) = 0;
 
 protected:

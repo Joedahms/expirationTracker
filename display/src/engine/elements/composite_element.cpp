@@ -53,6 +53,12 @@ void CompositeElement::handleEvent(const SDL_Event& event) {
   }
 }
 
+void CompositeElement::renderSelf() const {
+  if (this->hasBorder) {
+    renderBorder();
+  }
+}
+
 /**
  * Default updateSelf for a composite element. If a child of another composite element,
  * check positioning within parent.

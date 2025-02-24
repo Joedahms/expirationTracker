@@ -3,6 +3,12 @@
 
 #include "element.h"
 
+void Element::render() const {
+  if (this->hasBorder) {
+    renderBorder();
+  }
+}
+
 /**
  * Ensure that the positioning of the element is correct. Make sure that if need be, it is
  * centered with respect to its parent (if it has one) and that it is in the correct

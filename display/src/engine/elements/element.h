@@ -15,7 +15,7 @@ public:
   virtual ~Element() = default;
   virtual void addElement(std::unique_ptr<Element> element) {}
   virtual void update();
-  virtual void render() const                      = 0;
+  virtual void render() const;
   virtual void handleEvent(const SDL_Event& event) = 0;
 
   virtual std::string getContent() const { return "no content"; }
@@ -50,10 +50,10 @@ protected:
   SDL_Point positionRelativeToParent = {0, 0};
   Element* parent                    = nullptr;
   bool hasBorder                     = false;
+  int borderThickness                = 1;
   bool centerWithinParent            = false;
   bool centerVerticalWithinParent    = false;
   bool centerHorizontalWithinParent  = false;
-  int borderThickness                = 1;
 };
 
 #endif
