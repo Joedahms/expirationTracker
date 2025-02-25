@@ -6,7 +6,7 @@
  * @param foodItem FoodItem struct for filling out detected information.
  */
 ImageProcessor::ImageProcessor(const Pipes& pipes, FoodItem& foodItem)
-    : modelHandler(), pipes(pipes), foodItem(foodItem) {}
+    : modelHandler(foodItem), pipes(pipes), foodItem(foodItem) {}
 
 /**
  * Parent method to all image processing and analyzing
@@ -24,6 +24,8 @@ void ImageProcessor::process() const {
     // checked 16 images and failed them all
     //  how to handle?
     // Still send whatever information we do have to the display
+    writeString(pipes.visionToDisplay[WRITE],
+                "Food item not properly identified. Sending incomplete food item.");
   }
   // tell hardware to stop
   LOG(INFO) << "Sent stop signal to hardware";
@@ -57,12 +59,9 @@ bool ImageProcessor::analyze() const {
       }
       // check if the object exists in our object classification
       if (!objectDetected) {
-        // if object has already been detected no need to run this
-        if (this->modelHandler.handleObjectClassification(entry.path(), foodItem)) {
-          objectDetected = true;
-          return true;
-        }
-        if (this->modelHandler.handleClassificationOCR(entry.path(), foodItem)) {
+        // if object has already been detected no need to run this (still looking for exp
+        // date)
+        if (this->modelHandler.classifyObject(entry.path())) {
           objectDetected = true;
           return true;
         }

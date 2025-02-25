@@ -56,6 +56,9 @@ add_executable (expirationTracker
   vision/src/helperFunctions.cpp
   vision/src/ImageProcessor.cpp
   vision/src/ModelHandler.cpp
+  vision/src/ObjectClassifier.cpp
+  vision/src/TextClassifier.cpp
+
 
 
   #Hardware process after forked from main

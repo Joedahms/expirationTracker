@@ -1,13 +1,17 @@
 #ifndef IMODEL_H
 #define IMODEL_H
 
+#include "../../food_item.h"
 #include <filesystem>
 #include <string>
 #include <variant>
+class IModel {
+protected:
+  FoodItem& foodItem;
 
-class IModelHandler {
 public:
-  virtual ~IModelHandler() = default;
+  explicit IModel(FoodItem& foodItem) : foodItem(foodItem) {}
+  virtual ~IModel() = default;
 
   /**
    * Runs the model script.
@@ -24,8 +28,7 @@ public:
    * @param foodItem Struct to update.
    * @return Whether classification was successful.
    */
-  virtual bool handleClassification(const std::filesystem::path& imagePath,
-                                    struct FoodItem& foodItem) const = 0;
+  virtual bool handleClassification(const std::filesystem::path& imagePath) const = 0;
 };
 
 #endif // IMODELHANDLER_H

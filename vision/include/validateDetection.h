@@ -2,6 +2,7 @@
 #define VALIDATE_DETECTION_H
 
 #include <chrono>
+#include <glog/logging.h>
 #include <map>
 #include <string>
 #include <unordered_set>
@@ -73,6 +74,10 @@ std::pair<bool, std::string> isTextClass(const std::string&);
 bool isExpirationDate(const std::string&);
 std::chrono::year_month_day parseExpirationDate(const std::string&);
 inline std::string getFoodLabel(int predictedClass) {
+  if (!validFoodClasses.contains(predictedClass)) {
+    LOG(FATAL) << "Illegal item classified by model"
+               << "ImageNet index: " << predictedClass;
+  }
   return foodLabels.at(predictedClass);
 }
 
