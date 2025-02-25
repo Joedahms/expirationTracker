@@ -11,26 +11,33 @@
 #include "element.h"
 #include "panel.h"
 
-class ScrollBox : public Element {
+/**
+ * An element that contains a column of panels and allows the user to scroll through them
+ * with the mousewheel.
+ *
+ * @see Panel
+ */
+class ScrollBox : public CompositeElement {
 public:
-  ScrollBox(struct DisplayGlobal displayGlobal);
+  ScrollBox(struct DisplayGlobal displayGlobal, const SDL_Rect& boundaryRectangle);
 
-  void refreshPanels();
   void setPanelHeight(int panelHeight);
   void addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectangle);
 
-  void handleMouseButtonDown(const SDL_Point& mousePosition);
-  void update() override;
-  void scrollUp(const SDL_Point* mousePosition);
-  void scrollDown(const SDL_Point* mousePosition);
-  void render() const override;
+  void updateSelf() override;
+  void renderSelf() const override;
+  void handleEventSelf(const SDL_Event& event);
 
 private:
+  void refreshPanels();
+  void scrollUp();
+  void scrollDown();
+
   std::chrono::steady_clock::time_point previousUpdate;
   std::chrono::steady_clock::time_point currentUpdate;
-  std::vector<std::unique_ptr<Panel>> panels;
   int panelHeight;
   int topPanelPosition = 0;
+  int scrollAmount     = 4;
 };
 
 #endif

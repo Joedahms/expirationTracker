@@ -12,31 +12,38 @@
 #include "number_setting.h"
 #include "text.h"
 
-class Panel : public Element {
+/**
+ * At the moment this is an element specially designed for use within the scrollbox. It is
+ * also specific to displaying information about a food item.
+ *
+ * @see ScrollBox
+ */
+class Panel : public CompositeElement {
 public:
-  Panel(struct DisplayGlobal displayGlobal, int id);
-  Panel(struct DisplayGlobal displayGlobal, int id, SDL_Rect rect);
   Panel(struct DisplayGlobal displayGlobal,
         int id,
-        SDL_Rect rect,
+        SDL_Rect boundaryRectangle,
+        SDL_Point positionRelativeToParent,
         std::vector<std::unique_ptr<Text>> t);
+  Panel(struct DisplayGlobal displayGlobal, int id, SDL_Point positionRelativeToParent);
 
-  void handleMouseButtonDown(const SDL_Point& mousePosition);
   void addText(const std::string& fontPath,
                const std::string& content,
                const int& fontSize,
-               const SDL_Color& color);
-  void addFoodItem(const FoodItem& foodItem);
-  void addFoodItemName(const FoodItem& foodItem);
-  void addFoodItemExpirationDate(const FoodItem& foodItem);
+               const SDL_Color& color,
+               const SDL_Point& relativePosition);
+  void addFoodItem(const FoodItem& foodItem, const SDL_Point& relativePosition);
 
-  void update() override;
-  void render() const override;
+  void updateSelf() override;
+  void renderSelf() const override;
+  void handleEventSelf(const SDL_Event& event) override;
 
 private:
-  std::vector<std::unique_ptr<Text>> texts;
-  std::vector<std::unique_ptr<Button>> buttons;
-  NumberSetting itemQuantity;
+  int id = 0;
+
+  void addFoodItemName(const FoodItem& foodItem, const SDL_Point& relativePosition);
+  void addFoodItemExpirationDate(const FoodItem& foodItem,
+                                 const SDL_Point& relativePosition);
 };
 
 #endif

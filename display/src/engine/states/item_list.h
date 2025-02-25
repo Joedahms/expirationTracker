@@ -12,13 +12,13 @@
 #include "../elements/text.h"
 #include "state.h"
 
+/**
+ * State where all stored food items are displayed.
+ */
 class ItemList : public State {
 public:
   ItemList(struct DisplayGlobal displayGlobal);
-
-  int handleEvents(bool*) override;
-  int checkKeystates();
-  void update() override;
+  EngineState checkKeystates();
   void render() const override;
 
 private:

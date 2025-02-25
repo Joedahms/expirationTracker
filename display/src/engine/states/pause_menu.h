@@ -8,16 +8,16 @@
 #include "../display_global.h"
 #include "../elements/button.h"
 #include "../elements/text.h"
+#include "../engine_state.h"
 #include "state.h"
 
 /**
- * Pause menu state. Entered when pausing from gameplay.
+ * Pause menu state. Entered when pausing from gameplay. Allows resuming of scanning or
+ * return to main menu.
  */
 class PauseMenu : public State {
 public:
   PauseMenu(struct DisplayGlobal);
-  int handleEvents(bool*) override;
-  void update() override;
   void render() const override;
 };
 

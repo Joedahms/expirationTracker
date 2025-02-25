@@ -7,24 +7,22 @@
 #include "element.h"
 #include "text.h"
 
-class NumberSetting : public Element {
+/**
+ * Element that contains two buttons with some text sandwiched between them.
+ * Used to display a setting and allow the user to change said setting.
+ */
+class NumberSetting : public CompositeElement {
 public:
   NumberSetting(struct DisplayGlobal displayGlobal, int settingId);
   void setSettingId(const int& newSettingId);
-  void handleMouseButtonDown(const SDL_Point& mousePosition);
-  void update() override;
-  void render() const override;
+
+  void updateSelf() override;
+  void renderSelf() const override;
+  void handleEventSelf(const SDL_Event& event) override;
 
 private:
-  Button decreaseButton;
-  Button increaseButton;
-  Text settingValueText;
-
   int settingValue = -1;
   int settingId    = -1;
-
-  const int DECREMENT_SETTING = 0;
-  const int INCREMENT_SETTING = 1;
 };
 
 #endif
