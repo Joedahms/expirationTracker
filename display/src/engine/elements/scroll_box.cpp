@@ -78,6 +78,7 @@ void ScrollBox::refreshPanels() {
 
   this->children.clear();
   SDL_Point relativePosition = {0, 0};
+  relativePosition.y         = topPanelPosition;
   for (auto& foodItem : allFoodItems) {
     std::unique_ptr<Panel> newPanel =
         std::make_unique<Panel>(this->displayGlobal, foodItem.id, relativePosition);
@@ -97,6 +98,7 @@ void ScrollBox::refreshPanels() {
  * @return None
  */
 void ScrollBox::scrollUp() {
+  topPanelPosition -= this->scrollAmount;
   for (auto& currPanel : this->children) {
     SDL_Point currPanelRelativePosition = currPanel->getPositionRelativeToParent();
     currPanelRelativePosition.y -= this->scrollAmount;
@@ -111,6 +113,7 @@ void ScrollBox::scrollUp() {
  * @return None
  */
 void ScrollBox::scrollDown() {
+  topPanelPosition += this->scrollAmount;
   for (auto& currPanel : this->children) {
     SDL_Point currPanelRelativePosition = currPanel->getPositionRelativeToParent();
     currPanelRelativePosition.y += this->scrollAmount;
