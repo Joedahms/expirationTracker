@@ -43,6 +43,8 @@ void Element::update() {
   }
 }
 
+std::string Element::getContent() const { return "no content"; }
+
 void Element::setParent(Element* parent) { this->parent = parent; }
 
 void Element::setPositionRelativeToParent(const SDL_Point& relativePostion) {

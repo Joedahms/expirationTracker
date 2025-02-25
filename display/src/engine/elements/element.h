@@ -18,7 +18,7 @@ public:
   virtual void render() const;
   virtual void handleEvent(const SDL_Event& event) = 0;
 
-  virtual std::string getContent() const { return "no content"; }
+  virtual std::string getContent() const;
   virtual void setContent(const std::string& content) {}
 
   void setParent(Element* parent);
