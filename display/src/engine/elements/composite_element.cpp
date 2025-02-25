@@ -22,6 +22,12 @@ void CompositeElement::update() {
  * @return None
  */
 void CompositeElement::addElement(std::unique_ptr<Element> element) {
+  SDL_Rect elementRect = element->getBoundaryRectangle();
+  if (elementRect.w == 0) {
+    elementRect.w = this->boundaryRectangle.w;
+    element->setBoundaryRectangle(elementRect);
+  }
+
   Element* childPointer = element.get();
   this->children.push_back(std::move(element));
   childPointer->setParent(this);

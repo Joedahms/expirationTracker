@@ -27,7 +27,7 @@ public:
   void setPositionRelativeToParent(const SDL_Point& relativePosition);
 
   SDL_Rect getBoundaryRectangle();
-  void setboundaryRectangle(SDL_Rect boundaryRectangle);
+  void setBoundaryRectangle(SDL_Rect boundaryRectangle);
 
   void setCentered();
 

@@ -15,8 +15,9 @@
  */
 NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal, int settingId)
     : settingId(settingId) {
-  std::unique_ptr<Button> decreaseButton = std::make_unique<Button>(
-      displayGlobal, SDL_Rect{0, 0, 0, 0}, "-", [this]() { this->settingValue--; });
+  std::unique_ptr<Button> decreaseButton =
+      std::make_unique<Button>(displayGlobal, SDL_Rect{0, 0, 0, 0}, "-", SDL_Point{0, 0},
+                               [this]() { this->settingValue--; });
   addElement(std::move(decreaseButton));
 
   std::unique_ptr<Text> text =
@@ -24,8 +25,9 @@ NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal, int settingId)
                              SDL_Color{0, 255, 0, 255}, SDL_Rect{0, 0, 0, 0});
   addElement(std::move(text));
 
-  std::unique_ptr<Button> increaseButton = std::make_unique<Button>(
-      displayGlobal, SDL_Rect{0, 0, 0, 0}, "+", [this]() { this->settingValue++; });
+  std::unique_ptr<Button> increaseButton =
+      std::make_unique<Button>(displayGlobal, SDL_Rect{0, 0, 0, 0}, "+", SDL_Point{0, 0},
+                               [this]() { this->settingValue++; });
   addElement(std::move(increaseButton));
 
   FoodItem foodItem  = readFoodItemById(this->settingId);

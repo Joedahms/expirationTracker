@@ -80,7 +80,6 @@ void Panel::updateSelf() {
   }
 }
 
-void Panel::renderSelf() const {}
 void Panel::handleEventSelf(const SDL_Event& event) {}
 
 /**

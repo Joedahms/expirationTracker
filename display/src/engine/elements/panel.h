@@ -35,7 +35,6 @@ public:
   void addFoodItem(const FoodItem& foodItem, const SDL_Point& relativePosition);
 
   void updateSelf() override;
-  void renderSelf() const override;
   void handleEventSelf(const SDL_Event& event) override;
 
 private:

@@ -84,6 +84,8 @@ void ScrollBox::refreshPanels() {
     relativePosition.y += panelHeight;
 
     newPanel->addFoodItem(foodItem, relativePosition);
+    int borderThickness = 1;
+    newPanel->addBorder(borderThickness);
     addElement(std::move(newPanel));
   }
 }
