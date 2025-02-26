@@ -74,32 +74,6 @@ void CompositeElement::renderSelf() const {
  */
 void CompositeElement::updateSelf() {
   if (parent) {
-    if (this->centerWithinParent) {
-      if (checkCenterVertical() == false) {
-        centerVertical();
-      }
-      if (checkCenterHorizontal() == false) {
-        centerHorizontal();
-      }
-    }
-    if (this->centerVerticalWithinParent) {
-      if (checkCenterVertical() == false) {
-        centerVertical();
-      }
-    }
-    else if (this->centerHorizontalWithinParent) {
-      if (checkCenterHorizontal() == false) {
-        centerHorizontal();
-      }
-    }
-    updatePositionSelf();
+    hasParentUpdate();
   }
-}
-
-void CompositeElement::updatePositionSelf() {
-  SDL_Rect parentBoundaryRectangle = parent->getBoundaryRectangle();
-  this->boundaryRectangle.x =
-      parentBoundaryRectangle.x + this->positionRelativeToParent.x;
-  this->boundaryRectangle.y =
-      parentBoundaryRectangle.y + this->positionRelativeToParent.y;
 }

@@ -56,25 +56,7 @@ Button::Button(struct DisplayGlobal displayGlobal,
  */
 void Button::updateSelf() {
   if (parent) {
-    if (this->centerWithinParent) {
-      if (checkCenterVertical() == false) {
-        centerVertical();
-      }
-      if (checkCenterHorizontal() == false) {
-        centerHorizontal();
-      }
-    }
-    else if (this->centerVerticalWithinParent) {
-      if (checkCenterVertical() == false) {
-        centerVertical();
-      }
-    }
-    else if (this->centerHorizontalWithinParent) {
-      if (checkCenterHorizontal() == false) {
-        centerHorizontal();
-      }
-    }
-    updatePositionSelf();
+    hasParentUpdate();
   }
 
   // Change color if hovered

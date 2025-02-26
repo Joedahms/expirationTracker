@@ -30,25 +30,7 @@ void ScrollBox::setPanelHeight(int panelHeight) { this->panelHeight = panelHeigh
  */
 void ScrollBox::updateSelf() {
   if (parent) {
-    if (this->centerWithinParent) {
-      if (checkCenterVertical() == false) {
-        centerVertical();
-      }
-      if (checkCenterHorizontal() == false) {
-        centerHorizontal();
-      }
-    }
-    if (this->centerVerticalWithinParent) {
-      if (checkCenterVertical() == false) {
-        centerVertical();
-      }
-    }
-    else if (this->centerHorizontalWithinParent) {
-      if (checkCenterHorizontal() == false) {
-        centerHorizontal();
-      }
-    }
-    updatePositionSelf();
+    hasParentUpdate();
   }
 
   // Get time since last update

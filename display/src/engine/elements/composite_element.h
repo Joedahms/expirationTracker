@@ -17,7 +17,6 @@ public:
 
 protected:
   virtual void updateSelf();
-  void updatePositionSelf();
   virtual void renderSelf() const;
   virtual void handleEventSelf(const SDL_Event& event) = 0;
 

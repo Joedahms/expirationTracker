@@ -56,6 +56,7 @@ protected:
   bool centerHorizontalWithinParent  = false;
 
   void setupPosition(const SDL_Rect& boundaryRectangle);
+  void hasParentUpdate();
   void updatePosition();
 };
 

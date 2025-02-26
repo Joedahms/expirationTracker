@@ -51,25 +51,7 @@ NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal,
  */
 void NumberSetting::updateSelf() {
   if (parent) {
-    if (this->centerWithinParent) {
-      if (checkCenterVertical() == false) {
-        centerVertical();
-      }
-      if (checkCenterHorizontal() == false) {
-        centerHorizontal();
-      }
-    }
-    if (this->centerVerticalWithinParent) {
-      if (checkCenterVertical() == false) {
-        centerVertical();
-      }
-    }
-    else if (this->centerHorizontalWithinParent) {
-      if (checkCenterHorizontal() == false) {
-        centerHorizontal();
-      }
-    }
-    updatePositionSelf();
+    hasParentUpdate();
   }
 
   for (int i = 0; i < this->children.size(); i++) {
@@ -96,5 +78,4 @@ void NumberSetting::updateSelf() {
   }
 }
 
-void NumberSetting::renderSelf() const {}
 void NumberSetting::handleEventSelf(const SDL_Event& event) {}

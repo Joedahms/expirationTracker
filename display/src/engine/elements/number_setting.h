@@ -19,7 +19,6 @@ public:
   void setSettingId(const int& newSettingId);
 
   void updateSelf() override;
-  void renderSelf() const override;
   void handleEventSelf(const SDL_Event& event) override;
 
 private:

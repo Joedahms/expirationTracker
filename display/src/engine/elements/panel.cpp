@@ -66,26 +66,7 @@ void Panel::addFoodItem(const FoodItem& foodItem, const SDL_Point& relativePosit
  */
 void Panel::updateSelf() {
   if (parent) {
-    if (this->centerWithinParent) {
-      if (checkCenterVertical() == false) {
-        centerVertical();
-      }
-      if (checkCenterHorizontal() == false) {
-        centerHorizontal();
-      }
-    }
-    else if (this->centerVerticalWithinParent) {
-      if (checkCenterVertical() == false) {
-        centerVertical();
-      }
-    }
-    else if (this->centerHorizontalWithinParent) {
-      if (checkCenterHorizontal() == false) {
-        centerHorizontal();
-      }
-    }
-
-    updatePositionSelf();
+    hasParentUpdate();
   }
 
   // Align all children right next to each other

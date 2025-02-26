@@ -19,26 +19,30 @@ void Element::render() const {
  */
 void Element::update() {
   if (parent) {
-    if (this->centerWithinParent) {
-      if (checkCenterVertical() == false) {
-        centerVertical();
-      }
-      if (checkCenterHorizontal() == false) {
-        centerHorizontal();
-      }
-    }
-    else if (this->centerVerticalWithinParent) {
-      if (checkCenterVertical() == false) {
-        centerVertical();
-      }
-    }
-    else if (this->centerHorizontalWithinParent) {
-      if (checkCenterHorizontal() == false) {
-        centerHorizontal();
-      }
-    }
-    updatePosition();
+    hasParentUpdate();
   }
+}
+
+void Element::hasParentUpdate() {
+  if (this->centerWithinParent) {
+    if (checkCenterVertical() == false) {
+      centerVertical();
+    }
+    if (checkCenterHorizontal() == false) {
+      centerHorizontal();
+    }
+  }
+  else if (this->centerVerticalWithinParent) {
+    if (checkCenterVertical() == false) {
+      centerVertical();
+    }
+  }
+  else if (this->centerHorizontalWithinParent) {
+    if (checkCenterHorizontal() == false) {
+      centerHorizontal();
+    }
+  }
+  updatePosition();
 }
 
 void Element::updatePosition() {
