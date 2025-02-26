@@ -22,9 +22,9 @@ void engineEntry(int* engineToDisplay, int* displayToEngine) {
 
   while (displayEngine.running()) {
     displayEngine.handleEvents(engineToDisplay, displayToEngine);
-    displayEngine.checkState();
+    displayEngine.checkState(engineToDisplay, displayToEngine);
     displayEngine.checkKeystates();
-    displayEngine.checkState();
+    displayEngine.checkState(engineToDisplay, displayToEngine);
     displayEngine.update();
     displayEngine.renderState();
   }

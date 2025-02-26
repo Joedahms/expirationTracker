@@ -11,73 +11,41 @@
  * @return None
  */
 PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
+  this->currentState         = EngineState::PAUSE_MENU;
   this->displayGlobal        = displayGlobal;
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
+
+  SDL_Rect rootRectangle = {0, 0, 0, 0};
+  rootRectangle.w        = windowSurface->w;
+  rootRectangle.h        = windowSurface->h;
+  this->rootElement      = std::make_unique<Container>(rootRectangle);
 
   // Title text
   const char* titleContent = "Paused";
   SDL_Color titleColor     = {0, 255, 0, 255}; // Green
-  SDL_Rect titleRectangle  = {100, 100, 0, 0};
+  SDL_Rect titleRectangle  = {0, 0, 0, 0};
+  SDL_Point titleOffset    = {0, 100};
   std::unique_ptr<Text> title =
       std::make_unique<Text>(this->displayGlobal, displayGlobal.futuramFontPath,
-                             titleContent, 24, titleColor, titleRectangle);
-  title->centerHorizontal(windowSurface);
-  this->texts.push_back(std::move(title));
+                             titleContent, 24, titleColor, titleRectangle, titleOffset);
+  title->setCenteredHorizontal();
+  this->rootElement->addElement(std::move(title));
 
   // Resume button
-  SDL_Rect resumeButtonRectangle       = {200, 150, 200, 50};
-  std::unique_ptr<Button> resumeButton = std::make_unique<Button>(
-      this->displayGlobal, resumeButtonRectangle, "Resume", SCANNING);
-  resumeButton->centerHorizontal(windowSurface);
-  this->buttons.push_back(std::move(resumeButton));
+  SDL_Rect resumeButtonRectangle = {200, 150, 200, 50};
+  std::unique_ptr<Button> resumeButton =
+      std::make_unique<Button>(this->displayGlobal, resumeButtonRectangle, "Resume",
+                               [this]() { this->currentState = EngineState::SCANNING; });
+  resumeButton->setCenteredHorizontal();
+  this->rootElement->addElement(std::move(resumeButton));
 
   // Main menu button
-  SDL_Rect mainMenuButtonRectangle       = {200, 225, 200, 50};
-  std::unique_ptr<Button> mainMenuButton = std::make_unique<Button>(
-      this->displayGlobal, mainMenuButtonRectangle, "Main Menu", MAIN_MENU);
-  mainMenuButton->centerHorizontal(windowSurface);
-  this->buttons.push_back(std::move(mainMenuButton));
-}
-
-/**
- * Handle SDL events that occur in the pause menu state.
- *
- * @param displayIsRunning Whether or not the display is running.
- * @return Current state the display is in.
- */
-int PauseMenu::handleEvents(bool* displayIsRunning) {
-  SDL_Event event;
-  int returnValue = 2;
-  while (SDL_PollEvent(&event) != 0) { // While there are events in the queue
-    int mouseX = event.motion.x;
-    int mouseY = event.motion.y;
-    switch (event.type) { // Check which type of event
-    case SDL_QUIT:
-      *displayIsRunning = false;
-      break;
-
-    case SDL_MOUSEBUTTONDOWN:
-      returnValue = checkButtonsClicked(mouseX, mouseY);
-      break;
-
-    default:
-      break;
-    }
-  }
-  return returnValue;
-}
-
-/**
- * Perform operations that need to be done periodically within the state. Update all
- * buttons.
- *
- * @param None
- * @return None
- */
-void PauseMenu::update() {
-  for (auto& currentButton : this->buttons) {
-    currentButton->update();
-  }
+  SDL_Rect mainMenuButtonRectangle = {200, 225, 200, 50};
+  std::unique_ptr<Button> mainMenuButton =
+      std::make_unique<Button>(this->displayGlobal, mainMenuButtonRectangle, "Main Menu",
+                               [this]() { this->currentState = EngineState::MAIN_MENU; });
+  mainMenuButton->setCenteredHorizontal();
+  this->rootElement->addElement(std::move(mainMenuButton));
 }
 
 /**
@@ -89,6 +57,6 @@ void PauseMenu::update() {
 void PauseMenu::render() const {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background
   SDL_RenderClear(this->displayGlobal.renderer);
-  renderElements();
+  this->rootElement->render();
   SDL_RenderPresent(this->displayGlobal.renderer);
 }
