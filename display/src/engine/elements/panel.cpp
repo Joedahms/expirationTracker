@@ -85,11 +85,7 @@ void Panel::updateSelf() {
       }
     }
 
-    SDL_Rect parentBoundaryRectangle = this->parent->getBoundaryRectangle();
-    this->boundaryRectangle.x =
-        parentBoundaryRectangle.x + this->positionRelativeToParent.x;
-    this->boundaryRectangle.y =
-        parentBoundaryRectangle.y + this->positionRelativeToParent.y;
+    updatePositionSelf();
   }
 
   // Align all children right next to each other

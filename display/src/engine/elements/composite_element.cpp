@@ -92,11 +92,14 @@ void CompositeElement::updateSelf() {
         centerHorizontal();
       }
     }
-
-    SDL_Rect parentBoundaryRectangle = parent->getBoundaryRectangle();
-    this->boundaryRectangle.x =
-        parentBoundaryRectangle.x + this->positionRelativeToParent.x;
-    this->boundaryRectangle.y =
-        parentBoundaryRectangle.y + this->positionRelativeToParent.y;
+    updatePositionSelf();
   }
+}
+
+void CompositeElement::updatePositionSelf() {
+  SDL_Rect parentBoundaryRectangle = parent->getBoundaryRectangle();
+  this->boundaryRectangle.x =
+      parentBoundaryRectangle.x + this->positionRelativeToParent.x;
+  this->boundaryRectangle.y =
+      parentBoundaryRectangle.y + this->positionRelativeToParent.y;
 }

@@ -37,18 +37,16 @@ void Element::update() {
         centerHorizontal();
       }
     }
-
-    SDL_Rect parentBoundaryRectangle = parent->getBoundaryRectangle();
-    this->boundaryRectangle.x =
-        parentBoundaryRectangle.x + this->positionRelativeToParent.x;
-    this->boundaryRectangle.y =
-        parentBoundaryRectangle.y + this->positionRelativeToParent.y;
-
-    /*
-    this->boundaryRectangle.x = this->positionRelativeToParent.x;
-    this->boundaryRectangle.y = this->positionRelativeToParent.y;
-    */
+    updatePosition();
   }
+}
+
+void Element::updatePosition() {
+  SDL_Rect parentBoundaryRectangle = parent->getBoundaryRectangle();
+  this->boundaryRectangle.x =
+      parentBoundaryRectangle.x + this->positionRelativeToParent.x;
+  this->boundaryRectangle.y =
+      parentBoundaryRectangle.y + this->positionRelativeToParent.y;
 }
 
 std::string Element::getContent() const { return "no content"; }
@@ -198,9 +196,13 @@ void Element::renderBorder() const {
 }
 
 void Element::setupPosition(const SDL_Rect& boundaryRectangle) {
+  this->boundaryRectangle          = boundaryRectangle;
   this->positionRelativeToParent.x = boundaryRectangle.x;
   this->positionRelativeToParent.y = boundaryRectangle.y;
-  this->boundaryRectangle          = boundaryRectangle;
-  this->boundaryRectangle.x        = 0;
-  this->boundaryRectangle.y        = 0;
+
+  if (parent) {
+    SDL_Rect parentRectangle  = this->parent->getBoundaryRectangle();
+    this->boundaryRectangle.x = parentRectangle.x + this->positionRelativeToParent.x;
+    this->boundaryRectangle.y = parentRectangle.y + this->positionRelativeToParent.y;
+  }
 }

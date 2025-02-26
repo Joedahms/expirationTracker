@@ -29,6 +29,28 @@ void ScrollBox::setPanelHeight(int panelHeight) { this->panelHeight = panelHeigh
  * program to crash), so only refresh on a set interval.
  */
 void ScrollBox::updateSelf() {
+  if (parent) {
+    if (this->centerWithinParent) {
+      if (checkCenterVertical() == false) {
+        centerVertical();
+      }
+      if (checkCenterHorizontal() == false) {
+        centerHorizontal();
+      }
+    }
+    if (this->centerVerticalWithinParent) {
+      if (checkCenterVertical() == false) {
+        centerVertical();
+      }
+    }
+    else if (this->centerHorizontalWithinParent) {
+      if (checkCenterHorizontal() == false) {
+        centerHorizontal();
+      }
+    }
+    updatePositionSelf();
+  }
+
   // Get time since last update
   this->currentUpdate = std::chrono::steady_clock::now();
   std::chrono::seconds updateDifference;

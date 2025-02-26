@@ -69,12 +69,7 @@ void NumberSetting::updateSelf() {
         centerHorizontal();
       }
     }
-
-    SDL_Rect parentBoundaryRectangle = parent->getBoundaryRectangle();
-    this->boundaryRectangle.x =
-        parentBoundaryRectangle.x + this->positionRelativeToParent.x;
-    this->boundaryRectangle.y =
-        parentBoundaryRectangle.y + this->positionRelativeToParent.y;
+    updatePositionSelf();
   }
 
   for (int i = 0; i < this->children.size(); i++) {
