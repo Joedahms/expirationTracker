@@ -19,8 +19,7 @@ public:
    * @return Either a pair<int, float> (classification index & probability) or a string
    * (extracted text).
    */
-  virtual std::variant<std::pair<int, float>, std::string> runModel(
-      const std::filesystem::path& imagePath) const = 0;
+  virtual std::string runModel(const std::filesystem::path& imagePath) const = 0;
 
   /**
    * Handles classification based on the model's return.

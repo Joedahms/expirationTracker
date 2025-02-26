@@ -1,7 +1,6 @@
 import easyocr
 import re
 import sys
-import json
 import cv2
 import numpy as np
 
@@ -10,7 +9,8 @@ def preprocess_image(image_path):
     img = cv2.imread(image_path)
 
     if img is None:
-        return None
+        print("ERROR: Image not found")
+        sys.exit(1)
 
     # Convert to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -51,10 +51,14 @@ def perform_ocr(image_path):
         # Filter only valid classifications
         filtered_results = [is_text_class(text) for text in results if is_text_class(text)]
 
-        return json.dumps({"text": filtered_results})
-
+        if filtered_results:
+            for result in filtered_results:
+                print(f"CLASSIFICATION: {result['value']}")
+        else:
+            print("INFO: No valid classifications found")
     except Exception as e:
-        return json.dumps({"error": str(e)})
+        print(f"ERROR: {str(e)}")
+        sys.exit(1)
 
 classification_keywords = {
     "milk", "cheese", "bread", "eggs", "yogurt", "butter", "juice", "meat", "chicken",
@@ -82,11 +86,9 @@ def is_text_class(text):
     return None
 
 if __name__ == "__main__":
-    import sys
     if len(sys.argv) < 2:
-        print(json.dumps({"error": "No image path provided"}))
+        print("ERROR: No image path provided")
         sys.exit(1)
 
     image_path = sys.argv[1]
-    output = perform_ocr(image_path)
-    print(output)
+    perform_ocr(image_path)

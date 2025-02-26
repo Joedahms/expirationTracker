@@ -153,14 +153,3 @@ std::chrono::year_month_day parseExpirationDate(const std::string& text) {
   // Should never reach this point since isExpirationDate() guarantees validity
   throw std::runtime_error("Invalid expiration date format");
 }
-
-/**
- * Determine if a given index corresponds to a valid class
- *
- * Input:
- * @param predictedClass index of the prediction from model
- * Output: bool on whether or not the index is a valid class
- */
-bool isValidClassification(int predictedClass) {
-  return validFoodClasses.find(predictedClass) != validFoodClasses.end();
-}

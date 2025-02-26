@@ -39,7 +39,6 @@ sudo apt install libopencv-dev
 sudo apt install sqlite3
 sudo apt install libsqlite3-dev
 sudo add-apt-repository ppa:kisak/kisak-mesa
-sudo apt install nlohmann-json3-dev
 sudo apt update
 sudo apt upgrade
 

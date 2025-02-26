@@ -11,24 +11,14 @@ bool TextClassifier::handleClassification(const std::filesystem::path& imagePath
   LOG(INFO) << "Entering HandleClassificationOCR";
   auto result = this->runModel(imagePath);
 
-  if (std::holds_alternative<std::string>(result)) {
-    auto detectedClass = std::get<std::string>(result);
-
-    if (detectedClass.find("ERROR") != std::string::npos ||
-        detectedClass == "UNEXPECTED_JSON_FORMAT" ||
-        detectedClass == "NO_VALID_CLASSIFICATION") {
-      return false; // Classification failed or no valid result
-    }
-
+  std::string detectedClass = std::string(result);
+  if (detectedClass.find("CLASSIFICATION") != std::string::npos) {
     foodItem.name         = detectedClass;
     foodItem.absolutePath = std::filesystem::absolute(imagePath);
     foodItem.category     = FoodCategories::packaged;
     foodItem.quantity     = 1;
-
-    return true;
   }
-
-  return false;
+  return true;
 }
 
 /**
@@ -38,16 +28,14 @@ bool TextClassifier::handleClassification(const std::filesystem::path& imagePath
  * @param imagePath path to the image you wish to extract text from
  * @return valid class detected
  */
-std::variant<std::pair<int, float>, std::string> TextClassifier::runModel(
-    const std::filesystem::path& imagePath) const {
+std::string TextClassifier::runModel(const std::filesystem::path& imagePath) const {
   LOG(INFO) << "Entering runClassificationOCR";
-  std::string detectedClass;
   std::string command =
       "./models-venv/bin/python3 ../vision/Models/easyOCR.py " + imagePath.string();
 
   FILE* pipe = popen(command.c_str(), "r");
   if (!pipe) {
-    return "ERROR";
+    return "ERROR: Failed to open pipe";
   }
 
   std::ostringstream output;
@@ -55,29 +43,13 @@ std::variant<std::pair<int, float>, std::string> TextClassifier::runModel(
   while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
     output << buffer;
   }
-  std::string result = output.str();
-  std::cout << result << std::endl;
   pclose(pipe);
 
-  try {
-    nlohmann::json jsonData = nlohmann::json::parse(result);
+  std::string result = output.str();
 
-    if (jsonData.contains("error")) {
-      return "ERROR: " + jsonData["error"].get<std::string>();
-    }
-    else if (jsonData.contains("text") && jsonData["text"].is_array() &&
-             !jsonData["text"].empty()) {
-      if (jsonData["text"][0].contains("value") &&
-          jsonData["text"][0]["value"].is_string()) {
-        return jsonData["text"][0]["value"].get<std::string>();
-      }
-    }
-    else {
-      return "UNEXPECTED_JSON_FORMAT";
-    }
-  } catch (const nlohmann::json::parse_error& e) {
-    return "JSON_PARSE_ERROR: " + std::string(e.what());
+  if (result.find("ERROR") != std::string::npos) {
+    LOG(FATAL) << result;
   }
-
-  return "NO_VALID_CLASSIFICATION";
+  LOG(INFO) << result;
+  return result;
 }

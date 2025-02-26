@@ -11,21 +11,18 @@
 bool ObjectClassifier::handleClassification(
     const std::filesystem::path& imagePath) const {
   LOG(INFO) << "Handling EfficientNet Classification";
-  auto result = runModel(imagePath);
+  std::string result = runModel(imagePath);
 
-  if (std::holds_alternative<std::pair<int, float>>(result)) {
-    auto [detectionIndex, probability] = std::get<std::pair<int, float>>(result);
-    if (detectionIndex >= 0 && validFoodClasses.contains(detectionIndex)) {
-      this->foodItem.name         = getFoodLabel(detectionIndex);
-      this->foodItem.category     = FoodCategories::unpackaged;
-      this->foodItem.absolutePath = std::filesystem::absolute(imagePath);
-      this->foodItem.expirationDate =
-          std::chrono::year{2025} / std::chrono::month{2} / std::chrono::day{20};
-      this->foodItem.quantity = 1;
-      return true;
-    }
+  std::string detectedClass = std::string(result);
+  if (detectedClass.find("CLASSIFICATION") != std::string::npos) {
+    this->foodItem.name         = detectedClass;
+    this->foodItem.category     = FoodCategories::unpackaged;
+    this->foodItem.absolutePath = std::filesystem::absolute(imagePath);
+    this->foodItem.expirationDate =
+        std::chrono::year{2025} / std::chrono::month{2} / std::chrono::day{20};
+    this->foodItem.quantity = 1;
+    return true;
   }
-
   return false;
 }
 
@@ -34,10 +31,9 @@ bool ObjectClassifier::handleClassification(
  *
  * Input:
  * @param imagePath path to the image you wish to extract text from
- * @return std::pair<int, float> of predicted imagenet index and probability
+ * @return string containing detected class
  */
-std::variant<std::pair<int, float>, std::string> ObjectClassifier::runModel(
-    const std::filesystem::path& imagePath) const {
+std::string ObjectClassifier::runModel(const std::filesystem::path& imagePath) const {
   LOG(INFO) << "Running EfficientNet model.";
   std::string command =
       "./models-venv/bin/python3 ../vision/Models/efficientNet.py " + imagePath.string();
@@ -48,22 +44,18 @@ std::variant<std::pair<int, float>, std::string> ObjectClassifier::runModel(
     return "ERROR";
   }
 
-  std::ostringstream result;
+  std::ostringstream output;
   char buffer[256];
+
   while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
-    result << buffer;
+    output << buffer;
   }
   pclose(pipe);
+  std::string result = output.str();
 
-  try {
-    nlohmann::json output = nlohmann::json::parse(result.str());
-    if (output.contains("error")) {
-      LOG(FATAL) << output["error"];
-      return "ERROR";
-    }
-
-    return std::make_pair(output["index"].get<int>(), output["probability"].get<float>());
-  } catch (const nlohmann::json::parse_error&) {
-    return "JSON_PARSE_ERROR";
+  if (result.find("ERROR") != std::string::npos) {
+    LOG(FATAL) << result;
   }
+  LOG(INFO) << result;
+  return result;
 }
