@@ -11,11 +11,13 @@
 #include "text.h"
 
 Panel::Panel(struct DisplayGlobal displayGlobal,
-             int id,
-             SDL_Point positionRelativeToParent)
+             const int& id,
+             const SDL_Rect& boundaryRectangle,
+             const SDL_Point& positionRelativeToParent)
     : id(id) {
-  this->positionRelativeToParent = positionRelativeToParent;
   this->displayGlobal            = displayGlobal;
+  this->boundaryRectangle        = boundaryRectangle;
+  this->positionRelativeToParent = positionRelativeToParent;
 }
 
 /**
@@ -80,7 +82,6 @@ void Panel::updateSelf() {
   }
 }
 
-void Panel::renderSelf() const {}
 void Panel::handleEventSelf(const SDL_Event& event) {}
 
 /**

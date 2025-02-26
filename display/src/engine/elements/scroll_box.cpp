@@ -77,13 +77,18 @@ void ScrollBox::refreshPanels() {
   std::vector<FoodItem> allFoodItems = readAllFoodItems();
 
   this->children.clear();
+  SDL_Rect boundaryRectangle = {0, 0, 0, this->panelHeight};
   SDL_Point relativePosition = {0, 0};
+  relativePosition.y         = topPanelPosition;
+
   for (auto& foodItem : allFoodItems) {
-    std::unique_ptr<Panel> newPanel =
-        std::make_unique<Panel>(this->displayGlobal, foodItem.id, relativePosition);
+    std::unique_ptr<Panel> newPanel = std::make_unique<Panel>(
+        this->displayGlobal, foodItem.id, boundaryRectangle, relativePosition);
     relativePosition.y += panelHeight;
 
     newPanel->addFoodItem(foodItem, relativePosition);
+    int borderThickness = 1;
+    newPanel->addBorder(borderThickness);
     addElement(std::move(newPanel));
   }
 }
@@ -95,6 +100,7 @@ void ScrollBox::refreshPanels() {
  * @return None
  */
 void ScrollBox::scrollUp() {
+  topPanelPosition -= this->scrollAmount;
   for (auto& currPanel : this->children) {
     SDL_Point currPanelRelativePosition = currPanel->getPositionRelativeToParent();
     currPanelRelativePosition.y -= this->scrollAmount;
@@ -109,6 +115,7 @@ void ScrollBox::scrollUp() {
  * @return None
  */
 void ScrollBox::scrollDown() {
+  topPanelPosition += this->scrollAmount;
   for (auto& currPanel : this->children) {
     SDL_Point currPanelRelativePosition = currPanel->getPositionRelativeToParent();
     currPanelRelativePosition.y += this->scrollAmount;
