@@ -32,9 +32,8 @@ $ sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev
 $ sudo apt install libopencv-dev
 #### Install SQLite
 $ sudo apt install sqlite3 libsqlite3-dev
-#### Install mesa and json stuff
+#### Install mesa
 $ sudo add-apt-repository ppa:kisak/kisak-mesa
-$ sudo apt install nlohmann-json3-dev
    
 ## YOLO Setup
 ## Create a YOLO directory within the root of this repo

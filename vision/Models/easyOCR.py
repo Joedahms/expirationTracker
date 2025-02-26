@@ -1,5 +1,6 @@
 import easyocr
-import json
+import re
+import sys
 import cv2
 import numpy as np
 
@@ -8,7 +9,8 @@ def preprocess_image(image_path):
     img = cv2.imread(image_path)
 
     if img is None:
-        return None
+        print("ERROR: Image not found")
+        sys.exit(1)
 
     # Convert to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -42,31 +44,51 @@ def preprocess_image(image_path):
 
 def perform_ocr(image_path):
     try:
-        reader = easyocr.Reader(['en'], gpu=True)  # Use GPU if available
-
-        # Preprocess image before OCR
+        reader = easyocr.Reader(['en'], gpu=False)
         processed_image = preprocess_image(image_path)
+        results = reader.readtext(processed_image, detail=0, paragraph=True, text_threshold=0.8)
 
-        if processed_image is None:
-            return json.dumps({"error": "Image not found or unreadable"})
+        # Filter only valid classifications
+        filtered_results = [is_text_class(text) for text in results if is_text_class(text)]
 
-        # Perform OCR only on detected text regions
-        results = reader.readtext(processed_image, 
-                                  detail=0, 
-                                  paragraph=True, 
-                                  text_threshold=0.8)
-
-        return json.dumps({"text": results})
-
+        if filtered_results:
+            for result in filtered_results:
+                print(f"CLASSIFICATION: {result['value']}")
+        else:
+            print("INFO: No valid classifications found")
     except Exception as e:
-        return json.dumps({"error": str(e)})
+        print(f"ERROR: {str(e)}")
+        sys.exit(1)
+
+classification_keywords = {
+    "milk", "cheese", "bread", "eggs", "yogurt", "butter", "juice", "meat", "chicken",
+    "fish", "cereal", "pasta", "rice", "flour", "sugar", "salt", "pepper", "coffee",
+    "tea", "honey", "jam", "peanut butter", "chocolate", "candy", "cookies", "crackers",
+    "granola", "oats", "popcorn", "chips", "pancake mix", "syrup", "beans", "corn",
+    "tomatoes", "tuna", "soup", "fruit", "vegetables", "meals", "pizza", "fries",
+    "ice cream", "energy bars", "protein powder", "noodles", "ketchup", "mayonnaise",
+    "mustard", "soy sauce", "hot sauce", "dressing", "oil", "vinegar", "pudding",
+    "whipped cream", "sour cream", "tofu", "bacon"
+}
+
+def clean_text(text):
+    """ Normalize and clean extracted OCR text. """
+    return re.sub(r'[^a-zA-Z\s]', '', text).strip().lower()
+
+def is_text_class(text):
+    """ Check if extracted text belongs to a known classification. """
+    words = clean_text(text).split()
+    
+    for word in words:
+        if len(word) > 2 and word in classification_keywords:
+            return {"type": "classification", "value": word}  # Return food category
+
+    return None
 
 if __name__ == "__main__":
-    import sys
     if len(sys.argv) < 2:
-        print(json.dumps({"error": "No image path provided"}))
+        print("ERROR: No image path provided")
         sys.exit(1)
 
     image_path = sys.argv[1]
-    output = perform_ocr(image_path)
-    print(output)
+    perform_ocr(image_path)

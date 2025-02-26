@@ -149,7 +149,7 @@ void printFoodItem(const FoodItem& item) {
   std::cout << "Food Item Details:\n";
   std::cout << "ID: " << item.id << "\n";
   std::cout << "Name: " << item.name << "\n";
-  std::cout << "Category: " << static_cast<int>(item.category)
+  std::cout << "Category: " << foodCategoryToString(item.category)
             << "\n"; // Adjust based on enum to string conversion
   std::cout << "Scan Date: " << static_cast<int>(item.scanDate.year()) << "-"
             << static_cast<unsigned>(item.scanDate.month()) << "-"

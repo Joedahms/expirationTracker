@@ -6,7 +6,7 @@
 #include "display/src/display_entry.h"
 #include "hardware/src/hardware_entry.h"
 #include "pipes.h"
-#include "vision/include/vision_pipe.h"
+#include "vision/include/visionMain.h"
 
 int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);

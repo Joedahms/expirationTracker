@@ -58,7 +58,7 @@ void redoThis(struct Pipes pipes) {
   const std::chrono::time_point now{std::chrono::system_clock::now()};
 
   struct FoodItem foodItem;
-  foodItem.imageDirectory = std::filesystem::absolute("../images");
+  foodItem.imageDirectory = std::filesystem::absolute("../images/temp");
   foodItem.scanDate       = std::chrono::floor<std::chrono::days>(now);
   foodItem.weight         = 10.0;
 
