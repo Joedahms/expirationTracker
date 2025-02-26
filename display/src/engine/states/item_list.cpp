@@ -6,6 +6,7 @@
 #include "../../../../food_item.h"
 #include "../../sql_food.h"
 #include "../display_global.h"
+#include "../elements/dropdown.h"
 #include "../elements/panel.h"
 #include "../elements/scroll_box.h"
 #include "../elements/text.h"
@@ -38,6 +39,18 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
   scrollBox->addBorder(1);
   this->rootElement->addElement(std::move(scrollBox));
   this->rootElement->update();
+
+  SDL_Rect sortByRect = {400, 0, 200, 200};
+  std::unique_ptr<Dropdown> sortBy =
+      std::make_unique<Dropdown>(this->displayGlobal, sortByRect);
+
+  SDL_Rect expDateLowToHighRectangle       = {0, 0, 0, 0};
+  std::unique_ptr<Button> expDateLowToHigh = std::make_unique<Button>(
+      this->displayGlobal, expDateLowToHighRectangle, "Expiration date low to high",
+      SDL_Point{10, 10}, [this]() {});
+  sortBy->addOption(std::move(expDateLowToHigh));
+
+  this->rootElement->addElement(std::move(sortBy));
 }
 
 /**
