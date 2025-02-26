@@ -102,7 +102,6 @@ void Panel::updateSelf() {
     }
     this->children[i]->setPositionRelativeToParent(childRelativePosition);
   }
-  std::cout << std::endl;
 }
 
 void Panel::handleEventSelf(const SDL_Event& event) {}

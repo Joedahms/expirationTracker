@@ -50,6 +50,7 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
       SDL_Point{0, 0}, [this]() {});
 
   sortBy->addOption(std::move(sortByExpirationLowToHigh));
+  sortBy->update();
   sortBy->addOption(std::move(sortByExpirationHighToLow));
   this->rootElement->addElement(std::move(sortBy));
 }
