@@ -17,8 +17,9 @@ bool TextClassifier::handleClassification(const std::filesystem::path& imagePath
     foodItem.absolutePath = std::filesystem::absolute(imagePath);
     foodItem.category     = FoodCategories::packaged;
     foodItem.quantity     = 1;
+    return true;
   }
-  return true;
+  return false;
 }
 
 /**

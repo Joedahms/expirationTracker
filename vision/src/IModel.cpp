@@ -1,6 +1,4 @@
 #include "../include/IModel.h"
-
-#include <iostream>
 /**
  * Send request to models
  *
