@@ -4,7 +4,6 @@
 #include "../../food_item.h"
 #include <filesystem>
 #include <string>
-#include <variant>
 class IModel {
 protected:
   FoodItem& foodItem;
@@ -30,4 +29,4 @@ public:
   virtual bool handleClassification(const std::filesystem::path& imagePath) const = 0;
 };
 
-#endif // IMODELHANDLER_H
+#endif // IMODEL_H
