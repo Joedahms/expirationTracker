@@ -4,13 +4,41 @@ import sys
 import cv2
 import numpy as np
 
+try:
+    reader = easyocr.Reader(['en'], gpu=False)
+except Exception as e:
+    raise(f"ERROR: OCR model loading failed: {str(e)}")
+
+classification_keywords = {
+    "milk", "cheese", "bread", "eggs", "yogurt", "butter", "juice", "meat", "chicken",
+    "fish", "cereal", "pasta", "rice", "flour", "sugar", "salt", "pepper", "coffee",
+    "tea", "honey", "jam", "peanut butter", "chocolate", "candy", "cookies", "crackers",
+    "granola", "oats", "popcorn", "chips", "pancake mix", "syrup", "beans", "corn",
+    "tomatoes", "tuna", "soup", "fruit", "vegetables", "meals", "pizza", "fries",
+    "ice cream", "energy bars", "protein powder", "noodles", "ketchup", "mayonnaise",
+    "mustard", "soy sauce", "hot sauce", "dressing", "oil", "vinegar", "pudding",
+    "whipped cream", "sour cream", "tofu", "bacon"
+}
+
+def clean_text(text):
+    """ Normalize and clean extracted OCR text. """
+    return re.sub(r'[^a-zA-Z\s]', '', text).strip().lower()
+
+def is_text_class(text):
+    """ Check if extracted text belongs to a known classification. """
+    words = clean_text(text).split()
+    
+    for word in words:
+        if len(word) > 2 and word in classification_keywords:
+            return {"type": "classification", "value": word}  # Return food category
+
+    return None
+
 def preprocess_image(image_path):
-    """ Prepares the image for better OCR accuracy with text region detection. """
     img = cv2.imread(image_path)
 
     if img is None:
-        print("ERROR: Image not found")
-        sys.exit(1)
+        return("Image not found")
 
     # Convert to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -41,11 +69,13 @@ def preprocess_image(image_path):
     processed = cv2.bitwise_and(gray, gray, mask=mask)
 
     return processed  # Return improved image as a NumPy array
-
+    
 def perform_ocr(image_path):
+    processed_image = preprocess_image(image_path)
+    if isinstance(processed_image, str):
+        return(f"ERROR: {processed_image}")
+
     try:
-        reader = easyocr.Reader(['en'], gpu=False)
-        processed_image = preprocess_image(image_path)
         results = reader.readtext(processed_image, detail=0, paragraph=True, text_threshold=0.8)
 
         # Filter only valid classifications
@@ -53,42 +83,8 @@ def perform_ocr(image_path):
 
         if filtered_results:
             for result in filtered_results:
-                print(f"CLASSIFICATION: {result['value']}")
+                return(f"CLASSIFICATION: {result['value']}")
         else:
-            print("INFO: No valid classifications found")
+            return("INFO: No valid classifications found")
     except Exception as e:
-        print(f"ERROR: {str(e)}")
-        sys.exit(1)
-
-classification_keywords = {
-    "milk", "cheese", "bread", "eggs", "yogurt", "butter", "juice", "meat", "chicken",
-    "fish", "cereal", "pasta", "rice", "flour", "sugar", "salt", "pepper", "coffee",
-    "tea", "honey", "jam", "peanut butter", "chocolate", "candy", "cookies", "crackers",
-    "granola", "oats", "popcorn", "chips", "pancake mix", "syrup", "beans", "corn",
-    "tomatoes", "tuna", "soup", "fruit", "vegetables", "meals", "pizza", "fries",
-    "ice cream", "energy bars", "protein powder", "noodles", "ketchup", "mayonnaise",
-    "mustard", "soy sauce", "hot sauce", "dressing", "oil", "vinegar", "pudding",
-    "whipped cream", "sour cream", "tofu", "bacon"
-}
-
-def clean_text(text):
-    """ Normalize and clean extracted OCR text. """
-    return re.sub(r'[^a-zA-Z\s]', '', text).strip().lower()
-
-def is_text_class(text):
-    """ Check if extracted text belongs to a known classification. """
-    words = clean_text(text).split()
-    
-    for word in words:
-        if len(word) > 2 and word in classification_keywords:
-            return {"type": "classification", "value": word}  # Return food category
-
-    return None
-
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("ERROR: No image path provided")
-        sys.exit(1)
-
-    image_path = sys.argv[1]
-    perform_ocr(image_path)
+        return(f"ERROR: {str(e)}")

@@ -7,31 +7,21 @@ from tensorflow.keras.applications import EfficientNetB0
 from tensorflow.keras.applications.efficientnet import preprocess_input
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 
-# ✅ Suppress TensorFlow warnings
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-tf.get_logger().setLevel('ERROR')
-
-# ✅ Force CPU if needed (for Raspberry Pi)
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-
-# ✅ Load EfficientNetB0 Pre-trained on ImageNet
 try:
     model = EfficientNetB0(weights="imagenet")
 except Exception as e:
-    print(f"ERROR: Model loading failed: {str(e)}")
+    print(f"ERROR: CLS Model loading failed: {str(e)}")
     sys.exit(1)
 
-# ✅ Image Processing Parameters
 IMG_SIZE = (224, 224)  # Must match EfficientNet's input size
+PROBABILITY_THRESHOLD = 0.30  # Set minimum confidence level
 
-# ✅ Valid food class indices
 valid_food_classes = {
     924, 925, 926, 927, 928, 929, 930, 931, 932, 933, 934, 935, 936, 937, 938,
     939, 940, 941, 942, 943, 944, 945, 946, 947, 948, 949, 950, 951, 952, 953,
     954, 955, 956, 957, 959, 960, 961, 962, 963, 964, 965, 966, 967, 968, 969
 }
 
-# ✅ Food class label mapping
 food_labels = {
     924: "guacamole", 925: "consomme", 926: "hot_pot", 927: "trifle",
     928: "ice_cream", 929: "ice_lolly", 930: "French_loaf", 931: "bagel",
@@ -47,51 +37,30 @@ food_labels = {
 }
 
 def preprocess_image(image_path):
-    """Loads and preprocesses an image for EfficientNetB0."""
     if not os.path.exists(image_path):
-        return None  # Handle file not found scenario
+        return "Image does not exist"
 
     try:
         img = load_img(image_path, target_size=IMG_SIZE)  # Load & resize
         img_array = img_to_array(img)  # Convert to numpy array
         img_array = preprocess_input(img_array)  # Normalize using EfficientNet preprocessing
-        img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
-        return img_array
+        return np.expand_dims(img_array, axis=0)  # Add batch dimension
     except Exception as e:
-        return str(e)  # Return error message
+        return str(e)
 
 def classify_image(image_path):
-    """Runs inference on an image and returns the class name if valid."""
+    processed_image = preprocess_image(image_path)
+    if isinstance(processed_image, str):  # This means an error message was returned
+        return(f"ERROR: {processed_image}")
     try:
-        img_array = preprocess_image(image_path)
-        
-        if img_array is None:
-            print("ERROR: Image not found")
-            sys.exit(1)
-
-        if isinstance(img_array, str):  # This means an error message was returned
-            print(f"ERROR: {img_array}")
-            sys.exit(1)
-
-        preds = model.predict(img_array, verbose=0)  # Get predictions
+        preds = model.predict(processed_image, verbose=0)  # Get predictions
         top_class_index = np.argmax(preds)  # Get index of highest probability class
         top_probability = preds[0, top_class_index]  # Get the probability of the top class
 
-        PROBABILITY_THRESHOLD = 0.30  # Set minimum confidence level
         if top_class_index in valid_food_classes and top_probability >= PROBABILITY_THRESHOLD:
-            print(F"CLASSIFICATION: {food_labels[top_class_index]}")
+            return(F"CLASSIFICATION: {food_labels[top_class_index]}")
         else:
-            print("INFO: Low confidence or not a valid food item")
-            sys.exit(1)
+            return("INFO: Low confidence or not a valid food item")
     
     except Exception as e:
-        print(f"ERROR: {str(e)}")
-        sys.exit(1)
-
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("ERROR: No image path provided")
-        sys.exit(1)
-
-    image_path = sys.argv[1]  # Get image path from command-line argument
-    classify_image(image_path)
+        return(f"ERROR: {str(e)}")
