@@ -8,8 +8,7 @@
  * @param imagePath path to the image you wish to extract text from
  * @return success of attempt
  */
-bool ObjectClassifier::handleClassification(
-    const std::filesystem::path& imagePath) const {
+bool ObjectClassifier::handleClassification(const std::filesystem::path& imagePath) {
   LOG(INFO) << "Handling EfficientNet Classification";
   std::string result = runModel(imagePath);
 
@@ -35,23 +34,10 @@ bool ObjectClassifier::handleClassification(
  */
 std::string ObjectClassifier::runModel(const std::filesystem::path& imagePath) const {
   LOG(INFO) << "Running EfficientNet model.";
-  std::string command =
-      "./models-venv/bin/python3 ../vision/Models/efficientNet.py " + imagePath.string();
 
-  FILE* pipe = popen(command.c_str(), "r");
-  if (!pipe) {
-    LOG(FATAL) << "Failed to open pipe.";
-    return "ERROR";
-  }
+  sendRequest(TaskType::CLS, imagePath);
 
-  std::ostringstream output;
-  char buffer[256];
-
-  while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
-    output << buffer;
-  }
-  pclose(pipe);
-  std::string result = output.str();
+  std::string result = readResponse();
 
   if (result.find("ERROR") != std::string::npos) {
     LOG(FATAL) << result;

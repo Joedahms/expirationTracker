@@ -1,5 +1,6 @@
-build/**
+build/
 yoloDarknet/yolov4.weights
 *.db
 .vscode
-images/**
+images/
+vision/Models/__pycache__/

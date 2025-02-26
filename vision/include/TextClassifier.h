@@ -10,7 +10,7 @@ class TextClassifier : public IModel {
 public:
   explicit TextClassifier(FoodItem& foodItem) : IModel(foodItem) {}
   std::string runModel(const std::filesystem::path& imagePath) const override;
-  bool handleClassification(const std::filesystem::path& imagePath) const override;
+  bool handleClassification(const std::filesystem::path& imagePath) override;
 };
 
 #endif

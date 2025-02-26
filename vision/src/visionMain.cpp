@@ -29,7 +29,7 @@ void visionEntry(struct Pipes pipes) {
     sleep(2); // Wait 2 seconds before retrying
   }
 
-  usleep(500000); // Wait 0.5 sec to ensure Python server starts
+  sleep(5); // Wait 5 sec to ensure Python server starts
 
   struct FoodItem foodItem;
   ImageProcessor processor = ImageProcessor(pipes, foodItem);
@@ -61,7 +61,8 @@ bool startPythonServer() {
   }
   if (pid == 0) { // Child process
     LOG(INFO) << "Starting Python server...";
-    char* args[] = {(char*)"python3", (char*)"/path/to/server.py", nullptr};
+    char* args[] = {(char*)"./models-venv/bin/python3",
+                    (char*)"../vision/Models/server.py", nullptr};
     execvp(args[0], args);
     LOG(INFO) << "ERROR: execvp() failed to start Python server.";
     exit(1); // Exit child process if execvp fails

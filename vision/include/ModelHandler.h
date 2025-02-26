@@ -13,7 +13,7 @@ private:
 
 public:
   ModelHandler(FoodItem&);
-  bool classifyObject(const std::filesystem::path&) const;
+  bool classifyObject(const std::filesystem::path&);
   bool extractExpirationDate(const std::filesystem::path&) const;
 };
 
