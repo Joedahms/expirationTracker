@@ -53,8 +53,8 @@ void Panel::addFoodItem(const FoodItem& foodItem, const SDL_Point& relativePosit
   addFoodItemName(foodItem, relativePosition);
   addFoodItemExpirationDate(foodItem, relativePosition);
 
-  std::unique_ptr<NumberSetting> itemQuantity =
-      std::make_unique<NumberSetting>(this->displayGlobal, this->id);
+  std::unique_ptr<NumberSetting> itemQuantity = std::make_unique<NumberSetting>(
+      this->displayGlobal, SDL_Rect{0, 0, 0, 0}, this->id);
   addElement(std::move(itemQuantity));
 }
 
@@ -65,10 +65,36 @@ void Panel::addFoodItem(const FoodItem& foodItem, const SDL_Point& relativePosit
  * @return None
  */
 void Panel::updateSelf() {
+  if (parent) {
+    if (this->centerWithinParent) {
+      if (checkCenterVertical() == false) {
+        centerVertical();
+      }
+      if (checkCenterHorizontal() == false) {
+        centerHorizontal();
+      }
+    }
+    else if (this->centerVerticalWithinParent) {
+      if (checkCenterVertical() == false) {
+        centerVertical();
+      }
+    }
+    else if (this->centerHorizontalWithinParent) {
+      if (checkCenterHorizontal() == false) {
+        centerHorizontal();
+      }
+    }
+
+    SDL_Rect parentBoundaryRectangle = this->parent->getBoundaryRectangle();
+    this->boundaryRectangle.x =
+        parentBoundaryRectangle.x + this->positionRelativeToParent.x;
+    this->boundaryRectangle.y =
+        parentBoundaryRectangle.y + this->positionRelativeToParent.y;
+  }
+
   // Align all children right next to each other
   for (int i = 0; i < this->children.size(); i++) {
     SDL_Point childRelativePosition = this->children[i]->getPositionRelativeToParent();
-    childRelativePosition.y         = this->positionRelativeToParent.y;
     if (i == 0) {
       childRelativePosition.x = 0;
     }
@@ -80,6 +106,7 @@ void Panel::updateSelf() {
     }
     this->children[i]->setPositionRelativeToParent(childRelativePosition);
   }
+  std::cout << std::endl;
 }
 
 void Panel::handleEventSelf(const SDL_Event& event) {}

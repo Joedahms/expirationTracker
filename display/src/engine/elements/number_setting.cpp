@@ -13,8 +13,12 @@
  * @param displayGlobal
  * @param settingId The primary key of the food item corresponding to this object
  */
-NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal, int settingId)
+NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal,
+                             const SDL_Rect& boundaryRectangle,
+                             int settingId)
     : settingId(settingId) {
+  setupPosition(boundaryRectangle);
+
   std::unique_ptr<Button> decreaseButton =
       std::make_unique<Button>(displayGlobal, SDL_Rect{0, 0, 0, 0}, "-", SDL_Point{0, 0},
                                [this]() { this->settingValue--; });
@@ -46,11 +50,38 @@ NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal, int settingId)
  * @return None
  */
 void NumberSetting::updateSelf() {
+  if (parent) {
+    if (this->centerWithinParent) {
+      if (checkCenterVertical() == false) {
+        centerVertical();
+      }
+      if (checkCenterHorizontal() == false) {
+        centerHorizontal();
+      }
+    }
+    if (this->centerVerticalWithinParent) {
+      if (checkCenterVertical() == false) {
+        centerVertical();
+      }
+    }
+    else if (this->centerHorizontalWithinParent) {
+      if (checkCenterHorizontal() == false) {
+        centerHorizontal();
+      }
+    }
+
+    SDL_Rect parentBoundaryRectangle = parent->getBoundaryRectangle();
+    this->boundaryRectangle.x =
+        parentBoundaryRectangle.x + this->positionRelativeToParent.x;
+    this->boundaryRectangle.y =
+        parentBoundaryRectangle.y + this->positionRelativeToParent.y;
+  }
+
   for (int i = 0; i < this->children.size(); i++) {
     SDL_Point childRelativePosition = this->children[i]->getPositionRelativeToParent();
     childRelativePosition.y         = this->positionRelativeToParent.y;
     if (i == 0) {
-      childRelativePosition.x = this->positionRelativeToParent.x;
+      childRelativePosition.x = 0;
     }
     else {
       SDL_Point leftRelativePosition =

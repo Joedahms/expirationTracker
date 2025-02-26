@@ -18,7 +18,7 @@
 Button::Button(struct DisplayGlobal displayGlobal,
                const SDL_Rect& boundaryRectangle,
                const std::string& textContent,
-               const SDL_Point& padding,
+               const SDL_Point& textPadding,
                std::function<void()> callback)
     : textPadding(textPadding), onClick(callback) {
   this->displayGlobal = displayGlobal;

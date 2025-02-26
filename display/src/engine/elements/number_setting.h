@@ -13,7 +13,9 @@
  */
 class NumberSetting : public CompositeElement {
 public:
-  NumberSetting(struct DisplayGlobal displayGlobal, int settingId);
+  NumberSetting(struct DisplayGlobal displayGlobal,
+                const SDL_Rect& boundaryRectangle,
+                int settingId);
   void setSettingId(const int& newSettingId);
 
   void updateSelf() override;
