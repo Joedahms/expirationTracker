@@ -11,12 +11,10 @@
 #include "text.h"
 
 /**
- * @param displayGolobal
  * @param displayGlobal
  * @param boundaryRectangle Rectangle defining offset within parent (if any) and width +
  * height
- * @param settingId The primary key of the food item corresponding to this object
-
+ * @param settingId The primary key of the food item corresponding to this panel
  */
 Panel::Panel(struct DisplayGlobal displayGlobal,
              const SDL_Rect& boundaryRectangle,
