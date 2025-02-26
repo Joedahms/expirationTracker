@@ -4,12 +4,8 @@
 #include "../../food_item.h"
 #include "ObjectClassifier.h"
 #include "TextClassifier.h"
-#include "helperFunctions.h"
-#include "validateDetection.h"
 #include <filesystem>
 #include <glog/logging.h>
-#include <iostream>
-#include <nlohmann/json.hpp>
 class ModelHandler {
 private:
   ObjectClassifier objectClassifier;
