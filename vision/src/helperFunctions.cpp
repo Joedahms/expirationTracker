@@ -91,3 +91,19 @@ std::string cleanText(const std::string& text) {
   }
   return result;
 }
+
+/**
+ * Remove provided prefix if found
+ *
+ * Input:
+ * @param string original string
+ * @param prefix prefix to remove
+ * Output:
+ * @return updated string with prefix removed
+ */
+std::string removePrefix(const std::string& string, const std::string& prefix) {
+  if (string.rfind(prefix, 0) == 0) {
+    return string.substr(prefix.length());
+  }
+  return string;
+}

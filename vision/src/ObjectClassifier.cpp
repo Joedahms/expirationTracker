@@ -15,7 +15,7 @@ bool ObjectClassifier::handleClassification(
 
   std::string detectedClass = std::string(result);
   if (detectedClass.find("CLASSIFICATION") != std::string::npos) {
-    this->foodItem.name         = detectedClass;
+    this->foodItem.name         = removePrefix(detectedClass, "CLASSIFICATION: ");
     this->foodItem.category     = FoodCategories::unpackaged;
     this->foodItem.absolutePath = std::filesystem::absolute(imagePath);
     this->foodItem.expirationDate =

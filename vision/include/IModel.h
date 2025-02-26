@@ -2,6 +2,7 @@
 #define IMODEL_H
 
 #include "../../food_item.h"
+#include "helperFunctions.h"
 #include <filesystem>
 #include <string>
 class IModel {
