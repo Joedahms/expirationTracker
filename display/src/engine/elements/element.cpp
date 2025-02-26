@@ -3,6 +3,12 @@
 
 #include "element.h"
 
+void Element::render() const {
+  if (this->hasBorder) {
+    renderBorder();
+  }
+}
+
 /**
  * Ensure that the positioning of the element is correct. Make sure that if need be, it is
  * centered with respect to its parent (if it has one) and that it is in the correct
@@ -37,6 +43,8 @@ void Element::update() {
   }
 }
 
+std::string Element::getContent() const { return "no content"; }
+
 void Element::setParent(Element* parent) { this->parent = parent; }
 
 void Element::setPositionRelativeToParent(const SDL_Point& relativePostion) {
@@ -47,7 +55,7 @@ SDL_Point Element::getPositionRelativeToParent() {
 }
 
 SDL_Rect Element::getBoundaryRectangle() { return this->boundaryRectangle; }
-void Element::setboundaryRectangle(SDL_Rect boundaryRectangle) {
+void Element::setBoundaryRectangle(SDL_Rect boundaryRectangle) {
   this->boundaryRectangle = boundaryRectangle;
 };
 
@@ -147,29 +155,30 @@ void Element::renderBorder() const {
   // Draw the top border
   for (int i = 0; i < borderThickness; i++) {
     SDL_RenderDrawLine(this->displayGlobal.renderer,
-                       this->boundaryRectangle.x - i, // Start X
-                       this->boundaryRectangle.y - i, // Start Y
-                       this->boundaryRectangle.x + this->boundaryRectangle.w + i, // End X
-                       this->boundaryRectangle.y - i);                            // End Y
+                       this->positionRelativeToParent.x - i, // Start X
+                       this->positionRelativeToParent.y - i, // Start Y
+                       this->positionRelativeToParent.x + this->boundaryRectangle.w +
+                           i,                                 // End X
+                       this->positionRelativeToParent.y - i); // End Y
   }
 
   // Draw the bottom border
   for (int i = 0; i < borderThickness; i++) {
     SDL_RenderDrawLine(
         this->displayGlobal.renderer,
-        this->boundaryRectangle.x - i,                              // Start X
-        this->boundaryRectangle.y + this->boundaryRectangle.h + i,  // Start Y
-        this->boundaryRectangle.x + this->boundaryRectangle.w + i,  // End X
-        this->boundaryRectangle.y + this->boundaryRectangle.h + i); // End Y
+        this->positionRelativeToParent.x - i,                              // Start X
+        this->positionRelativeToParent.y + this->boundaryRectangle.h + i,  // Start Y
+        this->positionRelativeToParent.x + this->boundaryRectangle.w + i,  // End X
+        this->positionRelativeToParent.y + this->boundaryRectangle.h + i); // End Y
   }
 
   // Draw the left border
   for (int i = 0; i < borderThickness; i++) {
     SDL_RenderDrawLine(this->displayGlobal.renderer,
-                       this->boundaryRectangle.x - i, // Start X
-                       this->boundaryRectangle.y - i, // Start Y
-                       this->boundaryRectangle.x - i, // End X
-                       this->boundaryRectangle.y + this->boundaryRectangle.h +
+                       this->positionRelativeToParent.x - i, // Start X
+                       this->positionRelativeToParent.y - i, // Start Y
+                       this->positionRelativeToParent.x - i, // End X
+                       this->positionRelativeToParent.y + this->boundaryRectangle.h +
                            i); // End Y
   }
 
@@ -177,9 +186,9 @@ void Element::renderBorder() const {
   for (int i = 0; i < borderThickness; i++) {
     SDL_RenderDrawLine(
         this->displayGlobal.renderer,
-        this->boundaryRectangle.x + this->boundaryRectangle.w + i,  // Start X
-        this->boundaryRectangle.y - i,                              // Start Y
-        this->boundaryRectangle.x + this->boundaryRectangle.w + i,  // End X
-        this->boundaryRectangle.y + this->boundaryRectangle.h + i); // End Y
+        this->positionRelativeToParent.x + this->boundaryRectangle.w + i,  // Start X
+        this->positionRelativeToParent.y - i,                              // Start Y
+        this->positionRelativeToParent.x + this->boundaryRectangle.w + i,  // End X
+        this->positionRelativeToParent.y + this->boundaryRectangle.h + i); // End Y
   }
 }

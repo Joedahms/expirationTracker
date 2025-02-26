@@ -17,8 +17,9 @@
 Button::Button(struct DisplayGlobal displayGlobal,
                const SDL_Rect& boundaryRectangle,
                const std::string& textContent,
+               const SDL_Point& textPadding,
                std::function<void()> callback)
-    : onClick(callback) {
+    : textPadding(textPadding), onClick(callback) {
   this->displayGlobal              = displayGlobal;
   this->positionRelativeToParent.x = boundaryRectangle.x;
   this->positionRelativeToParent.y = boundaryRectangle.y;
@@ -33,19 +34,18 @@ Button::Button(struct DisplayGlobal displayGlobal,
   this->defaultColor    = {255, 0, 0, 255}; // Red
 
   // Button Text
-  SDL_Color textColor  = {255, 255, 0, 255}; // Yellow
-  SDL_Point textOffset = {10, 10};
-  SDL_Rect textRect    = {0, 0, 0, 0};
+  SDL_Color textColor = {255, 255, 0, 255}; // Yellow
+  SDL_Rect textRect   = {0, 0, 0, 0};
   std::unique_ptr<Text> text =
       std::make_unique<Text>(this->displayGlobal, "../display/fonts/16020_FUTURAM.ttf",
-                             textContent.c_str(), 24, textColor, textRect, textOffset);
+                             textContent.c_str(), 24, textColor, textRect, textPadding);
   text->setCentered();
 
   // Size based on text
   if (this->boundaryRectangle.w == 0 && this->boundaryRectangle.h == 0) {
     SDL_Rect textboundaryRectangle = text->getBoundaryRectangle();
-    this->boundaryRectangle.w      = textboundaryRectangle.w + 10;
-    this->boundaryRectangle.h      = textboundaryRectangle.h + 10;
+    this->boundaryRectangle.w      = textboundaryRectangle.w + textPadding.x;
+    this->boundaryRectangle.h      = textboundaryRectangle.h + textPadding.y;
   }
 
   addElement(std::move(text));

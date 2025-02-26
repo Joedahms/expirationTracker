@@ -20,12 +20,11 @@
  */
 class Panel : public CompositeElement {
 public:
-  Panel(struct DisplayGlobal displayGlobal,
-        int id,
-        SDL_Rect boundaryRectangle,
-        SDL_Point positionRelativeToParent,
-        std::vector<std::unique_ptr<Text>> t);
   Panel(struct DisplayGlobal displayGlobal, int id, SDL_Point positionRelativeToParent);
+  Panel(struct DisplayGlobal displayGlobal,
+        const int& id,
+        const SDL_Rect& boundaryRectangle,
+        const SDL_Point& positionRelativeToParent);
 
   void addText(const std::string& fontPath,
                const std::string& content,
@@ -35,7 +34,6 @@ public:
   void addFoodItem(const FoodItem& foodItem, const SDL_Point& relativePosition);
 
   void updateSelf() override;
-  void renderSelf() const override;
   void handleEventSelf(const SDL_Event& event) override;
 
 private:
