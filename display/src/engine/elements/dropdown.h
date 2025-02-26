@@ -1,8 +1,8 @@
 #ifndef DROPDOWN_H
 #define DROPDOWN_H
 
-#include "element.h"
+#include "composite_element.h"
 
-class Dropdown : public Element {};
+class Dropdown : public CompositeElement {};
 
 #endif

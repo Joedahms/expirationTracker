@@ -12,6 +12,7 @@
  * as well as the width and height. The x and y parameters of the rectangle are used as
  * the position relative to the parent.
  * @param textContent The text to print in the middle of the button
+ * @param textPadding How offset the text should be from parent
  * @param callback The callback function to execute when the button is clicked
  */
 Button::Button(struct DisplayGlobal displayGlobal,
@@ -34,11 +35,11 @@ Button::Button(struct DisplayGlobal displayGlobal,
   this->defaultColor    = {255, 0, 0, 255}; // Red
 
   // Button Text
-  SDL_Color textColor = {255, 255, 0, 255}; // Yellow
-  SDL_Rect textRect   = {0, 0, 0, 0};
-  std::unique_ptr<Text> text =
-      std::make_unique<Text>(this->displayGlobal, "../display/fonts/16020_FUTURAM.ttf",
-                             textContent.c_str(), 24, textColor, textRect, textPadding);
+  SDL_Color textColor        = {255, 255, 0, 255}; // Yellow
+  SDL_Rect textRect          = {textPadding.x, textPadding.y, 0, 0};
+  std::unique_ptr<Text> text = std::make_unique<Text>(
+      this->displayGlobal, textRect, "../display/fonts/16020_FUTURAM.ttf",
+      textContent.c_str(), 24, textColor);
   text->setCentered();
 
   // Size based on text

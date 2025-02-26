@@ -20,9 +20,9 @@ NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal, int settingId)
                                [this]() { this->settingValue--; });
   addElement(std::move(decreaseButton));
 
-  std::unique_ptr<Text> text =
-      std::make_unique<Text>(displayGlobal, displayGlobal.futuramFontPath, "0", 24,
-                             SDL_Color{0, 255, 0, 255}, SDL_Rect{0, 0, 0, 0});
+  std::unique_ptr<Text> text = std::make_unique<Text>(displayGlobal, SDL_Rect{0, 0, 0, 0},
+                                                      displayGlobal.futuramFontPath, "0",
+                                                      24, SDL_Color{0, 255, 0, 255});
   addElement(std::move(text));
 
   std::unique_ptr<Button> increaseButton =

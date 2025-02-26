@@ -21,14 +21,14 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) {
   rootRectangle.h        = windowSurface->h;
   this->rootElement      = std::make_unique<Container>(rootRectangle);
 
-  const char* fontPath                  = "../display/fonts/16020_FUTURAM.ttf";
-  const char* progressMessageContent    = "Scanning In Progress";
-  SDL_Color progressMessageColor        = {0, 255, 0, 255}; // Green
-  SDL_Rect progressMessageRectangle     = {0, 0, 0, 0};     // x y w h
-  SDL_Point progressMessageOffset       = {0, 100};
-  std::unique_ptr<Text> progressMessage = std::make_unique<Text>(
-      this->displayGlobal, fontPath, progressMessageContent, 24, progressMessageColor,
-      progressMessageRectangle, progressMessageOffset);
+  const char* fontPath               = "../display/fonts/16020_FUTURAM.ttf";
+  const char* progressMessageContent = "Scanning In Progress";
+  SDL_Color progressMessageColor     = {0, 255, 0, 255}; // Green
+  SDL_Rect progressMessageRectangle  = {0, 100, 0, 0};
+  std::unique_ptr<Text> progressMessage =
+      std::make_unique<Text>(this->displayGlobal, progressMessageRectangle, fontPath,
+                             progressMessageContent, 24, progressMessageColor);
+
   progressMessage->setCenteredHorizontal();
   this->rootElement->addElement(std::move(progressMessage));
 }

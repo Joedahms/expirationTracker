@@ -8,27 +8,32 @@
 #include "element.h"
 #include "text.h"
 
-Text::Text() {}
-
 Text::Text(struct DisplayGlobal displayGlobal,
+           const SDL_Rect& boundaryRectangle,
            const std::string& fontPath,
            const std::string& content,
            int fontSize,
-           SDL_Color color,
-           SDL_Rect boundaryRectangle)
+           SDL_Color color)
     : content(content), fontSize(fontSize), color(color) {
   this->displayGlobal = displayGlobal;
-  this->font          = TTF_OpenFont(fontPath.c_str(), this->fontSize);
+
+  this->positionRelativeToParent.x = boundaryRectangle.x;
+  this->positionRelativeToParent.y = boundaryRectangle.y;
+  this->boundaryRectangle          = boundaryRectangle;
+  this->boundaryRectangle.x        = 0;
+  this->boundaryRectangle.y        = 0;
+
+  this->font = TTF_OpenFont(fontPath.c_str(), this->fontSize);
   if (this->font == NULL) {
     LOG(FATAL) << "Text failed to open font";
   }
 
-  this->boundaryRectangle = boundaryRectangle;
   SDL_Surface* textSurface =
       TTF_RenderText_Solid(this->font, this->content.c_str(), this->color);
   this->texture = SDL_CreateTextureFromSurface(this->displayGlobal.renderer, textSurface);
   SDL_FreeSurface(textSurface);
 
+  // Set width and height
   SDL_QueryTexture(this->texture, NULL, NULL, &this->boundaryRectangle.w,
                    &this->boundaryRectangle.h);
 }
@@ -42,6 +47,7 @@ Text::Text(struct DisplayGlobal displayGlobal,
  * @param boundaryRectangle SDL boundaryRectangle defining the text
  * @param positionRelativeToParent Position of the text relative to its parent element
  */
+/*
 Text::Text(struct DisplayGlobal displayGlobal,
            const std::string& fontPath,
            const std::string& content,
@@ -66,6 +72,7 @@ Text::Text(struct DisplayGlobal displayGlobal,
   SDL_QueryTexture(this->texture, NULL, NULL, &this->boundaryRectangle.w,
                    &this->boundaryRectangle.h);
 }
+*/
 
 Text::~Text() { TTF_CloseFont(this->font); }
 

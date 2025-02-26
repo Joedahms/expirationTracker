@@ -36,9 +36,10 @@ void Panel::addText(const std::string& fontPath,
                     const int& fontSize,
                     const SDL_Color& color,
                     const SDL_Point& relativePosition) {
-  std::unique_ptr<Text> text =
-      std::make_unique<Text>(this->displayGlobal, fontPath, content, fontSize, color,
-                             SDL_Rect{0, 0, 0, 0}, relativePosition);
+  SDL_Rect textRectangle     = {relativePosition.x, relativePosition.y, 0, 0};
+  std::unique_ptr<Text> text = std::make_unique<Text>(this->displayGlobal, textRectangle,
+                                                      fontPath, content, fontSize, color);
+
   addElement(std::move(text));
 }
 
