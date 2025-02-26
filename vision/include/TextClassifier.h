@@ -3,11 +3,8 @@
 
 #include "../../food_item.h"
 #include "IModel.h"
-#include "validateDetection.h"
 #include <filesystem>
 #include <glog/logging.h>
-#include <iostream>
-#include <variant>
 
 class TextClassifier : public IModel {
 public:
