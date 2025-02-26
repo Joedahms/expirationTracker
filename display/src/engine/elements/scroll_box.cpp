@@ -77,19 +77,20 @@ void ScrollBox::refreshPanels() {
   std::vector<FoodItem> allFoodItems = readAllFoodItems();
 
   this->children.clear();
-  SDL_Rect boundaryRectangle = {0, 0, 0, this->panelHeight};
   SDL_Point relativePosition = {0, 0};
   relativePosition.y         = topPanelPosition;
+  SDL_Rect boundaryRectangle = {0, relativePosition.y, 0, this->panelHeight};
 
   for (auto& foodItem : allFoodItems) {
-    std::unique_ptr<Panel> newPanel = std::make_unique<Panel>(
-        this->displayGlobal, foodItem.id, boundaryRectangle, relativePosition);
+    std::unique_ptr<Panel> newPanel =
+        std::make_unique<Panel>(this->displayGlobal, boundaryRectangle, foodItem.id);
     relativePosition.y += panelHeight;
 
     newPanel->addFoodItem(foodItem, relativePosition);
     int borderThickness = 1;
     newPanel->addBorder(borderThickness);
     addElement(std::move(newPanel));
+    boundaryRectangle.y = relativePosition.y;
   }
 }
 

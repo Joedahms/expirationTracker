@@ -17,11 +17,7 @@ Text::Text(struct DisplayGlobal displayGlobal,
     : content(content), fontSize(fontSize), color(color) {
   this->displayGlobal = displayGlobal;
 
-  this->positionRelativeToParent.x = boundaryRectangle.x;
-  this->positionRelativeToParent.y = boundaryRectangle.y;
-  this->boundaryRectangle          = boundaryRectangle;
-  this->boundaryRectangle.x        = 0;
-  this->boundaryRectangle.y        = 0;
+  setupPosition(boundaryRectangle);
 
   this->font = TTF_OpenFont(fontPath.c_str(), this->fontSize);
   if (this->font == NULL) {
@@ -37,42 +33,6 @@ Text::Text(struct DisplayGlobal displayGlobal,
   SDL_QueryTexture(this->texture, NULL, NULL, &this->boundaryRectangle.w,
                    &this->boundaryRectangle.h);
 }
-
-/**
- * @param displayGlobal Global variables
- * @param fontPath Path to where the font is stored.
- * @param content What characters the text represents.
- * @param fontSize Size of the font
- * @param color Color of the font
- * @param boundaryRectangle SDL boundaryRectangle defining the text
- * @param positionRelativeToParent Position of the text relative to its parent element
- */
-/*
-Text::Text(struct DisplayGlobal displayGlobal,
-           const std::string& fontPath,
-           const std::string& content,
-           int fontSize,
-           SDL_Color color,
-           SDL_Rect boundaryRectangle,
-           SDL_Point positionRelativeToParent)
-    : content(content), fontSize(fontSize), color(color) {
-  this->displayGlobal            = displayGlobal;
-  this->positionRelativeToParent = positionRelativeToParent;
-  this->font                     = TTF_OpenFont(fontPath.c_str(), this->fontSize);
-  if (this->font == NULL) {
-    LOG(FATAL) << "Text failed to open font";
-  }
-
-  this->boundaryRectangle = boundaryRectangle;
-  SDL_Surface* textSurface =
-      TTF_RenderText_Solid(this->font, this->content.c_str(), this->color);
-  this->texture = SDL_CreateTextureFromSurface(this->displayGlobal.renderer, textSurface);
-  SDL_FreeSurface(textSurface);
-
-  SDL_QueryTexture(this->texture, NULL, NULL, &this->boundaryRectangle.w,
-                   &this->boundaryRectangle.h);
-}
-*/
 
 Text::~Text() { TTF_CloseFont(this->font); }
 

@@ -18,16 +18,12 @@
 Button::Button(struct DisplayGlobal displayGlobal,
                const SDL_Rect& boundaryRectangle,
                const std::string& textContent,
-               const SDL_Point& textPadding,
+               const SDL_Point& padding,
                std::function<void()> callback)
     : textPadding(textPadding), onClick(callback) {
-  this->displayGlobal              = displayGlobal;
-  this->positionRelativeToParent.x = boundaryRectangle.x;
-  this->positionRelativeToParent.y = boundaryRectangle.y;
+  this->displayGlobal = displayGlobal;
 
-  this->boundaryRectangle   = boundaryRectangle;
-  this->boundaryRectangle.x = 0;
-  this->boundaryRectangle.y = 0;
+  setupPosition(boundaryRectangle);
 
   // Colors
   this->backgroundColor = {255, 0, 0, 255}; // Red

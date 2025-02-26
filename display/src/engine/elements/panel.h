@@ -20,11 +20,9 @@
  */
 class Panel : public CompositeElement {
 public:
-  Panel(struct DisplayGlobal displayGlobal, int id, SDL_Point positionRelativeToParent);
   Panel(struct DisplayGlobal displayGlobal,
-        const int& id,
         const SDL_Rect& boundaryRectangle,
-        const SDL_Point& positionRelativeToParent);
+        const int& id);
 
   void addText(const std::string& fontPath,
                const std::string& content,

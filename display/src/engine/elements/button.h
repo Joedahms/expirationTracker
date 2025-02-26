@@ -20,7 +20,7 @@ public:
   Button(struct DisplayGlobal displayGlobal,
          const SDL_Rect& boundaryRectangle,
          const std::string& textContent,
-         const SDL_Point& textPadding,
+         const SDL_Point& padding,
          std::function<void()> callback);
 
   void updateSelf() override;
