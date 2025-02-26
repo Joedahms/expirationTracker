@@ -23,6 +23,14 @@ void Element::update() {
   }
 }
 
+/**
+ * Updates to perform if the element has a parent. Checks centering within parent and
+ * ensures the position of the element is correct giving its current position relative to
+ * parent.
+ *
+ * @param None
+ * @return None
+ */
 void Element::hasParentUpdate() {
   if (this->centerWithinParent) {
     if (checkCenterVertical() == false) {

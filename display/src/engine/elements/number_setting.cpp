@@ -11,6 +11,8 @@
  * Get the current value of the setting from the database and set the content to it.
  *
  * @param displayGlobal
+ * @param boundaryRectangle Rectangle defining offset within parent (if any) and width +
+ * height
  * @param settingId The primary key of the food item corresponding to this object
  */
 NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal,

@@ -13,6 +13,11 @@
 #include "panel.h"
 #include "scroll_box.h"
 
+/**
+ * @param displayGlobal
+ * @param boundaryRectangle Rectangle defining offset within parent (if any) and width +
+ * height
+ */
 ScrollBox::ScrollBox(struct DisplayGlobal displayGlobal,
                      const SDL_Rect& boundaryRectangle) {
   this->displayGlobal     = displayGlobal;

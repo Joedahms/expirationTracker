@@ -67,7 +67,7 @@ void CompositeElement::renderSelf() const {
 
 /**
  * Default updateSelf for a composite element. If a child of another composite element,
- * check positioning within parent.
+ * perform updates relating to being a child.
  *
  * @param None
  * @return None
