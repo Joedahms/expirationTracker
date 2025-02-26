@@ -52,7 +52,6 @@ add_executable (expirationTracker
 
   # Vision process after forked from main
   vision/src/visionMain.cpp
-  vision/src/validateDetection.cpp
   vision/src/helperFunctions.cpp
   vision/src/ImageProcessor.cpp
   vision/src/ModelHandler.cpp
