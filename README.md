@@ -1,6 +1,68 @@
 # raspi-yolo
+This repository is the software for our senior design project for Purdue Indianapolis course ECE492. We are aiming to engineer\
+a device to reduce household food waste by tracking expiration dates.
+\
+\
+The project consists of two teams, software and hardware. Hardware is responsible for the physical structure of the\
+device as well as the electronic components. Software is responsible for all the software.\
+We have split the software responsibilies up 3 ways, display, vision, and hardware. Display is responsible for creating\
+a GUI for the touchscreen. The GUI is to allow the user to see what food they have, and when it expires. Vision is\
+responsible for implementing the machine learning algorithms to identify when a food item expires. Hardware is responsible\
+for controlling all hardware components such as the cameras, weight sensor, and platform motor.
 
-## Function Comment Format
+# Team Members
+- Caleb Rector (Hardware)
+- John Teeguarden (Hardware)
+- Geromy Cunningham (Software, Hardware)
+- Logan Pelkey (Software, Vision)
+- Joe Dahms (Software Display)
+
+# Setup instructions
+
+## Install necessary dependencies
+#### Refresh local package information:
+$ sudo apt update
+#### Install build tools
+$ sudo apt install make g++ cmake
+#### Install Google logging library
+$ sudo apt install libgoogle-glog-dev
+#### Install SDL
+$ sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev  
+#### Install OPENCV
+$ sudo apt install libopencv-dev
+#### Install SQLite
+$ sudo apt install sqlite3 libsqlite3-dev
+#### Install mesa
+$ sudo add-apt-repository ppa:kisak/kisak-mesa
+   
+## YOLO Setup
+## Create a YOLO directory within the root of this repo
+$ mkdir YOLO
+#### Navigate into YOLO directory and clone the YOLO repo
+$ cd YOLO
+$ git clone https://github.com/lpelkey23/yolov4-tiny
+#### Change into the directory it creates
+$ cd yolov4-tiny
+#### Compile it
+$ make
+#### grab the weights file for tinyv4
+$ wget https://github.com/AlexeyAB/darknet/releases/download/yolov4/yolov4-tiny.weights 
+
+## Setup Python virual environment
+NOTE: To setup the Python virtual environment you must be in the build directory.
+#### Create the virtual environment
+$ python3 -m venv models-venv
+#### Activate it
+$ source models-venv/bin/activate
+#### Install EasyOCR inside the virtual environment
+$ pip install easyocr
+#### Install Efficientnet within the virtual environment
+$ pip install efficientnet
+#### Install Tensorflow
+$ pip install tensorflow
+
+# Developer Notes
+## Function Comment Format (javadoc)
 /**  
  \* Detailed description of what function's purpose is  
  \*  
@@ -10,60 +72,4 @@
  \* @return Description of return value
  */  
 
-# Create a build and a YOLO directory within the root of the repo
 
-Navigate into YOLO and run:
-git clone https://github.com/lpelkey23/yolov4-tiny
-
-cd into the directory it creates (yolov4-tiny)
-
-run make
-
-grab the weights file for tinyv4:
-wget https://github.com/AlexeyAB/darknet/releases/download/yolov4/yolov4-tiny.weights
-
-cd ../../build
-
-run cmake ..
-run make
-
-# Had to install to run repo:
-```plaintext
-sudo apt update && sudo apt upgrade -y
-```
-```plaintext
-sudo apt install make
-sudo apt install g++
-sudo apt install cmake
-sudo apt install libgoogle-glog-dev
-sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev  
-sudo apt install libopencv-dev
-sudo apt install sqlite3
-sudo apt install libsqlite3-dev
-sudo add-apt-repository ppa:kisak/kisak-mesa
-sudo apt install nlohmann-json3-dev
-sudo apt update
-sudo apt upgrade
-```
-
-# Using Models
-# BE IN BUILD DIRECTORY!!!!!!
-### Create the virtual environment
-```plaintext
-python3 -m venv ~/easyocr-venv
-```
-
-### Activate it
-```plaintext
-source ~/easyocr-venv/bin/activate
-```
-
-### Install EasyOCR inside the virtual environment
-```plaintext
-pip install easyocr
-```
-
-### Install Efficientnet within the virtual environment
-```plaintext
-pip install efficientnet
-```

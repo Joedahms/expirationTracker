@@ -3,57 +3,134 @@
 
 #include "element.h"
 
-/**
- * Template specialization for centering vertically within an SDL_Rect.
- *
- * @param centerWithin The SDL_Rect to center within
- * @return None
- */
-template <> void Element::centerVertical<SDL_Rect>(SDL_Rect centerWithin) {
-  this->rectangle.y = (centerWithin.h / 2 - this->rectangle.h / 2) + centerWithin.y;
+void Element::render() const {
+  if (this->hasBorder) {
+    renderBorder();
+  }
 }
 
 /**
- * Template specialization for centering horizontally within an SDL_Rect.
+ * Ensure that the positioning of the element is correct. Make sure that if need be, it is
+ * centered with respect to its parent (if it has one) and that it is in the correct
+ * position relative to its parent (if it has one).
  *
- * @param centerWithin The SDL_Rect to center within
+ * @param None
  * @return None
  */
-template <> void Element::centerHorizontal<SDL_Rect>(SDL_Rect centerWithin) {
-  this->rectangle.x = (centerWithin.w / 2 - this->rectangle.w / 2) + centerWithin.x;
+void Element::update() {
+  if (parent) {
+    if (this->centerWithinParent) {
+      if (checkCenterVertical() == false) {
+        centerVertical();
+      }
+      if (checkCenterHorizontal() == false) {
+        centerHorizontal();
+      }
+    }
+    else if (this->centerVerticalWithinParent) {
+      if (checkCenterVertical() == false) {
+        centerVertical();
+      }
+    }
+    else if (this->centerHorizontalWithinParent) {
+      if (checkCenterHorizontal() == false) {
+        centerHorizontal();
+      }
+    }
+
+    this->boundaryRectangle.x = this->positionRelativeToParent.x;
+    this->boundaryRectangle.y = this->positionRelativeToParent.y;
+  }
 }
 
+std::string Element::getContent() const { return "no content"; }
+
+void Element::setParent(Element* parent) { this->parent = parent; }
+
+void Element::setPositionRelativeToParent(const SDL_Point& relativePostion) {
+  this->positionRelativeToParent = relativePostion;
+}
+SDL_Point Element::getPositionRelativeToParent() {
+  return this->positionRelativeToParent;
+}
+
+SDL_Rect Element::getBoundaryRectangle() { return this->boundaryRectangle; }
+void Element::setBoundaryRectangle(SDL_Rect boundaryRectangle) {
+  this->boundaryRectangle = boundaryRectangle;
+};
+
+void Element::setCentered() { this->centerWithinParent = true; }
+
 /**
- * Template specialization for checking if centered vertically within an SDL_Rect.
- *
- * @param centerWithin The SDL_Rect to center within
- * @return None
+ * Centering vertically means centering on the y axis.
  */
-template <> bool Element::checkCenterVertical<SDL_Rect>(SDL_Rect centerWithin) {
+void Element::setCenteredVertical() { this->centerVerticalWithinParent = true; }
+bool Element::checkCenterVertical() {
   bool centered = false;
-  if (this->rectangle.y ==
-      (centerWithin.h / 2 - this->rectangle.h / 2) + centerWithin.y) {
+  if (this->positionRelativeToParent.y ==
+      (this->parent->boundaryRectangle.h / 2 - this->boundaryRectangle.h / 2) +
+          this->parent->positionRelativeToParent.y) {
     centered = true;
   }
   return centered;
 }
+void Element::centerVertical() {
+  this->positionRelativeToParent.y =
+      (this->parent->boundaryRectangle.h / 2 - this->boundaryRectangle.h / 2) +
+      this->parent->positionRelativeToParent.y;
+}
 
 /**
- * Template specialization for checking if centered horizontally within an SDL_Rect.
- *
- * @param centerWithin The SDL_Rect to center within
- * @return None
+ * Centering horizontally means centering on the x axis.
  */
-template <> bool Element::checkCenterHorizontal<SDL_Rect>(SDL_Rect centerWithin) {
+void Element::setCenteredHorizontal() { this->centerHorizontalWithinParent = true; }
+bool Element::checkCenterHorizontal() {
   bool centered = false;
-  if (this->rectangle.x ==
-      (centerWithin.w / 2 - this->rectangle.w / 2) + centerWithin.x) {
+  if (this->positionRelativeToParent.x ==
+      (this->parent->boundaryRectangle.w / 2 - this->boundaryRectangle.w / 2) +
+          this->parent->positionRelativeToParent.x) {
     centered = true;
   }
   return centered;
 }
+void Element::centerHorizontal() {
+  this->positionRelativeToParent.x =
+      ((this->parent->boundaryRectangle.w - this->boundaryRectangle.w) / 2) +
+      this->parent->positionRelativeToParent.x;
+}
 
-void Element::setRectangle(SDL_Rect rectangle) { this->rectangle = rectangle; };
+/**
+ * Check if the mouse is over the element.
+ *
+ * @param None
+ * @return Whether or not the mouse is over the button
+ */
+bool Element::checkHovered() {
+  int mouseXPosition, mouseYPosition;
+  SDL_GetMouseState(&mouseXPosition, &mouseYPosition);
+
+  // Outside left edge
+  if (mouseXPosition < this->boundaryRectangle.x) {
+    return false;
+  }
+
+  // Outside right edge
+  if (mouseXPosition > this->boundaryRectangle.x + this->boundaryRectangle.w) {
+    return false;
+  }
+
+  // Outside top edge
+  if (mouseYPosition < this->boundaryRectangle.y) {
+    return false;
+  }
+
+  // Outside bottom edge
+  if (mouseYPosition > this->boundaryRectangle.y + this->boundaryRectangle.h) {
+    return false;
+  }
+
+  return true;
+}
 
 /**
  * Add a border to an element.
@@ -68,7 +145,7 @@ void Element::addBorder(const int& borderThickness) {
 
 /**
  * Render a border around an object. Draws 4 lines on each side of the element's
- * rectangle.
+ * boundaryRectangle.
  *
  * @param None
  * @return None
@@ -78,36 +155,40 @@ void Element::renderBorder() const {
   // Draw the top border
   for (int i = 0; i < borderThickness; i++) {
     SDL_RenderDrawLine(this->displayGlobal.renderer,
-                       this->rectangle.x - i,                     // Start X
-                       this->rectangle.y - i,                     // Start Y
-                       this->rectangle.x + this->rectangle.w + i, // End X
-                       this->rectangle.y - i);                    // End Y
+                       this->positionRelativeToParent.x - i, // Start X
+                       this->positionRelativeToParent.y - i, // Start Y
+                       this->positionRelativeToParent.x + this->boundaryRectangle.w +
+                           i,                                 // End X
+                       this->positionRelativeToParent.y - i); // End Y
   }
 
   // Draw the bottom border
   for (int i = 0; i < borderThickness; i++) {
-    SDL_RenderDrawLine(this->displayGlobal.renderer,
-                       this->rectangle.x - i,                      // Start X
-                       this->rectangle.y + this->rectangle.h + i,  // Start Y
-                       this->rectangle.x + this->rectangle.w + i,  // End X
-                       this->rectangle.y + this->rectangle.h + i); // End Y
+    SDL_RenderDrawLine(
+        this->displayGlobal.renderer,
+        this->positionRelativeToParent.x - i,                              // Start X
+        this->positionRelativeToParent.y + this->boundaryRectangle.h + i,  // Start Y
+        this->positionRelativeToParent.x + this->boundaryRectangle.w + i,  // End X
+        this->positionRelativeToParent.y + this->boundaryRectangle.h + i); // End Y
   }
 
   // Draw the left border
   for (int i = 0; i < borderThickness; i++) {
     SDL_RenderDrawLine(this->displayGlobal.renderer,
-                       this->rectangle.x - i,                      // Start X
-                       this->rectangle.y - i,                      // Start Y
-                       this->rectangle.x - i,                      // End X
-                       this->rectangle.y + this->rectangle.h + i); // End Y
+                       this->positionRelativeToParent.x - i, // Start X
+                       this->positionRelativeToParent.y - i, // Start Y
+                       this->positionRelativeToParent.x - i, // End X
+                       this->positionRelativeToParent.y + this->boundaryRectangle.h +
+                           i); // End Y
   }
 
   // Draw the right border
   for (int i = 0; i < borderThickness; i++) {
-    SDL_RenderDrawLine(this->displayGlobal.renderer,
-                       this->rectangle.x + this->rectangle.w + i,  // Start X
-                       this->rectangle.y - i,                      // Start Y
-                       this->rectangle.x + this->rectangle.w + i,  // End X
-                       this->rectangle.y + this->rectangle.h + i); // End Y
+    SDL_RenderDrawLine(
+        this->displayGlobal.renderer,
+        this->positionRelativeToParent.x + this->boundaryRectangle.w + i,  // Start X
+        this->positionRelativeToParent.y - i,                              // Start Y
+        this->positionRelativeToParent.x + this->boundaryRectangle.w + i,  // End X
+        this->positionRelativeToParent.y + this->boundaryRectangle.h + i); // End Y
   }
 }
