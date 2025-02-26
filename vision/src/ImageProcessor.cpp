@@ -84,6 +84,13 @@ bool ImageProcessor::analyze() const {
   return false;
 }
 
+/**
+ * Return the food item
+ * @return whether FoodItem is successfully identified
+ */
 struct FoodItem& ImageProcessor::getFoodItem() { return this->foodItem; }
 
+/**
+ * set the food item entirely
+ */
 void ImageProcessor::setFoodItem(struct FoodItem& foodItem) { this->foodItem = foodItem; }
