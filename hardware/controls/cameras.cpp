@@ -75,6 +75,7 @@ void takePhotos(int angle) {
 int takePhoto(int angle) {
   struct stat sb;
   std::string fileName = std::string(IMAGE_DIR) + std::to_string(angle) + "_test.jpg";
+
   pid_t pid = fork();
 
   if (pid == -1) {
