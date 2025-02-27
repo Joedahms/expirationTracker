@@ -97,7 +97,7 @@ int takePhoto(int angle) {
                     const_cast<char*>(fileName.c_str()),
                     const_cast<char*>("--timeout"),
                     const_cast<char*>("50"),
-                    NULL};
+                    0};
     execvp("rpicam-still", args);
     LOG(FATAL) << "Failed to execute rpicam-still at position " << angle;
     _exit(1);
