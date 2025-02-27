@@ -49,6 +49,8 @@ $ sudo apt install ./wiringpi_3.14_arm64.deb
 
 ## Camera Apps
 ### This may be needed
+$ sudo chmod -R 777 /home/pi/Desktop/Project/raspi-yolo/images
+where pi is the name of your pi device
 $ sudo apt update && sudo apt full-upgrade -y
 $ sudo rpi-update
 $ sudo apt install libcamera-apps
