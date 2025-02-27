@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <unistd.h>
+// #include <wiringPi.h> // wiringPi.h can be found after install
 
 #include "../../../WiringPi/wiringPi/wiringPi.h"
 

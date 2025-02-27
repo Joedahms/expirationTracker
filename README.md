@@ -38,8 +38,9 @@ $ sudo add-apt-repository ppa:kisak/kisak-mesa
 ### For if you just need to make a file
 $ gcc -o myapp myapp.cpp -l wiringPi
 
-### I placed this in the same directory as the raspi-yolo project directory
-### This almost certainly will not install on your PC
+### WiringPi Installation/Instructions
+#### I placed this in the same directory as the raspi-yolo project directory
+#### This almost certainly will not install on your PC
 $ git clone https://github.com/WiringPi/WiringPi.git
 $ cd WiringPi
 $ ./build debian
