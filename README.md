@@ -34,7 +34,6 @@ $ sudo apt install libopencv-dev
 $ sudo apt install sqlite3 libsqlite3-dev
 #### Install mesa
 $ sudo add-apt-repository ppa:kisak/kisak-mesa
-
 ## WiringPi Setup
 ### For if you just need to make a file
 $ gcc -o myapp myapp.cpp -l wiringPi
@@ -56,19 +55,6 @@ $ sudo rpi-update
 $ sudo apt install libcamera-apps
 $ sudo apt install libcamera-dev
 $ sudo apt install libcamera0
-
-## YOLO Setup
-## Create a YOLO directory within the root of this repo
-$ mkdir YOLO
-#### Navigate into YOLO directory and clone the YOLO repo
-$ cd YOLO
-$ git clone https://github.com/lpelkey23/yolov4-tiny
-#### Change into the directory it creates
-$ cd yolov4-tiny
-#### Compile it
-$ make
-#### grab the weights file for tinyv4
-$ wget https://github.com/AlexeyAB/darknet/releases/download/yolov4/yolov4-tiny.weights 
 
 ## Setup Python virual environment
 NOTE: To setup the Python virtual environment you must be in the build directory.

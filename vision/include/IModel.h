@@ -4,30 +4,27 @@
 #include "../../food_item.h"
 #include "helperFunctions.h"
 #include <filesystem>
+#include <fstream>
+#include <glog/logging.h>
 #include <string>
+
+#define PIPE_IN  "/tmp/image_pipe"
+#define PIPE_OUT "/tmp/result_pipe"
+
+enum TaskType { unknown, CLS, OCR, EXP };
+
 class IModel {
 protected:
   FoodItem& foodItem;
+  std::string readResponse() const;
+  void sendRequest(const TaskType&, const std::filesystem::path&) const;
+  std::string taskTypeToString(const TaskType&) const;
+  virtual std::string runModel(const std::filesystem::path&) const = 0;
+  virtual bool handleClassification(const std::filesystem::path&)  = 0;
 
 public:
   explicit IModel(FoodItem& foodItem) : foodItem(foodItem) {}
   virtual ~IModel() = default;
-
-  /**
-   * Runs the model script.
-   * @param imagePath Path to the image.
-   * @return Either a pair<int, float> (classification index & probability) or a string
-   * (extracted text).
-   */
-  virtual std::string runModel(const std::filesystem::path& imagePath) const = 0;
-
-  /**
-   * Handles classification based on the model's return.
-   * @param imagePath Path to the image.
-   * @param foodItem Struct to update.
-   * @return Whether classification was successful.
-   */
-  virtual bool handleClassification(const std::filesystem::path& imagePath) const = 0;
 };
 
 #endif // IMODEL_H

@@ -8,4 +8,5 @@
 #include <iostream>
 
 void visionEntry(struct Pipes);
+bool startPythonServer();
 #endif
