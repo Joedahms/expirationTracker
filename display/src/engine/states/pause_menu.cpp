@@ -23,11 +23,10 @@ PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
   // Title text
   const char* titleContent = "Paused";
   SDL_Color titleColor     = {0, 255, 0, 255}; // Green
-  SDL_Rect titleRectangle  = {0, 0, 0, 0};
-  SDL_Point titleOffset    = {0, 100};
+  SDL_Rect titleRectangle  = {0, 100, 0, 0};
   std::unique_ptr<Text> title =
-      std::make_unique<Text>(this->displayGlobal, displayGlobal.futuramFontPath,
-                             titleContent, 24, titleColor, titleRectangle, titleOffset);
+      std::make_unique<Text>(this->displayGlobal, titleRectangle,
+                             displayGlobal.futuramFontPath, titleContent, 24, titleColor);
   title->setCenteredHorizontal();
   this->rootElement->addElement(std::move(title));
 

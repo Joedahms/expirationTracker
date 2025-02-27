@@ -40,16 +40,18 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
   this->rootElement->addElement(std::move(scrollBox));
   this->rootElement->update();
 
-  SDL_Rect sortByRect = {400, 0, 200, 200};
   std::unique_ptr<Dropdown> sortBy =
-      std::make_unique<Dropdown>(this->displayGlobal, sortByRect);
+      std::make_unique<Dropdown>(this->displayGlobal, SDL_Rect{450, 0, 0, 0}, "Sort by:");
+  std::unique_ptr<Button> sortByExpirationLowToHigh = std::make_unique<Button>(
+      this->displayGlobal, SDL_Rect{0, 0, 0, 0}, "Expiration Date - Highest to Lowest",
+      SDL_Point{0, 0}, [this]() {});
+  std::unique_ptr<Button> sortByExpirationHighToLow = std::make_unique<Button>(
+      this->displayGlobal, SDL_Rect{0, 0, 0, 0}, "Expiration Date - Lowest to Highest",
+      SDL_Point{0, 0}, [this]() {});
 
-  SDL_Rect expDateLowToHighRectangle       = {0, 0, 0, 0};
-  std::unique_ptr<Button> expDateLowToHigh = std::make_unique<Button>(
-      this->displayGlobal, expDateLowToHighRectangle, "Expiration date low to high",
-      SDL_Point{10, 10}, [this]() {});
-  sortBy->addOption(std::move(expDateLowToHigh));
-
+  sortBy->addOption(std::move(sortByExpirationLowToHigh));
+  sortBy->update();
+  sortBy->addOption(std::move(sortByExpirationHighToLow));
   this->rootElement->addElement(std::move(sortBy));
 }
 

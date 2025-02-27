@@ -11,18 +11,24 @@
  * Get the current value of the setting from the database and set the content to it.
  *
  * @param displayGlobal
+ * @param boundaryRectangle Rectangle defining offset within parent (if any) and width +
+ * height
  * @param settingId The primary key of the food item corresponding to this object
  */
-NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal, int settingId)
+NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal,
+                             const SDL_Rect& boundaryRectangle,
+                             int settingId)
     : settingId(settingId) {
+  setupPosition(boundaryRectangle);
+
   std::unique_ptr<Button> decreaseButton =
       std::make_unique<Button>(displayGlobal, SDL_Rect{0, 0, 0, 0}, "-", SDL_Point{0, 0},
                                [this]() { this->settingValue--; });
   addElement(std::move(decreaseButton));
 
-  std::unique_ptr<Text> text =
-      std::make_unique<Text>(displayGlobal, displayGlobal.futuramFontPath, "0", 24,
-                             SDL_Color{0, 255, 0, 255}, SDL_Rect{0, 0, 0, 0});
+  std::unique_ptr<Text> text = std::make_unique<Text>(displayGlobal, SDL_Rect{0, 0, 0, 0},
+                                                      displayGlobal.futuramFontPath, "0",
+                                                      24, SDL_Color{0, 255, 0, 255});
   addElement(std::move(text));
 
   std::unique_ptr<Button> increaseButton =
@@ -46,11 +52,15 @@ NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal, int settingId)
  * @return None
  */
 void NumberSetting::updateSelf() {
+  if (parent) {
+    hasParentUpdate();
+  }
+
   for (int i = 0; i < this->children.size(); i++) {
     SDL_Point childRelativePosition = this->children[i]->getPositionRelativeToParent();
     childRelativePosition.y         = this->positionRelativeToParent.y;
     if (i == 0) {
-      childRelativePosition.x = this->positionRelativeToParent.x;
+      childRelativePosition.x = 0;
     }
     else {
       SDL_Point leftRelativePosition =
@@ -70,5 +80,4 @@ void NumberSetting::updateSelf() {
   }
 }
 
-void NumberSetting::renderSelf() const {}
 void NumberSetting::handleEventSelf(const SDL_Event& event) {}

@@ -1,31 +1,36 @@
 #include "dropdown.h"
 
+/**
+ * @param displayGlobal Global display variables
+ * @param boundaryRectangle Rectangle defining offset from parent and width + height
+ * @param titleContent What the title of the drop down should be
+ */
 Dropdown::Dropdown(struct DisplayGlobal displayGlobal,
-                   const SDL_Rect& boundaryRectangle) {
+                   const SDL_Rect& boundaryRectangle,
+                   const std::string& titleContent) {
   this->displayGlobal = displayGlobal;
 
-  this->positionRelativeToParent.x = boundaryRectangle.x;
-  this->positionRelativeToParent.y = boundaryRectangle.y;
+  setupPosition(boundaryRectangle);
 
-  this->boundaryRectangle   = boundaryRectangle;
-  this->boundaryRectangle.x = 0;
-  this->boundaryRectangle.y = 0;
+  std::unique_ptr<Text> title = std::make_unique<Text>(
+      this->displayGlobal, SDL_Rect{0, 0, 0, 0}, this->displayGlobal.futuramFontPath,
+      titleContent, 24, SDL_Color{0, 255, 0, 255});
+  addElement(std::move(title));
 }
 
-void Dropdown::addOption(std::unique_ptr<Button> newOptionButton) {
-  if (this->children.size() == 0) {
-    newOptionButton->setPositionRelativeToParent(this->positionRelativeToParent);
-  }
-  /*
-  else {
-    SDL_Point bottomRelative    = this->children.back()->getPositionRelativeToParent();
-    SDL_Rect bottomBoundary     = this->children.back()->getBoundaryRectangle();
-    SDL_Point newBottomRelative = {0, 0};
-    newBottomRelative.x         = bottomRelative.x + bottomBoundary.h;
-    newOptionButton->setPositionRelativeToParent(newBottomRelative);
-  }
-*/
-  addElement(std::move(newOptionButton));
+/**
+ * Add an option to the drop down menu. Only supports adding options as buttons. The new
+ * option will be added below the lowest current option in the menu.
+ *
+ * @param newOption The new option button to add to the dropdown.
+ * @return None
+ */
+void Dropdown::addOption(std::unique_ptr<Button> newOption) {
+  SDL_Point newOptionRelativePosition = newOption->getPositionRelativeToParent();
+  SDL_Rect lowestOptionRectangle      = this->children.back()->getBoundaryRectangle();
+  newOptionRelativePosition.y         = lowestOptionRectangle.h + lowestOptionRectangle.y;
+  newOption->setPositionRelativeToParent(newOptionRelativePosition);
+  addElement(std::move(newOption));
 }
 
 void Dropdown::handleEventSelf(const SDL_Event& event) {}

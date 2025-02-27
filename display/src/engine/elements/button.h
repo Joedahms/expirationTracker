@@ -17,8 +17,8 @@
  */
 class Button : public CompositeElement {
 public:
-  Button(struct DisplayGlobal dg,
-         const SDL_Rect& rectangle,
+  Button(struct DisplayGlobal displayGlobal,
+         const SDL_Rect& boundaryRectangle,
          const std::string& textContent,
          const SDL_Point& textPadding,
          std::function<void()> callback);
