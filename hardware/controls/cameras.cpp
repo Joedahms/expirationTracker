@@ -73,39 +73,40 @@ void takePhotos(int angle) {
  */
 int takePhoto(int angle) {
   std::string fileName = std::string(IMAGE_DIR) + std::to_string(angle) + "_test.jpg";
-  pid_t pid            = fork();
-
+  pid_t pid = fork();
+  
   if (pid < 0) {
     LOG(FATAL) << "Error starting camera process.";
     return -1;
   }
   else if (pid == 0) {
+    // Reinitialize glog in the child process
+    google::ShutdownGoogleLogging();
+    google::InitGoogleLogging("takePhotoChild");
+
     LOG(INFO) << "Capturing at position " << angle;
-    // Construct command arguments for execvp()
-    char* args[] = {const_cast<char*>("rpicam-still"),
-                    const_cast<char*>("--width"),
-                    const_cast<char*>("2028"),
-                    const_cast<char*>("--height"),
-                    const_cast<char*>("1520"),
-                    const_cast<char*>("--nopreview"),
-                    const_cast<char*>("--autofocus-on-capture"),
-                    const_cast<char*>("on"),
-//                    const_cast<char*>("--autofocus-speed"),
-//                    const_cast<char*>("fast"),
-//                    const_cast<char*>("--exposure"),
-//                    const_cast<char*>("normal"),
-                    const_cast<char*>("--output"),
-                    const_cast<char*>(fileName.c_str()),
-                    const_cast<char*>("--timeout"),
-                    const_cast<char*>("50"),
-                    (char*)NULL};
-    execvp("/usr/bin/rpicam-still", args);
+    char* args[] = {
+      const_cast<char*>("rpicam-still"),
+      const_cast<char*>("--width"),
+      const_cast<char*>("2028"),
+      const_cast<char*>("--height"),
+      const_cast<char*>("1520"),
+      const_cast<char*>("--nopreview"),
+      const_cast<char*>("--autofocus-on-capture"),
+      const_cast<char*>("on"),
+      const_cast<char*>("--output"),
+      const_cast<char*>(fileName.c_str()),
+      const_cast<char*>("--timeout"),
+      const_cast<char*>("50"),
+      NULL
+    };
+    execvp("rpicam-still", args);
     LOG(FATAL) << "Failed to execute rpicam-still at position " << angle;
-    _exit(0);
+    _exit(1);
   }
-  else if (pid > 0) {
-    waitpid(pid, NULL, WNOHANG);
-    LOG(INFO) << "Photo successful at position " << angle;
-    return angle;
+  else {
+    int status;
+    waitpid(pid, &status, 0);
+    return status;
   }
 }
