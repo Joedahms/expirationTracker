@@ -34,7 +34,27 @@ $ sudo apt install libopencv-dev
 $ sudo apt install sqlite3 libsqlite3-dev
 #### Install mesa
 $ sudo add-apt-repository ppa:kisak/kisak-mesa
-   
+
+## WiringPi Setup
+### For if you just need to make a file
+$ gcc -o myapp myapp.cpp -l wiringPi
+
+### I placed this in the same directory as the raspi-yolo project directory
+### This almost certainly will not install on your PC
+$ git clone https://github.com/WiringPi/WiringPi.git
+$ cd WiringPi
+$ ./build debian
+$ mv debian-template/wiringpi_3.14_arm64.deb .
+$ sudo apt install ./wiringpi_3.14_arm64.deb
+
+## Camera Apps
+### This may be needed
+$ sudo apt update && sudo apt full-upgrade -y
+$ sudo rpi-update
+$ sudo apt install libcamera-apps
+$ sudo apt install libcamera-dev
+$ sudo apt install libcamera0
+
 ## YOLO Setup
 ## Create a YOLO directory within the root of this repo
 $ mkdir YOLO
