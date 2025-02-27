@@ -13,6 +13,11 @@
 #include "panel.h"
 #include "scroll_box.h"
 
+/**
+ * @param displayGlobal
+ * @param boundaryRectangle Rectangle defining offset within parent (if any) and width +
+ * height
+ */
 ScrollBox::ScrollBox(struct DisplayGlobal displayGlobal,
                      const SDL_Rect& boundaryRectangle) {
   this->displayGlobal     = displayGlobal;
@@ -29,6 +34,10 @@ void ScrollBox::setPanelHeight(int panelHeight) { this->panelHeight = panelHeigh
  * program to crash), so only refresh on a set interval.
  */
 void ScrollBox::updateSelf() {
+  if (parent) {
+    hasParentUpdate();
+  }
+
   // Get time since last update
   this->currentUpdate = std::chrono::steady_clock::now();
   std::chrono::seconds updateDifference;
@@ -77,16 +86,14 @@ void ScrollBox::refreshPanels() {
   std::vector<FoodItem> allFoodItems = readAllFoodItems();
 
   this->children.clear();
-  SDL_Rect boundaryRectangle = {0, 0, 0, this->panelHeight};
-  SDL_Point relativePosition = {0, 0};
-  relativePosition.y         = topPanelPosition;
+  SDL_Rect boundaryRectangle = {0, topPanelPosition, 0, this->panelHeight};
 
   for (auto& foodItem : allFoodItems) {
-    std::unique_ptr<Panel> newPanel = std::make_unique<Panel>(
-        this->displayGlobal, foodItem.id, boundaryRectangle, relativePosition);
-    relativePosition.y += panelHeight;
+    std::unique_ptr<Panel> newPanel =
+        std::make_unique<Panel>(this->displayGlobal, boundaryRectangle, foodItem.id);
+    boundaryRectangle.y += panelHeight;
 
-    newPanel->addFoodItem(foodItem, relativePosition);
+    newPanel->addFoodItem(foodItem, SDL_Point{0, 0});
     int borderThickness = 1;
     newPanel->addBorder(borderThickness);
     addElement(std::move(newPanel));
