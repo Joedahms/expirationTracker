@@ -103,8 +103,8 @@ int takePhoto(int angle) {
     _exit(1);
   }
   else {
-    int status;
-    waitpid(pid, &status, 0);
-    return status;
+    waitpid(pid, NULL, WNOHANG);
+    LOG(INFO) << "Photo successful at position " << angle;
+    return angle;
   }
 }
