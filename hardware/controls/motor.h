@@ -2,6 +2,6 @@
 #define MOTOR_H
 
 void setupMotor();
-void rotateMotor();
+void rotateMotor(bool clockwise);
 
 #endif

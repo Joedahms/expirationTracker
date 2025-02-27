@@ -34,7 +34,7 @@ void rotateAndCapture(struct Pipes pipes, float weight) {
     }
 
     LOG(INFO) << "Rotating platform...";
-    //    rotateMotor();
+    rotateMotor(1);
     usleep(200);
 
     bool stopSignal = false;

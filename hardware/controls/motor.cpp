@@ -40,14 +40,30 @@ void setupMotor() {
  * Rotates for a fixed duration.
  * According to current calculations in hardware-chat:
  * 10RPM = 4RPM -> ~ 1.875 sec for 45 degrees || 15 sec for full rotation.
+ * HIGH,LOW == forward LOW,HIGH == backwards
+ * @param clockwise Boolean; true for clockwise, false for counterclockwise
  *
  * @return None
  */
-void rotateMotor() {
-  digitalWrite(MOTOR_IN1, HIGH); // HIGH,LOW == forward LOW,HIGH == backwards
-  digitalWrite(MOTOR_IN2, LOW);
-  analogWrite(MOTOR_ENA, 255); // Adjust speed
-  usleep(1875000);             // Rotate for 1.875sec (roughly 45 degrees)
-  digitalWrite(MOTOR_IN1, LOW);
-  digitalWrite(MOTOR_IN2, LOW); // HIGH,HIGH || LOW,LOW == off
+void rotateMotor(
+    bool clockwise) { // likely needs to be updated after testing to confirm direction
+  if (clockwise) {
+    LOG(INFO) << "Rotating clockwise...";
+    digitalWrite(MOTOR_IN1, HIGH);
+    digitalWrite(MOTOR_IN2, LOW);
+    analogWrite(MOTOR_ENA, 255); // Adjust speed
+    usleep(1875000);             // Rotate duration
+    digitalWrite(MOTOR_IN1, LOW);
+    digitalWrite(MOTOR_IN2, LOW); // HIGH,HIGH || LOW,LOW == off
+  }
+  else {
+    LOG(INFO) << "Rotating counterclockwise...";
+    digitalWrite(MOTOR_IN1, LOW);
+    digitalWrite(MOTOR_IN2, HIGH);
+    analogWrite(MOTOR_ENA, 255);
+    usleep(1875000);
+    digitalWrite(MOTOR_IN1, LOW);
+    digitalWrite(MOTOR_IN2, LOW);
+  }
+  LOG(INFO) << "Rotation complete.";
 }
