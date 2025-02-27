@@ -45,8 +45,8 @@ void setupMotor() {
  *
  * @return None
  */
-void rotateMotor(
-    bool clockwise) { // likely needs to be updated after testing to confirm direction
+// likely needs to be updated after testing to confirm direction
+void rotateMotor(bool clockwise) {
   if (clockwise) {
     LOG(INFO) << "Rotating clockwise...";
     digitalWrite(MOTOR_IN1, HIGH);
