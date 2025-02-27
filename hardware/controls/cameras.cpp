@@ -30,7 +30,7 @@ void takePhotos(int angle) {
           "--nopreview", "--autofocus-on-capture", "on", "--autofocus-speed", "fast",
           //      "--autofocus-rang", "full",   // Full autofocus range
           "--exposure", "normal", "--output", filePath.c_str(), // Save location
-          "--timeout", "500", (char*)NULL);
+          "--timeout", "50", (char*)NULL);
 
     std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
     exit(1);
@@ -50,7 +50,7 @@ void takePhotos(int angle) {
           "--nopreview", "--autofocus-on-capture", "on", "--autofocus-speed", "fast",
           //      "--autofocus-rang", "full",   // Full autofocus range
           "--exposure", "normal", "--output", filePath.c_str(), // Save location
-          "--timeout", "500", (char*)NULL);
+          "--timeout", "50", (char*)NULL);
 
     std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
     exit(1);
@@ -98,8 +98,8 @@ int takePhoto(int angle) {
                     const_cast<char*>(fileName.c_str()),
                     const_cast<char*>("--timeout"),
                     const_cast<char*>("50"),
-                    NULL};
-    execvp("rpicam-still", args);
+                    (char*)NULL};
+    execvp("/usr/bin/rpicam-still", args);
     LOG(FATAL) << "Failed to execute rpicam-still at position " << angle;
     _exit(1);
   }
