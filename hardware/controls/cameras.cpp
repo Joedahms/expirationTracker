@@ -26,13 +26,13 @@ void takePhotos(int angle) {
   }
   else if (topCam == 0) {
     std::string filePath = std::string(IMAGE_DIR) + std::to_string(angle) + "_T.jpg";
-    execl("/usr/bin/rpicam-still", "rpicam-still", "--width", "4056", "--height", "3040",
+    execl("/usr/bin/libcamera-still", "libcamera-still", "--width", "4056", "--height", "3040",
           "--nopreview", "--autofocus-on-capture", "on", "--autofocus-speed", "fast",
           //      "--autofocus-rang", "full",   // Full autofocus range
           "--exposure", "normal", "--output", filePath.c_str(), // Save location
           "--timeout", "50", (char*)NULL);
 
-    std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
+    std::cerr << "Error: Failed to execute libcamera-still" << std::endl;
     exit(1);
     if (system(filePath.c_str()) == -1) {
       LOG(FATAL) << "Failed to capture image from top camera.";
@@ -100,7 +100,7 @@ int takePhoto(int angle) {
                     0};
     execvp("rpicam-still", args);
     LOG(FATAL) << "Failed to execute rpicam-still at position " << angle;
-    _exit(1);
+    _exit(-1);
   }
   else {
     waitpid(pid, NULL, WNOHANG);
