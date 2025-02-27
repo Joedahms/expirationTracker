@@ -11,7 +11,7 @@ ImageProcessor::ImageProcessor(const Pipes& pipes, FoodItem& foodItem)
 /**
  * Parent method to all image processing and analyzing
  */
-void ImageProcessor::process() const {
+void ImageProcessor::process() {
   LOG(INFO) << "Vision analyzing all images";
   if (!isValidDirectory(foodItem.imageDirectory)) {
     LOG(FATAL) << "Failed to open image directory" << foodItem.imageDirectory;
@@ -42,7 +42,7 @@ void ImageProcessor::process() const {
  * Conduct the analyzing and model processing
  * @return whether FoodItem is successfully identified
  */
-bool ImageProcessor::analyze() const {
+bool ImageProcessor::analyze() {
   constexpr int MAX_IMAGE_COUNT = 16;
   int imageCounter              = 0;
   bool objectDetected           = false;
