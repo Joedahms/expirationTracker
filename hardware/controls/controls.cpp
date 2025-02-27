@@ -8,8 +8,8 @@
 #include "../../pipes.h"
 #include "../src/hardware_entry.h"
 #include "../src/io.h"
-#include "cameras.h"
-// #include "motor.h"
+// #include "cameras.h"
+#include "motor.h"
 // #include "weight.h"
 
 /**
@@ -24,9 +24,10 @@ void rotateAndCapture(struct Pipes pipes, float weight) {
   for (int angle = 0; angle < 8; angle++) {
     LOG(INFO) << "At " << angle;
     // takePhotos(angle);    // This function is for both cameras
-    if (takePhoto(angle) != angle) {
-      LOG(INFO) << "Error taking photo";
-    }; // This function is for one camera/testing
+
+    // if (takePhoto(angle) != angle) {
+    //   LOG(INFO) << "Error taking photo";
+    // }; // This function is for one camera/testing
 
     if (angle == 0) {
       sendDataToVision(pipes.displayToVision[WRITE], weight);
