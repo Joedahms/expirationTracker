@@ -73,8 +73,8 @@ void takePhotos(int angle) {
  */
 int takePhoto(int angle) {
   std::string fileName = std::string(IMAGE_DIR) + std::to_string(angle) + "_test.jpg";
-  pid_t pid = fork();
-  
+  pid_t pid            = fork();
+
   if (pid < 0) {
     LOG(FATAL) << "Error starting camera process.";
     return -1;
@@ -85,21 +85,19 @@ int takePhoto(int angle) {
     google::InitGoogleLogging("takePhotoChild");
 
     LOG(INFO) << "Capturing at position " << angle;
-    char* args[] = {
-      const_cast<char*>("rpicam-still"),
-      const_cast<char*>("--width"),
-      const_cast<char*>("2028"),
-      const_cast<char*>("--height"),
-      const_cast<char*>("1520"),
-      const_cast<char*>("--nopreview"),
-      const_cast<char*>("--autofocus-on-capture"),
-      const_cast<char*>("on"),
-      const_cast<char*>("--output"),
-      const_cast<char*>(fileName.c_str()),
-      const_cast<char*>("--timeout"),
-      const_cast<char*>("50"),
-      NULL
-    };
+    char* args[] = {const_cast<char*>("rpicam-still"),
+                    const_cast<char*>("--width"),
+                    const_cast<char*>("2028"),
+                    const_cast<char*>("--height"),
+                    const_cast<char*>("1520"),
+                    const_cast<char*>("--nopreview"),
+                    const_cast<char*>("--autofocus-on-capture"),
+                    const_cast<char*>("on"),
+                    const_cast<char*>("--output"),
+                    const_cast<char*>(fileName.c_str()),
+                    const_cast<char*>("--timeout"),
+                    const_cast<char*>("50"),
+                    NULL};
     execvp("rpicam-still", args);
     LOG(FATAL) << "Failed to execute rpicam-still at position " << angle;
     _exit(1);
