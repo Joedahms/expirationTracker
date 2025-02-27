@@ -15,8 +15,8 @@ private:
   struct FoodItem& foodItem;
 
 public:
-  void process() const;
-  bool analyze() const;
+  void process();
+  bool analyze();
   explicit ImageProcessor(const struct Pipes&, FoodItem& foodItem);
   struct FoodItem& getFoodItem();
   void setFoodItem(struct FoodItem&);

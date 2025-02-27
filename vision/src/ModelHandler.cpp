@@ -10,7 +10,7 @@ ModelHandler::ModelHandler(struct FoodItem& foodItem)
  * @param imagePath path to the image you wish to extract text from
  * @return whether successful or not
  */
-bool ModelHandler::classifyObject(const std::filesystem::path& imagePath) const {
+bool ModelHandler::classifyObject(const std::filesystem::path& imagePath) {
   bool objectIdentified = this->objectClassifier.handleClassification(imagePath);
   if (!objectIdentified) {
     // try text extraction for classification
