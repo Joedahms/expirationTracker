@@ -101,11 +101,11 @@ int takePhoto(int angle) {
                     (char*)NULL};
     execvp("/usr/bin/rpicam-still", args);
     LOG(FATAL) << "Failed to execute rpicam-still at position " << angle;
-    _exit(1);
+    _exit(0);
   }
   else {
-    int status;
-    waitpid(pid, &status, 0);
-    return status;
+    waitpid(pid, NULL, WNOHANG);
+    LOG(INFO) << "Photo successful at position " << angle;
+    return angle;
   }
 }
