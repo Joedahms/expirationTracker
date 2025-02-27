@@ -6,9 +6,14 @@
 #include <unistd.h>
 
 #include "../../food_item.h"
+<<<<<<< HEAD
 #include "../../pipes.h"
 #include "../controls/controls.h"
 // #include "../controls/weight.h"
+=======
+#include "./controls/controls.h"
+#include "./controls/weight.h"
+>>>>>>> 76ce66bc0a4ce61b4b5f6e5b890c68f0c271a536
 #include "io.h"
 
 /*
@@ -37,6 +42,7 @@ void hardwareEntry(struct Pipes pipes) {
     LOG(INFO) << "Waiting for start signal from Display";
     if (receivedStartSignal(pipes.displayToHardware[READ])) {
       LOG(INFO) << "Checking if there is weight on the platform";
+<<<<<<< HEAD
       //      weightSetup();
       //      float weight = getWeight();
       float weight = 1;
@@ -44,6 +50,14 @@ void hardwareEntry(struct Pipes pipes) {
         LOG(INFO) << "Weight detected on platform. Beginning scan.";
         // send 1 to display to indicate weight
         rotateAndCapture(pipes, weight);
+=======
+      weightSetup();
+      float weight = getWeight();
+      if (weight > 0) {
+        LOG(INFO) << "Weight detected on platform. Beginning scan.";
+        // send 1 to display to indicate weight
+        rotateAndCapture(weight);
+>>>>>>> 76ce66bc0a4ce61b4b5f6e5b890c68f0c271a536
       }
       else {
         LOG(INFO) << "No weight detected on platform.";

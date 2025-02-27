@@ -8,6 +8,8 @@
 #include <string>
 #include <sys/select.h>
 
+extern Pipes pipes;
+
 /**
  * Checks to see if there is any data fromDisplay[READ]
  * Used to initialize control system and begin scanning
@@ -51,16 +53,26 @@ bool receivedStartSignal(int pipeToRead) {
  * @param weight The weight of the object on the platform.
  * @return None
  */
+<<<<<<< HEAD
 void sendDataToVision(int pipeToWrite, float weight) {
   LOG(INFO) << "Sending Images from Hardware to Vision";
   const std::chrono::time_point<std::chrono::system_clock> now{
       std::chrono::system_clock::now()};
+=======
+void sendDataToVision(float weight) {
+  LOG(INFO) << "Sending Images from Hardware to Vision";
+  const std::chrono::time_point now{std::chrono::system_clock::now()};
+>>>>>>> 76ce66bc0a4ce61b4b5f6e5b890c68f0c271a536
 
   struct FoodItem foodItem;
   foodItem.imageDirectory = std::filesystem::absolute("../images");
   foodItem.scanDate       = std::chrono::floor<std::chrono::days>(now);
   foodItem.weight         = weight;
+<<<<<<< HEAD
   sendFoodItem(foodItem, pipeToWrite);
+=======
+  sendFoodItem(foodItem, pipes.hardwareToVision[WRITE]);
+>>>>>>> 76ce66bc0a4ce61b4b5f6e5b890c68f0c271a536
 
   LOG(INFO) << "Done Sending Images from Hardware to Vision";
 }
