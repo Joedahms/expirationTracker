@@ -103,7 +103,7 @@ int takePhoto(int angle) {
     LOG(FATAL) << "Failed to execute rpicam-still at position " << angle;
     _exit(0);
   }
-  else {
+  else if (pid > 0) {
     waitpid(pid, NULL, WNOHANG);
     LOG(INFO) << "Photo successful at position " << angle;
     return angle;
