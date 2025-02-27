@@ -22,13 +22,12 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
   this->rootElement      = std::make_unique<Container>(rootRectangle);
 
   // Title
-  const char* titleContent = "Expiration Tracker";
-  SDL_Color titleColor     = {0, 255, 0, 255}; // Green
-  SDL_Rect titleRect       = {0, 0, 0, 0};
-  SDL_Point titleOffset    = {0, 100};
-  std::unique_ptr<Text> title =
-      std::make_unique<Text>(this->displayGlobal, this->displayGlobal.futuramFontPath,
-                             titleContent, 24, titleColor, titleRect, titleOffset);
+  const char* titleContent    = "Expiration Tracker";
+  SDL_Color titleColor        = {0, 255, 0, 255}; // Green
+  SDL_Rect titleRect          = {0, 100, 0, 0};
+  std::unique_ptr<Text> title = std::make_unique<Text>(
+      this->displayGlobal, titleRect, this->displayGlobal.futuramFontPath, titleContent,
+      24, titleColor);
   title->setCenteredHorizontal();
   this->rootElement->addElement(std::move(title));
 

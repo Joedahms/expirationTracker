@@ -10,14 +10,19 @@
 #include "panel.h"
 #include "text.h"
 
+/**
+ * @param displayGlobal
+ * @param boundaryRectangle Rectangle defining offset within parent (if any) and width +
+ * height
+ * @param settingId The primary key of the food item corresponding to this panel
+ */
 Panel::Panel(struct DisplayGlobal displayGlobal,
-             const int& id,
              const SDL_Rect& boundaryRectangle,
-             const SDL_Point& positionRelativeToParent)
+             const int& id)
     : id(id) {
-  this->displayGlobal            = displayGlobal;
-  this->boundaryRectangle        = boundaryRectangle;
-  this->positionRelativeToParent = positionRelativeToParent;
+  this->displayGlobal = displayGlobal;
+
+  setupPosition(boundaryRectangle);
 }
 
 /**
@@ -36,9 +41,10 @@ void Panel::addText(const std::string& fontPath,
                     const int& fontSize,
                     const SDL_Color& color,
                     const SDL_Point& relativePosition) {
-  std::unique_ptr<Text> text =
-      std::make_unique<Text>(this->displayGlobal, fontPath, content, fontSize, color,
-                             SDL_Rect{0, 0, 0, 0}, relativePosition);
+  SDL_Rect textRectangle     = {relativePosition.x, relativePosition.y, 0, 0};
+  std::unique_ptr<Text> text = std::make_unique<Text>(this->displayGlobal, textRectangle,
+                                                      fontPath, content, fontSize, color);
+
   addElement(std::move(text));
 }
 
@@ -53,8 +59,8 @@ void Panel::addFoodItem(const FoodItem& foodItem, const SDL_Point& relativePosit
   addFoodItemName(foodItem, relativePosition);
   addFoodItemExpirationDate(foodItem, relativePosition);
 
-  std::unique_ptr<NumberSetting> itemQuantity =
-      std::make_unique<NumberSetting>(this->displayGlobal, this->id);
+  std::unique_ptr<NumberSetting> itemQuantity = std::make_unique<NumberSetting>(
+      this->displayGlobal, SDL_Rect{0, 0, 0, 0}, this->id);
   addElement(std::move(itemQuantity));
 }
 
@@ -65,10 +71,13 @@ void Panel::addFoodItem(const FoodItem& foodItem, const SDL_Point& relativePosit
  * @return None
  */
 void Panel::updateSelf() {
+  if (parent) {
+    hasParentUpdate();
+  }
+
   // Align all children right next to each other
   for (int i = 0; i < this->children.size(); i++) {
     SDL_Point childRelativePosition = this->children[i]->getPositionRelativeToParent();
-    childRelativePosition.y         = this->positionRelativeToParent.y;
     if (i == 0) {
       childRelativePosition.x = 0;
     }

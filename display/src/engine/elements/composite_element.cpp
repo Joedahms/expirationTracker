@@ -67,36 +67,13 @@ void CompositeElement::renderSelf() const {
 
 /**
  * Default updateSelf for a composite element. If a child of another composite element,
- * check positioning within parent.
+ * perform updates relating to being a child.
  *
  * @param None
  * @return None
  */
 void CompositeElement::updateSelf() {
   if (parent) {
-    if (this->centerWithinParent) {
-      if (checkCenterVertical() == false) {
-        centerVertical();
-      }
-      if (checkCenterHorizontal() == false) {
-        centerHorizontal();
-      }
-    }
-    if (this->centerVerticalWithinParent) {
-      if (checkCenterVertical() == false) {
-        centerVertical();
-      }
-    }
-    else if (this->centerHorizontalWithinParent) {
-      if (checkCenterHorizontal() == false) {
-        centerHorizontal();
-      }
-    }
-
-    SDL_Rect parentBoundaryRectangle = parent->getBoundaryRectangle();
-    this->boundaryRectangle.x =
-        parentBoundaryRectangle.x + this->positionRelativeToParent.x;
-    this->boundaryRectangle.y =
-        parentBoundaryRectangle.y + this->positionRelativeToParent.y;
+    hasParentUpdate();
   }
 }
