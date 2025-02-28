@@ -73,8 +73,9 @@ void takePhotos(int angle) {
  * @return None - can add a 0 or -1 for success/failure
  */
 bool takePhoto(int angle) {
-std::string fileName = "/home/geromy/Desktop/Project/raspi-yolo/images/temp/IMG_2002.JPG";
-
+  std::string fileName = std::string(IMAGE_DIR) + std::to_string(angle) + "_test.jpg";
+  const char* arg      = "rpicam-jpeg 1920:1080:12:U --nopreview --output ";
+  google::ShutdownGoogleLogging();
   pid_t pid = fork();
   if (pid == -1) {
     LOG(FATAL) << "Error starting camera process." << strerror(errno);
@@ -82,27 +83,18 @@ std::string fileName = "/home/geromy/Desktop/Project/raspi-yolo/images/temp/IMG_
   }
   if (pid == 0) {
     // Reinitialize glog in the child process
-    google::ShutdownGoogleLogging();
-    google::InitGoogleLogging("takePhotoChild");
+    google::InitGoogleLogging("TakePhotoChild");
     LOG(INFO) << "Capturing at position " << angle;
-    char* args[] = {(char*)"/usr/bin/rpicam-jpeg",
-                    (char*)"rpicam-jpeg",
-                    (char*)"1920:1080:12:U", // 1920x1080, 12MP, unpacked
-                    (char*)"--nopreview",
-                    (char*)"--output",
-                    (char*)fileName.c_str(), // Save location
-                    nullptr};
-    const char* arg = "rpicam-jpeg --output /home/geromy/Desktop/Project/raspi-yolo/images/temp/test.jpg";
-    std::cout << "here" << std::endl;
-    //execl("rpicam-jpeg", arg);
-    system(arg);
-//      sendDataToVision(pipes.hardwareToVision[WRITE], weight);
-    LOG(INFO) << "ERROR: execvp() failed to capture image.";
+    execl("/usr/bin/rpicam-jpeg", "rpicam-jpeg", "1920:1080:12:U", "--nopreview",
+          "--output", fileName.c_str(), // Save location
+          "--timeout", "50", (char*)NULL);
+
+    std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
     exit(1);
+    // const char* arg = "rpicam-jpeg --output
+    // /home/geromy/Desktop/Project/raspi-yolo/images/temp/test.jpg"; system(arg);
   }
-  else {
-  }
+  google::InitGoogleLogging("HardwareParent");
   LOG(INFO) << "Captured image at position " << angle;
-  std::cout << "here 2" << std::endl;
   return true;
 }
