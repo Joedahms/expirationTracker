@@ -70,7 +70,6 @@ add_executable (expirationTracker
   #Hardware process after forked from main
   hardware/src/hardware_entry.cpp
   hardware/src/io.cpp
-  hardware/controls/controls.cpp
   hardware/controls/cameras.cpp
   #hardware/controls/motors.cpp
   #hardware/controls/weight.cpp
