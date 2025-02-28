@@ -91,8 +91,6 @@ bool takePhoto(int angle) {
 
     std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
     exit(1);
-    // const char* arg = "rpicam-jpeg --output
-    // /home/geromy/Desktop/Project/raspi-yolo/images/temp/test.jpg"; system(arg);
   }
   google::InitGoogleLogging("HardwareParent");
   LOG(INFO) << "Captured image at position " << angle;
