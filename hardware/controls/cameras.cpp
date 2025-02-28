@@ -26,8 +26,9 @@ void takePhotos(int angle) {
   }
   else if (topCam == 0) {
     std::string filePath = std::string(IMAGE_DIR) + std::to_string(angle) + "_T.jpg";
-    execl("/usr/bin/rpicam-still", "rpicam-still", "4056:3040:12", "--nopreview",
-          "--autofocus-on-capture", "on", "--autofocus-speed", "fast",
+    execl("/usr/bin/libcamera-still", "libcamera-still", "--width", "4056", "--height",
+          "3040", "--nopreview", "--autofocus-on-capture", "on", "--autofocus-speed",
+          "fast",
           //      "--autofocus-rang", "full",   // Full autofocus range
           "--exposure", "normal", "--output", filePath.c_str(), // Save location
           "--timeout", "50", (char*)NULL);
@@ -73,7 +74,6 @@ void takePhotos(int angle) {
  */
 int takePhoto(int angle) {
   std::string fileName = std::string(IMAGE_DIR) + std::to_string(angle) + "_test.jpg";
-  int status;
   pid_t pid = fork();
 
   if (pid == 0) {
@@ -82,20 +82,12 @@ int takePhoto(int angle) {
     google::InitGoogleLogging("takePhotoChild");
 
     LOG(INFO) << "Capturing at position " << angle;
-    char* args[] = {const_cast<char*>("rpicam-still"),
-                    const_cast<char*>("--width"),
-                    const_cast<char*>("2028"),
-                    const_cast<char*>("--height"),
-                    const_cast<char*>("1520"),
-                    const_cast<char*>("--nopreview"),
-                    const_cast<char*>("--output"),
-                    const_cast<char*>(fileName.c_str()),
-                    const_cast<char*>("--timeout"),
-                    const_cast<char*>("50"),
-                    (char*)NULL};
-    execvp("rpicam-still", args);
-    LOG(FATAL) << "Failed to execute rpicam-still at position " << angle;
-    _exit(-1);
+    execl("/usr/bin/rpicam-still", "rpicam-still", "--width", "4056", "--height", "3040",
+          "--nopreview", "--output", fileName.c_str(), // Save location
+          "--timeout", "50", (char*)NULL);
+
+    std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
+    exit(-1);
   }
   if (pid > 0) {
     waitpid(pid, NULL, WNOHANG);
@@ -104,6 +96,6 @@ int takePhoto(int angle) {
   }
   if (pid < 0) {
     LOG(FATAL) << "Error starting camera process.";
-    return -1;
+    return 0;
   }
 }
