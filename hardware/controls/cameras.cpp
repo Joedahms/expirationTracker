@@ -84,8 +84,8 @@ int takePhoto(int angle) {
     google::InitGoogleLogging("takePhotoChild");
 
     LOG(INFO) << "Capturing at position " << angle;
-    execl("/usr/bin/rpicam-still", "rpicam-still", "--width", "2028", "--height", "1520",
-          "--nopreview", "--output", fileName.c_str(), // Save location
+    execl("/usr/bin/rpicam-still", "rpicam-still", "1728:1296:12:P", "--nopreview",
+          "--output", fileName.c_str(), // Save location
           "--timeout", "50", (char*)0);
 
     std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
