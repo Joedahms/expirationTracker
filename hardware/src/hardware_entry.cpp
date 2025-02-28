@@ -78,6 +78,7 @@ void rotateAndCapture(struct Pipes pipes, float weight) {
       LOG(INFO) << "Error taking a photo";
     }; // This function is for one camera/testing
     if (angle == 0) {
+      sleep(2);
       sendDataToVision(pipes.hardwareToVision[WRITE], weight);
     }
 
