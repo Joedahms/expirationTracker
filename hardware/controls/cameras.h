@@ -4,6 +4,6 @@
 #include <string>
 
 bool takePhotos(int angle);
-bool takePhoto(int angle);
+bool capturePhoto(int angle);
 
 #endif

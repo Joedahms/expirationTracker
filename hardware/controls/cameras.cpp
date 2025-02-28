@@ -70,7 +70,7 @@ bool takePhotos(int angle) {
  * @param angle Used to create the fileName for the image.
  * @return None - can add a 0 or -1 for success/failure
  */
-bool takePhoto(int angle) {
+bool capturePhoto(int angle) {
   std::string fileName = std::string(IMAGE_DIR) + std::to_string(angle) + "_test.jpg";
   google::ShutdownGoogleLogging();
 
