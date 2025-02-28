@@ -5,5 +5,6 @@
 #include <string>
 
 void hardwareEntry(struct Pipes pipes);
+void rotateAndCapture(struct Pipes pipes, float weight);
 
 #endif

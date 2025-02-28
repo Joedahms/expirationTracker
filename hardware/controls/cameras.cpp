@@ -72,38 +72,35 @@ void takePhotos(int angle) {
  * @param angle Used to create the fileName for the image.
  * @return None - can add a 0 or -1 for success/failure
  */
-int takePhoto(int angle) {
+bool takePhoto(int angle) {
   std::string fileName = std::string(IMAGE_DIR) + std::to_string(angle) + "_test.jpg";
-  int status;
-  pid_t pid = 0;
 
-  pid = fork();
+  pid_t pid = fork();
+  if (pid == -1) {
+    LOG(FATAL) << "Error starting camera process." << strerror(errno);
+    return false;
+  }
   if (pid == 0) {
     // Reinitialize glog in the child process
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("takePhotoChild");
-
     LOG(INFO) << "Capturing at position " << angle;
-    execl("/usr/bin/rpicam-still", "rpicam-still", "1728:1296:12:P", "--nopreview",
-          "--output", fileName.c_str(), // Save location
-          "--timeout", "50", (char*)0);
-
-    std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
-    return -1;
+    char* args[] = {(char*)"/usr/bin/rpicam-still",
+                    (char*)"rpicam-still",
+                    (char*)"1728:1296:12:P",
+                    (char*)"--nopreview",
+                    (char*)"--output",
+                    (char*)fileName.c_str(), // Save location
+                    (char*)"--timeout",
+                    (char*)"50",
+                    nullptr};
+    execvp(args[0], args);
+    LOG(INFO) << "ERROR: execvp() failed to capture image.";
+    exit(1);
   }
-  if (pid > 0) {
-    pid = wait(&status);
-    LOG(INFO) << "Photo successful at position " << angle;
-    if (WIFEXITED(status)) {
-      LOG(INFO) << "Child process exited with status " << WEXITSTATUS(status);
-    }
-    if (WIFSIGNALED(status)) {
-      LOG(INFO) << "Child process was terminated by signal " << WTERMSIG(status);
-    }
-    return angle;
+  else {
   }
-  if (pid < 0) {
-    LOG(INFO) << "Error starting camera process.";
-    return -1;
-  }
+  LOG(INFO) << "Captured image at position " << angle;
+  return true;
+}
 }

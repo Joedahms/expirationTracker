@@ -1,3 +1,4 @@
+
 #include <filesystem>
 #include <fstream>
 #include <glog/logging.h>
@@ -7,8 +8,9 @@
 
 #include "../../food_item.h"
 #include "../../pipes.h"
-#include "../controls/controls.h"
+#include "../controls/cameras.h"
 // #include "../controls/weight.h"
+#include "hardware_entry.h"
 #include "io.h"
 
 /*
@@ -53,6 +55,42 @@ void hardwareEntry(struct Pipes pipes) {
     }
     else {
       usleep(500000);
+    }
+  }
+}
+
+/**
+ * Rotates platform in 45-degree increments, captures images, and sends the
+ * data to the AI Vision system until a full 360-degree rotation is complete.
+ * The process can be stopped early if AI Vision sends a "STOP" signal
+ * 0 - continue or 1 - stop
+ *
+ * @return None
+ */
+void rotateAndCapture(struct Pipes pipes, float weight) {
+  for (int angle = 0; angle < 8; angle++) {
+    LOG(INFO) << "At location " << angle << " of 8";
+    // takePhotos(angle);    // This function is for both cameras
+    if (takePhoto(angle) == false) {
+      LOG(INFO) << "Error taking photo";
+    }; // This function is for one camera/testing
+
+    if (angle == 0) {
+      sendDataToVision(pipes.displayToVision[WRITE], weight);
+    }
+
+    LOG(INFO) << "Rotating platform...";
+    //    rotateMotor();
+    usleep(200);
+
+    bool stopSignal = false;
+    if (read(pipes.visionToHardware[READ], &stopSignal, sizeof(stopSignal)) > 0 &&
+        stopSignal) {
+      LOG(INFO) << "AI Vision identified item. Stopping process.";
+      break;
+    }
+    else {
+      LOG(INFO) << "AI Vision did not identify item. Continuing process.";
     }
   }
 }

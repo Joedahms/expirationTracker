@@ -1,12 +1,13 @@
-#include "../../food_item.h"
-#include "../../pipes.h"
-#include "hardware_entry.h"
 #include <filesystem>
 #include <fstream>
 #include <glog/logging.h>
 #include <iostream>
 #include <string>
 #include <sys/select.h>
+
+#include "../../food_item.h"
+#include "../../pipes.h"
+#include "hardware_entry.h"
 
 /**
  * Checks to see if there is any data fromDisplay[READ]
