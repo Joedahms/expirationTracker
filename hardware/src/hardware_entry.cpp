@@ -70,31 +70,32 @@ void hardwareEntry(struct Pipes pipes) {
 void rotateAndCapture(struct Pipes pipes, float weight) {
   for (int angle = 0; angle < 8; angle++) {
     LOG(INFO) << "At location " << angle << " of 8";
-    // takePhotos(angle);    // This function is for both cameras
+    // This function is for both cameras
+    // if (takePhotos(angle) == false) {
+    //   LOG(INFO) << "Error taking photos";
+    // };
     if (capturePhoto(angle) == false) {
-      LOG(INFO) << "Error taking photo";
+      LOG(INFO) << "Error taking a photo";
     }; // This function is for one camera/testing
-
     if (angle == 0) {
-	    sleep(10);
       sendDataToVision(pipes.hardwareToVision[WRITE], weight);
     }
 
     LOG(INFO) << "Rotating platform...";
-    std::cout << "rotating platform" << std::endl;
+    std::cout << "Rotating platform" << std::endl;
     //    rotateMotor();
-    usleep(200);
+    usleep(500);
 
     bool stopSignal = false;
     if (read(pipes.visionToHardware[READ], &stopSignal, sizeof(stopSignal)) > 0 &&
         stopSignal) {
-	    std::cout << "AI Vision identified item. Stopping process." << std::endl;
       LOG(INFO) << "AI Vision identified item. Stopping process.";
+      std::cout << "AI Vision identified item. Stopping process." << std::endl;
       break;
     }
     else {
       LOG(INFO) << "AI Vision did not identify item. Continuing process.";
-      std::cout << "whoops" << std::endl;
+      std::cout << "Spin again!" << std::endl;
     }
   }
 }

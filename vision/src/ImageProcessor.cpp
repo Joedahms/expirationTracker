@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <iostream>
 
 #include "../include/ImageProcessor.h"
@@ -28,6 +29,7 @@ void ImageProcessor::process() {
     // Still send whatever information we do have to the display
     writeString(pipes.visionToDisplay[WRITE],
                 "Food item not properly identified. Sending incomplete food item.");
+    write(pipes.visionToHardware[WRITE], &detectedFoodItem, sizeof(detectedFoodItem));
   }
   // tell hardware to stop
   LOG(INFO) << "Sent stop signal to hardware";
@@ -70,15 +72,15 @@ bool ImageProcessor::analyze() {
         }
       }
       // delete bad image
-      /*
+
       try {
         std::filesystem::remove(entry.path());
         LOG(INFO) << "Deleted unclassified image: " << entry.path();
-	std::cout << "pic deleted" << std::endl;
+        std::cout << "pic deleted" << std::endl;
       } catch (const std::filesystem::filesystem_error& e) {
         LOG(ERROR) << "Failed to delete image: " << entry.path() << " - " << e.what();
       }
-      */
+
       // check if image directory has new files
       // directory iterator does not update
       // Wait if the directory is empty
