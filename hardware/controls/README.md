@@ -1,59 +1,123 @@
-# Hardware Errata
+# Camera Information
 
 ## rpi camera
 ```plaintext
 https://www.raspberrypi.com/documentation/computers/camera_software.html
 ```
+### Documentation on building own app
+```plaintext
+https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/camera/rpicam_apps_building.adoc
+```
 
---autofocus-mode Specify the autofocus mode <string>
-Specifies the autofocus mode to use, which may be one of
+## libcamera
+```plaintext
+https://docs.arducam.com/Raspberry-Pi-Camera/Native-camera/Libcamera-User-Guide/#introduction
+```
+### libcamera API
+```plaintext
+https://libcamera.org/api-html/namespacelibcamera.html
+```
+### simple-cam (uses libcamera from C++)
+```plaintext
+https://github.com/kbingham/simple-cam/blob/master/simple-cam.cpp
+```
+```plaintext
 
-default (also the default if the option is omitted) - normally puts the camera into continuous autofocus mode, except if either --lens-position or --autofocus-on-capture is given, in which case manual mode is chosen instead
+```
 
-manual - do not move the lens at all, but it can be set with the --lens-position option
+## Documentation for camera options
+````plaintext
+https://github.com/raspberrypi/documentation/blob/develop/documentation/asciidoc/computers/camera/rpicam_options_common.adoc
+````
 
-auto - does not move the lens except for an autofocus sweep when the camera starts (and for libcamera-still, just before capture if --autofocus-on-capture is given)
+### list-cameras
+Lists the detected cameras attached to your Raspberry Pi and their available sensor modes. Does not accept a value.
 
-continuous - adjusts the lens position automatically as the scene changes.
+Sensor mode identifiers have the following form: S<Bayer order><Bit-depth>_<Optional packing> : <Resolution list>
 
-This option is only supported for certain camera modules (such as the Raspberry Pi Camera Module 3).
+Crop is specified in native sensor pixels (even in pixel binning mode) as (<x>, <y>)/<Width>×<Height>. (x, y) specifies the location of the crop window of size width × height in the sensor array.
 
---autofocus-range Specify the autofocus range <string>
-Specifies the autofocus range, which may be one of
+For example, the following output displays information about an IMX219 sensor at index 0 and an IMX477 sensor at index 1:
 
-normal (the default) - focuses from reasonably close to infinity
+Available cameras
+-----------------
+0 : imx219 [3280x2464] (/base/soc/i2c0mux/i2c@1/imx219@10)
+    Modes: 'SRGGB10_CSI2P' : 640x480 [206.65 fps - (1000, 752)/1280x960 crop]
+                             1640x1232 [41.85 fps - (0, 0)/3280x2464 crop]
+                             1920x1080 [47.57 fps - (680, 692)/1920x1080 crop]
+                             3280x2464 [21.19 fps - (0, 0)/3280x2464 crop]
+           'SRGGB8' : 640x480 [206.65 fps - (1000, 752)/1280x960 crop]
+                      1640x1232 [41.85 fps - (0, 0)/3280x2464 crop]
+                      1920x1080 [47.57 fps - (680, 692)/1920x1080 crop]
+                      3280x2464 [21.19 fps - (0, 0)/3280x2464 crop]
+1 : imx477 [4056x3040] (/base/soc/i2c0mux/i2c@1/imx477@1a)
+    Modes: 'SRGGB10_CSI2P' : 1332x990 [120.05 fps - (696, 528)/2664x1980 crop]
+           'SRGGB12_CSI2P' : 2028x1080 [50.03 fps - (0, 440)/4056x2160 crop]
+                             2028x1520 [40.01 fps - (0, 0)/4056x3040 crop]
+                             4056x3040 [10.00 fps - (0, 0)/4056x3040 crop]
+For the IMX219 sensor in the above example:
 
-macro - focuses only on close objects, including the closest focal distances supported by the camera
+all modes have an RGGB Bayer ordering
 
-full - will focus on the entire range, from the very closest objects to infinity.
+all modes provide either 8-bit or 10-bit CSI2 packed readout at the listed resolutions
 
-This option is only supported for certain camera modules (such as the Raspberry Pi Camera Module 3).
+### timeout
+Alias: -t
 
---autofocus-speed Specify the autofocus speed <string>
-Specifies the autofocus speed, which may be one of
+Default value: 5000 milliseconds (5 seconds)
 
-normal (the default) - the lens position will change at the normal speed
+Specify how long the application runs before closing. This applies to both video recording and preview windows. When capturing a still image, the application shows a preview window for timeout milliseconds before capturing the output image.
 
-fast - the lens position may change more quickly.
+To run the application indefinitely, specify a value of 0.
 
-This option is only supported for certain camera modules (such as the Raspberry Pi Camera Module 3).
+### nopreview
+Alias: -n
 
---autofocus-window Specify the autofocus window
-Specifies the autofocus window, in the form x,y,width,height where the coordinates are given as a proportion of the entire image. For example, --autofocus-window 0.25,0.25,0.5,0.5 would choose a window that is half the size of the output image in each dimension, and centred in the middle.
+Causes the application to not display a preview window at all. Does not accept a value.
 
-The default value causes the algorithm to use the middle third of the output image in both dimensions (so 1/9 of the total image area).
+### mode
+Allows you to specify a camera mode in the following colon-separated format: <width>:<height>:<bit-depth>:<packing>. The system selects the closest available option for the sensor if there is not an exact match for a provided value. You can use the packed (P) or unpacked (U) packing formats. Impacts the format of stored videos and stills, but not the format of frames passed to the preview window.
 
-This option is only supported for certain camera modules (such as the Raspberry Pi Camera Module 3).
+Bit-depth and packing are optional. Bit-depth defaults to 12. Packing defaults to P (packed).
 
---lens-position Set the lens to a given position <string>
-Moves the lens to a fixed focal distance, normally given in dioptres (units of 1 / distance in metres). We have
+For information about the bit-depth, resolution, and packing options available for your sensor, see list-cameras.
 
-0.0 will move the lens to the "infinity" position
+Examples:
 
-Any other number: move the lens to the 1 / number position, so the value 2 would focus at approximately 0.5m
+4056:3040:12:P - 4056×3040 resolution, 12 bits per pixel, packed.
 
-default - move the lens to a default position which corresponds to the hyperfocal position of the lens.
+1632:1224:10 - 1632×1224 resolution, 10 bits per pixel.
 
-It should be noted that lenses can only be expected to be calibrated approximately, and there may well be variation between different camera modules.
+2592:1944:10:U - 2592×1944 resolution, 10 bits per pixel, unpacked.
 
-This option is only supported for certain camera modules (such as the Raspberry Pi Camera Module 3).
+3264:2448 - 3264×2448 resolution.
+
+#### Packed format details
+The packed format uses less storage for pixel data.
+
+On Raspberry Pi 4 and earlier devices, the packed format packs pixels using the MIPI CSI-2 standard. This means:
+
+10-bit camera modes pack 4 pixels into 5 bytes. The first 4 bytes contain the 8 most significant bits (MSBs) of each pixel, and the final byte contains the 4 pairs of least significant bits (LSBs).
+
+12-bit camera modes pack 2 pixels into 3 bytes. The first 2 bytes contain the 8 most significant bits (MSBs) of each pixel, and the final byte contains the 4 least significant bits (LSBs) of both pixels.
+
+On Raspberry Pi 5 and later devices, the packed format compresses pixel values with a visually lossless compression scheme into 8 bits (1 byte) per pixel.
+
+#### Unpacked format details
+The unpacked format provides pixel values that are much easier to manually manipulate, at the expense of using more storage for pixel data.
+
+On all devices, the unpacked format uses 2 bytes per pixel.
+
+On Raspberry Pi 4 and earlier devices, applications apply zero padding at the most significant end. In the unpacked format, a pixel from a 10-bit camera mode cannot exceed the value 1023.
+
+On Raspberry Pi 5 and later devices, applications apply zero padding at the least significant end, so images use the full 16-bit dynamic range of the pixel depth delivered by the sensor.
+
+### hflip
+Flips the image horizontally. Does not accept a value.
+
+### vflip
+Flips the image vertically. Does not accept a value.
+
+### rotation
+Rotates the image extracted from the sensor. Accepts only the values 0 or 180.
+

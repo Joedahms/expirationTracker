@@ -85,14 +85,12 @@ bool takePhoto(int angle) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("takePhotoChild");
     LOG(INFO) << "Capturing at position " << angle;
-    char* args[] = {(char*)"/usr/bin/rpicam-still",
-                    (char*)"rpicam-still",
-                    (char*)"1728:1296:12:P",
+    char* args[] = {(char*)"/usr/bin/rpicam-jpeg",
+                    (char*)"rpicam-jpeg",
+                    (char*)"1920:1080:12:U", // 1920x1080, 12MP, unpacked
                     (char*)"--nopreview",
                     (char*)"--output",
                     (char*)fileName.c_str(), // Save location
-                    (char*)"--timeout",
-                    (char*)"50",
                     nullptr};
     execvp(args[0], args);
     LOG(INFO) << "ERROR: execvp() failed to capture image.";
