@@ -9,7 +9,6 @@
 
 #define MOTOR_IN1 23 // GPIO Pin for L298N IN1
 #define MOTOR_IN2 24 // GPIO Pin for L298N IN2
-#define MOTOR_ENA 25 // GPIO Pin forL298N enable (PWM Speed Control)
 
 /**
  * Initializes GPIO, hardware and sensors.
@@ -27,11 +26,9 @@ void setupMotor() {
   // Setup DC Motor Driver Pins
   pinMode(MOTOR_IN1, OUTPUT);
   pinMode(MOTOR_IN2, OUTPUT);
-  pinMode(MOTOR_ENA, OUTPUT); // PWM_OUTPUT?
 
   digitalWrite(MOTOR_IN1, LOW);
   digitalWrite(MOTOR_IN2, LOW);
-  analogWrite(MOTOR_ENA, 128); // Set inital speed to 50% (0-255 range)
 
   LOG(INFO) << "Motor System Initialized.";
 }
@@ -52,8 +49,7 @@ void rotateMotor(bool clockwise) {
     LOG(INFO) << "Rotating clockwise...";
     digitalWrite(MOTOR_IN1, HIGH);
     digitalWrite(MOTOR_IN2, LOW);
-    analogWrite(MOTOR_ENA, 255); // Adjust speed
-    usleep(1875000);             // Rotate duration
+    usleep(1875000); // Rotate duration
     digitalWrite(MOTOR_IN1, LOW);
     digitalWrite(MOTOR_IN2, LOW); // HIGH,HIGH || LOW,LOW == off
   }
@@ -61,7 +57,6 @@ void rotateMotor(bool clockwise) {
     LOG(INFO) << "Rotating counterclockwise...";
     digitalWrite(MOTOR_IN1, LOW);
     digitalWrite(MOTOR_IN2, HIGH);
-    analogWrite(MOTOR_ENA, 255);
     usleep(1875000);
     digitalWrite(MOTOR_IN1, LOW);
     digitalWrite(MOTOR_IN2, LOW);
