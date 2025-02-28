@@ -176,13 +176,6 @@ void DisplayEngine::handleEvents(int* engineToDisplay, int* displayToEngine) {
   switch (this->engineState) {
   case EngineState::MAIN_MENU:
     this->mainMenu->handleEvents(&this->displayIsRunning);
-
-    /*
-  if (this->engineState == EngineState::SCANNING) {
-    LOG(INFO) << "Scan initialized, engine switching to scanning state";
-    writeString(engineToDisplay[WRITE], START_SCAN);
-  }
-  */
     break;
 
   case EngineState::SCANNING:
