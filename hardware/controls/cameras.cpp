@@ -103,4 +103,3 @@ bool takePhoto(int angle) {
   LOG(INFO) << "Captured image at position " << angle;
   return true;
 }
-}
