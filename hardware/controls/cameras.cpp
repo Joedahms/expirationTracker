@@ -73,7 +73,7 @@ void takePhotos(int angle) {
  * @return None - can add a 0 or -1 for success/failure
  */
 bool takePhoto(int angle) {
-  std::string fileName = std::string(IMAGE_DIR) + std::to_string(angle) + "_test.jpg";
+std::string fileName = "/home/geromy/Desktop/Project/raspi-yolo/images/temp/IMG_2002.JPG";
 
   pid_t pid = fork();
   if (pid == -1) {
@@ -92,12 +92,17 @@ bool takePhoto(int angle) {
                     (char*)"--output",
                     (char*)fileName.c_str(), // Save location
                     nullptr};
-    execvp(args[0], args);
+    const char* arg = "rpicam-jpeg --output /home/geromy/Desktop/Project/raspi-yolo/images/temp/test.jpg";
+    std::cout << "here" << std::endl;
+    //execl("rpicam-jpeg", arg);
+    system(arg);
+//      sendDataToVision(pipes.hardwareToVision[WRITE], weight);
     LOG(INFO) << "ERROR: execvp() failed to capture image.";
     exit(1);
   }
   else {
   }
   LOG(INFO) << "Captured image at position " << angle;
+  std::cout << "here 2" << std::endl;
   return true;
 }

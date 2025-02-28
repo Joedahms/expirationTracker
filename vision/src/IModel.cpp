@@ -23,7 +23,7 @@ void IModel::sendRequest(const TaskType& taskType,
  * @return string read back from model
  */
 std::string IModel::readResponse() const {
-  std::ifstream pipe_in(PIPE_OUT);
+  std::ifstream pipe_in(PIPE_IN);
   if (!pipe_in) {
     LOG(FATAL) << "Error opening pipe for reading.";
     return "ERROR: Failed to read response";

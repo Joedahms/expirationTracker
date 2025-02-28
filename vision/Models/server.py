@@ -14,9 +14,10 @@ for pipe in [pipe_in, pipe_out]:
 while True:
     with open(pipe_in, "r") as f:
         request = f.readline().strip()
+        print("request: " + request)
 
-    if request == "exit":
-        break  # Stop the server when "exit" is received
+    #    if request == "exit":
+    #        break  # Stop the server when "exit" is received
 
     parts = request.split(" ", 1)
     if len(parts) != 2:
@@ -24,11 +25,12 @@ while True:
     else:
         task_type, image_path = parts
         if task_type == "CLS":
-            result = classify_image(image_path)  # Calls classifier module
+            #result = classify_image(image_path)  # Calls classifier module
+            test = 1
         elif task_type == "OCR":
             result = perform_ocr(image_path)  # Calls OCR module
         else:
             result = "ERROR: Unknown task type"
 
     with open(pipe_out, "w") as f:
-        f.write(result + "\n")
+        f.write(result + "\n")#

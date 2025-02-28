@@ -58,10 +58,12 @@ void sendDataToVision(int pipeToWrite, float weight) {
       std::chrono::system_clock::now()};
 
   struct FoodItem foodItem;
-  foodItem.imageDirectory = std::filesystem::absolute("../images");
+  foodItem.imageDirectory = std::filesystem::absolute("../images/temp");
   foodItem.scanDate       = std::chrono::floor<std::chrono::days>(now);
   foodItem.weight         = weight;
   sendFoodItem(foodItem, pipeToWrite);
+
+
 
   LOG(INFO) << "Done Sending Images from Hardware to Vision";
 }

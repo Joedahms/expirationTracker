@@ -35,6 +35,7 @@ def is_text_class(text):
     return None
 
 def preprocess_image(image_path):
+    print(image_path)
     img = cv2.imread(image_path)
 
     if img is None:
