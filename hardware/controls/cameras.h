@@ -3,7 +3,7 @@
 
 #include <string>
 
-void takePhotos(int angle);
+bool takePhotos(int angle);
 bool takePhoto(int angle);
 
 #endif

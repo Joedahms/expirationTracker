@@ -19,51 +19,49 @@
  * @param angle - The angle at which the photos are taken. (0-8, where 8==0)
  * @return None
  */
-void takePhotos(int angle) {
-  pid_t topCam = fork();
-  if (topCam == -1) {
-    LOG(FATAL) << "Error starting top camera.";
-  }
-  else if (topCam == 0) {
-    std::string filePath = std::string(IMAGE_DIR) + std::to_string(angle) + "_T.jpg";
-    execl("/usr/bin/libcamera-still", "libcamera-still", "--width", "4056", "--height",
-          "3040", "--nopreview", "--autofocus-on-capture", "on", "--autofocus-speed",
-          "fast",
-          //      "--autofocus-rang", "full",   // Full autofocus range
-          "--exposure", "normal", "--output", filePath.c_str(), // Save location
-          "--timeout", "50", (char*)NULL);
+bool takePhotos(int angle) {
+  std::string topPhoto = std::string(IMAGE_DIR) + std::to_string(angle) + "_top.jpg";
+  google::ShutdownGoogleLogging();
 
-    std::cerr << "Error: Failed to execute libcamera-still" << std::endl;
+  pid_t pidt = fork();
+  if (pidt == -1) {
+    LOG(FATAL) << "Error starting top camera process." << strerror(errno);
+    return false;
+  }
+  if (pidt == 0) {
+    // Reinitialize glog in the child process
+    google::InitGoogleLogging("TakePhotoChild");
+    LOG(INFO) << "Capturing top at position " << angle;
+    execl("/usr/bin/rpicam-jpeg", "rpicam-jpeg", "1920:1080:12:U", "--nopreview",
+          "--output", topPhoto.c_str(), "--timeout", "50", (char*)NULL);
+
+    std::cerr << "Error: Failed to execute rpicam-still - top" << std::endl;
+    LOG(FATAL) << "Error: Failed to execute rpicam-still - top";
     exit(1);
-    if (system(filePath.c_str()) == -1) {
-      LOG(FATAL) << "Failed to capture image from top camera.";
-    }
-    exit(0);
   }
 
-  pid_t sideCam = fork();
-  if (sideCam == -1) {
-    LOG(FATAL) << "Error starting side camera process.";
-  }
-  else if (sideCam == 0) {
-    std::string filePath = std::string(IMAGE_DIR) + std::to_string(angle) + "_T.jpg";
-    execl("/usr/bin/rpicam-still", "rpicam-still", "--width", "4056", "--height", "3040",
-          "--nopreview", "--autofocus-on-capture", "on", "--autofocus-speed", "fast",
-          //      "--autofocus-rang", "full",   // Full autofocus range
-          "--exposure", "normal", "--output", filePath.c_str(), // Save location
-          "--timeout", "50", (char*)NULL);
+  std::string sidePhoto = std::string(IMAGE_DIR) + std::to_string(angle) + "_side.jpg";
+  google::ShutdownGoogleLogging();
 
-    std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
+  pid_t pids = fork();
+  if (pids == -1) {
+    LOG(FATAL) << "Error starting side camera process." << strerror(errno);
+    return false;
+  }
+  if (pids == 0) {
+    // Reinitialize glog in the child process
+    google::InitGoogleLogging("TakePhotoChild");
+    LOG(INFO) << "Capturing side at position " << angle;
+    execl("/usr/bin/rpicam-jpeg", "rpicam-jpeg", "1920:1080:12:U", "--nopreview",
+          "--output", sidePhoto.c_str(), "--timeout", "50", (char*)NULL);
+
+    std::cerr << "Error: Failed to execute rpicam-still - side" << std::endl;
+    LOG(FATAL) << "Error: Failed to execute rpicam-still - side";
     exit(1);
-    if (system(filePath.c_str()) == -1) {
-      LOG(FATAL) << "Failed to capture image from top camera.";
-    }
-    exit(0);
   }
-
-  waitpid(topCam, NULL, 0);
-  waitpid(sideCam, NULL, 0);
-  LOG(INFO) << "Photos successful at position " << angle;
+  google::InitGoogleLogging("HardwareParent");
+  LOG(INFO) << "Exiting photos at " << angle;
+  return true;
 }
 
 /**
@@ -74,8 +72,8 @@ void takePhotos(int angle) {
  */
 bool takePhoto(int angle) {
   std::string fileName = std::string(IMAGE_DIR) + std::to_string(angle) + "_test.jpg";
-  const char* arg      = "rpicam-jpeg 1920:1080:12:U --nopreview --output ";
   google::ShutdownGoogleLogging();
+
   pid_t pid = fork();
   if (pid == -1) {
     LOG(FATAL) << "Error starting camera process." << strerror(errno);
@@ -93,6 +91,6 @@ bool takePhoto(int angle) {
     exit(1);
   }
   google::InitGoogleLogging("HardwareParent");
-  LOG(INFO) << "Captured image at position " << angle;
+  LOG(INFO) << "Exiting photos at " << angle;
   return true;
 }
