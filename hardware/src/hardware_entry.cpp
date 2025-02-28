@@ -87,15 +87,13 @@ void rotateAndCapture(struct Pipes pipes, float weight) {
     usleep(500);
 
     bool stopSignal = false;
-    if (read(pipes.visionToHardware[READ], &stopSignal, sizeof(stopSignal)) > 0 &&
+    if (read(pipes.visionToHardware[READ], &stopSignal, sizeof(stopSignal) == true) > 0 &&
         stopSignal) {
       LOG(INFO) << "AI Vision identified item. Stopping process.";
       std::cout << "AI Vision identified item. Stopping process." << std::endl;
       break;
     }
-    else {
-      LOG(INFO) << "AI Vision did not identify item. Continuing process.";
-      std::cout << "Spin again!" << std::endl;
-    }
+    LOG(INFO) << "AI Vision did not identify item. Continuing process.";
+    std::cout << "Spin again!" << std::endl;
   }
 }
