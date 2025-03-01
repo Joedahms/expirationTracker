@@ -35,6 +35,15 @@ $ sudo apt install sqlite3 libsqlite3-dev
 #### Install mesa
 $ sudo add-apt-repository ppa:kisak/kisak-mesa
 
+sudo apt-get install libzmq3-dev 
+
+git clone https://github.com/zeromq/zmqpp.git
+cd zmqpp
+mkdir build && cd build
+cmake ..
+make
+sudo make install
+
 ## Setup Python virual environment
 NOTE: To setup the Python virtual environment you must be in the build directory.
 #### Create the virtual environment

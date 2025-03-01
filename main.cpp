@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <zmqpp/zmqpp.hpp>
 
 #include "display/src/display_entry.h"
 #include "hardware/src/hardware_entry.h"
@@ -15,6 +16,10 @@ int main(int argc, char* argv[]) {
 
   // Initialize all pipes
   initializePipes(pipes);
+
+  // Context and endpoints
+  zmqpp::context context;
+  Endpoints endpoints;
 
   LOG(INFO) << "Starting display process..";
   int displayPid;
