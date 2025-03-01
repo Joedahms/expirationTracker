@@ -17,7 +17,7 @@
  * @param pipes Pipes for hardware to communicate with the other processes
  * Output: None
  */
-void hardwareEntry(struct Pipes pipes, struct Endpoints endpoints) {
+void hardwareEntry(struct Pipes pipes, struct ExternalEndpoints endpoints) {
   LOG(INFO) << "Within vision process";
 
   // Close write end of read pipes

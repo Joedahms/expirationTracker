@@ -7,9 +7,6 @@
 #include "display_handler.h"
 #include "sql_food.h"
 
-DisplayHandler::DisplayHandler(struct Endpoints endpoints,
-                               const std::string engineEndpoint)
-    : endpoints(endpoints), engineEndpoint(engineEndpoint) {}
 /**
  * Handle communication between display and the other major components of the system
  * (vision and hardware).

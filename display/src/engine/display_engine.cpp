@@ -24,7 +24,13 @@ DisplayEngine::DisplayEngine(const char* windowTitle,
                              int screenWidth,
                              int screenHeight,
                              bool fullscreen,
-                             struct DisplayGlobal displayGlobal) {
+                             struct DisplayGlobal displayGlobal,
+                             const zmqpp::context& context,
+                             const std::string& displayEndpoint,
+                             const std::string& engineEndpoint)
+    : replySocket(context, zmqpp::socket_type::reply),
+      requestSocket(context, zmqpp::socket_type::request),
+      DISPLAY_ENDPOINT(displayEndpoint), ENGINE_ENDPOINT(engineEndpoint) {
   this->displayGlobal = displayGlobal;
   this->displayGlobal.window =
       setupWindow(windowTitle, windowXPosition, windowYPosition, screenWidth,
@@ -130,7 +136,7 @@ void DisplayEngine::initializeEngine(SDL_Window* window) {
  * @param None
  * @return None
  */
-void DisplayEngine::checkState(const std::string engineEndpoint) {
+void DisplayEngine::checkState() {
   switch (this->engineState) {
   case EngineState::MAIN_MENU:
     this->engineState = this->mainMenu->getCurrentState();
@@ -172,7 +178,7 @@ void DisplayEngine::checkState(const std::string engineEndpoint) {
  * @param displayToEngine Pipe from the display to the displayEngine
  * @return None
  */
-void DisplayEngine::handleEvents(const std::string engineEndpoint) {
+void DisplayEngine::handleEvents() {
   switch (this->engineState) {
   case EngineState::MAIN_MENU:
     this->mainMenu->handleEvents(&this->displayIsRunning);

@@ -15,7 +15,7 @@
  * (vision and hardware).
  * @return None
  */
-void displayEntry(struct Endpoints endpoints) {
+void displayEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints) {
   LOG(INFO) << "Entered display process";
 
   const std::string engineEndpoint = "ipc:///tmp/engine_endpoint";
@@ -28,11 +28,11 @@ void displayEntry(struct Endpoints endpoints) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("display_engine");
 
-    engineEntry(engineEndpoint);
+    engineEntry(context, externalEndpoints.displayEndpoint, engineEndpoint);
   }
   else {
     // Still in display entry
-    DisplayHandler displayHandler(endpoints, engineEndpoint);
+    DisplayHandler displayHandler;
 
     while (1) {
       bool stringFromSdl = false;

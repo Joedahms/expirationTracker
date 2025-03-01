@@ -8,7 +8,7 @@
  * @param pipes Pipes for vision to communicate with the other processes
  * Output: None
  */
-void visionEntry(struct Pipes pipes, struct Endpoints endpoints) {
+void visionEntry(struct Pipes pipes, struct ExternalEndpoints endpoints) {
   LOG(INFO) << "Within vision process";
   closeUnusedPipes(pipes);
 

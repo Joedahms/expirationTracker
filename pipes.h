@@ -19,7 +19,7 @@ struct Pipes {
   int visionToHardware[2];
 };
 
-struct Endpoints {
+struct ExternalEndpoints {
   const std::string visionEndpoint   = "ipc:///tmp/vision_endpoint";
   const std::string hardwareEndpoint = "ipc:///tmp/hardware_endpoint";
   const std::string displayEndpoint  = "ipc:///tmp/display_endpoint";

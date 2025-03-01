@@ -1,6 +1,10 @@
 #ifndef ENGINE_ENTRY_H
 #define ENGINE_ENTRY_H
 
-void engineEntry(const std::string engineEndpoint);
+#include <zmqpp/zmqpp.hpp>
+
+void engineEntry(const zmqpp::context& context,
+                 const std::string& displayEndpoint,
+                 const std::string& engineEndpoint);
 
 #endif

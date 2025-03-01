@@ -4,7 +4,7 @@
 #include "../../pipes.h"
 #include <string>
 
-void hardwareEntry(struct Pipes pipes, struct Endpoints endpoints);
+void hardwareEntry(struct Pipes pipes, struct ExternalEndpoints endpoints);
 void redoThis(struct Pipes pipes);
 void sendImagesWithinDirectory(int, const std::string&);
 

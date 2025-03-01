@@ -9,14 +9,11 @@
 
 class DisplayHandler {
 public:
-  DisplayHandler(struct Endpoints endpoints, const std::string engineEndpoint);
   void handleExternal();
-
   void handleEngine();
 
 private:
-  struct Endpoints endpoints;
-  const std::string engineEndpoint;
+  //  zmqpp::socket replySocket()
 
   void sendStartSignal();
 };
