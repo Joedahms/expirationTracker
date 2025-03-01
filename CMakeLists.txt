@@ -15,7 +15,7 @@ find_package(SDL2_ttf REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(SQLite3 REQUIRED)
 find_library(wiringPi_LIB wiringPi)
-target_link_libraries(Object ${wiringPi_LIB})
+target_link_libraries( Object ${OpenCV_LIBS} ${wiringPi})
 
 include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
 
