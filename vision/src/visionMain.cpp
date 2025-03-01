@@ -21,6 +21,14 @@ void visionEntry(struct Pipes pipes,
     FoodItem foodItem;
     foodItem.quantity = 2;
 
+    while (1) {
+      std::string response;
+      response = sendFoodItemNew(testSocket, foodItem);
+      std::cout << response << std::endl;
+      sleep(5);
+    }
+
+    /*
     FoodItemProto::FoodItem protoFoodItem = convertToProto(foodItem);
     std::cout << "q: " << protoFoodItem.quantity() << std::endl;
     std::string str;
@@ -33,6 +41,7 @@ void visionEntry(struct Pipes pipes,
       testSocket.receive(rec);
       sleep(5);
     }
+    */
 
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what() << std::endl;

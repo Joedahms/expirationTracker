@@ -21,6 +21,18 @@ DisplayHandler::DisplayHandler(zmqpp::context& context,
 
 void DisplayHandler::handle() {
   replySocket.bind(this->externalEndpoints.displayEndpoint);
+
+  while (true) {
+    bool received = false;
+    struct FoodItem foodItem;
+    while (!received) {
+      received = receiveFoodItemNew(replySocket, "got it", foodItem);
+    }
+
+    std::cout << foodItem.quantity << std::endl;
+  }
+
+  /*
   bool received = false;
   std::string requestString;
 
@@ -35,6 +47,7 @@ void DisplayHandler::handle() {
       this->replySocket.send("got it");
     }
   }
+  */
 }
 
 /**

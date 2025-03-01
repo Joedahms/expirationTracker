@@ -164,6 +164,33 @@ void printFoodItem(const FoodItem& item) {
   std::cout << "Absolute Path: " << item.absolutePath.string() << "\n";
 }
 
+std::string sendFoodItemNew(zmqpp::socket& socket, const FoodItem& foodItem) {
+  FoodItemProto::FoodItem protoFoodItem = convertToProto(foodItem);
+  std::string serializedString;
+  protoFoodItem.SerializeToString(&serializedString);
+  socket.send(serializedString);
+  std::string response;
+  socket.receive(response);
+  return response;
+}
+
+bool receiveFoodItemNew(zmqpp::socket& socket,
+                        const std::string& response,
+                        struct FoodItem& foodItem) {
+  bool received = false;
+  std::string requestString;
+  received = socket.receive(requestString, true);
+
+  if (received) {
+    FoodItemProto::FoodItem protoFoodItem;
+    protoFoodItem.ParseFromString(requestString);
+    foodItem = convertFromProto(protoFoodItem);
+    socket.send(response);
+    received = true;
+  }
+  return received;
+}
+
 // Convert from C++ struct to Protocol Buffer message
 FoodItemProto::FoodItem convertToProto(const FoodItem& foodItem) {
   FoodItemProto::FoodItem protoFoodItem;

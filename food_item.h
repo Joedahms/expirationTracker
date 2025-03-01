@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <memory>
 #include <string>
+#include <zmqpp/zmqpp.hpp>
 
 #include "fooditem.pb.h"
 
@@ -32,6 +33,11 @@ std::string readString(int pipeToRead);
 std::string foodCategoryToString(const FoodCategories&);
 FoodCategories foodCategoryFromString(const std::string&);
 void printFoodItem(const FoodItem&);
+
+std::string sendFoodItemNew(zmqpp::socket& socket, const FoodItem& foodItem);
+bool receiveFoodItemNew(zmqpp::socket& socket,
+                        const std::string& response,
+                        struct FoodItem& foodItem);
 
 FoodItemProto::FoodItem convertToProto(const FoodItem& foodItem);
 FoodItem convertFromProto(const FoodItemProto::FoodItem& protoFoodItem);
