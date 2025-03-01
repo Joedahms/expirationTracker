@@ -8,9 +8,27 @@
  * @param pipes Pipes for vision to communicate with the other processes
  * Output: None
  */
-void visionEntry(struct Pipes pipes, struct ExternalEndpoints endpoints) {
+void visionEntry(struct Pipes pipes,
+                 zmqpp::context& context,
+                 struct ExternalEndpoints externalEndpoints) {
   LOG(INFO) << "Within vision process";
   closeUnusedPipes(pipes);
+
+  try {
+    zmqpp::socket testSocket(context, zmqpp::socket_type::request);
+    testSocket.connect(externalEndpoints.displayEndpoint);
+
+    std::string str;
+    while (1) {
+      std::cout << "here" << std::endl;
+      testSocket.send("test");
+      testSocket.receive(str);
+      sleep(5);
+    }
+
+  } catch (const zmqpp::exception& e) {
+    LOG(FATAL) << e.what() << std::endl;
+  }
 
   int maxRetries = 5;
   int retryCount = 0;

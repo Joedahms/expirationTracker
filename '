@@ -20,28 +20,13 @@ DisplayHandler::DisplayHandler(zmqpp::context& context,
       requestVisionSocket(context, zmqpp::socket_type::request),
       replyVisionSocket(context, zmqpp::socket_type::reply) {}
 
-void DisplayHandler::handle() {
-  replyEngineSocket.bind(this->engineEndpoint);
-  replyVisionSocket.bind(this->externalEndpoints.displayEndpoint);
-  replyHardwareSocket.bind(this->externalEndpoints.hardwareEndpoint);
-  bool received = false;
-  std::string requestString;
+void DisplayHandler::handle() { handleVisionReply(); }
 
-  while (true) {
-    //    std::cout << "here" << std::endl;
-    received = this->replyEngineSocket.receive(requestString, true);
-    if (received) {
-    }
-    received = this->replyVisionSocket.receive(requestString, true);
-    if (received) {
-      std::cout << requestString << std::endl;
-      this->replyVisionSocket.send("got it");
-      // Handle food item from vision
-    }
-    received = this->replyHardwareSocket.receive(requestString, true);
-    if (received) {
-    }
-  }
+void DisplayHandler::handleVisionReply() {
+  replyVisionSocket.bind(externalEndpoints.visionEndpoint);
+
+  std::string requestString;
+  replyVisionSocket.receive(requestString, true);
 }
 
 /**

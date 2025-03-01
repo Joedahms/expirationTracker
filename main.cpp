@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("vision");
 
-    // visionEntry(pipes, externalEndpoints);
+    visionEntry(pipes, context, externalEndpoints);
     LOG(INFO) << "Vision process";
     return 0;
   }

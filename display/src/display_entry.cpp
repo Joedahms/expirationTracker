@@ -32,12 +32,14 @@ void displayEntry(zmqpp::context& context, struct ExternalEndpoints externalEndp
   }
   else {
     // Still in display entry
-    DisplayHandler displayHandler;
+    DisplayHandler displayHandler(context, externalEndpoints, engineEndpoint);
 
     while (1) {
       bool stringFromSdl = false;
-      displayHandler.handleExternal();
-      displayHandler.handleEngine();
+      displayHandler.handle();
+      //      displayHandler.handleExternal();
+      //
+      //     displayHandler.handleEngine();
     }
   }
 }
