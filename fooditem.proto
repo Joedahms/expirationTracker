@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package FoodItemProto;
+
+// Define the food categories enum
+enum FoodCategory {
+  UNKNOWN = 0;  // Proto3 requires first enum value to be zero
+  UNPACKAGED = 1;
+  PACKAGED = 2;
+  // Add categories here
+}
+
+// Message for representing dates (year, month, day)
+message Date {
+  int32 year = 1;
+  int32 month = 2;
+  int32 day = 3;
+}
+
+// Main FoodItem message
+message FoodItem {
+  int32 id = 1;
+  string image_directory = 2;  // Storing path as string
+  string name = 3;
+  FoodCategory category = 4;
+  Date scan_date = 5;
+  Date expiration_date = 6;
+  float weight = 7;
+  int32 quantity = 8;
+  string absolute_path = 9;  // Storing path as string
+}

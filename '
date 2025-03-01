@@ -22,15 +22,13 @@ void visionEntry(struct Pipes pipes,
     foodItem.quantity = 2;
 
     FoodItemProto::FoodItem protoFoodItem = convertToProto(foodItem);
-    std::cout << "q: " << protoFoodItem.quantity() << std::endl;
     std::string str;
     protoFoodItem.SerializeToString(&str);
 
-    std::string rec;
     while (1) {
       std::cout << "here" << std::endl;
-      testSocket.send(str);
-      testSocket.receive(rec);
+      testSocket.send("test");
+      testSocket.receive(str);
       sleep(5);
     }
 

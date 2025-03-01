@@ -6,6 +6,7 @@
 #include "../../food_item.h"
 #include "../../pipes.h"
 #include "display_handler.h"
+#include "fooditem.pb.h"
 #include "sql_food.h"
 
 DisplayHandler::DisplayHandler(zmqpp::context& context,
@@ -14,32 +15,24 @@ DisplayHandler::DisplayHandler(zmqpp::context& context,
 
     : externalEndpoints(externalEndpoints), engineEndpoint(engineEndpoint),
       requestEngineSocket(context, zmqpp::socket_type::request),
-      replyEngineSocket(context, zmqpp::socket_type::reply),
       requestHardwareSocket(context, zmqpp::socket_type::request),
-      replyHardwareSocket(context, zmqpp::socket_type::reply),
       requestVisionSocket(context, zmqpp::socket_type::request),
-      replyVisionSocket(context, zmqpp::socket_type::reply) {}
+      replySocket(context, zmqpp::socket_type::reply) {}
 
 void DisplayHandler::handle() {
-  replyEngineSocket.bind(this->engineEndpoint);
-  replyVisionSocket.bind(this->externalEndpoints.displayEndpoint);
-  replyHardwareSocket.bind(this->externalEndpoints.hardwareEndpoint);
+  replySocket.bind(this->externalEndpoints.displayEndpoint);
   bool received = false;
   std::string requestString;
 
   while (true) {
-    //    std::cout << "here" << std::endl;
-    received = this->replyEngineSocket.receive(requestString, true);
+    received = this->replySocket.receive(requestString, true);
     if (received) {
-    }
-    received = this->replyVisionSocket.receive(requestString, true);
-    if (received) {
-      std::cout << requestString << std::endl;
-      this->replyVisionSocket.send("got it");
-      // Handle food item from vision
-    }
-    received = this->replyHardwareSocket.receive(requestString, true);
-    if (received) {
+      FoodItemProto::FoodItem foodItem;
+      foodItem.ParseFromString(requestString);
+      struct FoodItem real = convertFromProto(foodItem);
+
+      std::cout << real.quantity << std::endl;
+      this->replySocket.send("got it");
     }
   }
 }

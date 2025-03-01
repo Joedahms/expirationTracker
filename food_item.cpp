@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <glog/logging.h>
 #include <iostream>
 #include <memory>
@@ -6,7 +7,7 @@
 #include <vector>
 
 #include "food_item.h"
-#include <filesystem>
+#include "fooditem.pb.h"
 
 /**
  * Send a food item struct through a specified pipe. Not all fields have to be populated.
@@ -161,4 +162,56 @@ void printFoodItem(const FoodItem& item) {
   std::cout << "Quantity: " << item.quantity << "\n";
   std::cout << "Image Directory: " << item.imageDirectory.string() << "\n";
   std::cout << "Absolute Path: " << item.absolutePath.string() << "\n";
+}
+
+// Convert from C++ struct to Protocol Buffer message
+FoodItemProto::FoodItem convertToProto(const FoodItem& foodItem) {
+  FoodItemProto::FoodItem protoFoodItem;
+
+  protoFoodItem.set_id(foodItem.id);
+  protoFoodItem.set_image_directory(foodItem.imageDirectory.string());
+  protoFoodItem.set_name(foodItem.name);
+  protoFoodItem.set_category(static_cast<FoodItemProto::FoodCategory>(foodItem.category));
+  protoFoodItem.set_weight(foodItem.weight);
+  protoFoodItem.set_quantity(foodItem.quantity);
+  protoFoodItem.set_absolute_path(foodItem.absolutePath.string());
+
+  // Handle dates
+  auto* scan_date = protoFoodItem.mutable_scan_date();
+  scan_date->set_year(static_cast<int>(foodItem.scanDate.year()));
+  scan_date->set_month(static_cast<unsigned>(foodItem.scanDate.month()));
+  scan_date->set_day(static_cast<unsigned>(foodItem.scanDate.day()));
+
+  auto* exp_date = protoFoodItem.mutable_expiration_date();
+  exp_date->set_year(static_cast<int>(foodItem.expirationDate.year()));
+  exp_date->set_month(static_cast<unsigned>(foodItem.expirationDate.month()));
+  exp_date->set_day(static_cast<unsigned>(foodItem.expirationDate.day()));
+
+  return protoFoodItem;
+}
+
+// Convert from Protocol Buffer message to C++ struct
+FoodItem convertFromProto(const FoodItemProto::FoodItem& protoFoodItem) {
+  FoodItem item;
+
+  item.id             = protoFoodItem.id();
+  item.imageDirectory = protoFoodItem.image_directory();
+  item.name           = protoFoodItem.name();
+  item.category       = static_cast<FoodCategories>(protoFoodItem.category());
+  item.weight         = protoFoodItem.weight();
+  item.quantity       = protoFoodItem.quantity();
+  item.absolutePath   = protoFoodItem.absolute_path();
+
+  // Handle dates
+  item.scanDate =
+      std::chrono::year_month_day{std::chrono::year(protoFoodItem.scan_date().year()),
+                                  std::chrono::month(protoFoodItem.scan_date().month()),
+                                  std::chrono::day(protoFoodItem.scan_date().day())};
+
+  item.expirationDate = std::chrono::year_month_day{
+      std::chrono::year(protoFoodItem.expiration_date().year()),
+      std::chrono::month(protoFoodItem.expiration_date().month()),
+      std::chrono::day(protoFoodItem.expiration_date().day())};
+
+  return item;
 }

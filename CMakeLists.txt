@@ -4,6 +4,7 @@ project(expirationTracker DESCRIPTION "Track expiration dates" LANGUAGES CXX)
 # Set build type and C++ standard
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Compiler flags (only compiler flags, not linker flags)
 set(CXXFLAGS "-Wall")
@@ -16,13 +17,10 @@ find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(SQLite3 REQUIRED)
-#find_package(libzmq REQUIRED)
-#find_package(libzmqpp REQUIRED)
-
-# Use pkg-config to find ZeroMQ and zmqpp
 find_package(PkgConfig REQUIRED)
+find_package(Protobuf REQUIRED)
+
 pkg_check_modules(ZMQ REQUIRED libzmq)
-#pkg_check_modules(ZMQPP REQUIRED libzmqpp)
 
 set(ZMQPP_INCLUDE_DIRS "/usr/local/include")
 set(ZMQPP_LIBRARIES "zmqpp")
@@ -34,7 +32,11 @@ include_directories(
   ${ZMQ_INCLUDE_DIRS}
   ${ZMQPP_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
+   ${CMAKE_CURRENT_BINARY_DIR}
+  ${PROTOBUF_INCLUDE_DIRS}
 )
+
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS fooditem.proto)
 
 # Add executable with all source files
 add_executable(expirationTracker 
@@ -80,6 +82,9 @@ add_executable(expirationTracker
   #Hardware process after forked from main
   hardware/src/hardware_entry.cpp
   hardware/src/io.cpp
+
+    ${PROTO_SRCS}
+  ${PROTO_HDRS}
 )
 
 # Link all libraries
@@ -92,6 +97,7 @@ target_link_libraries(expirationTracker
   sqlite3
   ${ZMQ_LIBRARIES}
   ${ZMQPP_LIBRARIES}
+  ${PROTOBUF_LIBRARIES}
 )
 
 # Add library search directories if needed

@@ -1,11 +1,13 @@
 #ifndef MODEL_HANDLER_H
 #define MODEL_HANDLER_H
 
+#include <filesystem>
+#include <glog/logging.h>
+
 #include "../../food_item.h"
 #include "ObjectClassifier.h"
 #include "TextClassifier.h"
-#include <filesystem>
-#include <glog/logging.h>
+
 class ModelHandler {
 private:
   ObjectClassifier objectClassifier;

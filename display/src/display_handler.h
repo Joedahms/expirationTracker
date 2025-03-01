@@ -19,13 +19,10 @@ private:
   const std::string engineEndpoint;
 
   zmqpp::socket requestEngineSocket;
-  zmqpp::socket replyEngineSocket;
-
   zmqpp::socket requestHardwareSocket;
-  zmqpp::socket replyHardwareSocket;
-
   zmqpp::socket requestVisionSocket;
-  zmqpp::socket replyVisionSocket;
+
+  zmqpp::socket replySocket;
 
   void sendStartSignal();
 };

@@ -13,4 +13,5 @@ void visionEntry(struct Pipes,
                  zmqpp::context& context,
                  struct ExternalEndpoints externalEndpoints);
 bool startPythonServer();
+
 #endif

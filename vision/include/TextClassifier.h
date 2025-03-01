@@ -1,10 +1,11 @@
 #ifndef TEXT_CLASSIFICATION_H
 #define TEXT_CLASSIFICATION_H
 
-#include "../../food_item.h"
-#include "IModel.h"
 #include <filesystem>
 #include <glog/logging.h>
+
+#include "../../food_item.h"
+#include "IModel.h"
 
 class TextClassifier : public IModel {
 public:

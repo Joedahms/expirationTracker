@@ -1,12 +1,13 @@
 #ifndef IMODEL_H
 #define IMODEL_H
 
-#include "../../food_item.h"
-#include "helperFunctions.h"
 #include <filesystem>
 #include <fstream>
 #include <glog/logging.h>
 #include <string>
+
+#include "../../food_item.h"
+#include "helperFunctions.h"
 
 #define PIPE_IN  "/tmp/image_pipe"
 #define PIPE_OUT "/tmp/result_pipe"

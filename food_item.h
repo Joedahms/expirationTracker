@@ -8,6 +8,8 @@
 #include <memory>
 #include <string>
 
+#include "fooditem.pb.h"
+
 enum class FoodCategories { unknown, unpackaged, packaged };
 
 struct FoodItem {
@@ -30,4 +32,7 @@ std::string readString(int pipeToRead);
 std::string foodCategoryToString(const FoodCategories&);
 FoodCategories foodCategoryFromString(const std::string&);
 void printFoodItem(const FoodItem&);
+
+FoodItemProto::FoodItem convertToProto(const FoodItem& foodItem);
+FoodItem convertFromProto(const FoodItemProto::FoodItem& protoFoodItem);
 #endif

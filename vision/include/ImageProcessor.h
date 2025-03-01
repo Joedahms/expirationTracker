@@ -1,12 +1,13 @@
 #ifndef IMAGE_PROCESSOR_H
 #define IMAGE_PROCESSOR_H
 
+#include <glog/logging.h>
+#include <thread>
+
 #include "../../food_item.h"
 #include "../../pipes.h"
 #include "ModelHandler.h"
 #include "helperFunctions.h"
-#include <glog/logging.h>
-#include <thread>
 
 class ImageProcessor {
 private:
