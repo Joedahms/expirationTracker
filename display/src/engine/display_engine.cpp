@@ -130,14 +130,14 @@ void DisplayEngine::initializeEngine(SDL_Window* window) {
  * @param None
  * @return None
  */
-void DisplayEngine::checkState(int* engineToDisplay, int* displayToEngine) {
+void DisplayEngine::checkState(const std::string engineEndpoint) {
   switch (this->engineState) {
   case EngineState::MAIN_MENU:
     this->engineState = this->mainMenu->getCurrentState();
 
     if (this->engineState == EngineState::SCANNING) {
       LOG(INFO) << "Scan initialized, engine switching to scanning state";
-      writeString(engineToDisplay[WRITE], START_SCAN);
+      //      writeString(engineToDisplay[WRITE], START_SCAN);
     }
 
     this->mainMenu->setCurrentState(EngineState::MAIN_MENU);
@@ -172,48 +172,43 @@ void DisplayEngine::checkState(int* engineToDisplay, int* displayToEngine) {
  * @param displayToEngine Pipe from the display to the displayEngine
  * @return None
  */
-void DisplayEngine::handleEvents(int* engineToDisplay, int* displayToEngine) {
+void DisplayEngine::handleEvents(const std::string engineEndpoint) {
   switch (this->engineState) {
   case EngineState::MAIN_MENU:
     this->mainMenu->handleEvents(&this->displayIsRunning);
-
-    /*
-  if (this->engineState == EngineState::SCANNING) {
-    LOG(INFO) << "Scan initialized, engine switching to scanning state";
-    writeString(engineToDisplay[WRITE], START_SCAN);
-  }
-  */
     break;
 
   case EngineState::SCANNING:
     {
       this->scanning->handleEvents(&this->displayIsRunning);
 
-      struct timeval timeout;
-      timeout.tv_sec  = 0;
-      timeout.tv_usec = 100;
+      /*
+    struct timeval timeout;
+    timeout.tv_sec  = 0;
+    timeout.tv_usec = 100;
 
-      int pipeToRead = displayToEngine[READ];
-      fd_set readPipeSet;
-      FD_ZERO(&readPipeSet);
-      FD_SET(pipeToRead, &readPipeSet);
+    int pipeToRead = displayToEngine[READ];
+    fd_set readPipeSet;
+    FD_ZERO(&readPipeSet);
+    FD_SET(pipeToRead, &readPipeSet);
 
-      // Check pipe for data
-      int pipeReady = select(pipeToRead + 1, &readPipeSet, NULL, NULL, &timeout);
+    // Check pipe for data
+    int pipeReady = select(pipeToRead + 1, &readPipeSet, NULL, NULL, &timeout);
 
-      if (pipeReady == -1) {
-        LOG(FATAL) << "Select error";
+    if (pipeReady == -1) {
+      LOG(FATAL) << "Select error";
+    }
+    else if (pipeReady == 0) { // No data available
+      break;
+    }
+    if (FD_ISSET(pipeToRead, &readPipeSet)) { // Data available
+      std::string fromDisplay = readString(displayToEngine[READ]);
+      if (fromDisplay == "ID successful") {
+        LOG(INFO) << "New item received, switching to item list state";
+        this->engineState = EngineState::ITEM_LIST;
       }
-      else if (pipeReady == 0) { // No data available
-        break;
-      }
-      if (FD_ISSET(pipeToRead, &readPipeSet)) { // Data available
-        std::string fromDisplay = readString(displayToEngine[READ]);
-        if (fromDisplay == "ID successful") {
-          LOG(INFO) << "New item received, switching to item list state";
-          this->engineState = EngineState::ITEM_LIST;
-        }
-      }
+    }
+    */
       break;
     }
 

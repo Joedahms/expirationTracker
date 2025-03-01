@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("display");
 
-    displayEntry(pipes, endpoints);
+    displayEntry(endpoints);
     LOG(INFO) << "Display process";
     return 0;
   }

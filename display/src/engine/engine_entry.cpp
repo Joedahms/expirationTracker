@@ -11,7 +11,7 @@
  * @param None
  * @return None
  */
-void engineEntry(int* engineToDisplay, int* displayToEngine) {
+void engineEntry(const std::string engineEndpoint) {
   LOG(INFO) << "SDL display process started successfully";
 
   struct DisplayGlobal displayGlobal;
@@ -21,10 +21,10 @@ void engineEntry(int* engineToDisplay, int* displayToEngine) {
                               1024, 600, false, displayGlobal);
 
   while (displayEngine.running()) {
-    displayEngine.handleEvents(engineToDisplay, displayToEngine);
-    displayEngine.checkState(engineToDisplay, displayToEngine);
+    displayEngine.handleEvents(engineEndpoint);
+    displayEngine.checkState(engineEndpoint);
     displayEngine.checkKeystates();
-    displayEngine.checkState(engineToDisplay, displayToEngine);
+    displayEngine.checkState(engineEndpoint);
     displayEngine.update();
     displayEngine.renderState();
   }

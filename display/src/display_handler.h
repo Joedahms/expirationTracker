@@ -9,15 +9,14 @@
 
 class DisplayHandler {
 public:
-  DisplayHandler(struct Pipes externalPipes, int* displayToEngine, int* engineToDisplay);
+  DisplayHandler(struct Endpoints endpoints, const std::string engineEndpoint);
   void handleExternal();
 
   void handleEngine();
 
 private:
-  struct Pipes externalPipes;
-  int* displayToEngine;
-  int* engineToDisplay;
+  struct Endpoints endpoints;
+  const std::string engineEndpoint;
 
   void sendStartSignal();
 };

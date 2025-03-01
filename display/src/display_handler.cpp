@@ -7,12 +7,9 @@
 #include "display_handler.h"
 #include "sql_food.h"
 
-DisplayHandler::DisplayHandler(struct Pipes externalPipes,
-                               int* displayToEngine,
-                               int* engineToDisplay)
-    : externalPipes(externalPipes), displayToEngine(displayToEngine),
-      engineToDisplay(engineToDisplay) {}
-
+DisplayHandler::DisplayHandler(struct Endpoints endpoints,
+                               const std::string engineEndpoint)
+    : endpoints(endpoints), engineEndpoint(engineEndpoint) {}
 /**
  * Handle communication between display and the other major components of the system
  * (vision and hardware).
@@ -21,6 +18,7 @@ DisplayHandler::DisplayHandler(struct Pipes externalPipes,
  * @return None
  */
 void DisplayHandler::handleExternal() {
+  /*
   struct timeval timeout;
   timeout.tv_sec  = 1;
   timeout.tv_usec = 0;
@@ -40,6 +38,7 @@ void DisplayHandler::handleExternal() {
 
     sqlite3_close(database);
   }
+  */
 }
 
 /**
@@ -49,6 +48,7 @@ void DisplayHandler::handleExternal() {
  * @param None
  */
 void DisplayHandler::handleEngine() {
+  /*
   fd_set readPipeSet;
 
   FD_ZERO(&readPipeSet);
@@ -69,6 +69,7 @@ void DisplayHandler::handleEngine() {
   if (FD_ISSET(this->engineToDisplay[READ], &readPipeSet)) { // Data available
     sendStartSignal();
   }
+  */
 }
 
 /**
@@ -78,7 +79,9 @@ void DisplayHandler::handleEngine() {
  * @return None
  */
 void DisplayHandler::sendStartSignal() {
+  /*
   LOG(INFO) << "Sending start signal to hardware";
   std::string sdlString = readString(this->engineToDisplay[READ]);
   writeString(this->externalPipes.displayToHardware[WRITE], sdlString);
+  */
 }
