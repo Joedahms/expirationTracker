@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("display");
 
-    displayEntry(pipes);
+    displayEntry(pipes, endpoints);
     LOG(INFO) << "Display process";
     return 0;
   }
@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("hardware");
 
-    hardwareEntry(pipes);
+    hardwareEntry(pipes, endpoints);
     LOG(INFO) << "Hardware process";
     return 0;
   }
@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("vision");
 
-    visionEntry(pipes);
+    visionEntry(pipes, endpoints);
     LOG(INFO) << "Vision process";
     return 0;
   }

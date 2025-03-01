@@ -3,6 +3,6 @@
 
 #include "../../pipes.h"
 
-void displayEntry(struct Pipes externalPipes);
+void displayEntry(struct Pipes externalPipes, struct Endpoints endpoints);
 
 #endif

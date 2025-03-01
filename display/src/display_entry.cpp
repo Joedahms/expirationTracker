@@ -15,7 +15,7 @@
  * (vision and hardware).
  * @return None
  */
-void displayEntry(struct Pipes externalPipes) {
+void displayEntry(struct Pipes externalPipes, struct Endpoints endpoints) {
   LOG(INFO) << "Entered display process";
 
   // Close write end of read pipes

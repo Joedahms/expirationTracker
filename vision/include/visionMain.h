@@ -7,6 +7,6 @@
 #include "../include/helperFunctions.h"
 #include <iostream>
 
-void visionEntry(struct Pipes);
+void visionEntry(struct Pipes, struct Endpoints endpoints);
 bool startPythonServer();
 #endif
