@@ -144,6 +144,13 @@ void Hardware::rotateAndCapture() {
 bool Hardware::capturePhoto(int angle) {
   LOG(INFO) << "Capturing photo at position: " << angle;
   std::string fileName = this->IMAGE_DIRECTORY + std::to_string(angle) + "_test.jpg";
+
+  std::string command = "rpicam-jpeg --output" + fileName;
+  system(command.c_str());
+
+  LOG(INFO) << "Photo successfully captured at position: " << angle;
+
+  /*
   pid_t pid;
   if ((pid = fork()) == -1) {
     LOG(FATAL) << "Error starting camera process." << strerror(errno);
@@ -160,12 +167,12 @@ bool Hardware::capturePhoto(int angle) {
           "--output", fileName.c_str(), // Save location
           "--timeout", "50", (char*)NULL);
     */
-    LOG(INFO) << "Photo successfully captured at position: " << angle;
-    std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
-    exit(1);
-  }
-  else {
-    LOG(INFO) << "Exiting capturePhoto at angle: " << angle;
-    return true;
-  }
+  // LOG(INFO) << "Photo successfully captured at position: " << angle;
+  // std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
+  // exit(1);
+  //}
+  // else {
+  LOG(INFO) << "Exiting capturePhoto at angle: " << angle;
+  return true;
+  //}
 }
