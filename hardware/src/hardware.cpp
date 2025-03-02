@@ -35,7 +35,7 @@ bool Hardware::checkStartSignal() {
   }
 }
 
-void Hardware::startScan() {
+bool Hardware::startScan() {
   LOG(INFO) << "Beginning scan";
   /**
    * Function call to controls routine
@@ -43,16 +43,18 @@ void Hardware::startScan() {
    */
 
   LOG(INFO) << "Checking weight";
-  if (hardware.checkWeight() == false) {
+  if (checkWeight() == false) {
     // TODO handle no weight on platform
   }
 
-  rotateAndCapture(weight);
+  rotateAndCapture();
+  // TODO
+  return true;
 }
 
 // TODO
 bool Hardware::checkWeight() {
-  this->weight = 1;
+  this->itemWeight = 1;
   return true;
 }
 
@@ -78,7 +80,7 @@ void Hardware::sendDataToVision() {
   std::filesystem::path filePath       = "../images/temp";
   std::chrono::year_month_day scanDate = std::chrono::floor<std::chrono::days>(now);
 
-  FoodItem foodItem(filePath, scanDate, this->weight);
+  FoodItem foodItem(filePath, scanDate, this->itemWeight);
 
   this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
   sendFoodItem(this->requestVisionSocket, foodItem);

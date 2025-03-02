@@ -32,8 +32,9 @@ void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints endpoints) 
   }
 
   bool scanSuccessful = hardware.startScan();
+
   if (scanSuccessful) {
-    hardware.sendDataToVision()
+    hardware.sendDataToVision();
   }
 }
 

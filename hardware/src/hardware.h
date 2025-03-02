@@ -11,6 +11,7 @@ public:
 
   bool checkStartSignal();
   bool startScan();
+  void sendDataToVision();
 
 private:
   ExternalEndpoints externalEndpoints;
@@ -23,7 +24,6 @@ private:
 
   float itemWeight = 0;
 
-  void sendDataToVision();
   void rotateAndCapture();
   bool capturePhoto(int angle);
   bool checkWeight();
