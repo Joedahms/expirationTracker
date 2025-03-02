@@ -1,3 +1,6 @@
+#ifndef LOGGER_H
+#define LOGGER_H
+
 #include <ctime>
 #include <fstream>
 #include <iostream>
@@ -65,3 +68,5 @@ public:
     return logFile.is_open();
   }
 };
+
+#endif

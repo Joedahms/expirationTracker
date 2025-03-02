@@ -10,23 +10,24 @@ ImageProcessor::ImageProcessor(zmqpp::context& context,
     : externalEndpoints(externalEndpoints),
       requestHardwareSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
-      replySocket(context, zmqpp::socket_type::reply), modelHandler(foodItem) {}
+      replySocket(context, zmqpp::socket_type::reply), modelHandler(foodItem),
+      logger("image_processor.txt") {}
 
 /**
  * Parent method to all image processing and analyzing
  */
 void ImageProcessor::process() {
-  LOG(INFO) << "Vision analyzing all images";
+  this->logger.log("Vision analyzing all images");
 
   if (!isValidDirectory(foodItem.getImagePath())) {
-    LOG(FATAL) << "Failed to open image directory" << foodItem.getImagePath();
+    std::cerr << "Failed to open image directory" << foodItem.getImagePath();
     return;
   }
 
   bool detectedFoodItem = analyze();
-  LOG(INFO) << "Successfully analyzed all images";
+  this->logger.log("Successfully analyzed all images");
   if (!detectedFoodItem) {
-    LOG(INFO) << "Item not successfully detected";
+    this->logger.log("Item not successfully detected");
     // checked 16 images and failed them all
     //  how to handle?
     // Still send whatever information we do have to the display
@@ -35,12 +36,12 @@ void ImageProcessor::process() {
   }
 
   // tell hardware to stop
-  LOG(INFO) << "Sent stop signal to hardware";
+  this->logger.log("Sent stop signal to hardware");
   bool detectionComplete = true;
   // write(pipes.visionToHardware[WRITE], &detectionComplete, sizeof(detectionComplete));
 
   // send display the food item
-  LOG(INFO) << "Sent detected food item to display";
+  this->logger.log("Sent detected food item to display");
   //  printFoodItem(foodItem);
   // sendFoodItem(foodItem, pipes.visionToDisplay[WRITE]);
 }
@@ -61,8 +62,12 @@ bool ImageProcessor::analyze() {
       }
 
       if (++imageCounter > this->MAX_IMAGE_COUNT) {
-        LOG(INFO) << (objectDetected ? "Object expiration date not found"
-                                     : "Object not able to be classified");
+        if (objectDetected) {
+          this->logger.log("Object expiration date not found");
+        }
+        else {
+          this->logger.log("Object not able to be classified");
+        }
         return false;
       }
 
@@ -79,9 +84,9 @@ bool ImageProcessor::analyze() {
       // delete bad image
       try {
         std::filesystem::remove(entry.path());
-        LOG(INFO) << "Deleted unclassified image: " << entry.path();
+        this->logger.log("Deleted unclassified image: " + entry.path().string());
       } catch (const std::filesystem::filesystem_error& e) {
-        LOG(ERROR) << "Failed to delete image: " << entry.path() << " - " << e.what();
+        std::cerr << "Failed to delete image: " << entry.path() << " - " << e.what();
       }
 
       // check if image directory has new files

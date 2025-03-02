@@ -5,6 +5,7 @@
 #include <thread>
 
 #include "../../food_item.h"
+#include "../../logger.h"
 #include "../../pipes.h"
 #include "ModelHandler.h"
 #include "helperFunctions.h"
@@ -20,6 +21,8 @@ public:
 
 private:
   ExternalEndpoints externalEndpoints;
+
+  Logger logger;
 
   zmqpp::socket requestHardwareSocket;
   zmqpp::socket requestDisplaySocket;
