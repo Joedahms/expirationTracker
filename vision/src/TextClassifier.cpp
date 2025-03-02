@@ -13,10 +13,10 @@ bool TextClassifier::handleClassification(const std::filesystem::path& imagePath
 
   std::string detectedClass = std::string(result);
   if (detectedClass.find("CLASSIFICATION") != std::string::npos) {
-    foodItem.name         = removePrefix(detectedClass, "CLASSIFICATION: ");
-    foodItem.absolutePath = std::filesystem::absolute(imagePath);
-    foodItem.category     = FoodCategories::packaged;
-    foodItem.quantity     = 1;
+    this->foodItem.setName(removePrefix(detectedClass, "CLASSIFICATION: "));
+    this->foodItem.setImagePath(std::filesystem::absolute(imagePath));
+    this->foodItem.setCategory(FoodCategories::packaged);
+    this->foodItem.setQuantity(1);
     return true;
   }
   return false;

@@ -9,9 +9,7 @@
 #include "../include/ImageProcessor.h"
 #include "../include/helperFunctions.h"
 
-void visionEntry(struct Pipes,
-                 zmqpp::context& context,
-                 struct ExternalEndpoints externalEndpoints);
+void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints);
 bool startPythonServer();
 
 #endif

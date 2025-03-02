@@ -1,7 +1,7 @@
 #include "../include/ModelHandler.h"
 
 ModelHandler::ModelHandler(struct FoodItem& foodItem)
-    : objectClassifier(foodItem), textClassifier(foodItem) {}
+    : objectClassifier(), textClassifier() {}
 
 /**
  * Run both object classification and text extraction to attempt to identify the item.

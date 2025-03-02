@@ -15,17 +15,15 @@
 enum TaskType { unknown, CLS, OCR, EXP };
 
 class IModel {
+public:
+  virtual ~IModel() = default;
+
 protected:
-  FoodItem& foodItem;
   std::string readResponse() const;
   void sendRequest(const TaskType&, const std::filesystem::path&) const;
   std::string taskTypeToString(const TaskType&) const;
   virtual std::string runModel(const std::filesystem::path&) const = 0;
   virtual bool handleClassification(const std::filesystem::path&)  = 0;
-
-public:
-  explicit IModel(FoodItem& foodItem) : foodItem(foodItem) {}
-  virtual ~IModel() = default;
 };
 
 #endif // IMODEL_H

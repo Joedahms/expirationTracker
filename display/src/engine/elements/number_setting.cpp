@@ -37,7 +37,7 @@ NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal,
   addElement(std::move(increaseButton));
 
   FoodItem foodItem  = readFoodItemById(this->settingId);
-  this->settingValue = foodItem.quantity;
+  this->settingValue = foodItem.getQuantity();
   this->children[1]->setContent(std::to_string(this->settingValue));
 }
 
@@ -72,7 +72,7 @@ void NumberSetting::updateSelf() {
   }
 
   FoodItem foodItem = readFoodItemById(this->settingId);
-  if (foodItem.quantity != this->settingValue) {
+  if (foodItem.getQuantity() != this->settingValue) {
     updateFoodItemQuantity(this->settingId, this->settingValue);
   }
   else {

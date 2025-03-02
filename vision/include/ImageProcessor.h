@@ -10,17 +10,25 @@
 #include "helperFunctions.h"
 
 class ImageProcessor {
-private:
-  ModelHandler modelHandler;
-  const struct Pipes& pipes;
-  struct FoodItem& foodItem;
-
 public:
+  explicit ImageProcessor(zmqpp::context& context,
+                          const struct ExternalEndpoints& externalEndpoints);
   void process();
   bool analyze();
-  explicit ImageProcessor(const struct Pipes&, FoodItem& foodItem);
   struct FoodItem& getFoodItem();
   void setFoodItem(struct FoodItem&);
+
+private:
+  ExternalEndpoints externalEndpoints;
+
+  zmqpp::socket requestHardwareSocket;
+  zmqpp::socket requestDisplaySocket;
+  zmqpp::socket replySocket;
+
+  ModelHandler modelHandler;
+  FoodItem foodItem;
+
+  const int MAX_IMAGE_COUNT = 16;
 };
 
 #endif

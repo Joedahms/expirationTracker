@@ -12,11 +12,6 @@
 int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
 
-  Pipes pipes;
-
-  // Initialize all pipes
-  initializePipes(pipes);
-
   // Context and endpoints
   zmqpp::context context;
   ExternalEndpoints externalEndpoints;
@@ -64,7 +59,7 @@ int main(int argc, char* argv[]) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("vision");
 
-    visionEntry(pipes, context, externalEndpoints);
+    visionEntry(context, externalEndpoints);
     LOG(INFO) << "Vision process";
     return 0;
   }

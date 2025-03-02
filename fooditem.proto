@@ -20,12 +20,11 @@ message Date {
 // Main FoodItem message
 message FoodItem {
   int32 id = 1;
-  string image_directory = 2;  // Storing path as string
+  string image_path = 2;  // Storing path as string
   string name = 3;
   FoodCategory category = 4;
   Date scan_date = 5;
   Date expiration_date = 6;
   float weight = 7;
   int32 quantity = 8;
-  string absolute_path = 9;  // Storing path as string
 }

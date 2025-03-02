@@ -61,17 +61,18 @@ void storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
   }
 
   // Pull date elements out of chrono
-  int scanDateYear           = static_cast<int>(foodItem.scanDate.year());
-  unsigned int scanDateMonth = static_cast<unsigned>(foodItem.scanDate.month());
-  unsigned int scanDateDay   = static_cast<unsigned>(foodItem.scanDate.day());
-  int expirationDateYear     = static_cast<int>(foodItem.expirationDate.year());
-  unsigned int expirationDateMonth =
-      static_cast<unsigned>(foodItem.expirationDate.month());
-  unsigned int expirationDateDay = static_cast<unsigned>(foodItem.expirationDate.day());
+  std::chrono::year_month_day scanDate       = foodItem.getScanDate();
+  std::chrono::year_month_day expirationDate = foodItem.getExpirationDate();
+  int scanDateYear                           = static_cast<int>(scanDate.year());
+  unsigned int scanDateMonth                 = static_cast<unsigned>(scanDate.month());
+  unsigned int scanDateDay                   = static_cast<unsigned>(scanDate.day());
+  int expirationDateYear                     = static_cast<int>(expirationDate.year());
+  unsigned int expirationDateMonth = static_cast<unsigned>(expirationDate.month());
+  unsigned int expirationDateDay   = static_cast<unsigned>(expirationDate.day());
 
   // Bind to query
-  sqlite3_bind_text(statement, 1, foodItem.name.c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_text(statement, 2, foodCategoryToString(foodItem.category).c_str(), -1,
+  sqlite3_bind_text(statement, 1, foodItem.getName().c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(statement, 2, foodItem.categoryToString().c_str(), -1,
                     SQLITE_TRANSIENT);
   sqlite3_bind_int(statement, 3, scanDateYear);
   sqlite3_bind_int(statement, 4, scanDateMonth);
@@ -79,8 +80,8 @@ void storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
   sqlite3_bind_int(statement, 6, expirationDateYear);
   sqlite3_bind_int(statement, 7, expirationDateMonth);
   sqlite3_bind_int(statement, 8, expirationDateDay);
-  sqlite3_bind_double(statement, 9, foodItem.weight);
-  sqlite3_bind_int(statement, 10, foodItem.quantity);
+  sqlite3_bind_double(statement, 9, foodItem.getWeight());
+  sqlite3_bind_int(statement, 10, foodItem.getQuantity());
 
   sqlReturn = sqlite3_step(statement);
   if (sqlReturn != SQLITE_DONE) {
@@ -100,49 +101,50 @@ void storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
  * @param columnName The name of the column that columnValue was read from
  * @return None
  */
-void setFoodItem(struct FoodItem& foodItem,
+void setFoodItem(FoodItem& foodItem,
                  const std::string& columnValue,
                  const std::string& columnName) {
+  std::chrono::year_month_day scanDate       = foodItem.getScanDate();
+  std::chrono::year_month_day expirationDate = foodItem.getExpirationDate();
   if (columnName == "id") {
-    foodItem.id = stoi(columnValue);
+    foodItem.setId(stoi(columnValue));
   }
   if (columnName == "name") {
-    foodItem.name = columnValue;
+    foodItem.setName(columnValue);
   }
   else if (columnName == "category") {
-    foodItem.category = foodCategoryFromString(columnValue);
+    foodItem.setCategory(foodCategoryFromString(columnValue));
   }
   else if (columnName == "scanDateYear") {
-    foodItem.scanDate =
-        std::chrono::year_month_day(std::chrono::year{stoi(columnValue)},
-                                    foodItem.scanDate.month(), foodItem.scanDate.day());
+    foodItem.setScanDate(std::chrono::year_month_day(std::chrono::year{stoi(columnValue)},
+                                                     scanDate.month(), scanDate.day()));
   }
   else if (columnName == "scanDateMonth") {
-    foodItem.scanDate = std::chrono::year_month_day(
-        foodItem.scanDate.year(),
+    foodItem.setScanDate(std::chrono::year_month_day(
+        scanDate.year(),
         std::chrono::month{static_cast<unsigned>(std::stoi(columnValue))},
-        foodItem.scanDate.day());
+        scanDate.day()));
   }
   else if (columnName == "scanDateDay") {
-    foodItem.scanDate = std::chrono::year_month_day(
-        foodItem.scanDate.year(), foodItem.scanDate.month(),
-        std::chrono::day{static_cast<unsigned>(stoi(columnValue))});
+    foodItem.setScanDate(std::chrono::year_month_day(
+        scanDate.year(), scanDate.month(),
+        std::chrono::day{static_cast<unsigned>(stoi(columnValue))}));
   }
   else if (columnName == "expirationDateYear") {
-    foodItem.expirationDate = std::chrono::year_month_day(
-        std::chrono::year{stoi(columnValue)}, foodItem.expirationDate.month(),
-        foodItem.expirationDate.day());
+    foodItem.setExpirationDate(
+        std::chrono::year_month_day(std::chrono::year{stoi(columnValue)},
+                                    expirationDate.month(), expirationDate.day()));
   }
   else if (columnName == "expirationDateMonth") {
-    foodItem.expirationDate = std::chrono::year_month_day(
-        foodItem.expirationDate.year(),
+    foodItem.setExpirationDate(std::chrono::year_month_day(
+        expirationDate.year(),
         std::chrono::month{static_cast<unsigned>(stoi(columnValue))},
-        foodItem.expirationDate.day());
+        expirationDate.day()));
   }
   else if (columnName == "expirationDateDay") {
-    foodItem.expirationDate = std::chrono::year_month_day(
-        foodItem.expirationDate.year(), foodItem.expirationDate.month(),
-        std::chrono::day{static_cast<unsigned>(stoi(columnValue))});
+    foodItem.setExpirationDate(std::chrono::year_month_day(
+        expirationDate.year(), expirationDate.month(),
+        std::chrono::day{static_cast<unsigned>(stoi(columnValue))}));
   }
   /*
   else if (std::string(columnNames[i]) == "weight") {
@@ -150,7 +152,7 @@ void setFoodItem(struct FoodItem& foodItem,
   }
   */
   else if (columnName == "quantity") {
-    foodItem.quantity = stoi(columnValue);
+    foodItem.setQuantity(stoi(columnValue));
   }
 }
 

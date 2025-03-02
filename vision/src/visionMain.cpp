@@ -8,12 +8,10 @@
  * @param pipes Pipes for vision to communicate with the other processes
  * Output: None
  */
-void visionEntry(struct Pipes pipes,
-                 zmqpp::context& context,
-                 struct ExternalEndpoints externalEndpoints) {
+void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints) {
   LOG(INFO) << "Within vision process";
-  closeUnusedPipes(pipes);
 
+  /*
   try {
     zmqpp::socket testSocket(context, zmqpp::socket_type::request);
     testSocket.connect(externalEndpoints.displayEndpoint);
@@ -30,6 +28,7 @@ void visionEntry(struct Pipes pipes,
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what() << std::endl;
   }
+  */
 
   int maxRetries = 5;
   int retryCount = 0;
@@ -50,20 +49,20 @@ void visionEntry(struct Pipes pipes,
 
   sleep(5); // Wait 5 sec to ensure Python server starts
 
-  struct FoodItem foodItem;
-  ImageProcessor processor = ImageProcessor(pipes, foodItem);
+  ImageProcessor processor = ImageProcessor(context, externalEndpoints);
   // Wait for start signal from Display with 0.5sec sleep
   while (1) {
     LOG(INFO) << "Waiting for start signal from Hardware";
-    if (receiveFoodItem(foodItem, pipes.hardwareToVision[READ], (struct timeval){1, 0})) {
-      LOG(INFO) << "Vision Received all images from hardware";
-      processor.setFoodItem(foodItem);
-      processor.process();
-    }
-    else {
-      usleep(500000);
-    }
+    // if (receiveFoodItem(foodItem, pipes.hardwareToVision[READ], (struct timeval){1,
+    // 0})) {
+    //  LOG(INFO) << "Vision Received all images from hardware";
+    // processor.setFoodItem(foodItem);
+    // processor.process();
   }
+  // else {
+  //  usleep(500000);
+  //}
+  //}
 }
 
 /**
