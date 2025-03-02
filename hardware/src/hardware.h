@@ -18,6 +18,10 @@ private:
   zmqpp::socket requestVisionSocket;
   zmqpp::socket requestDisplaySocket;
   zmqpp::socket replySocket;
+
+  const std::string IMAGE_DIRECTORY = "/home/geromy/Desktop/Project/raspi-yolo/images/";
+
+  bool capturePhoto(int angle);
 };
 
 #endif

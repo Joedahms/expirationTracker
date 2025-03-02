@@ -22,19 +22,6 @@ void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints endpoints) 
   LOG(INFO) << "Within vision process";
 
   Hardware hardware(context, endpoints);
-
-  /*
-  while (1) {
-    // Wait for start signal from Display with 0.5sec sleep
-    LOG(INFO) << "Waiting for start signal from Display";
-    if (receivedStartSignal(pipes.displayToHardware[READ])) {
-      redoThis(pipes);
-    }
-    else {
-      usleep(500000);
-    }
-  }
-  */
   bool startSignalReceived = false;
   while (startSignalReceived == false) {
     startSignalReceived = hardware.checkStartSignal();
@@ -45,34 +32,6 @@ void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints endpoints) 
 
   hardware.startScan();
 }
-
-/*
-void redoThis(struct Pipes pipes) {
-  LOG(INFO) << "Checking weight";
-   * Function call to scale
-   * 0 - nothing on scale
-   * 1 - valid input, begin scanning
-   */
-
-/*
-  LOG(INFO) << "Beginning scan";
-   * Function call to controls routine
-   * has a pipe read from vision in loop
-   */
-
-/*
-  LOG(INFO) << "Sending Images from Hardware to Vision";
-  const std::chrono::time_point now{std::chrono::system_clock::now()};
-
-  struct FoodItem foodItem;
-  foodItem.setImagePath(std::filesystem::absolute("../images/temp"));
-  foodItem.setScanDate(std::chrono::floor<std::chrono::days>(now));
-  //  foodItem.weight         = 10.0;
-
-  sendFoodItem(foodItem, pipes.hardwareToVision[WRITE]);
-  LOG(INFO) << "Done Sending Images from Hardware to Vision";
-}
-*/
 
 /**
  * Method to send images from a given directory using the pipe provided. It cycles through

@@ -53,3 +53,28 @@ void Hardware::startScan() {
   sendFoodItem(this->requestVisionSocket, foodItem);
   LOG(INFO) << "Done Sending Images from Hardware to Vision";
 }
+
+bool Hardware::capturePhoto(int angle) {
+  std::string fileName = this->IMAGE_DIRECTORY + std::to_string(angle) + "_test.jpg";
+  google::ShutdownGoogleLogging();
+
+  pid_t pid = fork();
+  if (pid == -1) {
+    LOG(FATAL) << "Error starting camera process." << strerror(errno);
+    return false;
+  }
+  if (pid == 0) {
+    // Reinitialize glog in the child process
+    google::InitGoogleLogging("TakePhotoChild");
+    LOG(INFO) << "Capturing at position " << angle;
+    execl("/usr/bin/rpicam-jpeg", "rpicam-jpeg", "1920:1080:12:U", "--nopreview",
+          "--output", fileName.c_str(), // Save location
+          "--timeout", "50", (char*)NULL);
+
+    std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
+    exit(1);
+  }
+  google::InitGoogleLogging("HardwareParent");
+  LOG(INFO) << "Exiting photos at " << angle;
+  return true;
+}
