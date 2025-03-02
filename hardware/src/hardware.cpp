@@ -153,9 +153,13 @@ bool Hardware::capturePhoto(int angle) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("TakePhotoChild");
     LOG(INFO) << "Capturing photo at position: " << angle;
+    std::string command = "rpicam-jpeg --output" + filename;
+    system(command);
+    /*
     execl("/usr/bin/rpicam-jpeg", "rpicam-jpeg", "1920:1080:12:U", "--nopreview",
           "--output", fileName.c_str(), // Save location
           "--timeout", "50", (char*)NULL);
+    */
     LOG(INFO) << "Photo successfully captured at position: " << angle;
     std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
     exit(1);
