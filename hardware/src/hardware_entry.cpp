@@ -21,6 +21,7 @@
 void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints endpoints) {
   LOG(INFO) << "Within vision process";
 
+  // while 1
   Hardware hardware(context, endpoints);
   bool startSignalReceived = false;
   while (startSignalReceived == false) {
@@ -31,6 +32,9 @@ void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints endpoints) 
   }
 
   bool scanSuccessful = hardware.startScan();
+  if (scanSuccessful) {
+    hardware.sendDataToVision()
+  }
 }
 
 /**

@@ -10,6 +10,7 @@ Hardware::Hardware(zmqpp::context& context,
       requestVisionSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
       replySocket(context, zmqpp::socket_type::reply) {
+  // Setup sockets
   try {
     this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
     this->requestDisplaySocket.connect(this->externalEndpoints.displayEndpoint);
@@ -34,28 +35,24 @@ bool Hardware::checkStartSignal() {
   }
 }
 
-bool Hardware::startScan() {
-  LOG(INFO) << "Checking weight";
-  /**
-   * Function call to scale
-   * 0 - nothing on scale
-   * 1 - valid input, begin scanning
-   */
-  // Logic for checking weight and sending sig to display
-  // return false if no weight
-  float weight = 1;
-
+void Hardware::startScan() {
   LOG(INFO) << "Beginning scan";
   /**
    * Function call to controls routine
    * has a pipe read from vision in loop
    */
 
-  if (weight > 0) {
-    rotateAndCapture(weight);
+  LOG(INFO) << "Checking weight";
+  if (hardware.checkWeight() == false) {
+    // TODO handle no weight on platform
   }
 
-  // sendDataToVision(weight);
+  rotateAndCapture(weight);
+}
+
+// TODO
+bool Hardware::checkWeight() {
+  this->weight = 1;
   return true;
 }
 
@@ -65,7 +62,7 @@ bool Hardware::startScan() {
  * @param weight The weight of the object on the platform.
  * @return None
  */
-void Hardware::sendDataToVision(float weight) {
+void Hardware::sendDataToVision() {
   LOG(INFO) << "Sending Images from Hardware to Vision";
   const std::chrono::time_point<std::chrono::system_clock> now{
       std::chrono::system_clock::now()};
@@ -80,9 +77,8 @@ void Hardware::sendDataToVision(float weight) {
 
   std::filesystem::path filePath       = "../images/temp";
   std::chrono::year_month_day scanDate = std::chrono::floor<std::chrono::days>(now);
-  // TODO
 
-  FoodItem foodItem(filePath, scanDate, weight);
+  FoodItem foodItem(filePath, scanDate, this->weight);
 
   this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
   sendFoodItem(this->requestVisionSocket, foodItem);
@@ -98,26 +94,28 @@ void Hardware::sendDataToVision(float weight) {
  *
  * @return None
  */
-void Hardware::rotateAndCapture(float weight) {
+void Hardware::rotateAndCapture() {
   for (int angle = 0; angle < 8; angle++) {
     LOG(INFO) << "At location " << angle << " of 8";
 
+    // TODO
     // This function is for both cameras
     // if (takePhotos(angle) == false) {
     //   LOG(INFO) << "Error taking photos";
     // };
 
+    // Temporary
     if (capturePhoto(angle) == false) {
       LOG(INFO) << "Error taking a photo";
-    }; // This function is for one camera/testing
+    }
+
     if (angle == 0) {
-      sleep(2);
-      sendDataToVision(weight);
+      //      sleep(2);
+      sendDataToVision();
     }
 
     LOG(INFO) << "Rotating platform...";
-    std::cout << "Rotating platform" << std::endl;
-    //    rotateMotor();
+    // TODO rotateMotor();
     usleep(500);
 
     bool receivedStopSignal = false;
@@ -126,18 +124,16 @@ void Hardware::rotateAndCapture(float weight) {
     receivedRequest = this->replySocket.receive(request, true);
     if (receivedRequest) {
       std::cout << request << std::endl;
-      // check if stop and set receivedStopSignal accordingly
+      // TODO check if stop and set receivedStopSignal accordingly
     }
     replySocket.close();
 
     if (receivedStopSignal) {
       LOG(INFO) << "AI Vision identified item. Stopping process.";
-      std::cout << "AI Vision identified item. Stopping process." << std::endl;
       break;
     }
 
     LOG(INFO) << "AI Vision did not identify item. Continuing process.";
-    std::cout << "Spin again!" << std::endl;
   }
 }
 

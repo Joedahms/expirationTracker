@@ -19,11 +19,14 @@ private:
   zmqpp::socket requestDisplaySocket;
   zmqpp::socket replySocket;
 
-  const std::string IMAGE_DIRECTORY = "/home/geromy/Desktop/Project/raspi-yolo/images/";
+  const std::string IMAGE_DIRECTORY = "/home/pi/Documents/raspi-yolo/images/";
 
-  void sendDataToVision(float weight);
-  void rotateAndCapture(float weight);
+  float itemWeight = 0;
+
+  void sendDataToVision();
+  void rotateAndCapture();
   bool capturePhoto(int angle);
+  bool checkWeight();
 };
 
 #endif
