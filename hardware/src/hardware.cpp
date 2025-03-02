@@ -149,7 +149,7 @@ bool Hardware::capturePhoto(int angle) {
     LOG(FATAL) << "Error starting camera process." << strerror(errno);
     return false;
   }
-  if (pid == 0) {
+  else if (pid == 0) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("TakePhotoChild");
     LOG(INFO) << "Capturing photo at position: " << angle;
@@ -160,6 +160,8 @@ bool Hardware::capturePhoto(int angle) {
     std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
     exit(1);
   }
-  LOG(INFO) << "Exiting capturePhoto at angle: " << angle;
-  return true;
+  else {
+    LOG(INFO) << "Exiting capturePhoto at angle: " << angle;
+    return true;
+  }
 }
