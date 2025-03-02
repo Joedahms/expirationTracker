@@ -10,7 +10,7 @@ public:
   Hardware(zmqpp::context& context, const struct ExternalEndpoints& externalEndpoints);
 
   bool checkStartSignal();
-  void startScan();
+  bool startScan();
 
 private:
   ExternalEndpoints externalEndpoints;
@@ -21,6 +21,8 @@ private:
 
   const std::string IMAGE_DIRECTORY = "/home/geromy/Desktop/Project/raspi-yolo/images/";
 
+  void sendDataToVision(float weight);
+  void rotateAndCapture(float weight);
   bool capturePhoto(int angle);
 };
 

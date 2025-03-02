@@ -30,7 +30,7 @@ void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints endpoints) 
     }
   }
 
-  hardware.startScan();
+  bool scanSuccessful = hardware.startScan();
 }
 
 /**
