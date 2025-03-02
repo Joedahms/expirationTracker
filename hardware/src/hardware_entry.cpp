@@ -27,7 +27,7 @@ void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints endpoints) 
   while (startSignalReceived == false) {
     startSignalReceived = hardware.checkStartSignal();
     if (startSignalReceived == false) {
-      sleep(1);
+      ;
     }
   }
 

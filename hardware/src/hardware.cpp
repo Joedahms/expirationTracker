@@ -22,13 +22,19 @@ Hardware::Hardware(zmqpp::context& context,
 
 bool Hardware::checkStartSignal() {
   LOG(INFO) << "Checking for start signal from display";
+  bool receivedRequest = false;
   try {
-    bool receivedRequest = false;
-    std::string request;
-    receivedRequest = this->replySocket.receive(request, true);
-    if (receivedRequest) {
-      this->replySocket.send("got it"); // Respond to display
-      LOG(INFO) << "Received start signal from display";
+    zmqpp::poller poller;
+    poller.add(this->replySocket);
+
+    if (poller.poll(500)) {
+      if (poller.has_input(this->replySocket)) {
+        std::string request;
+        this->replySocket.receive(request);
+        receivedRequest = true;
+        this->replySocket.send("got it"); // Respond to display
+        LOG(INFO) << "Received start signal from display";
+      }
     }
     else {
       LOG(INFO) << "Did not receive start signal from display";
