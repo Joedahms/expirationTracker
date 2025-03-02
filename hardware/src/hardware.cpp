@@ -9,19 +9,19 @@ Hardware::Hardware(zmqpp::context& context,
     : externalEndpoints(externalEndpoints),
       requestVisionSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
-      replySocket(context, zmqpp::socket_type::reply) {
+      replySocket(context, zmqpp::socket_type::reply), logger("hardware_log.txt") {
   // Setup sockets
   try {
     this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
     this->requestDisplaySocket.connect(this->externalEndpoints.displayEndpoint);
     this->replySocket.bind(this->externalEndpoints.hardwareEndpoint);
   } catch (const zmqpp::exception& e) {
-    LOG(FATAL) << e.what();
+    std::cerr << e.what();
   }
 }
 
 bool Hardware::checkStartSignal() {
-  LOG(INFO) << "Checking for start signal from display";
+  logger.log("Checking for start signal from display");
   bool receivedRequest = false;
   try {
     zmqpp::poller poller;
@@ -34,6 +34,7 @@ bool Hardware::checkStartSignal() {
         receivedRequest = true;
         this->replySocket.send("got it"); // Respond to display
         LOG(INFO) << "Received start signal from display";
+        logger.log("Received start signal from display");
         std::cout << "here" << std::endl;
       }
     }

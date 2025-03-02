@@ -3,6 +3,7 @@
 
 #include <zmqpp/zmqpp.hpp>
 
+#include "../../logger.h"
 #include "../../pipes.h"
 
 class Hardware {
@@ -15,6 +16,8 @@ public:
 
 private:
   ExternalEndpoints externalEndpoints;
+
+  Logger logger;
 
   zmqpp::socket requestVisionSocket;
   zmqpp::socket requestDisplaySocket;
