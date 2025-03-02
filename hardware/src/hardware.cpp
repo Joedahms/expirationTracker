@@ -154,30 +154,7 @@ bool Hardware::capturePhoto(int angle) {
   system(command.c_str());
 
   this->logger.log("Photo successfully captured at position: " + std::to_string(angle));
-
-  /*
-  pid_t pid;
-  if ((pid = fork()) == -1) {
-    LOG(FATAL) << "Error starting camera process." << strerror(errno);
-    return false;
-  }
-  else if (pid == 0) {
-    google::ShutdownGoogleLogging();
-    google::InitGoogleLogging("TakePhotoChild");
-    LOG(INFO) << "Capturing photo at position: " << angle;
-    std::string command = "rpicam-jpeg --output" + fileName;
-    system(command.c_str());
-    /*
-    execl("/usr/bin/rpicam-jpeg", "rpicam-jpeg", "1920:1080:12:U", "--nopreview",
-          "--output", fileName.c_str(), // Save location
-          "--timeout", "50", (char*)NULL);
-    */
-  // LOG(INFO) << "Photo successfully captured at position: " << angle;
-  // std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
-  // exit(1);
-  //}
-  // else {
   this->logger.log("Exiting capturePhoto at angle: " + std::to_string(angle));
+  // TODO always returns true
   return true;
-  //}
 }

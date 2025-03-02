@@ -1,3 +1,5 @@
+
+#include "../../logger.h"
 #include "../include/visionMain.h"
 
 /**
@@ -9,26 +11,8 @@
  * Output: None
  */
 void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints) {
-  LOG(INFO) << "Within vision process";
-
-  /*
-  try {
-    zmqpp::socket testSocket(context, zmqpp::socket_type::request);
-    testSocket.connect(externalEndpoints.displayEndpoint);
-
-    FoodItem foodItem;
-    foodItem.quantity = 2;
-
-    while (1) {
-      std::string response;
-      response = sendFoodItemNew(testSocket, foodItem);
-      std::cout << response << std::endl;
-      sleep(5);
-    }
-  } catch (const zmqpp::exception& e) {
-    LOG(FATAL) << e.what() << std::endl;
-  }
-  */
+  Logger logger("vision_entry.txt");
+  logger.log("Within vision process");
 
   int maxRetries = 5;
   int retryCount = 0;
@@ -37,22 +21,21 @@ void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpo
     retryCount++;
 
     if (retryCount >= maxRetries) {
-      LOG(FATAL) << "ERROR: Failed to start Python server after " << retryCount
-                 << " attempts.";
-      exit(1); // Stop the program if the server cannot start
+      std::cerr << "ERROR: Failed to start Python server after " << retryCount
+                << " attempts.";
     }
-
-    LOG(WARNING) << "Python server failed to start. Retrying in 2 seconds... ("
-                 << retryCount << "/" << maxRetries << ")";
-    sleep(2); // Wait 2 seconds before retrying
+    logger.log("Python server failed to start. Retrying in 2 seconds... (" +
+               std::to_string(retryCount) + "/" + std::to_string(maxRetries) + ")");
+    sleep(2);
   }
 
   sleep(5); // Wait 5 sec to ensure Python server starts
 
   ImageProcessor processor(context, externalEndpoints);
+
   // Wait for start signal from Display with 0.5sec sleep
   while (1) {
-    LOG(INFO) << "Waiting for start signal from Hardware";
+    logger.log("Waiting for start signal from Hardware");
     // if (receiveFoodItem(foodItem, pipes.hardwareToVision[READ], (struct timeval){1,
     // 0})) {
     //  LOG(INFO) << "Vision Received all images from hardware";
