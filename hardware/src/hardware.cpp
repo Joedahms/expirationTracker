@@ -34,6 +34,7 @@ bool Hardware::checkStartSignal() {
         receivedRequest = true;
         this->replySocket.send("got it"); // Respond to display
         LOG(INFO) << "Received start signal from display";
+        std::cout << "here" << std::endl;
       }
     }
     else {
