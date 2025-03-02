@@ -23,9 +23,7 @@ void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints endpoints) 
 
   // while 1
   Hardware hardware(context, endpoints);
-  LOG(INFO) << "Within hardware process";
   bool startSignalReceived = false;
-  LOG(INFO) << "Within hardware process";
   while (startSignalReceived == false) {
     startSignalReceived = hardware.checkStartSignal();
     if (startSignalReceived == false) {
