@@ -110,7 +110,7 @@ void Hardware::rotateAndCapture() {
 
     if (angle == 0) {
       //      sleep(2);
-      // sendDataToVision();
+      sendDataToVision();
     }
 
     LOG(INFO) << "Rotating platform...";
@@ -142,9 +142,9 @@ void Hardware::rotateAndCapture() {
 }
 
 bool Hardware::capturePhoto(int angle) {
+  LOG(INFO) << "Capturing photo at position: " << angle;
   std::string fileName = this->IMAGE_DIRECTORY + std::to_string(angle) + "_test.jpg";
-
-  pid_t pid = fork();
+  pid_t pid            = fork();
   if (pid == -1) {
     LOG(FATAL) << "Error starting camera process." << strerror(errno);
     return false;
@@ -152,7 +152,7 @@ bool Hardware::capturePhoto(int angle) {
   if (pid == 0) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("TakePhotoChild");
-    LOG(INFO) << "Capturing photo at position " << angle;
+    LOG(INFO) << "Capturing photo at position: " << angle;
     execl("/usr/bin/rpicam-jpeg", "rpicam-jpeg", "1920:1080:12:U", "--nopreview",
           "--output", fileName.c_str(), // Save location
           "--timeout", "50", (char*)NULL);
