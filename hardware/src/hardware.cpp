@@ -151,7 +151,7 @@ bool Hardware::capturePhoto(int angle) {
     std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
     exit(1);
   }
-  google::InitGoogleLogging("HardwareParent");
-  LOG(INFO) << "Exiting photos at " << angle;
+  google::InitGoogleLogging("hardware");
+  LOG(INFO) << "Exiting capturePhoto at angle: " << angle;
   return true;
 }
