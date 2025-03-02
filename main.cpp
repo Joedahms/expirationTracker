@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("vision");
 
-    visionEntry(context, externalEndpoints);
+    // visionEntry(context, externalEndpoints);
     LOG(INFO) << "Vision process";
     return 0;
   }

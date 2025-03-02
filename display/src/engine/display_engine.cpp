@@ -31,6 +31,14 @@ DisplayEngine::DisplayEngine(const char* windowTitle,
     : replySocket(context, zmqpp::socket_type::reply),
       requestSocket(context, zmqpp::socket_type::request),
       DISPLAY_ENDPOINT(displayEndpoint), ENGINE_ENDPOINT(engineEndpoint) {
+  // Setup sockets
+  try {
+    this->requestSocket.connect(this->DISPLAY_ENDPOINT);
+    this->replySocket.bind(this->ENGINE_ENDPOINT);
+  } catch (const zmqpp::exception& e) {
+    LOG(FATAL) << e.what();
+  }
+
   this->displayGlobal = displayGlobal;
   this->displayGlobal.window =
       setupWindow(windowTitle, windowXPosition, windowYPosition, screenWidth,
@@ -143,7 +151,14 @@ void DisplayEngine::checkState() {
 
     if (this->engineState == EngineState::SCANNING) {
       LOG(INFO) << "Scan initialized, engine switching to scanning state";
-      //      writeString(engineToDisplay[WRITE], START_SCAN);
+      try {
+        std::string startScan = "start scan";
+        this->requestSocket.send(startScan);
+        std::string response;
+        this->requestSocket.receive(response);
+      } catch (const zmqpp::exception& e) {
+        LOG(FATAL) << e.what();
+      }
     }
 
     this->mainMenu->setCurrentState(EngineState::MAIN_MENU);

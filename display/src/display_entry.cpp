@@ -37,9 +37,9 @@ void displayEntry(zmqpp::context& context, struct ExternalEndpoints externalEndp
     while (1) {
       bool stringFromSdl = false;
       displayHandler.handle();
-      //      displayHandler.handleExternal();
+      //       displayHandler.handleExternal();
       //
-      //     displayHandler.handleEngine();
+      //      displayHandler.handleEngine();
     }
   }
 }

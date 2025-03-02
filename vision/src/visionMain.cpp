@@ -49,7 +49,7 @@ void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpo
 
   sleep(5); // Wait 5 sec to ensure Python server starts
 
-  ImageProcessor processor = ImageProcessor(context, externalEndpoints);
+  ImageProcessor processor(context, externalEndpoints);
   // Wait for start signal from Display with 0.5sec sleep
   while (1) {
     LOG(INFO) << "Waiting for start signal from Hardware";

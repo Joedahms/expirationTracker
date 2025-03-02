@@ -9,20 +9,29 @@ Hardware::Hardware(zmqpp::context& context,
     : externalEndpoints(externalEndpoints),
       requestVisionSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
-      replySocket(context, zmqpp::socket_type::reply) {}
+      replySocket(context, zmqpp::socket_type::reply) {
+  try {
+    this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
+    this->requestDisplaySocket.connect(this->externalEndpoints.displayEndpoint);
+    this->replySocket.bind(this->externalEndpoints.hardwareEndpoint);
+  } catch (const zmqpp::exception& e) {
+    LOG(FATAL) << e.what();
+  }
+}
 
 bool Hardware::checkStartSignal() {
-  replySocket.bind(this->externalEndpoints.hardwareEndpoint);
-
-  bool receivedRequest = false;
-  std::string request;
-  receivedRequest = replySocket.receive(request, true);
-  if (receivedRequest) {
-    std::cout << request << std::endl;
+  try {
+    bool receivedRequest = false;
+    std::string request;
+    receivedRequest = this->replySocket.receive(request, true);
+    if (receivedRequest) {
+      this->replySocket.send("got it"); // Respond to display
+      LOG(INFO) << "Received start signal from display";
+    }
+    return receivedRequest;
+  } catch (const zmqpp::exception& e) {
+    LOG(FATAL) << e.what();
   }
-
-  replySocket.close();
-  return receivedRequest;
 }
 
 bool Hardware::startScan() {
@@ -42,7 +51,11 @@ bool Hardware::startScan() {
    * has a pipe read from vision in loop
    */
 
-  sendDataToVision(weight);
+  if (weight > 0) {
+    rotateAndCapture(weight);
+  }
+
+  // sendDataToVision(weight);
   return true;
 }
 
@@ -110,8 +123,7 @@ void Hardware::rotateAndCapture(float weight) {
     bool receivedStopSignal = false;
     bool receivedRequest    = false;
     std::string request;
-    this->replySocket.bind(this->externalEndpoints.hardwareEndpoint);
-    receivedRequest = replySocket.receive(request, true);
+    receivedRequest = this->replySocket.receive(request, true);
     if (receivedRequest) {
       std::cout << request << std::endl;
       // check if stop and set receivedStopSignal accordingly

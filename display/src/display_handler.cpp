@@ -17,11 +17,29 @@ DisplayHandler::DisplayHandler(zmqpp::context& context,
       requestEngineSocket(context, zmqpp::socket_type::request),
       requestHardwareSocket(context, zmqpp::socket_type::request),
       requestVisionSocket(context, zmqpp::socket_type::request),
-      replySocket(context, zmqpp::socket_type::reply) {}
+      replySocket(context, zmqpp::socket_type::reply) {
+  try {
+    this->requestEngineSocket.connect(this->engineEndpoint);
+    this->requestHardwareSocket.connect(this->externalEndpoints.hardwareEndpoint);
+    this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
+    this->replySocket.bind(this->externalEndpoints.displayEndpoint);
+  } catch (const zmqpp::exception& e) {
+    LOG(FATAL) << e.what();
+  }
+}
 
 void DisplayHandler::handle() {
-  replySocket.bind(this->externalEndpoints.displayEndpoint);
+  while (true) {
+    std::string receivedMessage;
+    this->replySocket.receive(receivedMessage);
 
+    if (receivedMessage == "start scan") {
+      this->replySocket.send(receivedMessage);           // Got it
+      this->requestHardwareSocket.send(receivedMessage); // Tell hardware to start
+      std::string hardwareResponse;
+      this->requestHardwareSocket.receive(hardwareResponse); // Response from hardware
+    }
+  }
   /*
   while (true) {
     bool received = false;
