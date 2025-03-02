@@ -21,6 +21,7 @@ Hardware::Hardware(zmqpp::context& context,
 }
 
 bool Hardware::checkStartSignal() {
+  LOG(INFO) << "Checking for start signal from display";
   try {
     bool receivedRequest = false;
     std::string request;
@@ -29,6 +30,9 @@ bool Hardware::checkStartSignal() {
       this->replySocket.send("got it"); // Respond to display
       LOG(INFO) << "Received start signal from display";
     }
+    else {
+      LOG(INFO) << "Did not receive start signal from display";
+    }
     return receivedRequest;
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
@@ -36,7 +40,7 @@ bool Hardware::checkStartSignal() {
 }
 
 bool Hardware::startScan() {
-  LOG(INFO) << "Beginning scan";
+  LOG(INFO) << "Starting scan";
   /**
    * Function call to controls routine
    * has a pipe read from vision in loop
@@ -49,6 +53,7 @@ bool Hardware::startScan() {
 
   rotateAndCapture();
   // TODO
+  LOG(INFO) << "Scan completed";
   return true;
 }
 
@@ -105,22 +110,27 @@ void Hardware::rotateAndCapture() {
 
     if (angle == 0) {
       //      sleep(2);
-      sendDataToVision();
+      // sendDataToVision();
     }
 
     LOG(INFO) << "Rotating platform...";
     // TODO rotateMotor();
     usleep(500);
 
+    LOG(INFO) << "Checking for stop signal from vision";
     bool receivedStopSignal = false;
     bool receivedRequest    = false;
     std::string request;
     receivedRequest = this->replySocket.receive(request, true);
     if (receivedRequest) {
-      std::cout << request << std::endl;
-      // TODO check if stop and set receivedStopSignal accordingly
+      if (request == "item identified") {
+        LOG(INFO) << "Received stop signal from vision";
+        receivedStopSignal = true;
+      }
+      else {
+        LOG(INFO) << "Received something else from vision";
+      }
     }
-    replySocket.close();
 
     if (receivedStopSignal) {
       LOG(INFO) << "AI Vision identified item. Stopping process.";
@@ -142,7 +152,7 @@ bool Hardware::capturePhoto(int angle) {
   if (pid == 0) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("TakePhotoChild");
-    LOG(INFO) << "Capturing at position " << angle;
+    LOG(INFO) << "Capturing photo at position " << angle;
     execl("/usr/bin/rpicam-jpeg", "rpicam-jpeg", "1920:1080:12:U", "--nopreview",
           "--output", fileName.c_str(), // Save location
           "--timeout", "50", (char*)NULL);
