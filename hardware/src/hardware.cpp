@@ -21,7 +21,7 @@ Hardware::Hardware(zmqpp::context& context,
 }
 
 bool Hardware::checkStartSignal() {
-  logger.log("Checking for start signal from display");
+  this->logger.log("Checking for start signal from display");
   bool receivedRequest = false;
   try {
     zmqpp::poller poller;
@@ -33,35 +33,33 @@ bool Hardware::checkStartSignal() {
         this->replySocket.receive(request);
         receivedRequest = true;
         this->replySocket.send("got it"); // Respond to display
-        LOG(INFO) << "Received start signal from display";
-        logger.log("Received start signal from display");
-        std::cout << "here" << std::endl;
+        this->logger.log("Received start signal from display");
       }
     }
     else {
-      LOG(INFO) << "Did not receive start signal from display";
+      this->logger.log("Did not receive start signal from display");
     }
     return receivedRequest;
   } catch (const zmqpp::exception& e) {
-    LOG(FATAL) << e.what();
+    std::cerr << e.what();
   }
 }
 
 bool Hardware::startScan() {
-  LOG(INFO) << "Starting scan";
+  this->logger.log("Starting scan");
   /**
    * Function call to controls routine
    * has a pipe read from vision in loop
    */
 
-  LOG(INFO) << "Checking weight";
+  this->logger.log("Checking weight");
   if (checkWeight() == false) {
     // TODO handle no weight on platform
   }
 
   rotateAndCapture();
   // TODO
-  LOG(INFO) << "Scan completed";
+  this->logger.log("Scan complete");
   return true;
 }
 
@@ -78,7 +76,7 @@ bool Hardware::checkWeight() {
  * @return None
  */
 void Hardware::sendDataToVision() {
-  LOG(INFO) << "Sending Images from Hardware to Vision";
+  this->logger.log("Sending images from hardware to vision");
   const std::chrono::time_point<std::chrono::system_clock> now{
       std::chrono::system_clock::now()};
 
@@ -90,7 +88,7 @@ void Hardware::sendDataToVision() {
   this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
   sendFoodItem(this->requestVisionSocket, foodItem);
 
-  LOG(INFO) << "Done Sending Images from Hardware to Vision";
+  this->logger.log("Done sending images from hardware to vision");
 }
 
 /**
@@ -103,7 +101,7 @@ void Hardware::sendDataToVision() {
  */
 void Hardware::rotateAndCapture() {
   for (int angle = 0; angle < 8; angle++) {
-    LOG(INFO) << "At location " << angle << " of 8";
+    this->logger.log("At location " + std::to_string(angle) + " of 8");
 
     // TODO
     // This function is for both cameras
@@ -113,50 +111,49 @@ void Hardware::rotateAndCapture() {
 
     // Temporary
     if (capturePhoto(angle) == false) {
-      LOG(INFO) << "Error taking a photo";
+      this->logger.log("Error taking a photo");
     }
 
     if (angle == 0) {
-      //      sleep(2);
       sendDataToVision();
     }
 
-    LOG(INFO) << "Rotating platform...";
+    this->logger.log("Rotating platform");
     // TODO rotateMotor();
     usleep(500);
 
-    LOG(INFO) << "Checking for stop signal from vision";
+    this->logger.log("Checking for stop signal from vision");
     bool receivedStopSignal = false;
     bool receivedRequest    = false;
     std::string request;
     receivedRequest = this->replySocket.receive(request, true);
     if (receivedRequest) {
       if (request == "item identified") {
-        LOG(INFO) << "Received stop signal from vision";
+        this->logger.log("Received stop signal from vision");
         receivedStopSignal = true;
       }
       else {
-        LOG(INFO) << "Received something else from vision";
+        this->logger.log("Received something else from vision");
       }
     }
 
     if (receivedStopSignal) {
-      LOG(INFO) << "AI Vision identified item. Stopping process.";
+      this->logger.log("AI Vision identified item. Stopping process.");
       break;
     }
 
-    LOG(INFO) << "AI Vision did not identify item. Continuing process.";
+    this->logger.log("AI Vision did not identify item. Continuing process.");
   }
 }
 
 bool Hardware::capturePhoto(int angle) {
-  LOG(INFO) << "Capturing photo at position: " << angle;
+  this->logger.log("Capturing photo at position: " + std::to_string(angle));
   std::string fileName = this->IMAGE_DIRECTORY + std::to_string(angle) + "_test.jpg";
 
   std::string command = "rpicam-jpeg --output " + fileName;
   system(command.c_str());
 
-  LOG(INFO) << "Photo successfully captured at position: " << angle;
+  this->logger.log("Photo successfully captured at position: " + std::to_string(angle));
 
   /*
   pid_t pid;
@@ -180,7 +177,7 @@ bool Hardware::capturePhoto(int angle) {
   // exit(1);
   //}
   // else {
-  LOG(INFO) << "Exiting capturePhoto at angle: " << angle;
+  this->logger.log("Exiting capturePhoto at angle: " + std::to_string(angle));
   return true;
   //}
 }
