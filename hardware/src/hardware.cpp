@@ -27,7 +27,7 @@ bool Hardware::checkStartSignal() {
     zmqpp::poller poller;
     poller.add(this->replySocket);
 
-    if (poller.poll(500)) {
+    if (poller.poll(1000)) {
       if (poller.has_input(this->replySocket)) {
         std::string request;
         this->replySocket.receive(request);
