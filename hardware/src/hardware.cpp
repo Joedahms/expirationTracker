@@ -133,7 +133,6 @@ void Hardware::rotateAndCapture() {
 
 bool Hardware::capturePhoto(int angle) {
   std::string fileName = this->IMAGE_DIRECTORY + std::to_string(angle) + "_test.jpg";
-  google::ShutdownGoogleLogging();
 
   pid_t pid = fork();
   if (pid == -1) {
@@ -141,7 +140,7 @@ bool Hardware::capturePhoto(int angle) {
     return false;
   }
   if (pid == 0) {
-    // Reinitialize glog in the child process
+    google::ShutdownGoogleLogging();
     google::InitGoogleLogging("TakePhotoChild");
     LOG(INFO) << "Capturing at position " << angle;
     execl("/usr/bin/rpicam-jpeg", "rpicam-jpeg", "1920:1080:12:U", "--nopreview",
@@ -151,7 +150,6 @@ bool Hardware::capturePhoto(int angle) {
     std::cerr << "Error: Failed to execute rpicam-still" << std::endl;
     exit(1);
   }
-  google::InitGoogleLogging("hardware");
   LOG(INFO) << "Exiting capturePhoto at angle: " << angle;
   return true;
 }
