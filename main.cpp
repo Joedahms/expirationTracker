@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("hardware");
 
-    // hardwareEntry(pipes, externalEndpoints);
+    hardwareEntry(context, externalEndpoints);
     LOG(INFO) << "Hardware process";
     return 0;
   }

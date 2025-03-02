@@ -18,6 +18,7 @@
  * Output:
  * @return Boolean; true or false
  */
+/*
 bool receivedStartSignal(int pipeToRead) {
   fd_set readPipeSet;
 
@@ -44,3 +45,4 @@ bool receivedStartSignal(int pipeToRead) {
     return true;
   }
 }
+*/

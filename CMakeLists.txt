@@ -82,6 +82,7 @@ add_executable(expirationTracker
   #Hardware process after forked from main
   hardware/src/hardware_entry.cpp
   hardware/src/io.cpp
+  hardware/src/hardware.cpp
 
     ${PROTO_SRCS}
   ${PROTO_HDRS}

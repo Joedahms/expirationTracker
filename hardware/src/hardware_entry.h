@@ -4,7 +4,7 @@
 #include "../../pipes.h"
 #include <string>
 
-void hardwareEntry(struct Pipes pipes, struct ExternalEndpoints endpoints);
+void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints);
 void redoThis(struct Pipes pipes);
 void sendImagesWithinDirectory(int, const std::string&);
 

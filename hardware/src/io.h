@@ -3,6 +3,6 @@
 
 #include "../../pipes.h"
 
-bool receivedStartSignal(int pipeToRead);
+// bool receivedStartSignal(int pipeToRead);
 
 #endif
