@@ -69,14 +69,6 @@ void Hardware::sendDataToVision() {
   const std::chrono::time_point<std::chrono::system_clock> now{
       std::chrono::system_clock::now()};
 
-  /*
-  struct FoodItem foodItem;
-  foodItem.imageDirectory = std::filesystem::absolute("../images");
-  foodItem.scanDate       = std::chrono::floor<std::chrono::days>(now);
-  foodItem.weight         = weight;
-  sendFoodItem(foodItem, pipeToWrite);
-  */
-
   std::filesystem::path filePath       = "../images/temp";
   std::chrono::year_month_day scanDate = std::chrono::floor<std::chrono::days>(now);
 
