@@ -27,22 +27,6 @@ void visionEntry(struct Pipes pipes,
       std::cout << response << std::endl;
       sleep(5);
     }
-
-    /*
-    FoodItemProto::FoodItem protoFoodItem = convertToProto(foodItem);
-    std::cout << "q: " << protoFoodItem.quantity() << std::endl;
-    std::string str;
-    protoFoodItem.SerializeToString(&str);
-
-    std::string rec;
-    while (1) {
-      std::cout << "here" << std::endl;
-      testSocket.send(str);
-      testSocket.receive(rec);
-      sleep(5);
-    }
-    */
-
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what() << std::endl;
   }

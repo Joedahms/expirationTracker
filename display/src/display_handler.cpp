@@ -31,23 +31,6 @@ void DisplayHandler::handle() {
 
     std::cout << foodItem.quantity << std::endl;
   }
-
-  /*
-  bool received = false;
-  std::string requestString;
-
-  while (true) {
-    received = this->replySocket.receive(requestString, true);
-    if (received) {
-      FoodItemProto::FoodItem foodItem;
-      foodItem.ParseFromString(requestString);
-      struct FoodItem real = convertFromProto(foodItem);
-
-      std::cout << real.quantity << std::endl;
-      this->replySocket.send("got it");
-    }
-  }
-  */
 }
 
 /**
