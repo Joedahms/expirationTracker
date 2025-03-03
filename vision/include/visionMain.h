@@ -10,6 +10,6 @@
 #include "../include/helperFunctions.h"
 
 void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints);
-bool startPythonServer();
+bool startPythonServer(Logger& logger);
 
 #endif

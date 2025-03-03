@@ -20,7 +20,7 @@ find_package(SQLite3 REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(Protobuf REQUIRED)
 
-pkg_check_modules(ZMQ REQUIRED libzmq)
+#pkg_check_modules(ZMQ REQUIRED libzmq)
 
 set(ZMQPP_INCLUDE_DIRS "/usr/local/include")
 set(ZMQPP_LIBRARIES "zmqpp")

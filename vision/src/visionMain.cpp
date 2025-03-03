@@ -16,7 +16,7 @@ void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpo
   int maxRetries = 5;
   int retryCount = 0;
 
-  while (!startPythonServer()) {
+  while (!startPythonServer(logger)) {
     retryCount++;
 
     if (retryCount >= maxRetries) {
@@ -72,7 +72,8 @@ void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpo
  *
  * @return success for fail
  */
-bool startPythonServer() {
+bool startPythonServer(Logger& logger) {
+  logger.log("Starting python server");
   pid_t pid = fork();
 
   if (pid == -1) {
@@ -88,7 +89,8 @@ bool startPythonServer() {
     exit(1); // Exit child process if execvp fails
   }
   else { // Parent process
-    LOG(INFO) << "Python server started with PID: " << pid;
+         //    LOG(INFO) << "Python server started with PID: " << pid;
+    logger.log("Python server started");
     return true;
   }
 }
