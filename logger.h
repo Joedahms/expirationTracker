@@ -8,8 +8,8 @@
 
 class Logger {
 private:
-  std::ofstream logFile; // The file stream as a class member
-  std::string filename;  // Store the filename for potential reopening
+  mutable std::ofstream logFile; // The file stream as a class member
+  std::string filename;          // Store the filename for potential reopening
 
 public:
   // Constructor opens the file
@@ -30,7 +30,7 @@ public:
   }
 
   // Log a message with timestamp
-  void log(const std::string& message) {
+  void log(const std::string& message) const {
     if (logFile.is_open()) {
       // Get current time
       time_t now = time(nullptr);

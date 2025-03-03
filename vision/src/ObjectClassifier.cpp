@@ -1,5 +1,8 @@
+/*
 
 #include "../include/ObjectClassifier.h"
+
+ObjectClassifier::ObjectClassifier() {}
 
 /**
  * Handle object classification
@@ -8,6 +11,7 @@
  * @param imagePath path to the image you wish to extract text from
  * @return success of attempt
  */
+/*
 bool ObjectClassifier::handleClassification(const std::filesystem::path& imagePath) {
   LOG(INFO) << "Handling EfficientNet Classification";
   std::string result = runModel(imagePath);
@@ -25,6 +29,8 @@ bool ObjectClassifier::handleClassification(const std::filesystem::path& imagePa
   return false;
 }
 
+
+
 /**
  * Call and return output of python classification script
  *
@@ -32,6 +38,7 @@ bool ObjectClassifier::handleClassification(const std::filesystem::path& imagePa
  * @param imagePath path to the image you wish to extract text from
  * @return string containing detected class
  */
+/*
 std::string ObjectClassifier::runModel(const std::filesystem::path& imagePath) const {
   LOG(INFO) << "Running EfficientNet model.";
 
@@ -45,3 +52,4 @@ std::string ObjectClassifier::runModel(const std::filesystem::path& imagePath) c
   LOG(INFO) << result;
   return result;
 }
+*/

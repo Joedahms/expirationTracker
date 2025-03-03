@@ -45,6 +45,7 @@ make
 sudo make install
 
 sudo apt install protobuf-compiler libprotobuf-dev
+pip install pyzmq
 
 ## Setup Python virual environment
 NOTE: To setup the Python virtual environment you must be in the build directory.

@@ -7,7 +7,9 @@
  * @return success of the attempt
  */
 void IModel::sendRequest(const TaskType& taskType,
-                         const std::filesystem::path& imagePath) const {
+                         const std::filesystem::path& imagePath) {
+  this->logger.log("Enter sendRequest");
+  /*
   std::ofstream pipe_out(PIPE_IN);
   if (!pipe_out) {
     LOG(FATAL) << "Error opening pipe for writing.";
@@ -15,6 +17,16 @@ void IModel::sendRequest(const TaskType& taskType,
   }
   pipe_out << taskTypeToString(taskType) << " " << imagePath.string() << std::endl;
   pipe_out.close();
+  */
+  std::string request = taskTypeToString(taskType) + " " + imagePath.string();
+  this->logger.log("Sending request: " + request);
+
+  std::string response;
+  this->requestSocket.send(request);
+  this->requestSocket.receive(response);
+
+  this->logger.log("Got response from server: " + response);
+  this->logger.log("Exiting sendRequest");
 }
 
 /**
@@ -23,6 +35,7 @@ void IModel::sendRequest(const TaskType& taskType,
  * @return string read back from model
  */
 std::string IModel::readResponse() const {
+  this->logger.log("Reading response");
   std::ifstream pipe_in(PIPE_OUT);
   if (!pipe_in) {
     LOG(FATAL) << "Error opening pipe for reading.";
@@ -33,10 +46,12 @@ std::string IModel::readResponse() const {
   std::getline(pipe_in, response);
   pipe_in.close();
 
+  this->logger.log("Response read");
   return response;
 }
 
 std::string IModel::taskTypeToString(const TaskType& taskType) const {
+  this->logger.log("Converting task type to string");
   switch (taskType) {
   case CLS:
     return "CLS";

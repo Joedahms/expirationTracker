@@ -1,7 +1,10 @@
 #include "../include/ModelHandler.h"
 
-ModelHandler::ModelHandler(struct FoodItem& foodItem)
-    : objectClassifier(), textClassifier(), logger("model_handler.txt") {}
+ModelHandler::ModelHandler(zmqpp::context& context)
+    : textClassifier(context,
+                     "ipc:///tmp/text_classifier_endpoint",
+                     "ipc:///tmp/python_server_endpoint"),
+      logger("model_handler.txt") {}
 
 /**
  * Run both object classification and text extraction to attempt to identify the item.

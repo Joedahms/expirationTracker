@@ -10,7 +10,7 @@ ImageProcessor::ImageProcessor(zmqpp::context& context,
     : externalEndpoints(externalEndpoints),
       requestHardwareSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
-      replySocket(context, zmqpp::socket_type::reply), modelHandler(foodItem),
+      replySocket(context, zmqpp::socket_type::reply), modelHandler(context),
       logger("image_processor.txt") {
   try {
     this->requestHardwareSocket.connect(this->externalEndpoints.hardwareEndpoint);

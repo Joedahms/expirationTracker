@@ -1,3 +1,4 @@
+/*
 #ifndef OBJECT_CLASSIFICATION_H
 #define OBJECT_CLASSIFICATION_H
 
@@ -9,6 +10,8 @@
 
 class ObjectClassifier : public IModel {
 public:
+  ObjectClassifier();
+
   std::string runModel(const std::filesystem::path& imagePath) const override;
   bool handleClassification(const std::filesystem::path& imagePath) override;
 
@@ -17,3 +20,4 @@ private:
 };
 
 #endif
+*/

@@ -9,7 +9,11 @@
 
 class TextClassifier : public IModel {
 public:
-  std::string runModel(const std::filesystem::path& imagePath) const override;
+  TextClassifier(zmqpp::context& context,
+                 const std::string& textClassifierEndpoint,
+                 const std::string& pythonServerEndpoint);
+
+  std::string runModel(const std::filesystem::path& imagePath) override;
   bool handleClassification(const std::filesystem::path& imagePath) override;
 
 private:

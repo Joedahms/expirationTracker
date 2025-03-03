@@ -11,14 +11,14 @@
 
 class ModelHandler {
 public:
-  ModelHandler(FoodItem&);
+  ModelHandler(zmqpp::context& context);
   bool classifyObject(const std::filesystem::path&);
   bool extractExpirationDate(const std::filesystem::path&) const;
 
 private:
   Logger logger;
 
-  ObjectClassifier objectClassifier;
+  //  ObjectClassifier objectClassifier;
   TextClassifier textClassifier;
 };
 
