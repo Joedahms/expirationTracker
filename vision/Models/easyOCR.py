@@ -79,7 +79,9 @@ def perform_ocr(image_path):
         return(f"ERROR: {processed_image}")
 
     try:
+        print("Reading text");
         results = reader.readtext(processed_image, detail=0, paragraph=True, text_threshold=0.8)
+        print("Text read");
 
         # Filter only valid classifications
         filtered_results = [is_text_class(text) for text in results if is_text_class(text)]
