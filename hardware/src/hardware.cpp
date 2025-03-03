@@ -150,7 +150,7 @@ bool Hardware::capturePhoto(int angle) {
   this->logger.log("Capturing photo at position: " + std::to_string(angle));
   std::string fileName = this->IMAGE_DIRECTORY + std::to_string(angle) + "_test.jpg";
 
-  std::string command = "rpicam-jpeg --output " + fileName;
+  std::string command = "rpicam-jpeg --output " + fileName + " -n";
   system(command.c_str());
 
   this->logger.log("Photo successfully captured at position: " + std::to_string(angle));
