@@ -73,24 +73,24 @@ void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpo
  * @return success for fail
  */
 bool startPythonServer(Logger& logger) {
-  logger.log("Starting python server");
   pid_t pid = fork();
+  logger.log("Entering startPythonServer");
 
   if (pid == -1) {
-    LOG(FATAL) << "ERROR: Failed to fork process: " << strerror(errno);
+    logger.log("Failed to fork process");
     return false;
   }
   if (pid == 0) { // Child process
-    LOG(INFO) << "Starting Python server...";
+    logger.log("Starting python server");
     char* args[] = {(char*)"./models-venv/bin/python3",
                     (char*)"../vision/Models/server.py", nullptr};
     execvp(args[0], args);
-    LOG(INFO) << "ERROR: execvp() failed to start Python server.";
+    logger.log("failed to start python server");
     exit(1); // Exit child process if execvp fails
   }
   else { // Parent process
          //    LOG(INFO) << "Python server started with PID: " << pid;
-    logger.log("Python server started");
+    logger.log("Leaving startPythonServer");
     return true;
   }
 }
