@@ -11,10 +11,11 @@ ModelHandler::ModelHandler(struct FoodItem& foodItem)
  * @return whether successful or not
  */
 bool ModelHandler::classifyObject(const std::filesystem::path& imagePath) {
-  bool objectIdentified = this->objectClassifier.handleClassification(imagePath);
-  if (!objectIdentified) {
-    // try text extraction for classification
-    objectIdentified = this->textClassifier.handleClassification(imagePath);
-  }
-  return objectIdentified;
+  //  bool objectIdentified = this->objectClassifier.handleClassification(imagePath);
+  // if (!objectIdentified) {
+  // try text extraction for classification
+  //   objectIdentified = this->textClassifier.handleClassification(imagePath);
+  //}
+  // return objectIdentified;
+  return true;
 }
