@@ -48,10 +48,11 @@ void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpo
           if (poller.has_input(replySocket)) {
             receiveFoodItem(replySocket, "got it", foodItem);
             logger.log("Received start signal from hardware");
+            startSignalReceived = true;
           }
         }
         else {
-          logger.log("Did not receive start signal from display");
+          logger.log("Did not receive start signal from hardware");
         }
       } catch (const zmqpp::exception& e) {
         std::cerr << e.what();
