@@ -32,18 +32,37 @@ void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpo
 
   ImageProcessor processor(context, externalEndpoints);
 
-  // Wait for start signal from Display with 0.5sec sleep
+  zmqpp::socket replySocket(context, zmqpp::socket_type::reply);
+  replySocket.bind(externalEndpoints.visionEndpoint);
   while (1) {
+    FoodItem foodItem;
     logger.log("Waiting for start signal from Hardware");
-    // if (receiveFoodItem(foodItem, pipes.hardwareToVision[READ], (struct timeval){1,
-    // 0})) {
+
+    bool startSignalReceived = false;
+    while (startSignalReceived == false) {
+      try {
+        zmqpp::poller poller;
+        poller.add(replySocket);
+
+        if (poller.poll(1000)) {
+          if (poller.has_input(replySocket)) {
+            receiveFoodItem(replySocket, "got it", foodItem);
+            logger.log("Received start signal from hardware");
+          }
+        }
+        else {
+          logger.log("Did not receive start signal from display");
+        }
+      } catch (const zmqpp::exception& e) {
+        std::cerr << e.what();
+      }
+    }
     //  LOG(INFO) << "Vision Received all images from hardware";
-    // processor.setFoodItem(foodItem);
-    // processor.process();
+    processor.setFoodItem(foodItem);
+    processor.process();
   }
   // else {
   //  usleep(500000);
-  //}
   //}
 }
 

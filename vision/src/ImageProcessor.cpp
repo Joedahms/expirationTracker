@@ -6,12 +6,20 @@
  * @param foodItem FoodItem struct for filling out detected information.
  */
 ImageProcessor::ImageProcessor(zmqpp::context& context,
-                               const struct ExternalEndpoints& ExternalEndpoints)
+                               const struct ExternalEndpoints& externalEndpoints)
     : externalEndpoints(externalEndpoints),
       requestHardwareSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
       replySocket(context, zmqpp::socket_type::reply), modelHandler(foodItem),
-      logger("image_processor.txt") {}
+      logger("image_processor.txt") {
+  try {
+    this->requestHardwareSocket.connect(this->externalEndpoints.hardwareEndpoint);
+    this->requestDisplaySocket.connect(this->externalEndpoints.displayEndpoint);
+    this->replySocket.bind(this->externalEndpoints.visionEndpoint);
+  } catch (const zmqpp::exception& e) {
+    std::cerr << e.what();
+  }
+}
 
 /**
  * Parent method to all image processing and analyzing
@@ -36,14 +44,14 @@ void ImageProcessor::process() {
   }
 
   // tell hardware to stop
-  this->logger.log("Sent stop signal to hardware");
   bool detectionComplete = true;
-  // write(pipes.visionToHardware[WRITE], &detectionComplete, sizeof(detectionComplete));
+  this->requestHardwareSocket.send("item identified");
+  this->logger.log("Sent stop signal to hardware");
 
   // send display the food item
+  // TODO  printFoodItem(foodItem);
+  sendFoodItem(this->requestDisplaySocket, this->foodItem);
   this->logger.log("Sent detected food item to display");
-  //  printFoodItem(foodItem);
-  // sendFoodItem(foodItem, pipes.visionToDisplay[WRITE]);
 }
 
 /**

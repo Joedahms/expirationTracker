@@ -5,18 +5,21 @@
 #include <glog/logging.h>
 
 #include "../../food_item.h"
+#include "../../logger.h"
 #include "ObjectClassifier.h"
 #include "TextClassifier.h"
 
 class ModelHandler {
-private:
-  ObjectClassifier objectClassifier;
-  TextClassifier textClassifier;
-
 public:
   ModelHandler(FoodItem&);
   bool classifyObject(const std::filesystem::path&);
   bool extractExpirationDate(const std::filesystem::path&) const;
+
+private:
+  Logger logger;
+
+  ObjectClassifier objectClassifier;
+  TextClassifier textClassifier;
 };
 
 #endif

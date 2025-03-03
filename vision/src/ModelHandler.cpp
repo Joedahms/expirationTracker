@@ -1,7 +1,7 @@
 #include "../include/ModelHandler.h"
 
 ModelHandler::ModelHandler(struct FoodItem& foodItem)
-    : objectClassifier(), textClassifier() {}
+    : objectClassifier(), textClassifier(), logger("model_handler.txt") {}
 
 /**
  * Run both object classification and text extraction to attempt to identify the item.
@@ -15,6 +15,10 @@ bool ModelHandler::classifyObject(const std::filesystem::path& imagePath) {
   // if (!objectIdentified) {
   // try text extraction for classification
   //   objectIdentified = this->textClassifier.handleClassification(imagePath);
+  this->logger.log("Running text classificiation");
+  this->textClassifier.handleClassification(imagePath);
+  this->logger.log("Text classification complete");
+
   //}
   // return objectIdentified;
   return true;
