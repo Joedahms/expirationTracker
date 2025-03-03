@@ -35,6 +35,7 @@ def is_text_class(text):
     return None
 
 def preprocess_image(image_path):
+    print("Preprocessing image")
     img = cv2.imread(image_path)
 
     if img is None:
@@ -68,9 +69,11 @@ def preprocess_image(image_path):
     # Apply the mask
     processed = cv2.bitwise_and(gray, gray, mask=mask)
 
+    print("Image Preprocessed")
     return processed  # Return improved image as a NumPy array
     
 def perform_ocr(image_path):
+    print("Performing OCR")
     processed_image = preprocess_image(image_path)
     if isinstance(processed_image, str):
         return(f"ERROR: {processed_image}")
@@ -81,6 +84,7 @@ def perform_ocr(image_path):
         # Filter only valid classifications
         filtered_results = [is_text_class(text) for text in results if is_text_class(text)]
 
+        print("OCR performed")
         if filtered_results:
             for result in filtered_results:
                 return(f"CLASSIFICATION: {result['value']}")

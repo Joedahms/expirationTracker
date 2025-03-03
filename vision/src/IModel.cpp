@@ -19,13 +19,15 @@ void IModel::sendRequest(const TaskType& taskType,
   pipe_out.close();
   */
   std::string request = taskTypeToString(taskType) + " " + imagePath.string();
-  this->logger.log("Sending request: " + request);
 
+  this->logger.log("Sending request: " + request);
   std::string response;
   this->requestSocket.send(request);
-  this->requestSocket.receive(response);
 
+  this->logger.log("Request sent, waiting for response");
+  this->requestSocket.receive(response);
   this->logger.log("Got response from server: " + response);
+
   this->logger.log("Exiting sendRequest");
 }
 
