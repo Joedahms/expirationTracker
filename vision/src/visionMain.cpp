@@ -1,5 +1,5 @@
-#include "../../logger.h"
 #include "../include/visionMain.h"
+#include "../../logger.h"
 
 /**
  * Entry into the vision code. Only called from main after vision child process is
