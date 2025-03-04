@@ -34,15 +34,14 @@ $ sudo apt install libopencv-dev
 $ sudo apt install sqlite3 libsqlite3-dev
 #### Install mesa
 $ sudo add-apt-repository ppa:kisak/kisak-mesa
-
-sudo apt-get install libzmq3-dev 
-
-git clone https://github.com/zeromq/zmqpp.git
-cd zmqpp
-mkdir build && cd build
-cmake ..
-make
-sudo make install
+#### Install zeroMQ
+$ sudo apt-get install libzmq3-dev 
+$ git clone https://github.com/zeromq/zmqpp.git
+$ cd zmqpp
+$ mkdir build && cd build
+$ cmake ..
+$ make
+$ sudo make install
 
 sudo apt install protobuf-compiler libprotobuf-dev
 pip install pyzmq
