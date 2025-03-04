@@ -35,29 +35,32 @@ $ sudo apt install sqlite3 libsqlite3-dev
 #### Install mesa
 $ sudo add-apt-repository ppa:kisak/kisak-mesa
 #### Install zeroMQ
-$ sudo apt-get install libzmq3-dev 
-$ git clone https://github.com/zeromq/zmqpp.git
-$ cd zmqpp
-$ mkdir build && cd build
-$ cmake ..
-$ make
+$ sudo apt-get install libzmq3-dev\
+$ git clone https://github.com/zeromq/zmqpp.git \
+$ cd zmqpp\
+$ mkdir build && cd build\
+$ cmake ..\
+$ make\
 $ sudo make install
-
+#### Install Protobuf
 sudo apt install protobuf-compiler libprotobuf-dev
-pip install pyzmq
+
 
 ## Setup Python virual environment
-NOTE: To setup the Python virtual environment you must be in the build directory.
+NOTE: To setup the Python virtual environment you must be in the build directory. Run all pip commands within the 
+build directory.
 #### Create the virtual environment
 $ python3 -m venv models-venv
 #### Activate it
 $ source models-venv/bin/activate
-#### Install EasyOCR inside the virtual environment
+#### Install EasyOCR
 $ pip install easyocr
-#### Install Efficientnet within the virtual environment
+#### Install Efficientnett
 $ pip install efficientnet
 #### Install Tensorflow
 $ pip install tensorflow
+#### Install zeroMQ
+pip install pyzmq
 
 # Developer Notes
 ## Function Comment Format (javadoc)
