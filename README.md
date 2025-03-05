@@ -43,7 +43,7 @@ $ cmake ..\
 $ make\
 $ sudo make install
 #### Install Protobuf
-sudo apt install protobuf-compiler libprotobuf-dev
+$ sudo apt install protobuf-compiler libprotobuf-dev
 
 
 ## Setup Python virual environment
@@ -60,7 +60,7 @@ $ pip install efficientnet
 #### Install Tensorflow
 $ pip install tensorflow
 #### Install zeroMQ
-pip install pyzmq
+$ pip install pyzmq
 
 # Developer Notes
 ## Function Comment Format (javadoc)
