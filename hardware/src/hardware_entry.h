@@ -5,6 +5,5 @@
 #include <string>
 
 void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints);
-void sendImagesWithinDirectory(int, const std::string&);
 
 #endif
