@@ -4,6 +4,7 @@
 #include "../../food_item.h"
 #include "hardware.h"
 
+// Communication setup
 Hardware::Hardware(zmqpp::context& context,
                    const struct ExternalEndpoints& externalEndpoints)
     : externalEndpoints(externalEndpoints),
@@ -18,6 +19,28 @@ Hardware::Hardware(zmqpp::context& context,
   } catch (const zmqpp::exception& e) {
     std::cerr << e.what();
   }
+}
+
+/*
+ * Sends the photo directory and weight data to the AI Vision system.
+ *
+ * @param weight The weight of the object on the platform.
+ * @return None
+ */
+void Hardware::sendDataToVision() {
+  this->logger.log("Sending images from hardware to vision");
+  const std::chrono::time_point<std::chrono::system_clock> now{
+      std::chrono::system_clock::now()};
+
+  std::filesystem::path filePath       = "../images/temp";
+  std::chrono::year_month_day scanDate = std::chrono::floor<std::chrono::days>(now);
+
+  FoodItem foodItem(filePath, scanDate, this->itemWeight);
+
+  this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
+  sendFoodItem(this->requestVisionSocket, foodItem);
+
+  this->logger.log("Done sending images from hardware to vision");
 }
 
 /*
@@ -62,47 +85,35 @@ bool Hardware::checkStartSignal() {
  * */
 bool Hardware::startScan() {
   this->logger.log("Starting scan");
-  // TODO add in a mkdir command to create a directory for the images for this process
+  
   this->logger.log("Checking weight");
   if (checkWeight() == false) {
     // TODO handle no weight on platform
+    // Send error to display
+    // Possible pattern HW error msg -> Display message with 3 options:
+    // 1. Retry 2. Skip/Override 3. Cancel
+    // Response from Display will then decide action
+    this->logger.log("No weight detected on platform");
+    return false;
   }
 
   rotateAndCapture();
-  // TODO
   this->logger.log("Scan complete");
   return true;
 }
 
-// TODO
+// TODO 1. setup zmqpp with Arduino
+//      2. integrate code to check weight from Arduino
 bool Hardware::checkWeight() {
-  this->itemWeight = 1;
+  this->itemWeight = 1; // set to 1 for testing
+  if (this->itemWeight <= 0) {
+    // May need to adjust up because the scale is likely sensitive to vibrations
+    return false;
+  }
   return true;
 }
 
-/**
- * Sends the photo directory and weight data to the AI Vision system.
- *
- * @param weight The weight of the object on the platform.
- * @return None
- */
-void Hardware::sendDataToVision() {
-  this->logger.log("Sending images from hardware to vision");
-  const std::chrono::time_point<std::chrono::system_clock> now{
-      std::chrono::system_clock::now()};
-
-  std::filesystem::path filePath       = "../images/temp";
-  std::chrono::year_month_day scanDate = std::chrono::floor<std::chrono::days>(now);
-
-  FoodItem foodItem(filePath, scanDate, this->itemWeight);
-
-  this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
-  sendFoodItem(this->requestVisionSocket, foodItem);
-
-  this->logger.log("Done sending images from hardware to vision");
-}
-
-/**
+/*
  * Rotates platform in 45-degree increments, captures images, and sends the
  * data to the AI Vision system until a full 360-degree rotation is complete.
  * The process can be stopped early if AI Vision sends a "STOP" signal
@@ -114,16 +125,36 @@ void Hardware::rotateAndCapture() {
   for (int angle = 0; angle < 8; angle++) {
     this->logger.log("At location " + std::to_string(angle) + " of 8");
 
-    // TODO
-    // This function is for both cameras
-    // if (takePhotos(angle) == false) {
-    //   LOG(INFO) << "Error taking photos";
-    // };
-
-    // Temporary
-    if (capturePhoto(angle) == false) {
-      this->logger.log("Error taking a photo");
+    if (angle > 0) {
+      this->logger.log("Checking for stop signal from vision");
+      bool receivedStopSignal = false;
+      bool receivedRequest    = false;
+      std::string request;
+      receivedRequest = this->replySocket.receive(request, true);
+      if (receivedRequest) {
+        if (request == "item identified") {
+          this->logger.log("Received stop signal from vision");
+          receivedStopSignal = true;
+        }
+        else {
+          this->logger.log("Received other from vision");
+        }
+      }
+      if (receivedStopSignal) {
+        this->logger.log("AI Vision identified item. Stopping process.");
+        break;
+      }
+      this->logger.log("AI Vision did not identify item. Continuing process.");
     }
+
+    // Leaving in T/F logic in case we need to add error handling later
+    if (takePhotos(angle) == false) {
+      this->logger.log("Error taking photos");
+    };
+
+    // if (capturePhoto(angle) == false) {
+    //   this->logger.log("Error taking a photo");
+    // }
 
     if (angle == 0) {
       sendDataToVision();
@@ -131,29 +162,10 @@ void Hardware::rotateAndCapture() {
 
     this->logger.log("Rotating platform");
     // TODO rotateMotor();
-    usleep(500);
 
-    this->logger.log("Checking for stop signal from vision");
-    bool receivedStopSignal = false;
-    bool receivedRequest    = false;
-    std::string request;
-    receivedRequest = this->replySocket.receive(request, true);
-    if (receivedRequest) {
-      if (request == "item identified") {
-        this->logger.log("Received stop signal from vision");
-        receivedStopSignal = true;
-      }
-      else {
-        this->logger.log("Received something else from vision");
-      }
-    }
-
-    if (receivedStopSignal) {
-      this->logger.log("AI Vision identified item. Stopping process.");
-      break;
-    }
-
-    this->logger.log("AI Vision did not identify item. Continuing process.");
+    // Swap comment lines below if you don't want to wait on realistic motor rotation time
+    // usleep(500);
+    sleep(3);
   }
 }
 

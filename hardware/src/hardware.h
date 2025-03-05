@@ -10,9 +10,9 @@ class Hardware {
 public:
   Hardware(zmqpp::context& context, const struct ExternalEndpoints& externalEndpoints);
 
+  void sendDataToVision();
   bool checkStartSignal();
   bool startScan();
-  void sendDataToVision();
 
 private:
   ExternalEndpoints externalEndpoints;
@@ -23,16 +23,17 @@ private:
   zmqpp::socket requestDisplaySocket;
   zmqpp::socket replySocket;
 
-  const std::string IMAGE_DIRECTORY = "/home/pi/Documents/raspi-yolo/images/temp/";
-  // Code for when testing on different pi
-  //  const std::string IMAGE_DIRECTORY =
-  //  "/home/geromy/Desktop/Project/raspi-yolo/images/temp/";
+  // const std::string IMAGE_DIRECTORY = "/home/pi/Documents/raspi-yolo/images/temp/";
+
+  // Code for Geromy
+  const std::string IMAGE_DIRECTORY =
+      "/home/geromy/Desktop/Project/raspi-yolo/images/temp/";
 
   float itemWeight = 0;
-
-  void rotateAndCapture();
-  bool capturePhoto(int angle);
   bool checkWeight();
+  void rotateAndCapture();
+  bool takePhotos(int angle);
+  bool capturePhoto(int angle);
 };
 
 #endif
