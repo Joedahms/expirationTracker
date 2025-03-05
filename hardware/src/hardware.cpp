@@ -178,13 +178,17 @@ void Hardware::rotateAndCapture() {
  */
 bool Hardware::takePhotos(int angle) {
   this->logger.log("Taking photos at position: " + std::to_string(angle));
+  std::string cmd0      = "rpicam-jpeg --camera 0";
+  std::string cmd1      = "rpicam-jpeg --camera 1";
+  std::string np        = " --nopreview";
+  std::string mode      = " --mode 1920:1080:10:U";
+  std::string out       = " --output ";
+  std::string to        = " --timeout 50";
   std::string topPhoto  = this->IMAGE_DIRECTORY + std::to_string(angle) + "_top.jpg";
   std::string sidePhoto = this->IMAGE_DIRECTORY + std::to_string(angle) + "_side.jpg";
 
-  std::string command0 =
-      "rpicam-jpeg --camera 0 -n -t 50 1920:1080:10:U --output " + topPhoto;
-  std::string command1 =
-      "rpicam-jpeg --camera 1 -n -t 50 1920:1080:10:U --output " + sidePhoto;
+  std::string command0 = cmd0 + np + mode + out + topPhoto + to;
+  std::string command1 = cmd0 + np + mode + out + sidePhoto + to;
   system(command0.c_str());
   system(command1.c_str());
 
