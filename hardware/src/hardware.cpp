@@ -146,25 +146,26 @@ void Hardware::rotateAndCapture() {
     sleep(3);
 
     this->logger.log("Checking for stop signal from vision");
-      bool receivedStopSignal = false;
-      bool receivedRequest    = false;
-      std::string request;
-      receivedRequest = this->replySocket.receive(request, true);
-      if (receivedRequest) {
-        if (request == "item identified") {
-          this->logger.log("Received stop signal from vision");
-          receivedStopSignal = true;
-        }
-        else {
-          // Could skip receivedStopSignal and this else statement and just break if "item identified"
-          this->logger.log("Received other from vision");
-        }
+    bool receivedStopSignal = false;
+    bool receivedRequest    = false;
+    std::string request;
+    receivedRequest = this->replySocket.receive(request, true);
+    if (receivedRequest) {
+      if (request == "item identified") {
+        this->logger.log("Received stop signal from vision");
+        receivedStopSignal = true;
       }
-      if (receivedStopSignal) {
-        this->logger.log("AI Vision identified item. Stopping process.");
-        break;
+      else {
+        // Could skip receivedStopSignal and this else statement and just break if "item
+        // identified"
+        this->logger.log("Received other from vision");
       }
-      this->logger.log("AI Vision did not identify item. Continuing process.");
+    }
+    if (receivedStopSignal) {
+      this->logger.log("AI Vision identified item. Stopping process.");
+      break;
+    }
+    this->logger.log("AI Vision did not identify item. Continuing process.");
   }
 }
 
@@ -173,8 +174,10 @@ bool Hardware::takePhotos(int angle) {
   std::string topPhoto  = this->IMAGE_DIRECTORY + std::to_string(angle) + "_top.jpg";
   std::string sidePhoto = this->IMAGE_DIRECTORY + std::to_string(angle) + "_side.jpg";
 
-  std::string command0 = "rpicam-jpeg -camera 0 -n -t 50 1920:1080:10:U --output " + topPhoto;
-  std::string command1 = "rpicam-jpeg -camera 1 -n -t 50 1920:1080:10:U --output " + sidePhoto;
+  std::string command0 =
+      "rpicam-jpeg --camera 0 -n -t 50 1920:1080:10:U --output " + topPhoto;
+  std::string command1 =
+      "rpicam-jpeg --camera 1 -n -t 50 1920:1080:10:U --output " + sidePhoto;
   system(command0.c_str());
   system(command1.c_str());
 
