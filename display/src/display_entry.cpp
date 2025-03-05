@@ -15,22 +15,10 @@
  * (vision and hardware).
  * @return None
  */
-void displayEntry(struct Pipes externalPipes) {
+void displayEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints) {
   LOG(INFO) << "Entered display process";
 
-  // Close write end of read pipes
-  close(externalPipes.hardwareToDisplay[WRITE]);
-  close(externalPipes.visionToDisplay[WRITE]);
-
-  // Close read end of write pipes
-  close(externalPipes.displayToHardware[READ]);
-  close(externalPipes.displayToVision[READ]);
-
-  // SDL pipes
-  int engineToDisplay[2];
-  int displayToEngine[2];
-  pipe(engineToDisplay);
-  pipe(displayToEngine);
+  const std::string engineEndpoint = "ipc:///tmp/engine_endpoint";
 
   int sdlPid;
   if ((sdlPid = fork()) == -1) {
@@ -40,22 +28,18 @@ void displayEntry(struct Pipes externalPipes) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("display_engine");
 
-    // In engine
-    close(engineToDisplay[READ]);
-    close(displayToEngine[WRITE]);
-
-    engineEntry(engineToDisplay, displayToEngine);
+    engineEntry(context, externalEndpoints.displayEndpoint, engineEndpoint);
   }
   else {
     // Still in display entry
-    close(engineToDisplay[WRITE]);
-    close(displayToEngine[READ]);
-    DisplayHandler displayHandler(externalPipes, displayToEngine, engineToDisplay);
+    DisplayHandler displayHandler(context, externalEndpoints, engineEndpoint);
 
     while (1) {
       bool stringFromSdl = false;
-      displayHandler.handleExternal();
-      displayHandler.handleEngine();
+      displayHandler.handle();
+      //       displayHandler.handleExternal();
+      //
+      //      displayHandler.handleEngine();
     }
   }
 }

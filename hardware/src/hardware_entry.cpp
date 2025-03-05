@@ -7,9 +7,7 @@
 #include <unistd.h>
 
 #include "../../food_item.h"
-#include "../../pipes.h"
-#include "../controls/cameras.h"
-// #include "../controls/weight.h"
+#include "hardware.h"
 #include "hardware_entry.h"
 #include "io.h"
 
@@ -21,80 +19,78 @@
  * @param pipes Pipes for hardware to communicate with the other processes
  * @return None
  */
-void hardwareEntry(struct Pipes pipes) {
+void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints endpoints) {
   LOG(INFO) << "Within hardware process";
 
-  // Close write end of read pipes
-  close(pipes.displayToHardware[WRITE]);
-  close(pipes.visionToHardware[WRITE]);
-
-  // Close read end of write pipes
-  close(pipes.hardwareToDisplay[READ]);
-  close(pipes.hardwareToVision[READ]);
-
-  /*
-   * Wait for start signal from Display with 0.5sec sleep.
-   */
-  while (1) {
-    LOG(INFO) << "Waiting for start signal from Display";
-    if (receivedStartSignal(pipes.displayToHardware[READ])) {
-      LOG(INFO) << "Checking if there is weight on the platform";
-      //      weightSetup();
-      //      float weight = getWeight();
-      float weight = 1;
-      if (weight > 0) {
-        LOG(INFO) << "Weight detected on platform. Beginning scan.";
-        // send 1 to display to indicate weight
-        rotateAndCapture(pipes, weight);
-      }
-      else {
-        LOG(INFO) << "No weight detected on platform.";
-        // send 0 to display to indicate no weight
-        continue;
-      }
+  // while 1
+  Hardware hardware(context, endpoints);
+  bool startSignalReceived = false;
+  while (startSignalReceived == false) {
+    startSignalReceived = hardware.checkStartSignal();
+    if (startSignalReceived == false) {
+      ;
     }
-    else {
-      usleep(500000);
-    }
+  }
+
+  bool scanSuccessful = hardware.startScan();
+
+  if (scanSuccessful) {
+    LOG(INFO) << "Scan successful";
+    // hardware.sendDataToVision();
   }
 }
 
 /**
- * Rotates platform in 45-degree increments, captures images, and sends the
- * data to the AI Vision system until a full 360-degree rotation is complete.
- * The process can be stopped early if AI Vision sends a "STOP" signal
- * 0 - continue or 1 - stop
+ * Method to send images from a given directory using the pipe provided. It cycles through
+ * all .jpg images within the directory and sends them across processes.
  *
- * @return None
+ * Input:
+ * @param pipeToWrite Pipe to write image information to
+ * @param directory_path Directory path as a string to get images from
+ * Output: None
  */
-void rotateAndCapture(struct Pipes pipes, float weight) {
-  for (int angle = 0; angle < 8; angle++) {
-    LOG(INFO) << "At location " << angle << " of 8";
-    // This function is for both cameras
-    // if (takePhotos(angle) == false) {
-    //   LOG(INFO) << "Error taking photos";
-    // };
-    if (capturePhoto(angle) == false) {
-      LOG(INFO) << "Error taking a photo";
-    }; // This function is for one camera/testing
-    if (angle == 0) {
-      sleep(2);
-      sendDataToVision(pipes.hardwareToVision[WRITE], weight);
-    }
 
-    LOG(INFO) << "Rotating platform...";
-    std::cout << "Rotating platform" << std::endl;
-    //    rotateMotor();
-    usleep(500);
+void sendImagesWithinDirectory(int pipeToWrite, const std::string& directory_path) {
+  for (const auto& entry : std::filesystem::directory_iterator(directory_path)) {
+    if (entry.is_regular_file()) {
+      const std::string file_path = entry.path().string();
 
-    bool stopSignal = false;
-    if (read(pipes.visionToHardware[READ], &stopSignal, sizeof(stopSignal) == true) > 0 &&
-        stopSignal) {
-      LOG(INFO) << "AI Vision identified item. Stopping process.";
-      std::cout << "AI Vision identified item. Stopping process." << std::endl;
-      break;
+      // Check if the file has a .jpg extension
+      if (entry.path().extension() != ".jpg") {
+        continue; // Skip non-.jpg files
+      }
+
+      // Open the file
+      std::ifstream file(file_path, std::ios::binary | std::ios::ate);
+      if (!file.is_open()) {
+        LOG(FATAL) << "Failed to open file: " << file_path;
+        continue;
+      }
+
+      // Get the file size
+      std::streamsize file_size = file.tellg();
+      file.seekg(0, std::ios::beg);
+
+      // Header: Send the file size (4 bytes)
+      uint32_t header = static_cast<uint32_t>(file_size);
+      write(pipeToWrite, &header, sizeof(header)); // Send file size
+
+      // Send the file data in chunks
+      const int CHUNK_SIZE = 4096;
+      char buffer[CHUNK_SIZE];
+      while (file_size > 0) {
+        std::streamsize to_read =
+            std::min(file_size, static_cast<std::streamsize>(CHUNK_SIZE));
+        file.read(buffer, to_read);
+        write(pipeToWrite, buffer, to_read);
+        file_size -= to_read;
+      }
+
+      file.close();
     }
-    LOG(INFO) << "AI Vision did not identify item. Continuing process.";
-    std::cout << "Spin again!" << std::endl;
   }
+
+  // Send a special header with size 0 to signal end of transmission
+  uint32_t end_signal = 0;
+  write(pipeToWrite, &end_signal, sizeof(end_signal));
 }

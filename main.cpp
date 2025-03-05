@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <zmqpp/zmqpp.hpp>
 
 #include "display/src/display_entry.h"
 #include "hardware/src/hardware_entry.h"
@@ -11,10 +12,9 @@
 int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
 
-  Pipes pipes;
-
-  // Initialize all pipes
-  initializePipes(pipes);
+  // Context and endpoints
+  zmqpp::context context;
+  ExternalEndpoints externalEndpoints;
 
   LOG(INFO) << "Starting display process..";
   int displayPid;
@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("display");
 
-    displayEntry(pipes);
+    displayEntry(context, externalEndpoints);
     LOG(INFO) << "Display process";
     return 0;
   }
@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("hardware");
 
-    hardwareEntry(pipes);
+    hardwareEntry(context, externalEndpoints);
     LOG(INFO) << "Hardware process";
     return 0;
   }
@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("vision");
 
-    visionEntry(pipes);
+    visionEntry(context, externalEndpoints);
     LOG(INFO) << "Vision process";
     return 0;
   }

@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <zmqpp/zmqpp.hpp>
 
 #include "states/item_list.h"
 #include "states/main_menu.h"
@@ -26,7 +27,10 @@ public:
                 int screenWidth,
                 int screenHeight,
                 bool fullscreen,
-                struct DisplayGlobal displayGlobal);
+                struct DisplayGlobal displayGlobal,
+                const zmqpp::context& context,
+                const std::string& displayEndpoint,
+                const std::string& engineEndpoint);
 
   SDL_Window* setupWindow(const char* windowTitle,
                           int windowXPosition,
@@ -36,8 +40,8 @@ public:
                           bool fullscreen);
   void initializeEngine(SDL_Window* window);
 
-  void checkState(int* engineToDisplay, int* displayToEngine);
-  void handleEvents(int* engineToDisplay, int* displayToEngine);
+  void checkState();
+  void handleEvents();
   void checkKeystates();
   void update();
 
@@ -47,6 +51,12 @@ public:
 
 private:
   struct DisplayGlobal displayGlobal;
+
+  zmqpp::socket replySocket;
+  zmqpp::socket requestSocket;
+
+  const std::string& DISPLAY_ENDPOINT;
+  const std::string& ENGINE_ENDPOINT;
 
   EngineState engineState = EngineState::MAIN_MENU;
 

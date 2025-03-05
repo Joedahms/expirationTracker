@@ -4,7 +4,8 @@
 #include "../../pipes.h"
 #include <string>
 
-void hardwareEntry(struct Pipes pipes);
-void rotateAndCapture(struct Pipes pipes, float weight);
+void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints);
+void redoThis(struct Pipes pipes);
+void sendImagesWithinDirectory(int, const std::string&);
 
 #endif

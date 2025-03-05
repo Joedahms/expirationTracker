@@ -1,6 +1,7 @@
 #ifndef PIPES_H
 #define PIPES_H
 
+#include <string>
 #include <unistd.h>
 
 // Define constants for readability
@@ -16,6 +17,12 @@ struct Pipes {
 
   int visionToDisplay[2];
   int visionToHardware[2];
+};
+
+struct ExternalEndpoints {
+  const std::string visionEndpoint   = "ipc:///tmp/vision_endpoint";
+  const std::string hardwareEndpoint = "ipc:///tmp/hardware_endpoint";
+  const std::string displayEndpoint  = "ipc:///tmp/display_endpoint";
 };
 
 /**

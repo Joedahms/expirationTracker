@@ -2,20 +2,27 @@
 #define DISPLAY_HANDLER_H
 
 #include <sqlite3.h>
+#include <zmqpp/zmqpp.hpp>
 
 #include "../../food_item.h"
 #include "../../pipes.h"
 
 class DisplayHandler {
 public:
-  DisplayHandler(struct Pipes externalPipes, int* displayToEngine, int* engineToDisplay);
-  void handleExternal();
-  void handleEngine();
+  DisplayHandler(zmqpp::context& context,
+                 struct ExternalEndpoints externalEndpoints,
+                 const std::string& engineEndpoint);
+  void handle();
 
 private:
-  struct Pipes externalPipes;
-  int* displayToEngine;
-  int* engineToDisplay;
+  ExternalEndpoints externalEndpoints;
+  const std::string engineEndpoint;
+
+  zmqpp::socket requestEngineSocket;
+  zmqpp::socket requestHardwareSocket;
+  zmqpp::socket requestVisionSocket;
+
+  zmqpp::socket replySocket;
 
   void sendStartSignal();
 };
