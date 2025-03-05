@@ -5,4 +5,5 @@ yoloDarknet/yolov4.weights
 images/
 vision/Models/__pycache__/
 *.swp
-*/*/*.swp
+/*/*.swp
+/*/*/*.swp
