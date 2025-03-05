@@ -17,6 +17,7 @@ def run_server():
     
     try:
         while True:
+            print(f"Waiting for request");
             # Wait for request from client
             request = socket.recv_string()
             print(f"Received request: {request}")
