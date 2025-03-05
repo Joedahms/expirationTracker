@@ -181,7 +181,7 @@ bool Hardware::takePhotos(int angle) {
   std::string cmd0      = "rpicam-jpeg --camera 0";
   std::string cmd1      = "rpicam-jpeg --camera 1";
   std::string np        = " --nopreview";
-  std::string mode      = " --mode 1920:1080:10:U";
+  std::string mode      = " --mode 2304:1296:10:U";
   std::string out       = " --output ";
   std::string to        = " --timeout 50";
   std::string topPhoto  = this->IMAGE_DIRECTORY + std::to_string(angle) + "_top.jpg";
