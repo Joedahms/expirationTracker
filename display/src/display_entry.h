@@ -1,8 +1,10 @@
 #ifndef DISPLAY_PIPE_H
 #define DISPLAY_PIPE_H
 
-#include "../../pipes.h"
+#include <zmqpp/zmqpp.hpp>
 
-void displayEntry(struct Pipes externalPipes);
+#include "../../endpoints.h"
+
+void displayEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints);
 
 #endif

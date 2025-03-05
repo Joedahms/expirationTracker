@@ -1,22 +1,38 @@
 #include "../include/TextClassifier.h"
 
 /**
- * Handle classification via text extraction
+ * @param context The zeroMQ context with which to creates with
+ * @param textClassifierEndpoint Endpoint of the text classifier
+ * @param pythonServerEndpoint Endpont of the python server
+ */
+TextClassifier::TextClassifier(zmqpp::context& context,
+                               const std::string& textClassifierEndpoint,
+                               const std::string& pythonServerEndpoint)
+    : IModel("text_classifer.txt", context) {
+  try {
+    this->requestSocket.connect(pythonServerEndpoint);
+    this->replySocket.bind(textClassifierEndpoint);
+  } catch (const zmqpp::exception& e) {
+    LOG(FATAL) << e.what();
+  }
+}
+
+/**
+ * Handle classification via text extraction.
  *
- * Input:
- * @param imagePath path to the image you wish to extract text from
- * @return success of the attempt
+ * @param imagePath Path to the image to extract text from
+ * @return True if item successfully classified. False if item not classified.
  */
 bool TextClassifier::handleClassification(const std::filesystem::path& imagePath) {
-  LOG(INFO) << "Entering HandleClassificationOCR";
+  this->logger.log("Entering handleClassification, running model");
   auto result = this->runModel(imagePath);
 
   std::string detectedClass = std::string(result);
   if (detectedClass.find("CLASSIFICATION") != std::string::npos) {
-    foodItem.name         = removePrefix(detectedClass, "CLASSIFICATION: ");
-    foodItem.absolutePath = std::filesystem::absolute(imagePath);
-    foodItem.category     = FoodCategories::packaged;
-    foodItem.quantity     = 1;
+    this->foodItem.setName(removePrefix(detectedClass, "CLASSIFICATION: "));
+    this->foodItem.setImagePath(std::filesystem::absolute(imagePath));
+    this->foodItem.setCategory(FoodCategories::packaged);
+    this->foodItem.setQuantity(1);
     return true;
   }
   return false;
@@ -26,19 +42,17 @@ bool TextClassifier::handleClassification(const std::filesystem::path& imagePath
  * Handle calling python script to run text extraction.
  *
  * Input:
- * @param imagePath path to the image you wish to extract text from
- * @return valid class detected
+ * @param imagePath path to the image to extract text from
+ * @return The result send back from the python server
  */
-std::string TextClassifier::runModel(const std::filesystem::path& imagePath) const {
-  LOG(INFO) << "Entering runClassificationOCR";
+std::string TextClassifier::runModel(const std::filesystem::path& imagePath) {
+  this->logger.log("Entering runModel");
 
-  sendRequest(TaskType::OCR, imagePath);
-
-  std::string result = readResponse();
+  std::string result = sendRequest(TaskType::OCR, imagePath);
 
   if (result.find("ERROR") != std::string::npos) {
     LOG(FATAL) << result;
   }
-  LOG(INFO) << result;
+  this->logger.log("Result from running model: " + result);
   return result;
 }

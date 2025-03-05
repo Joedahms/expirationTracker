@@ -2,20 +2,21 @@
 #include <iostream>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <zmqpp/zmqpp.hpp>
 
 #include "display/src/display_entry.h"
+#include "endpoints.h"
 #include "hardware/src/hardware_entry.h"
-#include "pipes.h"
 #include "vision/include/visionMain.h"
 
 int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
 
-  Pipes pipes;
+  // Context and endpoints
+  zmqpp::context context;
+  ExternalEndpoints externalEndpoints;
 
-  // Initialize all pipes
-  initializePipes(pipes);
-
+  // Display
   LOG(INFO) << "Starting display process..";
   int displayPid;
   if ((displayPid = fork()) == -1) {
@@ -25,7 +26,7 @@ int main(int argc, char* argv[]) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("display");
 
-    displayEntry(pipes);
+    displayEntry(context, externalEndpoints);
     LOG(INFO) << "Display process";
     return 0;
   }
@@ -33,6 +34,7 @@ int main(int argc, char* argv[]) {
     LOG(INFO) << "Display process started successfully";
   }
 
+  // Hardware
   LOG(INFO) << "Starting hardware process..";
   int hardwarePid;
   if ((hardwarePid = fork()) == -1) {
@@ -42,7 +44,7 @@ int main(int argc, char* argv[]) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("hardware");
 
-    hardwareEntry(pipes);
+    hardwareEntry(context, externalEndpoints);
     LOG(INFO) << "Hardware process";
     return 0;
   }
@@ -50,6 +52,7 @@ int main(int argc, char* argv[]) {
     LOG(INFO) << "Hardware process started successfully";
   }
 
+  // Vision
   LOG(INFO) << "Starting vision process..";
   int visionPid;
   if ((visionPid = fork()) == -1) {
@@ -59,7 +62,7 @@ int main(int argc, char* argv[]) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("vision");
 
-    visionEntry(pipes);
+    visionEntry(context, externalEndpoints);
     LOG(INFO) << "Vision process";
     return 0;
   }

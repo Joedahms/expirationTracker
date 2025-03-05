@@ -11,20 +11,23 @@
  * @param None
  * @return None
  */
-void engineEntry(int* engineToDisplay, int* displayToEngine) {
+void engineEntry(const zmqpp::context& context,
+                 const std::string& displayEndpoint,
+                 const std::string& engineEndpoint) {
   LOG(INFO) << "SDL display process started successfully";
 
   struct DisplayGlobal displayGlobal;
 
   // Initialize the displayEngine
   DisplayEngine displayEngine("Display", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                              1024, 600, false, displayGlobal);
+                              1024, 600, false, displayGlobal, context, displayEndpoint,
+                              engineEndpoint);
 
   while (displayEngine.running()) {
-    displayEngine.handleEvents(engineToDisplay, displayToEngine);
-    displayEngine.checkState(engineToDisplay, displayToEngine);
+    displayEngine.handleEvents();
+    displayEngine.checkState();
     displayEngine.checkKeystates();
-    displayEngine.checkState(engineToDisplay, displayToEngine);
+    displayEngine.checkState();
     displayEngine.update();
     displayEngine.renderState();
   }

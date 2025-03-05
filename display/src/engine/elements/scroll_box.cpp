@@ -90,7 +90,7 @@ void ScrollBox::refreshPanels() {
 
   for (auto& foodItem : allFoodItems) {
     std::unique_ptr<Panel> newPanel =
-        std::make_unique<Panel>(this->displayGlobal, boundaryRectangle, foodItem.id);
+        std::make_unique<Panel>(this->displayGlobal, boundaryRectangle, foodItem.getId());
     boundaryRectangle.y += panelHeight;
 
     newPanel->addFoodItem(foodItem, SDL_Point{0, 0});

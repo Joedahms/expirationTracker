@@ -105,7 +105,7 @@ void Panel::addFoodItemName(const FoodItem& foodItem, const SDL_Point& relativeP
   int fontSize         = 24;
   SDL_Color textColor  = {0, 255, 0, 255}; // Green
 
-  addText(fontPath, foodItem.name, fontSize, textColor, relativePosition);
+  addText(fontPath, foodItem.getName(), fontSize, textColor, relativePosition);
 }
 
 /**
@@ -117,16 +117,17 @@ void Panel::addFoodItemName(const FoodItem& foodItem, const SDL_Point& relativeP
  */
 void Panel::addFoodItemExpirationDate(const FoodItem& foodItem,
                                       const SDL_Point& relativePosition) {
-  std::string fontPath = this->displayGlobal.futuramFontPath;
-  int fontSize         = 24;
-  SDL_Color textColor  = {0, 255, 0, 255}; // Green
+  std::string fontPath                       = this->displayGlobal.futuramFontPath;
+  int fontSize                               = 24;
+  SDL_Color textColor                        = {0, 255, 0, 255}; // Green
+  std::chrono::year_month_day expirationDate = foodItem.getExpirationDate();
 
   // Expires
   addText(fontPath, " Expires: ", fontSize, textColor, relativePosition);
 
   // Month
   std::string expirationDateMonth =
-      std::to_string(static_cast<unsigned>(foodItem.expirationDate.month()));
+      std::to_string(static_cast<unsigned>(expirationDate.month()));
   addText(fontPath, expirationDateMonth, fontSize, textColor, relativePosition);
 
   // Slash
@@ -134,7 +135,7 @@ void Panel::addFoodItemExpirationDate(const FoodItem& foodItem,
 
   // Date
   std::string expirationDateDay =
-      std::to_string(static_cast<unsigned>(foodItem.expirationDate.day()));
+      std::to_string(static_cast<unsigned>(expirationDate.day()));
   addText(fontPath, expirationDateDay, fontSize, textColor, relativePosition);
 
   // Slash
@@ -142,6 +143,6 @@ void Panel::addFoodItemExpirationDate(const FoodItem& foodItem,
 
   // Year
   std::string expirationDateYear =
-      std::to_string(static_cast<int>(foodItem.expirationDate.year()));
+      std::to_string(static_cast<int>(expirationDate.year()));
   addText(fontPath, expirationDateYear, fontSize, textColor, relativePosition);
 }

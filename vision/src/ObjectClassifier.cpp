@@ -1,5 +1,8 @@
+/*
 
 #include "../include/ObjectClassifier.h"
+
+ObjectClassifier::ObjectClassifier() {}
 
 /**
  * Handle object classification
@@ -8,22 +11,25 @@
  * @param imagePath path to the image you wish to extract text from
  * @return success of attempt
  */
+/*
 bool ObjectClassifier::handleClassification(const std::filesystem::path& imagePath) {
   LOG(INFO) << "Handling EfficientNet Classification";
   std::string result = runModel(imagePath);
 
   std::string detectedClass = std::string(result);
   if (detectedClass.find("CLASSIFICATION") != std::string::npos) {
-    this->foodItem.name         = removePrefix(detectedClass, "CLASSIFICATION: ");
-    this->foodItem.category     = FoodCategories::unpackaged;
-    this->foodItem.absolutePath = std::filesystem::absolute(imagePath);
-    this->foodItem.expirationDate =
-        std::chrono::year{2025} / std::chrono::month{2} / std::chrono::day{20};
-    this->foodItem.quantity = 1;
+    this->foodItem.setName(removePrefix(detectedClass, "CLASSIFICATION: "));
+    this->foodItem.setCategory(FoodCategories::unpackaged);
+    this->foodItem.setImagePath(std::filesystem::absolute(imagePath));
+    this->foodItem.setExpirationDate(std::chrono::year{2025} / std::chrono::month{2} /
+                                     std::chrono::day{20});
+    this->foodItem.setQuantity(1);
     return true;
   }
   return false;
 }
+
+
 
 /**
  * Call and return output of python classification script
@@ -32,6 +38,7 @@ bool ObjectClassifier::handleClassification(const std::filesystem::path& imagePa
  * @param imagePath path to the image you wish to extract text from
  * @return string containing detected class
  */
+/*
 std::string ObjectClassifier::runModel(const std::filesystem::path& imagePath) const {
   LOG(INFO) << "Running EfficientNet model.";
 
@@ -45,3 +52,4 @@ std::string ObjectClassifier::runModel(const std::filesystem::path& imagePath) c
   LOG(INFO) << result;
   return result;
 }
+*/
