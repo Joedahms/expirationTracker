@@ -20,6 +20,13 @@ Hardware::Hardware(zmqpp::context& context,
   }
 }
 
+/*
+ * Checks for a start signal from the display.
+ * Used to start the scan process.ADJ_OFFSET_SINGLESHOT
+ *
+ * @param None
+ * @return bool - True if start signal received, false otherwise
+ */
 bool Hardware::checkStartSignal() {
   this->logger.log("Checking for start signal from display");
   bool receivedRequest = false;
@@ -45,13 +52,17 @@ bool Hardware::checkStartSignal() {
   }
 }
 
+/*
+ * Function call to controls routine:
+ * Checks weight
+ * weight = ~0 -> error to Display
+ * weight = +int -> start scan
+ *
+ * @return bool
+ * */
 bool Hardware::startScan() {
   this->logger.log("Starting scan");
-  /**
-   * Function call to controls routine
-   * has a pipe read from vision in loop
-   */
-
+  // TODO add in a mkdir command to create a directory for the images for this process
   this->logger.log("Checking weight");
   if (checkWeight() == false) {
     // TODO handle no weight on platform
@@ -146,15 +157,31 @@ void Hardware::rotateAndCapture() {
   }
 }
 
+bool Hardware::takePhotos(int angle) {
+  this->logger.log("Taking photos at position: " + std::to_string(angle));
+  std::string topPhoto  = this->IMAGE_DIRECTORY + std::to_string(angle) + "_top.jpg";
+  std::string sidePhoto = this->IMAGE_DIRECTORY + std::to_string(angle) + "_side.jpg";
+
+  std::string command0 = "rpicam-jpeg -n -t 50 1920:1080:12:U --output " + topPhoto;
+  std::string command1 = "rpicam-jpeg -n -t 50 1920:1080:12:U --output " + sidePhoto;
+  system(command0.c_str());
+  system(command1.c_str());
+
+  this->logger.log("Photos successfully captured at position: " + std::to_string(angle));
+  this->logger.log("Exiting takePhotos at angle: " + std::to_string(angle));
+  // Always returns true
+  return true;
+}
+
 bool Hardware::capturePhoto(int angle) {
   this->logger.log("Capturing photo at position: " + std::to_string(angle));
   std::string fileName = this->IMAGE_DIRECTORY + std::to_string(angle) + "_test.jpg";
 
-  std::string command = "rpicam-jpeg --output " + fileName + " -n";
+  std::string command = "rpicam-jpeg -n -t 50 1920:1080:12:U --output " + fileName;
   system(command.c_str());
 
   this->logger.log("Photo successfully captured at position: " + std::to_string(angle));
   this->logger.log("Exiting capturePhoto at angle: " + std::to_string(angle));
-  // TODO always returns true
+  // Always returns true
   return true;
 }
