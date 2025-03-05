@@ -11,10 +11,7 @@
 
 int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
-
-  // Context and endpoints
   zmqpp::context context;
-  ExternalEndpoints externalEndpoints;
 
   // Display
   LOG(INFO) << "Starting display process..";
@@ -26,7 +23,7 @@ int main(int argc, char* argv[]) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("display");
 
-    displayEntry(context, externalEndpoints);
+    displayEntry(context);
     LOG(INFO) << "Display process";
     return 0;
   }
@@ -44,7 +41,7 @@ int main(int argc, char* argv[]) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("hardware");
 
-    hardwareEntry(context, externalEndpoints);
+    hardwareEntry(context);
     LOG(INFO) << "Hardware process";
     return 0;
   }
@@ -62,7 +59,7 @@ int main(int argc, char* argv[]) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("vision");
 
-    visionEntry(context, externalEndpoints);
+    visionEntry(context);
     LOG(INFO) << "Vision process";
     return 0;
   }

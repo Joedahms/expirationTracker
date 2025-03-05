@@ -22,11 +22,11 @@
  * TODO Add an infinite loop so that more than one food item can be scanned per
  * execution.
  */
-void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints) {
+void hardwareEntry(zmqpp::context& context) {
   Logger logger("hardware_entry.txt");
   logger.log("Within hardware process");
 
-  Hardware hardware(context, externalEndpoints);
+  Hardware hardware(context);
   bool startSignalReceived = false;
   int startSignalTimeoutMs = 1000;
   while (startSignalReceived == false) {

@@ -5,10 +5,8 @@
  * @param externalEndpoints Endpoints to the main components of the system (vision,
  * hardware, and display)
  */
-ImageProcessor::ImageProcessor(zmqpp::context& context,
-                               const struct ExternalEndpoints& externalEndpoints)
-    : externalEndpoints(externalEndpoints),
-      requestHardwareSocket(context, zmqpp::socket_type::request),
+ImageProcessor::ImageProcessor(zmqpp::context& context)
+    : requestHardwareSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
       replySocket(context, zmqpp::socket_type::reply), modelHandler(context),
       logger("image_processor.txt") {
@@ -41,11 +39,7 @@ void ImageProcessor::process() {
   if (!detectedFoodItem) {
     this->logger.log("Item not successfully detected");
     // checked 16 images and failed them all
-    //  how to handle?
-    // Still send whatever information we do have to the display
-    //    TODO
-    //    writeString(pipes.visionToDisplay[WRITE],
-    //               "Food item not properly identified. Sending incomplete food item.");
+    this->requestDisplaySocket.send(this->messages.ITEM_DETECTION_FAILED);
   }
 
   // Tell hardware to stop
@@ -65,13 +59,9 @@ void ImageProcessor::process() {
     }
   }
 
-  /*
-  // TODO
-  // send display the food item
   // TODO  printFoodItem(foodItem);
   sendFoodItem(this->requestDisplaySocket, this->foodItem);
   this->logger.log("Sent detected food item to display");
-  */
 }
 
 /**

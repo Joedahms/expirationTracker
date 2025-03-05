@@ -9,4 +9,8 @@ struct ExternalEndpoints {
   const std::string displayEndpoint  = "ipc:///tmp/display_endpoint";
 };
 
+struct Messages {
+  const std::string ITEM_DETECTION_FAILED = "item detection failed";
+};
+
 #endif

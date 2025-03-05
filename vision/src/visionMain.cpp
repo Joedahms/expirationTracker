@@ -9,7 +9,7 @@
  * hardware, and display)
  * @return None
  */
-void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints) {
+void visionEntry(zmqpp::context& context) {
   Logger logger("vision_entry.txt");
   logger.log("Within vision process");
 
@@ -31,8 +31,9 @@ void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpo
   // Wait 5 sec to ensure Python server starts
   sleep(5);
 
-  ImageProcessor processor(context, externalEndpoints);
+  ImageProcessor processor(context);
 
+  ExternalEndpoints externalEndpoints;
   zmqpp::socket replySocket(context, zmqpp::socket_type::reply);
   replySocket.bind(externalEndpoints.visionEndpoint);
   while (1) {

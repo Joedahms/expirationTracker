@@ -12,8 +12,7 @@
 
 class ImageProcessor {
 public:
-  explicit ImageProcessor(zmqpp::context& context,
-                          const struct ExternalEndpoints& externalEndpoints);
+  explicit ImageProcessor(zmqpp::context& context);
   void process();
   bool analyze();
   struct FoodItem& getFoodItem();
@@ -21,6 +20,7 @@ public:
 
 private:
   ExternalEndpoints externalEndpoints;
+  Messages messages;
 
   Logger logger;
 

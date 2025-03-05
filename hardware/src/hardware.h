@@ -14,7 +14,7 @@
 
 class Hardware {
 public:
-  Hardware(zmqpp::context& context, const struct ExternalEndpoints& externalEndpoints);
+  Hardware(zmqpp::context& context);
 
   bool checkStartSignal(int timeoutMs);
   bool startScan();

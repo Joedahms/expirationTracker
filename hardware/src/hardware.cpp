@@ -9,10 +9,8 @@
  * @param externalEndpoints Endpoints to the main components of the system (vision,
  * hardware, and display)
  */
-Hardware::Hardware(zmqpp::context& context,
-                   const struct ExternalEndpoints& externalEndpoints)
-    : externalEndpoints(externalEndpoints),
-      requestVisionSocket(context, zmqpp::socket_type::request),
+Hardware::Hardware(zmqpp::context& context)
+    : requestVisionSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
       replySocket(context, zmqpp::socket_type::reply), logger("hardware_log.txt") {
   try {
