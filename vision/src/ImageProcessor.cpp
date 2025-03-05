@@ -1,6 +1,3 @@
-#include <filesystem>
-#include <iostream>
-
 #include "../include/ImageProcessor.h"
 
 /**
@@ -93,7 +90,6 @@ bool ImageProcessor::analyze() {
       }
 
       // delete bad image
-
       try {
         std::filesystem::remove(entry.path());
         this->logger.log("Deleted unclassified image: " + entry.path().string());
