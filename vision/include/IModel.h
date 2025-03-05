@@ -10,9 +10,6 @@
 #include "../../logger.h"
 #include "helperFunctions.h"
 
-#define PIPE_IN  "/tmp/image_pipe"
-#define PIPE_OUT "/tmp/result_pipe"
-
 enum TaskType { unknown, CLS, OCR, EXP };
 
 class IModel {
@@ -30,8 +27,7 @@ protected:
   virtual std::string runModel(const std::filesystem::path&)      = 0;
   virtual bool handleClassification(const std::filesystem::path&) = 0;
 
-  std::string readResponse() const;
-  void sendRequest(const TaskType&, const std::filesystem::path&);
+  std::string sendRequest(const TaskType&, const std::filesystem::path&);
   std::string taskTypeToString(const TaskType&) const;
 };
 

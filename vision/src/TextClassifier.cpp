@@ -44,9 +44,7 @@ bool TextClassifier::handleClassification(const std::filesystem::path& imagePath
 std::string TextClassifier::runModel(const std::filesystem::path& imagePath) {
   this->logger.log("Entering runModel");
 
-  sendRequest(TaskType::OCR, imagePath);
-
-  std::string result = readResponse();
+  std::string result = sendRequest(TaskType::OCR, imagePath);
 
   if (result.find("ERROR") != std::string::npos) {
     LOG(FATAL) << result;
