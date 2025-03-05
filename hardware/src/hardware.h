@@ -23,11 +23,11 @@ private:
   zmqpp::socket requestDisplaySocket;
   zmqpp::socket replySocket;
 
-  const std::string IMAGE_DIRECTORY = "/home/pi/Documents/raspi-yolo/images/temp/";
+  // const std::string IMAGE_DIRECTORY = "/home/pi/Documents/raspi-yolo/images/temp/";
 
-  // // Code for Geromy
-  // const std::string IMAGE_DIRECTORY =
-  //     "/home/geromy/Desktop/Project/raspi-yolo/images/temp/";
+  // Code for Geromy
+  const std::string IMAGE_DIRECTORY =
+      "/home/geromy/Desktop/Project/raspi-yolo/images/temp/";
 
   float itemWeight = 0;
   bool checkWeight();
