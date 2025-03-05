@@ -132,10 +132,12 @@ void Hardware::rotateAndCapture() {
     if (receivedRequest) {
       if (request == "item identified") {
         this->logger.log("Received stop signal from vision");
+        this->replySocket.send("got it");
         receivedStopSignal = true;
       }
       else {
         this->logger.log("Received something else from vision");
+        this->replySocket.send("retransmit");
       }
     }
 

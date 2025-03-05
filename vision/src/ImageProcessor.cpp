@@ -40,19 +40,35 @@ void ImageProcessor::process() {
     // checked 16 images and failed them all
     //  how to handle?
     // Still send whatever information we do have to the display
+    //    TODO
     //    writeString(pipes.visionToDisplay[WRITE],
     //               "Food item not properly identified. Sending incomplete food item.");
   }
 
   // tell hardware to stop
-  bool detectionComplete = true;
-  this->requestHardwareSocket.send("item identified");
-  this->logger.log("Sent stop signal to hardware");
+  bool hardwareStopping = false;
+  while (hardwareStopping == false) {
+    this->logger.log("Sending stop signal to hardware");
+    this->requestHardwareSocket.send("item identified");
+    this->logger.log("Sent stop signal to hardware");
+    std::string response;
+    this->requestHardwareSocket.receive(response);
+    if (response != "retransmit") {
+      hardwareStopping = true;
+      this->logger.log("Hardware received stop signal");
+    }
+    else {
+      this->logger.log("Hardware did not receive stop signal, retrying");
+    }
+  }
 
+  /*
+  // TODO
   // send display the food item
   // TODO  printFoodItem(foodItem);
   sendFoodItem(this->requestDisplaySocket, this->foodItem);
   this->logger.log("Sent detected food item to display");
+  */
 }
 
 /**
