@@ -181,14 +181,14 @@ bool Hardware::takePhotos(int angle) {
   std::string cmd0      = "rpicam-jpeg --camera 0";
   std::string cmd1      = "rpicam-jpeg --camera 1";
   std::string np        = " --nopreview";
-  std::string mode      = " --mode 2304:1296:10:U";
+  std::string res       = " --width 2304 --height 1296";
   std::string out       = " --output ";
-  std::string to        = " --timeout 50";
+  std::string to        = " --timeout 50";  // DO NOT SET TO 0! Will cause infinite preview!
   std::string topPhoto  = this->IMAGE_DIRECTORY + std::to_string(angle) + "_top.jpg";
   std::string sidePhoto = this->IMAGE_DIRECTORY + std::to_string(angle) + "_side.jpg";
 
-  std::string command0 = cmd0 + np + mode + out + topPhoto + to;
-  std::string command1 = cmd0 + np + mode + out + sidePhoto + to;
+  std::string command0 = cmd0 + np + res + out + topPhoto + to;
+  std::string command1 = cmd0 + np + res + out + sidePhoto + to;
   system(command0.c_str());
   system(command1.c_str());
 

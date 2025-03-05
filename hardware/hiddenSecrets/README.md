@@ -75,7 +75,26 @@ Alias: -n
 
 Causes the application to not display a preview window at all. Does not accept a value.
 
-### mode
+### width and height
+Each accepts a single number defining the dimensions, in pixels, of the captured image.
+
+For rpicam-still, rpicam-jpeg and rpicam-vid, specifies output resolution.
+
+For rpicam-raw, specifies raw frame resolution. For cameras with a 2×2 binned readout mode, specifying a resolution equal to or smaller than the binned mode captures 2×2 binned raw frames.
+
+For rpicam-hello, has no effect.
+
+Examples:
+
+rpicam-vid -o test.h264 --width 1920 --height 1080 captures 1080p video.
+
+rpicam-still -r -o test.jpg --width 2028 --height 1520 captures a 2028×1520 resolution JPEG. If used with the HQ camera, uses 2×2 binned mode, so the raw file (test.dng) contains a 2028×1520 raw Bayer image.
+
+***MAYBE***
+### viewfinder-width and viewfinder-height
+Each accepts a single number defining the dimensions, in pixels, of the image displayed in the preview window. Does not effect the preview window dimensions, since images are resized to fit. Does not affect captured still images or videos.
+
+### mode (Auto formats to 10/12MP and 4608x2592)
 Allows you to specify a camera mode in the following colon-separated format: <width>:<height>:<bit-depth>:<packing>. The system selects the closest available option for the sensor if there is not an exact match for a provided value. You can use the packed (P) or unpacked (U) packing formats. Impacts the format of stored videos and stills, but not the format of frames passed to the preview window.
 
 Bit-depth and packing are optional. Bit-depth defaults to 12. Packing defaults to P (packed).
