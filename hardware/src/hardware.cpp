@@ -169,6 +169,13 @@ void Hardware::rotateAndCapture() {
   }
 }
 
+/*
+ * Takes two photos, one top & side, saves them to the image directory, and logs
+ * Note: current "top camera" is ribbon port closer to USB
+ *
+ * @param int angle - the position of the platform for unique photo ID
+ * @return bool - always true
+ */
 bool Hardware::takePhotos(int angle) {
   this->logger.log("Taking photos at position: " + std::to_string(angle));
   std::string topPhoto  = this->IMAGE_DIRECTORY + std::to_string(angle) + "_top.jpg";
@@ -187,6 +194,13 @@ bool Hardware::takePhotos(int angle) {
   return true;
 }
 
+/*
+ * Test Function
+ * Captures a photo at the given angle and saves it to the image directory
+ *
+ * @param int angle - the position of the platform for unique photo ID
+ * @return bool - always true
+ */
 bool Hardware::capturePhoto(int angle) {
   this->logger.log("Capturing photo at position: " + std::to_string(angle));
   std::string fileName = this->IMAGE_DIRECTORY + std::to_string(angle) + "_test.jpg";
