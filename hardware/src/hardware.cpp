@@ -173,8 +173,8 @@ bool Hardware::takePhotos(int angle) {
   std::string topPhoto  = this->IMAGE_DIRECTORY + std::to_string(angle) + "_top.jpg";
   std::string sidePhoto = this->IMAGE_DIRECTORY + std::to_string(angle) + "_side.jpg";
 
-  std::string command0 = "rpicam-jpeg -0 -n -t 50 1920:1080:10:U --output " + topPhoto;
-  std::string command1 = "rpicam-jpeg -1 -n -t 50 1920:1080:10:U --output " + sidePhoto;
+  std::string command0 = "rpicam-jpeg -camera 0 -n -t 50 1920:1080:10:U --output " + topPhoto;
+  std::string command1 = "rpicam-jpeg -camera 1 -n -t 50 1920:1080:10:U --output " + sidePhoto;
   system(command0.c_str());
   system(command1.c_str());
 
