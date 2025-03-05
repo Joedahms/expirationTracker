@@ -49,7 +49,6 @@ void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints endpoints) 
  * @param directory_path Directory path as a string to get images from
  * Output: None
  */
-
 void sendImagesWithinDirectory(int pipeToWrite, const std::string& directory_path) {
   for (const auto& entry : std::filesystem::directory_iterator(directory_path)) {
     if (entry.is_regular_file()) {
