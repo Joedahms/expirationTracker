@@ -6,6 +6,7 @@
 
 #include "../../endpoints.h"
 #include "../../food_item.h"
+#include "../../logger.h"
 #include "../include/ImageProcessor.h"
 #include "../include/helperFunctions.h"
 
