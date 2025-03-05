@@ -125,29 +125,6 @@ void Hardware::rotateAndCapture() {
   for (int angle = 0; angle < 8; angle++) {
     this->logger.log("At location " + std::to_string(angle) + " of 8");
 
-    if (angle > 0) {
-      this->logger.log("Checking for stop signal from vision");
-      bool receivedStopSignal = false;
-      bool receivedRequest    = false;
-      std::string request;
-      receivedRequest = this->replySocket.receive(request, true);
-      if (receivedRequest) {
-        if (request == "item identified") {
-          this->logger.log("Received stop signal from vision");
-          receivedStopSignal = true;
-        }
-        else {
-          // Could skip receivedStopSignal and this else statement and just break if "item identified"
-          this->logger.log("Received other from vision");
-        }
-      }
-      if (receivedStopSignal) {
-        this->logger.log("AI Vision identified item. Stopping process.");
-        break;
-      }
-      this->logger.log("AI Vision did not identify item. Continuing process.");
-    }
-
     // Leaving in T/F logic in case we need to add error handling later
     if (takePhotos(angle) == false) {
       this->logger.log("Error taking photos");
@@ -167,6 +144,27 @@ void Hardware::rotateAndCapture() {
     // Swap comment lines below if you don't want to wait on realistic motor rotation time
     // usleep(500);
     sleep(3);
+
+    this->logger.log("Checking for stop signal from vision");
+      bool receivedStopSignal = false;
+      bool receivedRequest    = false;
+      std::string request;
+      receivedRequest = this->replySocket.receive(request, true);
+      if (receivedRequest) {
+        if (request == "item identified") {
+          this->logger.log("Received stop signal from vision");
+          receivedStopSignal = true;
+        }
+        else {
+          // Could skip receivedStopSignal and this else statement and just break if "item identified"
+          this->logger.log("Received other from vision");
+        }
+      }
+      if (receivedStopSignal) {
+        this->logger.log("AI Vision identified item. Stopping process.");
+        break;
+      }
+      this->logger.log("AI Vision did not identify item. Continuing process.");
   }
 }
 
