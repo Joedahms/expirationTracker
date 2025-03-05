@@ -17,7 +17,8 @@ ImageProcessor::ImageProcessor(zmqpp::context& context,
     this->requestDisplaySocket.connect(this->externalEndpoints.displayEndpoint);
     this->replySocket.bind(this->externalEndpoints.visionEndpoint);
   } catch (const zmqpp::exception& e) {
-    std::cerr << e.what();
+    LOG(FATAL) << e.what();
+    //    std::cerr << e.what();
   }
 }
 
@@ -94,7 +95,7 @@ bool ImageProcessor::analyze() {
         std::filesystem::remove(entry.path());
         this->logger.log("Deleted unclassified image: " + entry.path().string());
       } catch (const std::filesystem::filesystem_error& e) {
-        std::cerr << "Failed to delete image: " << entry.path() << " - " << e.what();
+        LOG(FATAL) << "Failed to delete image: " << entry.path() << " - " << e.what();
       }
 
       // check if image directory has new files

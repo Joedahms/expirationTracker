@@ -16,7 +16,8 @@ Hardware::Hardware(zmqpp::context& context,
     this->requestDisplaySocket.connect(this->externalEndpoints.displayEndpoint);
     this->replySocket.bind(this->externalEndpoints.hardwareEndpoint);
   } catch (const zmqpp::exception& e) {
-    std::cerr << e.what();
+    //    std::cerr << e.what();
+    LOG(FATAL) << e.what();
   }
 }
 
@@ -41,7 +42,8 @@ bool Hardware::checkStartSignal() {
     }
     return receivedRequest;
   } catch (const zmqpp::exception& e) {
-    std::cerr << e.what();
+    //    std::cerr << e.what();
+    LOG(FATAL) << e.what();
   }
 }
 

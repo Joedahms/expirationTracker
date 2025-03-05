@@ -6,6 +6,7 @@
 #include <unistd.h>
 
 #include "../../food_item.h"
+#include "../../logger.h"
 #include "hardware.h"
 #include "hardware_entry.h"
 #include "io.h"
@@ -19,7 +20,8 @@
  * Output: None
  */
 void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints endpoints) {
-  LOG(INFO) << "Within hardware process";
+  Logger logger("hardware_entry.txt");
+  logger.log("Within hardware process");
 
   // while 1
   Hardware hardware(context, endpoints);
@@ -34,8 +36,11 @@ void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints endpoints) 
   bool scanSuccessful = hardware.startScan();
 
   if (scanSuccessful) {
-    LOG(INFO) << "Scan successful";
-    // hardware.sendDataToVision();
+    logger.log("Scan successful");
+    //  hardware.sendDataToVision();
+  }
+  else {
+    logger.log("Scan unsuccessful");
   }
 }
 

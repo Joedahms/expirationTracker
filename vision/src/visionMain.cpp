@@ -1,5 +1,5 @@
-#include "../include/visionMain.h"
 #include "../../logger.h"
+#include "../include/visionMain.h"
 
 /**
  * Entry into the vision code. Only called from main after vision child process is
@@ -55,7 +55,7 @@ void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpo
           logger.log("Did not receive start signal from hardware");
         }
       } catch (const zmqpp::exception& e) {
-        std::cerr << e.what();
+        LOG(FATAL) << e.what();
       }
     }
     //  LOG(INFO) << "Vision Received all images from hardware";

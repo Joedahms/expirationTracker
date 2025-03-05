@@ -8,7 +8,8 @@ TextClassifier::TextClassifier(zmqpp::context& context,
     this->requestSocket.connect(pythonServerEndpoint);
     this->replySocket.bind(textClassifierEndpoint);
   } catch (const zmqpp::exception& e) {
-    std::cerr << e.what();
+    //    std::cerr << e.what();
+    LOG(FATAL) << e.what();
   }
 }
 
