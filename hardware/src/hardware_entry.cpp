@@ -23,7 +23,7 @@ void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints externalEnd
   // TODO - Setup communication with Arduino for weight.
 
   // while 1
-  Hardware hardware(context, endpoints);
+  Hardware hardware(context, externalEndpoints);
   bool startSignalReceived = false;
   while (startSignalReceived == false) {
     startSignalReceived = hardware.checkStartSignal();

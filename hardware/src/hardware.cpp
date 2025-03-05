@@ -85,7 +85,7 @@ bool Hardware::checkStartSignal() {
  * */
 bool Hardware::startScan() {
   this->logger.log("Starting scan");
-  
+
   this->logger.log("Checking weight");
   if (checkWeight() == false) {
     // TODO handle no weight on platform
@@ -137,6 +137,7 @@ void Hardware::rotateAndCapture() {
           receivedStopSignal = true;
         }
         else {
+          // Could skip receivedStopSignal and this else statement and just break if "item identified"
           this->logger.log("Received other from vision");
         }
       }
