@@ -4,7 +4,6 @@
 #include <glog/logging.h>
 #include <iostream>
 
-#include "../../../pipes.h"
 #include "display_engine.h"
 #include "display_global.h"
 #include "states/state.h"

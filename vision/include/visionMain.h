@@ -4,8 +4,8 @@
 #include <iostream>
 #include <zmqpp/zmqpp.hpp>
 
+#include "../../endpoints.h"
 #include "../../food_item.h"
-#include "../../pipes.h"
 #include "../include/ImageProcessor.h"
 #include "../include/helperFunctions.h"
 

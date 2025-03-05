@@ -3,7 +3,7 @@
 
 #include <zmqpp/zmqpp.hpp>
 
-#include "../../pipes.h"
+#include "../../endpoints.h"
 
 void displayEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints);
 

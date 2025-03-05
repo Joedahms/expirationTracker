@@ -1,9 +1,9 @@
 #include "../include/ImageProcessor.h"
 
 /**
- * ImageProcessor Constructor. This class handles all image operations.
- * @param pipes Pipe struct for communication with other processes.
- * @param foodItem FoodItem struct for filling out detected information.
+ * @param context The zeroMQ context with which to creates with
+ * @param externalEndpoints Endpoints to the main components of the system (vision,
+ * hardware, and display)
  */
 ImageProcessor::ImageProcessor(zmqpp::context& context,
                                const struct ExternalEndpoints& externalEndpoints)
@@ -18,12 +18,15 @@ ImageProcessor::ImageProcessor(zmqpp::context& context,
     this->replySocket.bind(this->externalEndpoints.visionEndpoint);
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
-    //    std::cerr << e.what();
   }
 }
 
 /**
- * Parent method to all image processing and analyzing
+ * Parent method to all image processing and analyzing. Initializes the process of
+ * identifying a food item.
+ *
+ * @param None
+ * @return None
  */
 void ImageProcessor::process() {
   this->logger.log("Vision analyzing all images");
@@ -45,7 +48,7 @@ void ImageProcessor::process() {
     //               "Food item not properly identified. Sending incomplete food item.");
   }
 
-  // tell hardware to stop
+  // Tell hardware to stop
   bool hardwareStopping = false;
   while (hardwareStopping == false) {
     this->logger.log("Sending stop signal to hardware");
@@ -72,8 +75,10 @@ void ImageProcessor::process() {
 }
 
 /**
- * Conduct the analyzing and model processing
- * @return whether FoodItem is successfully identified
+ * Conduct the analyzing and model processing.
+ *
+ * @param None
+ * @return Whether FoodItem is successfully identified
  */
 bool ImageProcessor::analyze() {
   int imageCounter    = 0;
@@ -96,10 +101,9 @@ bool ImageProcessor::analyze() {
         return false;
       }
 
-      // check if the object exists in our object classification
+      // Only runs text atm
       if (!objectDetected) {
-        // if object has already been detected no need to run this (still looking for exp
-        // date)
+        // TODO classifyObject always returns true
         if (this->modelHandler.classifyObject(entry.path())) {
           objectDetected = true;
           return true;

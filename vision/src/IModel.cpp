@@ -4,7 +4,7 @@
  *
  * @param taskType Which model do you want to access
  * @param imagePath path to the image to look at
- * @return success of the attempt
+ * @return Response from the server
  */
 std::string IModel::sendRequest(const TaskType& taskType,
                                 const std::filesystem::path& imagePath) {

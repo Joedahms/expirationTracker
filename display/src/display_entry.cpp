@@ -1,7 +1,6 @@
 #include <glog/logging.h>
 #include <iostream>
 
-#include "../../pipes.h"
 #include "display_entry.h"
 #include "display_handler.h"
 #include "engine/engine_entry.h"

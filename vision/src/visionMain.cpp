@@ -5,9 +5,10 @@
  * Entry into the vision code. Only called from main after vision child process is
  * forked.
  *
- * Input:
- * @param pipes Pipes for vision to communicate with the other processes
- * Output: None
+ * @param context The zeroMQ context with which to creates with
+ * @param externalEndpoints Endpoints to the main components of the system (vision,
+ * hardware, and display)
+ * @return None
  */
 void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints) {
   Logger logger("vision_entry.txt");
@@ -28,7 +29,8 @@ void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpo
     sleep(2);
   }
 
-  sleep(5); // Wait 5 sec to ensure Python server starts
+  // Wait 5 sec to ensure Python server starts
+  sleep(5);
 
   ImageProcessor processor(context, externalEndpoints);
 
@@ -58,19 +60,17 @@ void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpo
         LOG(FATAL) << e.what();
       }
     }
-    //  LOG(INFO) << "Vision Received all images from hardware";
     processor.setFoodItem(foodItem);
     processor.process();
   }
-  // else {
-  //  usleep(500000);
-  //}
 }
 
 /**
- * Start the python server for hosting models
+ * Start the python server for hosting models.
  *
- * @return success for fail
+ * @param logger Logger being used to log visionMain
+ * @return True if python server was started successfully. False if failed to start python
+ * server
  */
 bool startPythonServer(Logger& logger) {
   pid_t pid = fork();
@@ -80,16 +80,20 @@ bool startPythonServer(Logger& logger) {
     logger.log("Failed to fork process");
     return false;
   }
-  if (pid == 0) { // Child process
+  // Child process
+  if (pid == 0) {
     logger.log("Starting python server");
     char* args[] = {(char*)"./models-venv/bin/python3",
                     (char*)"../vision/Models/server.py", nullptr};
     execvp(args[0], args);
-    logger.log("failed to start python server");
-    exit(1); // Exit child process if execvp fails
+
+    // Exit child process if execvp fails
+    logger.log("Failed to start python server");
+    exit(1);
   }
-  else { // Parent process
-         //    LOG(INFO) << "Python server started with PID: " << pid;
+  // Parent process
+  else {
+    logger.log("Python server started with PID: " + std::to_string(pid));
     logger.log("Leaving startPythonServer");
     return true;
   }

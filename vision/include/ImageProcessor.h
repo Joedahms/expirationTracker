@@ -4,9 +4,9 @@
 #include <glog/logging.h>
 #include <thread>
 
+#include "../../endpoints.h"
 #include "../../food_item.h"
 #include "../../logger.h"
-#include "../../pipes.h"
 #include "ModelHandler.h"
 #include "helperFunctions.h"
 

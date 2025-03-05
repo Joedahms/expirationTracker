@@ -4,31 +4,42 @@
 #include "../../food_item.h"
 #include "hardware.h"
 
+/**
+ * @param context The zeroMQ context with which to creates with
+ * @param externalEndpoints Endpoints to the main components of the system (vision,
+ * hardware, and display)
+ */
 Hardware::Hardware(zmqpp::context& context,
                    const struct ExternalEndpoints& externalEndpoints)
     : externalEndpoints(externalEndpoints),
       requestVisionSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
       replySocket(context, zmqpp::socket_type::reply), logger("hardware_log.txt") {
-  // Setup sockets
   try {
     this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
     this->requestDisplaySocket.connect(this->externalEndpoints.displayEndpoint);
     this->replySocket.bind(this->externalEndpoints.hardwareEndpoint);
   } catch (const zmqpp::exception& e) {
-    //    std::cerr << e.what();
     LOG(FATAL) << e.what();
   }
 }
 
-bool Hardware::checkStartSignal() {
-  this->logger.log("Checking for start signal from display");
+/**
+ * Check to see if display has sent the signal to initiate the scanning of a new food
+ * item.
+ *
+ * @param None
+ * @return True if the start signal was received. False if the signal was not received.
+ */
+bool Hardware::checkStartSignal(int timeoutMs) {
   bool receivedRequest = false;
+  this->logger.log("Checking for start signal from display");
+
   try {
     zmqpp::poller poller;
     poller.add(this->replySocket);
 
-    if (poller.poll(1000)) {
+    if (poller.poll(timeoutMs)) {
       if (poller.has_input(this->replySocket)) {
         std::string request;
         this->replySocket.receive(request);
@@ -42,17 +53,20 @@ bool Hardware::checkStartSignal() {
     }
     return receivedRequest;
   } catch (const zmqpp::exception& e) {
-    //    std::cerr << e.what();
     LOG(FATAL) << e.what();
   }
 }
 
+/**
+ * Start the scan of a new food item.
+ *
+ * @param None
+ * @return True if the scan was successful. False if the scan was unsuccessful.
+ *
+ * TODO Handle no weight on platform
+ */
 bool Hardware::startScan() {
   this->logger.log("Starting scan");
-  /**
-   * Function call to controls routine
-   * has a pipe read from vision in loop
-   */
 
   this->logger.log("Checking weight");
   if (checkWeight() == false) {
@@ -60,12 +74,18 @@ bool Hardware::startScan() {
   }
 
   rotateAndCapture();
-  // TODO
   this->logger.log("Scan complete");
   return true;
 }
 
-// TODO
+/**
+ * Read from the weight sensor to get the weight of an object on the platform.
+ *
+ * @param None
+ * @return True if non zero weight. False if zero weight.
+ *
+ * TODO Read from weight sensor
+ */
 bool Hardware::checkWeight() {
   this->itemWeight = 1;
   return true;
@@ -74,11 +94,11 @@ bool Hardware::checkWeight() {
 /**
  * Sends the photo directory and weight data to the AI Vision system.
  *
- * @param weight The weight of the object on the platform.
+ * @param None
  * @return None
  */
 void Hardware::sendDataToVision() {
-  this->logger.log("Sending images from hardware to vision");
+  this->logger.log("Sending start signal to vision");
   const std::chrono::time_point<std::chrono::system_clock> now{
       std::chrono::system_clock::now()};
 
@@ -90,7 +110,7 @@ void Hardware::sendDataToVision() {
   this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
   sendFoodItem(this->requestVisionSocket, foodItem);
 
-  this->logger.log("Done sending images from hardware to vision");
+  this->logger.log("Done sending start signal to vision");
 }
 
 /**
@@ -99,7 +119,11 @@ void Hardware::sendDataToVision() {
  * The process can be stopped early if AI Vision sends a "STOP" signal
  * 0 - continue or 1 - stop
  *
+ * @param None
  * @return None
+ *
+ * TODO Multiple cameras
+ * TODO Rotate motor
  */
 void Hardware::rotateAndCapture() {
   for (int angle = 0; angle < 8; angle++) {
@@ -116,6 +140,7 @@ void Hardware::rotateAndCapture() {
       this->logger.log("Error taking a photo");
     }
 
+    // Initiate scan
     if (angle == 0) {
       sendDataToVision();
     }
@@ -150,6 +175,15 @@ void Hardware::rotateAndCapture() {
   }
 }
 
+/**
+ * Capture a single photo using the raspberry pi camera.
+ *
+ * @param angle Angle the photo was taken at. Used to construct the name of the
+ * photo file.
+ * @return Always true?
+ *
+ * TODO Always returns true
+ */
 bool Hardware::capturePhoto(int angle) {
   this->logger.log("Capturing photo at position: " + std::to_string(angle));
   std::string fileName = this->IMAGE_DIRECTORY + std::to_string(angle) + "_test.jpg";

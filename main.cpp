@@ -5,8 +5,8 @@
 #include <zmqpp/zmqpp.hpp>
 
 #include "display/src/display_entry.h"
+#include "endpoints.h"
 #include "hardware/src/hardware_entry.h"
-#include "pipes.h"
 #include "vision/include/visionMain.h"
 
 int main(int argc, char* argv[]) {
@@ -16,6 +16,7 @@ int main(int argc, char* argv[]) {
   zmqpp::context context;
   ExternalEndpoints externalEndpoints;
 
+  // Display
   LOG(INFO) << "Starting display process..";
   int displayPid;
   if ((displayPid = fork()) == -1) {
@@ -33,6 +34,7 @@ int main(int argc, char* argv[]) {
     LOG(INFO) << "Display process started successfully";
   }
 
+  // Hardware
   LOG(INFO) << "Starting hardware process..";
   int hardwarePid;
   if ((hardwarePid = fork()) == -1) {
@@ -50,6 +52,7 @@ int main(int argc, char* argv[]) {
     LOG(INFO) << "Hardware process started successfully";
   }
 
+  // Vision
   LOG(INFO) << "Starting vision process..";
   int visionPid;
   if ((visionPid = fork()) == -1) {

@@ -4,8 +4,8 @@
 #include <sqlite3.h>
 #include <zmqpp/zmqpp.hpp>
 
+#include "../../endpoints.h"
 #include "../../food_item.h"
-#include "../../pipes.h"
 
 class DisplayHandler {
 public:

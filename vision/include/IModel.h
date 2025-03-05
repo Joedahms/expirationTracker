@@ -31,4 +31,4 @@ protected:
   std::string taskTypeToString(const TaskType&) const;
 };
 
-#endif // IMODEL_H
+#endif
