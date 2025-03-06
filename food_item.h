@@ -23,7 +23,7 @@ public:
 
   std::string categoryToString();
 
-  // print food item
+  // TODO print food item
 
   int getId() const;
   std::filesystem::path getImagePath() const;

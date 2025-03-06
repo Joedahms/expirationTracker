@@ -15,6 +15,7 @@ public:
 
 private:
   Logger logger;
+  Messages messages;
   ExternalEndpoints externalEndpoints;
   const std::string engineEndpoint;
 

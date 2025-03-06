@@ -100,15 +100,7 @@ bool ImageProcessor::analyze() {
   return false;
 }
 
-/**
- * Return the food item
- * @return whether FoodItem is successfully identified
- */
 struct FoodItem& ImageProcessor::getFoodItem() { return this->foodItem; }
-
-/**
- * set the food item entirely
- */
 void ImageProcessor::setFoodItem(struct FoodItem& foodItem) { this->foodItem = foodItem; }
 
 void ImageProcessor::detectionSucceeded() {
@@ -140,8 +132,13 @@ void ImageProcessor::foodItemToDisplay() {
   this->requestDisplaySocket.receive(response);
   if (response == this->messages.AFFIRMATIVE) {
     this->logger.log("Success indicated to display, sending detected food item");
-    sendFoodItem(this->requestDisplaySocket, this->foodItem);
-    this->logger.log("Detected food item sent");
+    response = sendFoodItem(this->requestDisplaySocket, this->foodItem);
+    if (response == this->messages.AFFIRMATIVE) {
+      this->logger.log("Detected food item sent successfully");
+    }
+    else {
+      LOG(FATAL) << "Detected food item transmission failure";
+    }
   }
 }
 

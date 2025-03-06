@@ -46,24 +46,24 @@ void DisplayHandler::handle() {
       }
 
       this->logger.log("Waiting for message from vision");
-      FoodItem foodItem;
-      bool foodItemReceived = false;
-      while (foodItemReceived == false) {
-        foodItemReceived = receiveFoodItem(this->replySocket, "got it", foodItem);
+      std::string request;
+      this->replySocket.receive(request);
+      if (request == this->messages.ITEM_DETECTION_FAILED) {
+        this->logger.log("Item detection failed");
+        // TODO Display failure message
+      }
+      else if (request == this->messages.ITEM_DETECTION_SUCCEEDED) {
+        this->replySocket.send(this->messages.AFFIRMATIVE);
+        this->logger.log("Item detection succeeded, receiving food item");
+        FoodItem foodItem;
+        receiveFoodItem(this->replySocket, this->messages.AFFIRMATIVE, foodItem);
+        this->logger.log("Food item received");
+      }
+      else {
+        LOG(FATAL) << "Unexpected message received";
       }
     }
   }
-  /*
-  while (true) {
-    bool received = false;
-    struct FoodItem foodItem;
-    while (!received) {
-      received = receiveFoodItemNew(replySocket, "got it", foodItem);
-    }
-
-    std::cout << foodItem.quantity << std::endl;
-  }
-  */
 }
 
 /**
