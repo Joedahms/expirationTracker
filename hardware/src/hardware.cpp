@@ -26,7 +26,7 @@ Hardware::Hardware(zmqpp::context& context,
 
 /*
  * Checks for a start signal from the display.
- * Used to start the scan process.ADJ_OFFSET_SINGLESHOT
+ * Used to start the scan process
  *
  * @param None
  * @return bool - True if start signal received, false otherwise
