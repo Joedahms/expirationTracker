@@ -43,7 +43,7 @@ bool Hardware::checkStartSignal(int timeoutMs) {
         std::string request;
         this->replySocket.receive(request);
         receivedRequest = true;
-        this->replySocket.send("got it"); // Respond to display
+        this->replySocket.send(Messages::AFFIRMATIVE); // Respond to display
         this->logger.log("Received start signal from display");
       }
     }
