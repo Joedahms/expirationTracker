@@ -38,15 +38,6 @@ void ImageProcessor::process() {
 
   bool detectedFoodItem = analyze();
   this->logger.log("Successfully analyzed all images");
-  if (!detectedFoodItem) {
-    this->logger.log("Item not successfully detected");
-    // checked 16 images and failed them all
-    //  how to handle?
-    // Still send whatever information we do have to the display
-    //    TODO
-    //    writeString(pipes.visionToDisplay[WRITE],
-    //               "Food item not properly identified. Sending incomplete food item.");
-  }
 
   // Tell hardware to stop
   bool hardwareStopping = false;
@@ -63,6 +54,27 @@ void ImageProcessor::process() {
     else {
       this->logger.log("Hardware did not receive stop signal, retrying");
     }
+  }
+
+  if (!detectedFoodItem) {
+    this->logger.log("Item not successfully detected");
+    // Tell display we failed
+    bool notifiedDisplayOfFailure = false;
+    std::string response;
+    while (!notifiedDisplayOfFailure) {
+      this->logger.log("Notifying display of failure");
+      this->requestHardwareSocket.send("item identification failed");
+      this->logger.log("Send notification to display");
+      this->requestHardwareSocket.receive(response);
+      if (response != "retransmit") {
+        notifiedDisplayOfFailure = true;
+        this->logger.log("Display received notification");
+      }
+      else {
+        this->logger.log("Display did not receive notification, retrying");
+      }
+    }
+    return;
   }
 
   /*
@@ -133,7 +145,7 @@ bool ImageProcessor::analyze() {
  * Return the food item
  * @return whether FoodItem is successfully identified
  */
-struct FoodItem& ImageProcessor::getFoodItem() { return this->foodItem; }
+FoodItem& ImageProcessor::getFoodItem() { return this->foodItem; }
 
 /**
  * set the food item entirely
