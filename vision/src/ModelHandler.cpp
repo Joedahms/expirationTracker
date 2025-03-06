@@ -30,5 +30,5 @@ bool ModelHandler::classifyObject(const std::filesystem::path& imagePath,
         std::chrono::year{2025}, std::chrono::month{3}, std::chrono::day{15}});
     return true;
   }
-  return true;
+  return false;
 }
