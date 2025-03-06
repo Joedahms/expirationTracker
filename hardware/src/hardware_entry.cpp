@@ -30,7 +30,7 @@ void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints externalEnd
 
   // while 1
   Hardware hardware(context, externalEndpoints);
-  bool startSignalReceived;
+  bool startSignalReceived = false;
   int startSignalTimeoutMs = 1000;
   while (1) {
     startSignalReceived = false;
