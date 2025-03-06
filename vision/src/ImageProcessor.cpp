@@ -11,9 +11,9 @@ ImageProcessor::ImageProcessor(zmqpp::context& context)
       requestDisplaySocket(context, zmqpp::socket_type::request),
       replySocket(context, zmqpp::socket_type::reply), modelHandler(context) {
   try {
-    this->requestHardwareSocket.connect(this->externalEndpoints.hardwareEndpoint);
-    this->requestDisplaySocket.connect(this->externalEndpoints.displayEndpoint);
-    this->replySocket.bind(this->externalEndpoints.visionEndpoint);
+    this->requestHardwareSocket.connect(ExternalEndpoints::hardwareEndpoint);
+    this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
+    this->replySocket.bind(ExternalEndpoints::visionEndpoint);
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
   }
@@ -98,11 +98,11 @@ void ImageProcessor::detectionFailed() {
   this->logger.log("Item not successfully detected");
 
   this->logger.log("Sending detection failed to display");
-  this->requestDisplaySocket.send(this->messages.ITEM_DETECTION_FAILED);
+  this->requestDisplaySocket.send(Messages::ITEM_DETECTION_FAILED);
   std::string response;
   this->requestDisplaySocket.receive(response);
 
-  if (response == this->messages.AFFIRMATIVE) {
+  if (response == Messages::AFFIRMATIVE) {
     this->logger.log("Display received failure message");
   }
   else {
@@ -112,13 +112,13 @@ void ImageProcessor::detectionFailed() {
 
 void ImageProcessor::foodItemToDisplay() {
   this->logger.log("Indicating detection success to display");
-  this->requestDisplaySocket.send(this->messages.ITEM_DETECTION_SUCCEEDED);
+  this->requestDisplaySocket.send(Messages::ITEM_DETECTION_SUCCEEDED);
   std::string response;
   this->requestDisplaySocket.receive(response);
-  if (response == this->messages.AFFIRMATIVE) {
+  if (response == Messages::AFFIRMATIVE) {
     this->logger.log("Success indicated to display, sending detected food item");
     response = sendFoodItem(this->requestDisplaySocket, this->foodItem);
-    if (response == this->messages.AFFIRMATIVE) {
+    if (response == Messages::AFFIRMATIVE) {
       this->logger.log("Detected food item sent successfully");
     }
     else {
@@ -131,17 +131,17 @@ void ImageProcessor::stopHardware() {
   bool hardwareStopping = false;
   while (hardwareStopping == false) {
     this->logger.log("Sending stop signal hardware");
-    this->requestHardwareSocket.send(this->messages.ITEM_DETECTION_SUCCEEDED);
+    this->requestHardwareSocket.send(Messages::ITEM_DETECTION_SUCCEEDED);
     this->logger.log("Sent stop signal to hardware");
 
     std::string response;
     this->requestHardwareSocket.receive(response);
 
-    if (response == this->messages.AFFIRMATIVE) {
+    if (response == Messages::AFFIRMATIVE) {
       this->logger.log("Hardware received stop signal");
       hardwareStopping = true;
     }
-    else if (response == this->messages.RETRANSMIT) {
+    else if (response == Messages::RETRANSMIT) {
       this->logger.log("Hardware requested retransmission");
     }
     else {

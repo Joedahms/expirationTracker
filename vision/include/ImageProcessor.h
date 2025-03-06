@@ -21,9 +21,6 @@ public:
   void tellDisplayWeFailed();
 
 private:
-  ExternalEndpoints externalEndpoints;
-  Messages messages;
-
   Logger logger;
 
   zmqpp::socket requestHardwareSocket;
