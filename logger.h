@@ -15,7 +15,7 @@ public:
   // Constructor opens the file
   Logger(const std::string& logFilename) : filename(logFilename) {
     // Open file in append mode to preserve previous log entries
-    logFile.open(filename, std::ios::app);
+    logFile.open(filename, std::ios::trunc);
 
     if (!logFile.is_open()) {
       std::cerr << "Failed to open log file: " << filename << std::endl;
