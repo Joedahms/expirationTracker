@@ -9,7 +9,7 @@
  * hardware, and display)
  * @return None
  */
-void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints) {
+void visionEntry(zmqpp::context& context, const ExternalEndpoints& externalEndpoints) {
   Logger logger("vision_entry.txt");
   logger.log("Within vision process");
 
@@ -52,6 +52,26 @@ void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpo
 }
 
 /**
+ * Attempts to start the python server MAX_SERVER_RETRIES times before erroring out
+ *
+ * @param logger Logger being used to log visionMain
+ */
+void attemptStartPythonServer(const Logger& logger) {
+  for (int retry = 1; retry <= MAX_SERVER_RETRIES; ++retry) {
+    if (startPythonServer(logger)) {
+      return;
+    }
+
+    logger.log("Python server failed to start. Retrying in 2 seconds... (" +
+               std::to_string(retry) + "/" + std::to_string(MAX_SERVER_RETRIES) + ")");
+    sleep(2);
+  }
+
+  std::cerr << "ERROR: Failed to start Python server after " << MAX_SERVER_RETRIES
+            << " attempts.\n";
+}
+
+/**
  * Start the python server for hosting models.
  *
  * @param logger Logger being used to log visionMain
@@ -84,24 +104,4 @@ bool startPythonServer(const Logger& logger) {
     logger.log("Leaving startPythonServer");
     return true;
   }
-}
-
-/**
- * Attempts to start the python server MAX_SERVER_RETRIES times before erroring out
- *
- * @param logger Logger being used to log visionMain
- */
-void attemptStartPythonServer(const Logger& logger) {
-  for (int retry = 1; retry <= MAX_SERVER_RETRIES; ++retry) {
-    if (startPythonServer(logger)) {
-      return;
-    }
-
-    logger.log("Python server failed to start. Retrying in 2 seconds... (" +
-               std::to_string(retry) + "/" + std::to_string(MAX_SERVER_RETRIES) + ")");
-    sleep(2);
-  }
-
-  std::cerr << "ERROR: Failed to start Python server after " << MAX_SERVER_RETRIES
-            << " attempts.\n";
 }

@@ -12,8 +12,8 @@
 
 constexpr int MAX_SERVER_RETRIES = 5;
 
-void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints);
-bool startPythonServer(const Logger& logger);
-void attemptStartPythonServer(const Logger& logger);
+void visionEntry(zmqpp::context&, const ExternalEndpoints&);
+void attemptStartPythonServer(const Logger&);
+bool startPythonServer(const Logger&);
 
 #endif
