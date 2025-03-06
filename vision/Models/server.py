@@ -1,6 +1,6 @@
 import os
 import zmq
-from easyOCR import perform_ocr, perform_ocr_with_zoom
+from easyOCR import performOCR, performOCRWithZooming
 #from efficientNet import classify_image
 
 def run_server():
@@ -34,7 +34,7 @@ def run_server():
             else:
                 task_type, image_path = parts
                 if task_type == "OCR":
-                    result = perform_ocr(image_path)  # Calls OCR module
+                    result = performOCR(image_path)  # Calls OCR module
                 #elif task_type == "CLS":
                     #result = classify_image(image_path)  # Calls classifier module
                 else:
