@@ -1,9 +1,10 @@
 #include "../include/ModelHandler.h"
 
-ModelHandler::ModelHandler(zmqpp::context& context, const ExternalEndpoints& endpoints)
+ModelHandler::ModelHandler(zmqpp::context& context)
     : logger("model_handler.txt"),
-      textClassifier(
-          context, endpoints.textClassifierEndpoint, endpoints.pythonServerEndpoint) {}
+      textClassifier(context,
+                     VisionExternalEndpoints::textClassifierEndpoint,
+                     VisionExternalEndpoints::pythonServerEndpoint) {}
 
 /**
  * Run text extraction to attempt to identify the item. Upon success, update the given
