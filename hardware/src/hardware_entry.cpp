@@ -27,21 +27,25 @@ void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints externalEnd
   logger.log("Within hardware process");
 
   Hardware hardware(context, externalEndpoints);
-  bool startSignalReceived = false;
+  bool startSignalReceived;
   int startSignalTimeoutMs = 1000;
-  while (startSignalReceived == false) {
-    startSignalReceived = hardware.checkStartSignal(startSignalTimeoutMs);
-    if (startSignalReceived == false) {
-      ;
+  while (1) {
+    startSignalReceived = false;
+    while (startSignalReceived == false) {
+      logger.log("Waiting for start signal from display");
+      startSignalReceived = hardware.checkStartSignal(startSignalTimeoutMs);
+      if (startSignalReceived == false) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      }
     }
-  }
+    logger.log("Received start signal from display");
+    bool scanSuccessful = hardware.startScan();
 
-  bool scanSuccessful = hardware.startScan();
-
-  if (scanSuccessful) {
-    logger.log("Scan successful");
-  }
-  else {
-    logger.log("Scan unsuccessful");
+    if (scanSuccessful) {
+      logger.log("Scan successful");
+    }
+    else {
+      logger.log("Scan unsuccessful");
+    }
   }
 }
