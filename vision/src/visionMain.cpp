@@ -34,6 +34,15 @@ void visionEntry(zmqpp::context& context, const ExternalEndpoints& externalEndpo
   }
 }
 
+/**
+ * polls for 1000ms for socket activity and then checks replySocket for input
+ *
+ * @param replySocket replySocket to check for input on
+ * @param logger Logger being used to log visionMain
+ * @param foodItem foodItem to return with data
+ * @param poller poller to use for polling socket activity
+ * @return whether start signal was received or not
+ */
 bool startSignalCheck(zmqpp::socket& replySocket,
                       const Logger& logger,
                       FoodItem& foodItem,
