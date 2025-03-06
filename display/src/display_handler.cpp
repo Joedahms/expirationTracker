@@ -30,12 +30,12 @@ void DisplayHandler::handle() {
     this->replySocket.receive(receivedMessage);
 
     // Engine wants to start a new scan
-    if (receivedMessage == "start scan") {
-      this->logger.log("Received start scan");
+    if (receivedMessage == Messages::START_SCAN) {
+      this->logger.log("Received start scan from engine");
       try {
         this->logger.log("Telling hardware to start scan");
 
-        this->replySocket.send(receivedMessage);
+        this->replySocket.send(Messages::AFFIRMATIVE);
         this->requestHardwareSocket.send(Messages::START_SCAN);
         std::string hardwareResponse;
         this->requestHardwareSocket.receive(hardwareResponse);
