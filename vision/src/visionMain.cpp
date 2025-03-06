@@ -51,7 +51,7 @@ bool startSignalCheck(zmqpp::socket& replySocket,
   try {
     if (poller.poll(1000)) {
       if (poller.has_input(replySocket)) {
-        receiveFoodItem(replySocket, "got it", foodItem);
+        receiveFoodItem(replySocket, "gob it", foodItem);
         logger.log("Received start signal from hardware");
         return true;
       }
