@@ -17,50 +17,35 @@ for controlling all hardware components such as the cameras, weight sensor, and 
 - Logan Pelkey (Software, Vision)
 - Joe Dahms (Software Display)
 
-# Setup instructions
+# Setup 
+$ sudo chmod 777 install.sh
+$ ./install.sh \
 
-## Install necessary dependencies
-#### Refresh local package information:
-$ sudo apt update
-#### Install build tools
-$ sudo apt install make g++ cmake
-#### Install Google logging library
-$ sudo apt install libgoogle-glog-dev
-#### Install SDL
-$ sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev  
-#### Install OPENCV
-$ sudo apt install libopencv-dev
-#### Install SQLite
-$ sudo apt install sqlite3 libsqlite3-dev
-#### Install mesa
-$ sudo add-apt-repository ppa:kisak/kisak-mesa
-#### Install zeroMQ
-$ sudo apt-get install libzmq3-dev\
-$ git clone https://github.com/zeromq/zmqpp.git \
-$ cd zmqpp\
-$ mkdir build && cd build\
-$ cmake ..\
-$ make\
-$ sudo make install
-#### Install Protobuf
-$ sudo apt install protobuf-compiler libprotobuf-dev
+### WiringPi Setup
+#### For if you just need to make a file
+$ gcc -o myapp myapp.cpp -l wiringPi
 
+## Todo - add to install.sh
+### I placed this in the same directory as the raspi-yolo project directory
+### This almost certainly will not install on your PC
+$ git clone https://github.com/WiringPi/WiringPi.git
+$ cd WiringPi
+$ ./build debian
+$ mv debian-template/wiringpi_3.14_arm64.deb .
+$ sudo apt install ./wiringpi_3.14_arm64.deb
 
-## Setup Python virual environment
-NOTE: To setup the Python virtual environment you must be in the build directory. Run all pip commands within the 
-build directory.
-#### Create the virtual environment
-$ python3 -m venv models-venv
-#### Activate it
+### Camera Apps
+#### This may be needed
+$ sudo chmod -R 777 /home/pi/Desktop/Project/raspi-yolo/images
+where pi is the name of your pi device
+$ sudo apt update && sudo apt full-upgrade -y
+$ sudo rpi-update
+$ sudo apt install libcamera-apps
+$ sudo apt install libcamera-dev
+
+# Usage
 $ source models-venv/bin/activate
-#### Install EasyOCR
-$ pip install easyocr
-#### Install Efficientnett
-$ pip install efficientnet
-#### Install Tensorflow
-$ pip install tensorflow
-#### Install zeroMQ
-$ pip install pyzmq
+$ ./expirationTracker
 
 # Developer Notes
 ## Function Comment Format (javadoc)

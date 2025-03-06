@@ -10,9 +10,9 @@
 #include "hardware.h"
 #include "hardware_entry.h"
 
-/**
- * Entry into the hardware code. Only called from main after hardware child process is
- * forked.
+/*
+ * Entry into the hardware code.
+ * Only called from main after hardware child process is forked.
  *
  * @param context The zeroMQ context with which to creates with
  * @param externalEndpoints Endpoints to the main components of the system (vision,
@@ -22,10 +22,14 @@
  * TODO Add an infinite loop so that more than one food item can be scanned per
  * execution.
  */
-void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints) {
+void hardwareEntry(zmqpp::context& context,
+                   struct ExternalEndpoints externalExternalEndpoints) {
   Logger logger("hardware_entry.txt");
   logger.log("Within hardware process");
+  // TODO - Add a function to initialize motor and weight sensor.
+  // TODO - Setup communication with Arduino for weight.
 
+  // while 1
   Hardware hardware(context, externalEndpoints);
   bool startSignalReceived;
   int startSignalTimeoutMs = 1000;

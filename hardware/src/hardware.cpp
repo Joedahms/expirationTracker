@@ -24,12 +24,12 @@ Hardware::Hardware(zmqpp::context& context,
   }
 }
 
-/**
- * Check to see if display has sent the signal to initiate the scanning of a new food
- * item.
+/*
+ * Checks for a start signal from the display.
+ * Used to start the scan process
  *
  * @param None
- * @return True if the start signal was received. False if the signal was not received.
+ * @return bool - True if start signal received, false otherwise
  */
 bool Hardware::checkStartSignal(int timeoutMs) {
   bool receivedRequest = false;
@@ -57,6 +57,28 @@ bool Hardware::checkStartSignal(int timeoutMs) {
   }
 }
 
+/*
+ * Sends the photo directory and weight data to the AI Vision system.
+ *
+ * @param weight The weight of the object on the platform.
+ * @return None
+ */
+void Hardware::sendDataToVision() {
+  this->logger.log("Sending images from hardware to vision");
+  const std::chrono::time_point<std::chrono::system_clock> now{
+      std::chrono::system_clock::now()};
+
+  std::filesystem::path filePath       = "../images/temp";
+  std::chrono::year_month_day scanDate = std::chrono::floor<std::chrono::days>(now);
+
+  FoodItem foodItem(filePath, scanDate, this->itemWeight);
+
+  this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
+  sendFoodItem(this->requestVisionSocket, foodItem);
+
+  this->logger.log("Done sending images from hardware to vision");
+}
+
 /**
  * Start the scan of a new food item.
  *
@@ -65,12 +87,26 @@ bool Hardware::checkStartSignal(int timeoutMs) {
  *
  * TODO Handle no weight on platform
  */
+/*
+ * Function call to controls routine:
+ * Checks weight
+ * weight = ~0 -> error to Display
+ * weight = +int -> start scan
+ *
+ * @return bool
+ * */
 bool Hardware::startScan() {
   this->logger.log("Starting scan");
 
   this->logger.log("Checking weight");
   if (checkWeight() == false) {
     // TODO handle no weight on platform
+    // Send error to display
+    // Possible pattern HW error msg -> Display message with 3 options:
+    // 1. Retry 2. Skip/Override 3. Cancel
+    // Response from Display will then decide action
+    this->logger.log("No weight detected on platform");
+    return false;
   }
 
   rotateAndCapture();
@@ -84,36 +120,19 @@ bool Hardware::startScan() {
  * @param None
  * @return True if non zero weight. False if zero weight.
  *
- * TODO Read from weight sensor
+ * TODO 1. setup zmqpp with Arduino
+ *      2. integrate code to check weight from Arduino Read from weight sensor
  */
 bool Hardware::checkWeight() {
-  this->itemWeight = 1;
+  this->itemWeight = 1; // set to 1 for testing
+  if (this->itemWeight <= 0) {
+    // May need to adjust up because the scale is likely sensitive to vibrations
+    return false;
+  }
   return true;
 }
 
-/**
- * Sends the photo directory and weight data to the AI Vision system.
- *
- * @param None
- * @return None
- */
-void Hardware::sendDataToVision() {
-  this->logger.log("Sending start signal to vision");
-  const std::chrono::time_point<std::chrono::system_clock> now{
-      std::chrono::system_clock::now()};
-
-  std::filesystem::path filePath       = "../images/temp";
-  std::chrono::year_month_day scanDate = std::chrono::floor<std::chrono::days>(now);
-
-  FoodItem foodItem(filePath, scanDate, this->itemWeight);
-
-  this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
-  sendFoodItem(this->requestVisionSocket, foodItem);
-
-  this->logger.log("Done sending start signal to vision");
-}
-
-/**
+/*
  * Rotates platform in 45-degree increments, captures images, and sends the
  * data to the AI Vision system until a full 360-degree rotation is complete.
  * The process can be stopped early if AI Vision sends a "STOP" signal
@@ -129,16 +148,14 @@ void Hardware::rotateAndCapture() {
   for (int angle = 0; angle < 8; angle++) {
     this->logger.log("At location " + std::to_string(angle) + " of 8");
 
-    // TODO
-    // This function is for both cameras
-    // if (takePhotos(angle) == false) {
-    //   LOG(INFO) << "Error taking photos";
-    // };
+    // Leaving in T/F logic in case we need to add error handling later
+    if (takePhotos(angle) == false) {
+      this->logger.log("Error taking photos");
+    };
 
-    // Temporary
-    if (capturePhoto(angle) == false) {
-      this->logger.log("Error taking a photo");
-    }
+    // if (capturePhoto(angle) == false) {
+    //   this->logger.log("Error taking a photo");
+    // }
 
     // Initiate scan
     if (angle == 0) {
@@ -147,7 +164,10 @@ void Hardware::rotateAndCapture() {
 
     this->logger.log("Rotating platform");
     // TODO rotateMotor();
-    usleep(500);
+
+    // Swap comment lines below if you don't want to wait on realistic motor rotation time
+    // usleep(500);
+    sleep(3);
 
     this->logger.log("Checking for stop signal from vision");
     bool receivedStopSignal = false;
@@ -161,38 +181,65 @@ void Hardware::rotateAndCapture() {
         receivedStopSignal = true;
       }
       else {
-        this->logger.log("Received something else from vision");
+        // Could skip receivedStopSignal and this else statement and just break if "item
+        // identified"
+        this->logger.log("Received other from vision");
         this->replySocket.send("retransmit");
       }
     }
-
     if (receivedStopSignal) {
       this->logger.log("AI Vision identified item. Stopping process.");
       break;
     }
-
     this->logger.log("AI Vision did not identify item. Continuing process.");
   }
 }
 
-/**
- * Capture a single photo using the raspberry pi camera.
+/*
+ * Takes two photos, one top & side, saves them to the image directory, and logs
+ * Note: current "top camera" is ribbon port closer to USB
  *
- * @param angle Angle the photo was taken at. Used to construct the name of the
- * photo file.
- * @return Always true?
+ * @param int angle - the position of the platform for unique photo ID
+ * @return bool - always true
+ */
+bool Hardware::takePhotos(int angle) {
+  this->logger.log("Taking photos at position: " + std::to_string(angle));
+  std::string cmd0     = "rpicam-jpeg --camera 0";
+  std::string cmd1     = "rpicam-jpeg --camera 1";
+  std::string np       = " --nopreview";
+  std::string res      = " --width 2304 --height 1296";
+  std::string out      = " --output ";
+  std::string to       = " --timeout 50"; // DO NOT SET TO 0! Will cause infinite preview!
+  std::string topPhoto = this->IMAGE_DIRECTORY + std::to_string(angle) + "_top.jpg";
+  std::string sidePhoto = this->IMAGE_DIRECTORY + std::to_string(angle) + "_side.jpg";
+
+  std::string command0 = cmd0 + np + res + out + topPhoto + to;
+  std::string command1 = cmd0 + np + res + out + sidePhoto + to;
+  system(command0.c_str());
+  system(command1.c_str());
+
+  this->logger.log("Photos successfully captured at position: " + std::to_string(angle));
+  this->logger.log("Exiting takePhotos at angle: " + std::to_string(angle));
+  // Always returns true
+  return true;
+}
+
+/*
+ * Test Function
+ * Captures a photo at the given angle and saves it to the image directory
  *
- * TODO Always returns true
+ * @param int angle - the position of the platform for unique photo ID
+ * @return bool - always true
  */
 bool Hardware::capturePhoto(int angle) {
   this->logger.log("Capturing photo at position: " + std::to_string(angle));
   std::string fileName = this->IMAGE_DIRECTORY + std::to_string(angle) + "_test.jpg";
 
-  std::string command = "rpicam-jpeg --output " + fileName + " -n";
+  std::string command = "rpicam-jpeg -n -t 50 1920:1080:12:U --output " + fileName;
   system(command.c_str());
 
   this->logger.log("Photo successfully captured at position: " + std::to_string(angle));
   this->logger.log("Exiting capturePhoto at angle: " + std::to_string(angle));
-  // TODO always returns true
+  // Always returns true
   return true;
 }
