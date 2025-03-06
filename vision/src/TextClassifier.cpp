@@ -21,21 +21,18 @@ TextClassifier::TextClassifier(zmqpp::context& context,
  * Handle classification via text extraction.
  *
  * @param imagePath Path to the image to extract text from
- * @return True if item successfully classified. False if item not classified.
+ * @return pair <item identification success/fail, string>
  */
-bool TextClassifier::handleClassification(const std::filesystem::path& imagePath) {
+std::optional<std::string> TextClassifier::handleClassification(
+    const std::filesystem::path& imagePath) {
   this->logger.log("Entering handleClassification, running model");
   auto result = this->runModel(imagePath);
 
   std::string detectedClass = std::string(result);
   if (detectedClass.find("CLASSIFICATION") != std::string::npos) {
-    this->foodItem.setName(removePrefix(detectedClass, "CLASSIFICATION: "));
-    this->foodItem.setImagePath(std::filesystem::absolute(imagePath));
-    this->foodItem.setCategory(FoodCategories::packaged);
-    this->foodItem.setQuantity(1);
-    return true;
+    return removePrefix(detectedClass, "CLASSIFICATION: ");
   }
-  return false;
+  return std::nullopt;
 }
 
 /**

@@ -22,8 +22,7 @@
  * TODO Add an infinite loop so that more than one food item can be scanned per
  * execution.
  */
-void hardwareEntry(zmqpp::context& context,
-                   struct ExternalEndpoints externalExternalEndpoints) {
+void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints) {
   Logger logger("hardware_entry.txt");
   logger.log("Within hardware process");
   // TODO - Add a function to initialize motor and weight sensor.
@@ -33,19 +32,23 @@ void hardwareEntry(zmqpp::context& context,
   Hardware hardware(context, externalEndpoints);
   bool startSignalReceived = false;
   int startSignalTimeoutMs = 1000;
-  while (startSignalReceived == false) {
-    startSignalReceived = hardware.checkStartSignal(startSignalTimeoutMs);
-    if (startSignalReceived == false) {
-      ;
+  while (1) {
+    startSignalReceived = false;
+    while (startSignalReceived == false) {
+      logger.log("Waiting for start signal from display");
+      startSignalReceived = hardware.checkStartSignal(startSignalTimeoutMs);
+      if (startSignalReceived == false) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      }
     }
-  }
+    logger.log("Received start signal from display");
+    bool scanSuccessful = hardware.startScan();
 
-  bool scanSuccessful = hardware.startScan();
-
-  if (scanSuccessful) {
-    logger.log("Scan successful");
-  }
-  else {
-    logger.log("Scan unsuccessful");
+    if (scanSuccessful) {
+      logger.log("Scan successful");
+    }
+    else {
+      logger.log("Scan unsuccessful");
+    }
   }
 }

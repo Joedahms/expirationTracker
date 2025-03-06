@@ -18,6 +18,8 @@ public:
   bool analyze();
   struct FoodItem& getFoodItem();
   void setFoodItem(struct FoodItem&);
+  void tellHardwareToStop();
+  void tellDisplayWeFailed();
 
 private:
   ExternalEndpoints externalEndpoints;

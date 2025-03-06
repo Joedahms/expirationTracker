@@ -8,11 +8,12 @@
 #include "../../logger.h"
 #include "ObjectClassifier.h"
 #include "TextClassifier.h"
+#include "externalEndpoints.h"
 
 class ModelHandler {
 public:
-  ModelHandler(zmqpp::context& context);
-  bool classifyObject(const std::filesystem::path&);
+  ModelHandler(zmqpp::context&);
+  bool classifyObject(const std::filesystem::path&, FoodItem&);
   bool extractExpirationDate(const std::filesystem::path&) const;
 
 private:
