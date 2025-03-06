@@ -90,7 +90,7 @@ rpicam-vid -o test.h264 --width 1920 --height 1080 captures 1080p video.
 
 rpicam-still -r -o test.jpg --width 2028 --height 1520 captures a 2028×1520 resolution JPEG. If used with the HQ camera, uses 2×2 binned mode, so the raw file (test.dng) contains a 2028×1520 raw Bayer image.
 
-***MAYBE***
+***MAYBE for testing aim (shrinks preview size)***
 ### viewfinder-width and viewfinder-height
 Each accepts a single number defining the dimensions, in pixels, of the image displayed in the preview window. Does not effect the preview window dimensions, since images are resized to fit. Does not affect captured still images or videos.
 
