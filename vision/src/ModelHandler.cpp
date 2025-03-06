@@ -1,10 +1,9 @@
 #include "../include/ModelHandler.h"
 
 ModelHandler::ModelHandler(zmqpp::context& context)
-    : textClassifier(context,
-                     "ipc:///tmp/text_classifier_endpoint",
-                     "ipc:///tmp/python_server_endpoint"),
-      logger("model_handler.txt") {}
+    : logger("model_handler.txt"), textClassifier(context,
+                                                  "ipc:///tmp/text_classifier_endpoint",
+                                                  "ipc:///tmp/python_server_endpoint") {}
 
 /**
  * Run text extraction to attempt to identify the item.

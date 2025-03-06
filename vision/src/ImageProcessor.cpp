@@ -7,11 +7,10 @@
  */
 ImageProcessor::ImageProcessor(zmqpp::context& context,
                                const struct ExternalEndpoints& externalEndpoints)
-    : externalEndpoints(externalEndpoints),
+    : externalEndpoints(externalEndpoints), logger("image_processor.txt"),
       requestHardwareSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
-      replySocket(context, zmqpp::socket_type::reply), modelHandler(context),
-      logger("image_processor.txt") {
+      replySocket(context, zmqpp::socket_type::reply), modelHandler(context) {
   try {
     this->requestHardwareSocket.connect(this->externalEndpoints.hardwareEndpoint);
     this->requestDisplaySocket.connect(this->externalEndpoints.displayEndpoint);
