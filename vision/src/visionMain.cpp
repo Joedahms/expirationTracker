@@ -15,9 +15,6 @@ void visionEntry(zmqpp::context& context, const ExternalEndpoints& externalEndpo
 
   attemptStartPythonServer(logger);
 
-  // Wait 5 sec to ensure Python server starts
-  sleep(5);
-
   ImageProcessor processor(context, externalEndpoints);
 
   zmqpp::socket replySocket(context, zmqpp::socket_type::reply);
