@@ -28,7 +28,6 @@ void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints externalEnd
   // TODO - Add a function to initialize motor and weight sensor.
   // TODO - Setup communication with Arduino for weight.
 
-  // while 1
   Hardware hardware(context, externalEndpoints);
   bool startSignalReceived = false;
   int startSignalTimeoutMs = 1000;
@@ -38,7 +37,7 @@ void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints externalEnd
       logger.log("Waiting for start signal from display");
       startSignalReceived = hardware.checkStartSignal(startSignalTimeoutMs);
       if (startSignalReceived == false) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
       }
     }
     logger.log("Received start signal from display");

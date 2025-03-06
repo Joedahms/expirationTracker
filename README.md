@@ -17,36 +17,21 @@ for controlling all hardware components such as the cameras, weight sensor, and 
 - Logan Pelkey (Software, Vision)
 - Joe Dahms (Software Display)
 
-# Setup 
-$ sudo chmod 777 install.sh
-$ ./install.sh \
-
+# Setup
+````plaintext
+sudo chmod 777 install.sh
+./install.sh \
+````
 ### WiringPi Setup
 #### For if you just need to make a file
-$ gcc -o myapp myapp.cpp -l wiringPi
-
-## Todo - add to install.sh
-### I placed this in the same directory as the raspi-yolo project directory
-### This almost certainly will not install on your PC
-$ git clone https://github.com/WiringPi/WiringPi.git
-$ cd WiringPi
-$ ./build debian
-$ mv debian-template/wiringpi_3.14_arm64.deb .
-$ sudo apt install ./wiringpi_3.14_arm64.deb
-
-### Camera Apps
-#### This may be needed
-$ sudo chmod -R 777 /home/pi/Desktop/Project/raspi-yolo/images
-where pi is the name of your pi device
-$ sudo apt update && sudo apt full-upgrade -y
-$ sudo rpi-update
-$ sudo apt install libcamera-apps
-$ sudo apt install libcamera-dev
-
+````plaintet
+gcc -o myapp myapp.cpp -l wiringPi
+````
 # Usage
-$ source models-venv/bin/activate
+````plaintet
+source models-venv/bin/activate
 $ ./expirationTracker
-
+````
 # Developer Notes
 ## Function Comment Format (javadoc)
 /**  
@@ -57,5 +42,4 @@ $ ./expirationTracker
  \* @param Name of Input 2 Description of Input 2  
  \* @return Description of return value
  */  
-
-
+ 
