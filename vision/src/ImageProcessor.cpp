@@ -31,7 +31,7 @@ void ImageProcessor::process() {
   this->logger.log("Vision analyzing all images");
 
   if (!isValidDirectory(foodItem.getImagePath())) {
-    this->logger.log("Failed to open image directory");
+    LOG(FATAL) << "Failed to open image directory";
     return;
   }
 
