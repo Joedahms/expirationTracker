@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <glog/logging.h>
 
+#include "../../endpoints.h"
 #include "../../food_item.h"
 #include "../../logger.h"
 #include "ObjectClassifier.h"
@@ -11,7 +12,7 @@
 
 class ModelHandler {
 public:
-  ModelHandler(zmqpp::context& context);
+  ModelHandler(zmqpp::context&, const ExternalEndpoints&);
   bool classifyObject(const std::filesystem::path&);
   bool extractExpirationDate(const std::filesystem::path&) const;
 
