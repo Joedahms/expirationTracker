@@ -25,28 +25,6 @@ Hardware::Hardware(zmqpp::context& context,
 }
 
 /*
- * Sends the photo directory and weight data to the AI Vision system.
- *
- * @param weight The weight of the object on the platform.
- * @return None
- */
-void Hardware::sendDataToVision() {
-  this->logger.log("Sending images from hardware to vision");
-  const std::chrono::time_point<std::chrono::system_clock> now{
-      std::chrono::system_clock::now()};
-
-  std::filesystem::path filePath       = "../images/temp";
-  std::chrono::year_month_day scanDate = std::chrono::floor<std::chrono::days>(now);
-
-  FoodItem foodItem(filePath, scanDate, this->itemWeight);
-
-  this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
-  sendFoodItem(this->requestVisionSocket, foodItem);
-
-  this->logger.log("Done sending images from hardware to vision");
-}
-
-/*
  * Checks for a start signal from the display.
  * Used to start the scan process.ADJ_OFFSET_SINGLESHOT
  *
@@ -77,6 +55,28 @@ bool Hardware::checkStartSignal(int timeoutMs) {
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
   }
+}
+
+/*
+ * Sends the photo directory and weight data to the AI Vision system.
+ *
+ * @param weight The weight of the object on the platform.
+ * @return None
+ */
+void Hardware::sendDataToVision() {
+  this->logger.log("Sending images from hardware to vision");
+  const std::chrono::time_point<std::chrono::system_clock> now{
+      std::chrono::system_clock::now()};
+
+  std::filesystem::path filePath       = "../images/temp";
+  std::chrono::year_month_day scanDate = std::chrono::floor<std::chrono::days>(now);
+
+  FoodItem foodItem(filePath, scanDate, this->itemWeight);
+
+  this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
+  sendFoodItem(this->requestVisionSocket, foodItem);
+
+  this->logger.log("Done sending images from hardware to vision");
 }
 
 /**
@@ -121,7 +121,7 @@ bool Hardware::startScan() {
  * @return True if non zero weight. False if zero weight.
  *
  * TODO 1. setup zmqpp with Arduino
-//      2. integrate code to check weight from Arduino Read from weight sensor
+ *      2. integrate code to check weight from Arduino Read from weight sensor
  */
 bool Hardware::checkWeight() {
   this->itemWeight = 1; // set to 1 for testing

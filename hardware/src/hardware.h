@@ -37,6 +37,7 @@ private:
 
   float itemWeight = 0;
 
+  bool checkWeight();
   void rotateAndCapture();
   bool takePhotos(int angle);
   bool capturePhoto(int angle);
