@@ -39,41 +39,10 @@ void ImageProcessor::process() {
   bool detectedFoodItem = analyze();
   this->logger.log("Successfully analyzed all images");
 
-  // Tell hardware to stop
-  bool hardwareStopping = false;
-  while (hardwareStopping == false) {
-    this->logger.log("Sending stop signal to hardware");
-    this->requestHardwareSocket.send("item identified");
-    this->logger.log("Sent stop signal to hardware");
-    std::string response;
-    this->requestHardwareSocket.receive(response);
-    if (response != "retransmit") {
-      hardwareStopping = true;
-      this->logger.log("Hardware received stop signal");
-    }
-    else {
-      this->logger.log("Hardware did not receive stop signal, retrying");
-    }
-  }
+  tellHardwareToStop();
 
   if (!detectedFoodItem) {
-    this->logger.log("Item not successfully detected");
-    // Tell display we failed
-    bool notifiedDisplayOfFailure = false;
-    std::string response;
-    while (!notifiedDisplayOfFailure) {
-      this->logger.log("Notifying display of failure");
-      this->requestHardwareSocket.send("item identification failed");
-      this->logger.log("Send notification to display");
-      this->requestHardwareSocket.receive(response);
-      if (response != "retransmit") {
-        notifiedDisplayOfFailure = true;
-        this->logger.log("Display received notification");
-      }
-      else {
-        this->logger.log("Display did not receive notification, retrying");
-      }
-    }
+    tellDisplayWeFailed();
     return;
   }
 
@@ -139,6 +108,45 @@ bool ImageProcessor::analyze() {
     }
   }
   return false;
+}
+
+void ImageProcessor::tellHardwareToStop() {
+  // Tell hardware to stop
+  bool hardwareStopping = false;
+  while (hardwareStopping == false) {
+    this->logger.log("Sending stop signal to hardware");
+    this->requestHardwareSocket.send("item identified");
+    this->logger.log("Sent stop signal to hardware");
+    std::string response;
+    this->requestHardwareSocket.receive(response);
+    if (response != "retransmit") {
+      hardwareStopping = true;
+      this->logger.log("Hardware received stop signal");
+    }
+    else {
+      this->logger.log("Hardware did not receive stop signal, retrying");
+    }
+  }
+}
+
+void ImageProcessor::tellDisplayWeFailed() {
+  this->logger.log("Item not successfully detected");
+  // Tell display we failed
+  bool notifiedDisplayOfFailure = false;
+  std::string response;
+  while (!notifiedDisplayOfFailure) {
+    this->logger.log("Notifying display of failure");
+    this->requestHardwareSocket.send("item identification failed");
+    this->logger.log("Send notification to display");
+    this->requestHardwareSocket.receive(response);
+    if (response != "retransmit") {
+      notifiedDisplayOfFailure = true;
+      this->logger.log("Display received notification");
+    }
+    else {
+      this->logger.log("Display did not receive notification, retrying");
+    }
+  }
 }
 
 /**
