@@ -13,20 +13,7 @@ void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpo
   Logger logger("vision_entry.txt");
   logger.log("Within vision process");
 
-  int maxRetries = 5;
-  int retryCount = 0;
-
-  while (!startPythonServer(logger)) {
-    retryCount++;
-
-    if (retryCount >= maxRetries) {
-      std::cerr << "ERROR: Failed to start Python server after " << retryCount
-                << " attempts.";
-    }
-    logger.log("Python server failed to start. Retrying in 2 seconds... (" +
-               std::to_string(retryCount) + "/" + std::to_string(maxRetries) + ")");
-    sleep(2);
-  }
+  attemptStartPythonServer(logger);
 
   // Wait 5 sec to ensure Python server starts
   sleep(5);
@@ -71,9 +58,9 @@ void visionEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpo
  * @return True if python server was started successfully. False if failed to start python
  * server
  */
-bool startPythonServer(Logger& logger) {
-  pid_t pid = fork();
+bool startPythonServer(const Logger& logger) {
   logger.log("Entering startPythonServer");
+  pid_t pid = fork();
 
   if (pid == -1) {
     logger.log("Failed to fork process");
@@ -87,8 +74,9 @@ bool startPythonServer(Logger& logger) {
     execvp(args[0], args);
 
     // Exit child process if execvp fails
+    perror("execvp failed");
     logger.log("Failed to start python server");
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   // Parent process
   else {
@@ -96,4 +84,24 @@ bool startPythonServer(Logger& logger) {
     logger.log("Leaving startPythonServer");
     return true;
   }
+}
+
+/**
+ * Attempts to start the python server MAX_SERVER_RETRIES times before erroring out
+ *
+ * @param logger Logger being used to log visionMain
+ */
+void attemptStartPythonServer(const Logger& logger) {
+  for (int retry = 1; retry <= MAX_SERVER_RETRIES; ++retry) {
+    if (startPythonServer(logger)) {
+      return;
+    }
+
+    logger.log("Python server failed to start. Retrying in 2 seconds... (" +
+               std::to_string(retry) + "/" + std::to_string(MAX_SERVER_RETRIES) + ")");
+    sleep(2);
+  }
+
+  std::cerr << "ERROR: Failed to start Python server after " << MAX_SERVER_RETRIES
+            << " attempts.\n";
 }
