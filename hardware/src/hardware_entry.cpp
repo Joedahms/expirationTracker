@@ -22,8 +22,7 @@
  * TODO Add an infinite loop so that more than one food item can be scanned per
  * execution.
  */
-void hardwareEntry(zmqpp::context& context,
-                   struct ExternalEndpoints externalExternalEndpoints) {
+void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints) {
   Logger logger("hardware_entry.txt");
   logger.log("Within hardware process");
   // TODO - Add a function to initialize motor and weight sensor.
