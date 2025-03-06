@@ -18,7 +18,6 @@ public:
 private:
   Logger logger;
 
-  //  ObjectClassifier objectClassifier;
   TextClassifier textClassifier;
 };
 

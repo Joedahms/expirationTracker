@@ -4,7 +4,6 @@
 #include <thread>
 
 #include "../../food_item.h"
-#include "../../pipes.h"
 #include "display_handler.h"
 #include "fooditem.pb.h"
 #include "sql_food.h"

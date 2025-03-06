@@ -4,20 +4,23 @@
 #include "../../food_item.h"
 #include "hardware.h"
 
-// Communication setup
+/**
+ * @param context The zeroMQ context with which to creates with
+ * @param externalEndpoints Endpoints to the main components of the system (vision,
+ * hardware, and display)
+ */
 Hardware::Hardware(zmqpp::context& context,
                    const struct ExternalEndpoints& externalEndpoints)
     : externalEndpoints(externalEndpoints),
       requestVisionSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
       replySocket(context, zmqpp::socket_type::reply), logger("hardware_log.txt") {
-  // Setup sockets
   try {
     this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
     this->requestDisplaySocket.connect(this->externalEndpoints.displayEndpoint);
     this->replySocket.bind(this->externalEndpoints.hardwareEndpoint);
   } catch (const zmqpp::exception& e) {
-    std::cerr << e.what();
+    LOG(FATAL) << e.what();
   }
 }
 
@@ -50,14 +53,15 @@ void Hardware::sendDataToVision() {
  * @param None
  * @return bool - True if start signal received, false otherwise
  */
-bool Hardware::checkStartSignal() {
-  this->logger.log("Checking for start signal from display");
+bool Hardware::checkStartSignal(int timeoutMs) {
   bool receivedRequest = false;
+  this->logger.log("Checking for start signal from display");
+
   try {
     zmqpp::poller poller;
     poller.add(this->replySocket);
 
-    if (poller.poll(1000)) {
+    if (poller.poll(timeoutMs)) {
       if (poller.has_input(this->replySocket)) {
         std::string request;
         this->replySocket.receive(request);
@@ -71,10 +75,18 @@ bool Hardware::checkStartSignal() {
     }
     return receivedRequest;
   } catch (const zmqpp::exception& e) {
-    std::cerr << e.what();
+    LOG(FATAL) << e.what();
   }
 }
 
+/**
+ * Start the scan of a new food item.
+ *
+ * @param None
+ * @return True if the scan was successful. False if the scan was unsuccessful.
+ *
+ * TODO Handle no weight on platform
+ */
 /*
  * Function call to controls routine:
  * Checks weight
@@ -102,8 +114,15 @@ bool Hardware::startScan() {
   return true;
 }
 
-// TODO 1. setup zmqpp with Arduino
-//      2. integrate code to check weight from Arduino
+/**
+ * Read from the weight sensor to get the weight of an object on the platform.
+ *
+ * @param None
+ * @return True if non zero weight. False if zero weight.
+ *
+ * TODO 1. setup zmqpp with Arduino
+//      2. integrate code to check weight from Arduino Read from weight sensor
+ */
 bool Hardware::checkWeight() {
   this->itemWeight = 1; // set to 1 for testing
   if (this->itemWeight <= 0) {
@@ -119,7 +138,11 @@ bool Hardware::checkWeight() {
  * The process can be stopped early if AI Vision sends a "STOP" signal
  * 0 - continue or 1 - stop
  *
+ * @param None
  * @return None
+ *
+ * TODO Multiple cameras
+ * TODO Rotate motor
  */
 void Hardware::rotateAndCapture() {
   for (int angle = 0; angle < 8; angle++) {
@@ -134,6 +157,7 @@ void Hardware::rotateAndCapture() {
     //   this->logger.log("Error taking a photo");
     // }
 
+    // Initiate scan
     if (angle == 0) {
       sendDataToVision();
     }
@@ -153,12 +177,14 @@ void Hardware::rotateAndCapture() {
     if (receivedRequest) {
       if (request == "item identified") {
         this->logger.log("Received stop signal from vision");
+        this->replySocket.send("got it");
         receivedStopSignal = true;
       }
       else {
         // Could skip receivedStopSignal and this else statement and just break if "item
         // identified"
         this->logger.log("Received other from vision");
+        this->replySocket.send("retransmit");
       }
     }
     if (receivedStopSignal) {
