@@ -37,6 +37,7 @@ void ImageProcessor::process() {
   bool detectedFoodItem = analyze();
   this->logger.log("Successfully analyzed all images");
 
+  // Move this into analyze
   if (detectedFoodItem) {
     detectionSucceeded();
   }
