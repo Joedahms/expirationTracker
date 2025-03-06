@@ -32,6 +32,12 @@ private:
   FoodItem foodItem;
 
   const int MAX_IMAGE_COUNT = 16;
+
+  void detectionSucceeded();
+  void detectionFailed();
+
+  void foodItemToDisplay();
+  void stopHardware();
 };
 
 #endif
