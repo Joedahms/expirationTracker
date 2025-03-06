@@ -21,11 +21,6 @@ def run_server():
             # Wait for request from client
             request = socket.recv_string()
             print(f"Received request: {request}")
-            
-            # Handle readiness check
-            if request == "ping":
-                socket.send_string("pong")
-                continue
 
             # Check for exit command
             if request == "exit":
