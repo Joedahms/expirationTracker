@@ -63,7 +63,22 @@ void DisplayHandler::handle() {
         this->logger.log("Item detection succeeded, receiving food item");
         FoodItem foodItem;
         receiveFoodItem(this->replySocket, Messages::AFFIRMATIVE, foodItem);
-        this->logger.log("Food item received");
+        this->logger.log("Food item received, storing in database");
+
+        sqlite3* database = nullptr;
+        openDatabase(&database);
+        storeFoodItem(database, foodItem);
+        sqlite3_close(database);
+
+        this->requestEngineSocket.send(Messages::ITEM_DETECTION_SUCCEEDED);
+        std::string engineResponse;
+        this->requestEngineSocket.receive(engineResponse);
+        if (engineResponse == Messages::AFFIRMATIVE) {
+          this->logger.log("Item stored in database and engine notified of success");
+        }
+        else {
+          LOG(FATAL) << "Unexpected message received";
+        }
       }
       else {
         LOG(FATAL) << "Unexpected message received";
@@ -71,78 +86,3 @@ void DisplayHandler::handle() {
     }
   }
 }
-
-/**
- * Handle communication between display and the other major components of the system
- * (vision and hardware).
- *
- * @param None
- * @return None
- */
-/*
-void DisplayHandler::handleExternal() {
-  struct timeval timeout;
-  timeout.tv_sec  = 1;
-  timeout.tv_usec = 0;
-
-  struct FoodItem foodItem;
-  bool foodItemReceived = false;
-  foodItemReceived =
-      receiveFoodItem(foodItem, this->externalPipes.visionToDisplay[READ], timeout);
-
-  if (foodItemReceived) {
-    LOG(INFO) << "Food item received from vision";
-    sqlite3* database = nullptr;
-    openDatabase(&database);
-
-    storeFoodItem(database, foodItem);
-    writeString(this->displayToEngine[WRITE], "ID successful");
-
-    sqlite3_close(database);
-  }
-}
-
-*/
-/**
- * Handle communication between the main display process and the engine process.
- *
- * @param None
- * @param None
- */
-/*
-void DisplayHandler::handleEngine() {
-  fd_set readPipeSet;
-
-  FD_ZERO(&readPipeSet);
-  FD_SET(this->engineToDisplay[READ], &readPipeSet);
-
-  struct timeval timeout;
-  timeout.tv_sec  = 1;
-  timeout.tv_usec = 0;
-  int pipeReady =
-      select(this->engineToDisplay[READ] + 1, &readPipeSet, NULL, NULL, &timeout);
-
-  if (pipeReady == -1) {
-    LOG(FATAL) << "Select error when receiving food item";
-  }
-  else if (pipeReady == 0) { // No data available
-    ;
-  }
-  if (FD_ISSET(this->engineToDisplay[READ], &readPipeSet)) { // Data available
-    sendStartSignal();
-  }
-}
-*/
-/**
- * Signify to hardware that the user would like to scan in an item.
- *
- * @param None
- * @return None
- */
-/*
-void DisplayHandler::sendStartSignal() {
-  LOG(INFO) << "Sending start signal to hardware";
-  std::string sdlString = readString(this->engineToDisplay[READ]);
-  writeString(this->externalPipes.displayToHardware[WRITE], sdlString);
-}
-*/

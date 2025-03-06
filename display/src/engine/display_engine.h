@@ -8,6 +8,8 @@
 #include <vector>
 #include <zmqpp/zmqpp.hpp>
 
+#include "../../../logger.h"
+
 #include "states/item_list.h"
 #include "states/main_menu.h"
 #include "states/pause_menu.h"
@@ -51,6 +53,7 @@ public:
 
 private:
   struct DisplayGlobal displayGlobal;
+  Logger logger;
 
   zmqpp::socket replySocket;
   zmqpp::socket requestSocket;
