@@ -14,7 +14,8 @@ public:
                  const std::string& pythonServerEndpoint);
 
   std::string runModel(const std::filesystem::path& imagePath) override;
-  bool handleClassification(const std::filesystem::path& imagePath) override;
+  std::optional<std::string> handleClassification(
+      const std::filesystem::path& imagePath) override;
 
 private:
   FoodItem foodItem;

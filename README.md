@@ -17,14 +17,21 @@ for controlling all hardware components such as the cameras, weight sensor, and 
 - Logan Pelkey (Software, Vision)
 - Joe Dahms (Software Display)
 
-# Setup 
-$ sudo chmod 777 install.sh
-$ ./install.sh \
-
+# Setup
+````plaintext
+sudo chmod 777 install.sh
+./install.sh \
+````
+### WiringPi Setup
+#### For if you just need to make a file
+````plaintet
+gcc -o myapp myapp.cpp -l wiringPi
+````
 # Usage
-$ source models-venv/bin/activate
+````plaintet
+source models-venv/bin/activate
 $ ./expirationTracker
-
+````
 # Developer Notes
 ## Function Comment Format (javadoc)
 /**  
@@ -35,5 +42,4 @@ $ ./expirationTracker
  \* @param Name of Input 2 Description of Input 2  
  \* @return Description of return value
  */  
-
-
+ 

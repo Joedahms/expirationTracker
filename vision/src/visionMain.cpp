@@ -13,56 +13,78 @@ void visionEntry(zmqpp::context& context) {
   Logger logger("vision_entry.txt");
   logger.log("Within vision process");
 
-  int maxRetries = 5;
-  int retryCount = 0;
-
-  while (!startPythonServer(logger)) {
-    retryCount++;
-
-    if (retryCount >= maxRetries) {
-      std::cerr << "ERROR: Failed to start Python server after " << retryCount
-                << " attempts.";
-    }
-    logger.log("Python server failed to start. Retrying in 2 seconds... (" +
-               std::to_string(retryCount) + "/" + std::to_string(maxRetries) + ")");
-    sleep(2);
-  }
-
-  // Wait 5 sec to ensure Python server starts
-  sleep(5);
+  attemptStartPythonServer(logger);
 
   ImageProcessor processor(context);
 
   ExternalEndpoints externalEndpoints;
   zmqpp::socket replySocket(context, zmqpp::socket_type::reply);
   replySocket.bind(externalEndpoints.visionEndpoint);
+
+  zmqpp::poller poller;
+  poller.add(replySocket);
+
   while (1) {
     FoodItem foodItem;
     logger.log("Waiting for start signal from Hardware");
 
-    bool startSignalReceived = false;
-    while (startSignalReceived == false) {
-      try {
-        zmqpp::poller poller;
-        poller.add(replySocket);
-
-        if (poller.poll(1000)) {
-          if (poller.has_input(replySocket)) {
-            receiveFoodItem(replySocket, "got it", foodItem);
-            logger.log("Received start signal from hardware");
-            startSignalReceived = true;
-          }
-        }
-        else {
-          logger.log("Did not receive start signal from hardware");
-        }
-      } catch (const zmqpp::exception& e) {
-        LOG(FATAL) << e.what();
-      }
-    }
+    while (!startSignalCheck(replySocket, logger, foodItem, poller))
+      ;
     processor.setFoodItem(foodItem);
     processor.process();
   }
+}
+
+/**
+ * polls for 1000ms for socket activity and then checks replySocket for input
+ *
+ * @param replySocket replySocket to check for input on
+ * @param logger Logger being used to log visionMain
+ * @param foodItem foodItem to return with data
+ * @param poller poller to use for polling socket activity
+ * @return whether start signal was received or not
+ */
+bool startSignalCheck(zmqpp::socket& replySocket,
+                      const Logger& logger,
+                      FoodItem& foodItem,
+                      zmqpp::poller& poller) {
+  try {
+    if (poller.poll(1000)) {
+      if (poller.has_input(replySocket)) {
+        receiveFoodItem(replySocket, "got it", foodItem);
+        logger.log("Received start signal from hardware");
+        return true;
+      }
+      return false;
+    }
+    else {
+      logger.log("Did not receive start signal from hardware");
+      return false;
+    }
+  } catch (const zmqpp::exception& e) {
+    LOG(FATAL) << e.what();
+    return false;
+  }
+}
+
+/**
+ * Attempts to start the python server MAX_SERVER_RETRIES times before erroring out
+ *
+ * @param logger Logger being used to log visionMain
+ */
+void attemptStartPythonServer(const Logger& logger) {
+  for (int retry = 1; retry <= MAX_SERVER_RETRIES; ++retry) {
+    if (startPythonServer(logger)) {
+      return;
+    }
+
+    logger.log("Python server failed to start. Retrying in 2 seconds... (" +
+               std::to_string(retry) + "/" + std::to_string(MAX_SERVER_RETRIES) + ")");
+    sleep(2);
+  }
+
+  std::cerr << "ERROR: Failed to start Python server after " << MAX_SERVER_RETRIES
+            << " attempts.\n";
 }
 
 /**
@@ -72,9 +94,9 @@ void visionEntry(zmqpp::context& context) {
  * @return True if python server was started successfully. False if failed to start python
  * server
  */
-bool startPythonServer(Logger& logger) {
-  pid_t pid = fork();
+bool startPythonServer(const Logger& logger) {
   logger.log("Entering startPythonServer");
+  pid_t pid = fork();
 
   if (pid == -1) {
     logger.log("Failed to fork process");
@@ -88,8 +110,9 @@ bool startPythonServer(Logger& logger) {
     execvp(args[0], args);
 
     // Exit child process if execvp fails
+    perror("execvp failed");
     logger.log("Failed to start python server");
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   // Parent process
   else {

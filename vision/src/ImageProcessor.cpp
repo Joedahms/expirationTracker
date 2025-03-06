@@ -6,10 +6,10 @@
  * hardware, and display)
  */
 ImageProcessor::ImageProcessor(zmqpp::context& context)
-    : requestHardwareSocket(context, zmqpp::socket_type::request),
+    : logger("image_processor.txt"),
+      requestHardwareSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
-      replySocket(context, zmqpp::socket_type::reply), modelHandler(context),
-      logger("image_processor.txt") {
+      replySocket(context, zmqpp::socket_type::reply), modelHandler(context) {
   try {
     this->requestHardwareSocket.connect(this->externalEndpoints.hardwareEndpoint);
     this->requestDisplaySocket.connect(this->externalEndpoints.displayEndpoint);
@@ -30,7 +30,7 @@ void ImageProcessor::process() {
   this->logger.log("Vision analyzing all images");
 
   if (!isValidDirectory(foodItem.getImagePath())) {
-    std::cerr << "Failed to open image directory" << foodItem.getImagePath();
+    LOG(FATAL) << "Failed to open image directory";
     return;
   }
 
@@ -75,26 +75,10 @@ bool ImageProcessor::analyze() {
 
       // Only runs text atm
       if (!objectDetected) {
-        // TODO classifyObject always returns true
-        if (this->modelHandler.classifyObject(entry.path())) {
+        if (this->modelHandler.classifyObject(entry.path(), this->foodItem)) {
           objectDetected = true;
           return true;
         }
-      }
-
-      // delete bad image
-      try {
-        std::filesystem::remove(entry.path());
-        this->logger.log("Deleted unclassified image: " + entry.path().string());
-      } catch (const std::filesystem::filesystem_error& e) {
-        LOG(FATAL) << "Failed to delete image: " << entry.path() << " - " << e.what();
-      }
-
-      // check if image directory has new files
-      // directory iterator does not update
-      // Wait if the directory is empty
-      while (!hasFiles(foodItem.getImagePath())) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
       }
     }
   }

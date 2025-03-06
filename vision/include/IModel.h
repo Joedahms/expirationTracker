@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <fstream>
 #include <glog/logging.h>
+#include <optional>
 #include <string>
 
 #include "../../food_item.h"
@@ -24,8 +25,9 @@ protected:
   zmqpp::socket requestSocket;
   zmqpp::socket replySocket;
 
-  virtual std::string runModel(const std::filesystem::path&)      = 0;
-  virtual bool handleClassification(const std::filesystem::path&) = 0;
+  virtual std::string runModel(const std::filesystem::path&) = 0;
+  virtual std::optional<std::string> handleClassification(
+      const std::filesystem::path&) = 0;
 
   std::string sendRequest(const TaskType&, const std::filesystem::path&);
   std::string taskTypeToString(const TaskType&) const;
