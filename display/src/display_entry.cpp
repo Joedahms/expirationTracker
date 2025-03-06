@@ -27,8 +27,7 @@ void displayEntry(zmqpp::context& context) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("display_engine");
 
-    ExternalEndpoints externalEndpoints;
-    engineEntry(context, externalEndpoints.displayEndpoint, engineEndpoint);
+    engineEntry(context, engineEndpoint);
   }
   else {
     // Still in display entry

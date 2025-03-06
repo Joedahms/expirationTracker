@@ -17,9 +17,8 @@ void visionEntry(zmqpp::context& context) {
 
   ImageProcessor processor(context);
 
-  ExternalEndpoints externalEndpoints;
   zmqpp::socket replySocket(context, zmqpp::socket_type::reply);
-  replySocket.bind(externalEndpoints.visionEndpoint);
+  replySocket.bind(ExternalEndpoints::visionEndpoint);
 
   zmqpp::poller poller;
   poller.add(replySocket);
@@ -28,8 +27,9 @@ void visionEntry(zmqpp::context& context) {
     FoodItem foodItem;
     logger.log("Waiting for start signal from Hardware");
 
-    while (!startSignalCheck(replySocket, logger, foodItem, poller))
+    while (startSignalCheck(replySocket, logger, foodItem, poller) == false) {
       ;
+    }
     processor.setFoodItem(foodItem);
     processor.process();
   }

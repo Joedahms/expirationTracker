@@ -17,12 +17,10 @@ public:
   Hardware(zmqpp::context& context);
 
   bool checkStartSignal(int timeoutMs);
-  void sendDataToVision();
+  void sendStartToVision();
   bool startScan();
 
 private:
-  ExternalEndpoints externalEndpoints;
-
   Logger logger;
 
   zmqpp::socket requestVisionSocket;

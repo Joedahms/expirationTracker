@@ -1,6 +1,7 @@
 #include <filesystem>
 #include <glog/logging.h>
 
+#include "../../endpoints.h"
 #include "../../food_item.h"
 #include "hardware.h"
 
@@ -14,9 +15,9 @@ Hardware::Hardware(zmqpp::context& context)
       requestDisplaySocket(context, zmqpp::socket_type::request),
       replySocket(context, zmqpp::socket_type::reply), logger("hardware_log.txt") {
   try {
-    this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
-    this->requestDisplaySocket.connect(this->externalEndpoints.displayEndpoint);
-    this->replySocket.bind(this->externalEndpoints.hardwareEndpoint);
+    this->requestVisionSocket.connect(ExternalEndpoints::visionEndpoint);
+    this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
+    this->replySocket.bind(ExternalEndpoints::hardwareEndpoint);
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
   }
@@ -61,8 +62,8 @@ bool Hardware::checkStartSignal(int timeoutMs) {
  * @param weight The weight of the object on the platform.
  * @return None
  */
-void Hardware::sendDataToVision() {
-  this->logger.log("Sending images from hardware to vision");
+void Hardware::sendStartToVision() {
+  this->logger.log("Sending start signal to vision");
   const std::chrono::time_point<std::chrono::system_clock> now{
       std::chrono::system_clock::now()};
 
@@ -71,10 +72,14 @@ void Hardware::sendDataToVision() {
 
   FoodItem foodItem(filePath, scanDate, this->itemWeight);
 
-  this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
-  sendFoodItem(this->requestVisionSocket, foodItem);
-
-  this->logger.log("Done sending images from hardware to vision");
+  std::string response;
+  response = sendFoodItem(this->requestVisionSocket, foodItem);
+  if (response == Messages::AFFIRMATIVE) {
+    this->logger.log("Successfully sent start signal to vision");
+  }
+  else {
+    LOG(FATAL) << "Error sending start signal to vision";
+  }
 }
 
 /**
@@ -157,7 +162,7 @@ void Hardware::rotateAndCapture() {
 
     // Initiate scan
     if (angle == 0) {
-      sendDataToVision();
+      sendStartToVision();
     }
 
     this->logger.log("Rotating platform");
