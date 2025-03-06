@@ -13,7 +13,7 @@
 class ModelHandler {
 public:
   ModelHandler(zmqpp::context&, const ExternalEndpoints&);
-  bool classifyObject(const std::filesystem::path&);
+  bool classifyObject(const std::filesystem::path&, FoodItem&);
   bool extractExpirationDate(const std::filesystem::path&) const;
 
 private:

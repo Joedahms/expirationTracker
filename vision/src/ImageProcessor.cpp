@@ -85,7 +85,7 @@ bool ImageProcessor::analyze() {
       // Only runs text atm
       if (!objectDetected) {
         // TODO classifyObject always returns true
-        if (this->modelHandler.classifyObject(entry.path())) {
+        if (this->modelHandler.classifyObject(entry.path(), this->foodItem)) {
           objectDetected = true;
           return true;
         }
@@ -108,45 +108,6 @@ bool ImageProcessor::analyze() {
     }
   }
   return false;
-}
-
-void ImageProcessor::tellHardwareToStop() {
-  // Tell hardware to stop
-  bool hardwareStopping = false;
-  while (hardwareStopping == false) {
-    this->logger.log("Sending stop signal to hardware");
-    this->requestHardwareSocket.send("item identified");
-    this->logger.log("Sent stop signal to hardware");
-    std::string response;
-    this->requestHardwareSocket.receive(response);
-    if (response != "retransmit") {
-      hardwareStopping = true;
-      this->logger.log("Hardware received stop signal");
-    }
-    else {
-      this->logger.log("Hardware did not receive stop signal, retrying");
-    }
-  }
-}
-
-void ImageProcessor::tellDisplayWeFailed() {
-  this->logger.log("Item not successfully detected");
-  // Tell display we failed
-  bool notifiedDisplayOfFailure = false;
-  std::string response;
-  while (!notifiedDisplayOfFailure) {
-    this->logger.log("Notifying display of failure");
-    this->requestHardwareSocket.send("item identification failed");
-    this->logger.log("Send notification to display");
-    this->requestHardwareSocket.receive(response);
-    if (response != "retransmit") {
-      notifiedDisplayOfFailure = true;
-      this->logger.log("Display received notification");
-    }
-    else {
-      this->logger.log("Display did not receive notification, retrying");
-    }
-  }
 }
 
 /**
