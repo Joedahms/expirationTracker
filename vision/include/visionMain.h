@@ -15,5 +15,5 @@ constexpr int MAX_SERVER_RETRIES = 5;
 void visionEntry(zmqpp::context&, const ExternalEndpoints&);
 void attemptStartPythonServer(const Logger&);
 bool startPythonServer(const Logger&);
-
+bool startSignalCheck(zmqpp::socket&, const Logger&, FoodItem&, zmqpp::poller&);
 #endif

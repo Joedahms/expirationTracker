@@ -19,32 +19,41 @@ void visionEntry(zmqpp::context& context, const ExternalEndpoints& externalEndpo
 
   zmqpp::socket replySocket(context, zmqpp::socket_type::reply);
   replySocket.bind(externalEndpoints.visionEndpoint);
+
+  zmqpp::poller poller;
+  poller.add(replySocket);
+
   while (1) {
     FoodItem foodItem;
     logger.log("Waiting for start signal from Hardware");
 
-    bool startSignalReceived = false;
-    while (startSignalReceived == false) {
-      try {
-        zmqpp::poller poller;
-        poller.add(replySocket);
-
-        if (poller.poll(1000)) {
-          if (poller.has_input(replySocket)) {
-            receiveFoodItem(replySocket, "got it", foodItem);
-            logger.log("Received start signal from hardware");
-            startSignalReceived = true;
-          }
-        }
-        else {
-          logger.log("Did not receive start signal from hardware");
-        }
-      } catch (const zmqpp::exception& e) {
-        LOG(FATAL) << e.what();
-      }
-    }
+    while (!startSignalCheck(replySocket, logger, foodItem, poller))
+      ;
     processor.setFoodItem(foodItem);
     processor.process();
+  }
+}
+
+bool startSignalCheck(zmqpp::socket& replySocket,
+                      const Logger& logger,
+                      FoodItem& foodItem,
+                      zmqpp::poller& poller) {
+  try {
+    if (poller.poll(1000)) {
+      if (poller.has_input(replySocket)) {
+        receiveFoodItem(replySocket, "got it", foodItem);
+        logger.log("Received start signal from hardware");
+        return true;
+      }
+      return false;
+    }
+    else {
+      logger.log("Did not receive start signal from hardware");
+      return false;
+    }
+  } catch (const zmqpp::exception& e) {
+    LOG(FATAL) << e.what();
+    return false;
   }
 }
 
