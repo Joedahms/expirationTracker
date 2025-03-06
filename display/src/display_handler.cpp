@@ -16,9 +16,9 @@ DisplayHandler::DisplayHandler(zmqpp::context& context, const std::string& engin
       replySocket(context, zmqpp::socket_type::reply), logger("display_handler.txt") {
   try {
     this->requestEngineSocket.connect(this->engineEndpoint);
-    this->requestHardwareSocket.connect(this->externalEndpoints.hardwareEndpoint);
-    this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
-    this->replySocket.bind(this->externalEndpoints.displayEndpoint);
+    this->requestHardwareSocket.connect(ExternalEndpoints::hardwareEndpoint);
+    this->requestVisionSocket.connect(ExternalEndpoints::visionEndpoint);
+    this->replySocket.bind(ExternalEndpoints::displayEndpoint);
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
   }
@@ -36,11 +36,17 @@ void DisplayHandler::handle() {
         this->logger.log("Telling hardware to start scan");
 
         this->replySocket.send(receivedMessage);
-        this->requestHardwareSocket.send(receivedMessage);
+        this->requestHardwareSocket.send(Messages::START_SCAN);
         std::string hardwareResponse;
         this->requestHardwareSocket.receive(hardwareResponse);
+        if (hardwareResponse == Messages::AFFIRMATIVE) {
+          this->logger.log("Hardware starting scan");
+        }
+        else {
+          LOG(FATAL)
+              << "Received invalid response from hardware after sending start signal";
+        }
 
-        this->logger.log("Hardware starting scan");
       } catch (const zmqpp::exception& e) {
         LOG(FATAL) << e.what();
       }
@@ -48,15 +54,15 @@ void DisplayHandler::handle() {
       this->logger.log("Waiting for message from vision");
       std::string request;
       this->replySocket.receive(request);
-      if (request == this->messages.ITEM_DETECTION_FAILED) {
+      if (request == Messages::ITEM_DETECTION_FAILED) {
         this->logger.log("Item detection failed");
         // TODO Display failure message
       }
-      else if (request == this->messages.ITEM_DETECTION_SUCCEEDED) {
-        this->replySocket.send(this->messages.AFFIRMATIVE);
+      else if (request == Messages::ITEM_DETECTION_SUCCEEDED) {
+        this->replySocket.send(Messages::AFFIRMATIVE);
         this->logger.log("Item detection succeeded, receiving food item");
         FoodItem foodItem;
-        receiveFoodItem(this->replySocket, this->messages.AFFIRMATIVE, foodItem);
+        receiveFoodItem(this->replySocket, Messages::AFFIRMATIVE, foodItem);
         this->logger.log("Food item received");
       }
       else {

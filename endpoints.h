@@ -21,6 +21,9 @@ struct Messages {
 
   // Send that message again. May not be ready to handle it yet.
   static const std::string RETRANSMIT;
+
+  // Start the scan of a new food item
+  static const std::string START_SCAN;
 };
 
 #endif
