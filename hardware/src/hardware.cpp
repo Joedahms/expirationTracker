@@ -14,7 +14,7 @@ Hardware::Hardware(zmqpp::context& context)
     : requestVisionSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
       replySocket(context, zmqpp::socket_type::reply), logger("hardware_log.txt"),
-      IMAGE_DIRECTORY(std::filesystem::current_path() / "/tmp/images/") {
+      IMAGE_DIRECTORY(std::filesystem::current_path() / "tmp/images/") {
   try {
     this->requestVisionSocket.connect(ExternalEndpoints::visionEndpoint);
     this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
@@ -68,7 +68,7 @@ void Hardware::sendStartToVision() {
   const std::chrono::time_point<std::chrono::system_clock> now{
       std::chrono::system_clock::now()};
 
-  std::filesystem::path filePath       = "../images/temp";
+  std::filesystem::path filePath       = "../tmp/images/";
   std::chrono::year_month_day scanDate = std::chrono::floor<std::chrono::days>(now);
 
   FoodItem foodItem(filePath, scanDate, this->itemWeight);
@@ -216,8 +216,10 @@ bool Hardware::takePhotos(int angle) {
   std::string to   = " --timeout 50"; // DO NOT SET TO 0! Will cause infinite preview!
   std::string topPhoto =
       this->IMAGE_DIRECTORY.string() + std::to_string(angle) + "_top.jpg";
+  this->logger.log("TopPhoto path: " + topPhoto);
   std::string sidePhoto =
       this->IMAGE_DIRECTORY.string() + std::to_string(angle) + "_side.jpg";
+  this->logger.log("SidePhoto path: " + sidePhoto);
 
   std::string command0 = cmd0 + np + res + out + topPhoto + to;
   std::string command1 = cmd0 + np + res + out + sidePhoto + to;
