@@ -186,16 +186,16 @@ void Hardware::rotateAndCapture() {
     std::string request;
     receivedRequest = this->replySocket.receive(request, true);
     if (receivedRequest) {
-      if (request == "item identified") {
+      if (request == Messages::ITEM_DETECTION_SUCCEEDED) {
         this->logger.log("Received stop signal from vision");
-        this->replySocket.send("got it");
+        this->replySocket.send(Messages::AFFIRMATIVE);
         receivedStopSignal = true;
       }
       else {
         // Could skip receivedStopSignal and this else statement and just break if "item
         // identified"
         this->logger.log("Received other from vision");
-        this->replySocket.send("retransmit");
+        this->replySocket.send(Messages::RETRANSMIT);
       }
     }
     if (receivedStopSignal) {
