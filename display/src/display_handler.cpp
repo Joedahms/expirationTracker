@@ -76,7 +76,9 @@ void DisplayHandler::handle() {
         this->requestEngineSocket.send(Messages::ITEM_DETECTION_SUCCEEDED);
         this->logger.log("Success message send to engine");
         std::string engineResponse;
+        this->logger.log("Receiving response from engine");
         this->requestEngineSocket.receive(engineResponse);
+        this->logger.log("Received response from engine");
         if (engineResponse == Messages::AFFIRMATIVE) {
           this->logger.log("Item stored in database and engine notified of success");
         }
