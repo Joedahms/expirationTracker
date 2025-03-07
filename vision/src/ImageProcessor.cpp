@@ -37,7 +37,7 @@ void ImageProcessor::process() {
 
   bool detectedFoodItem = analyze();
   this->logger.log("Successfully analyzed all images");
-
+  stopHardware();
   // Move this into analyze
   if (detectedFoodItem) {
     detectionSucceeded();
@@ -92,7 +92,6 @@ void ImageProcessor::setFoodItem(struct FoodItem& foodItem) { this->foodItem = f
 
 void ImageProcessor::detectionSucceeded() {
   this->logger.log("Item successfully detected");
-  stopHardware();
   foodItemToDisplay();
 }
 
