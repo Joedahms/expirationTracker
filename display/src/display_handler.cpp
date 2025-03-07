@@ -63,12 +63,13 @@ void DisplayHandler::handle() {
         this->logger.log("Item detection succeeded, receiving food item");
         FoodItem foodItem;
         receiveFoodItem(this->replySocket, Messages::AFFIRMATIVE, foodItem);
-        this->logger.log("Food item received, storing in database");
 
+        this->logger.log("Food item received, storing in database");
         sqlite3* database = nullptr;
         openDatabase(&database);
         storeFoodItem(database, foodItem);
         sqlite3_close(database);
+        this->logger.log("Food item stored in database");
 
         this->requestEngineSocket.send(Messages::ITEM_DETECTION_SUCCEEDED);
         std::string engineResponse;
