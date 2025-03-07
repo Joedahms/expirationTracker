@@ -72,7 +72,9 @@ void DisplayHandler::handle() {
         sqlite3_close(database);
         this->logger.log("Food item stored in database");
 
+        this->logger.log("Sending success message to engine");
         this->requestEngineSocket.send(Messages::ITEM_DETECTION_SUCCEEDED);
+        this->logger.log("Success message send to engine");
         std::string engineResponse;
         this->requestEngineSocket.receive(engineResponse);
         if (engineResponse == Messages::AFFIRMATIVE) {
