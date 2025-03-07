@@ -213,7 +213,7 @@ void DisplayEngine::handleEvents() {
 
       bool gotMessageFromDisplay = false;
       std::string messageFromDisplay;
-      messageFromDisplay = this->replySocket.receive(messageFromDisplay, true);
+      gotMessageFromDisplay = this->replySocket.receive(messageFromDisplay, true);
       if (gotMessageFromDisplay == false) {
         break;
       }
