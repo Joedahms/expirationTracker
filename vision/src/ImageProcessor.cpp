@@ -58,6 +58,15 @@ bool ImageProcessor::analyze() {
   int imageCounter    = 0;
   bool objectDetected = false;
 
+  std::filesystem::path imageDir = foodItem.getImagePath();
+  for (int i = 0; i < 2; i++) {
+    // cycle through all angles twice
+    for (int j = 0; j < 7; j++) {
+      // cycle through angles 0-7
+      processImagePair(j);
+    }
+  }
+
   while (!objectDetected) {
     for (const auto& entry :
          std::filesystem::directory_iterator(foodItem.getImagePath())) {
@@ -74,8 +83,8 @@ bool ImageProcessor::analyze() {
         return false;
       }
       this->logger.log("Analyzing path: " + entry.path().string());
-      continue;
-      // Only runs text atm
+      // continue;
+      //  Only runs text atm
       if (!objectDetected) {
         if (this->modelHandler.classifyObject(entry.path(), this->foodItem)) {
           objectDetected = true;
@@ -85,6 +94,31 @@ bool ImageProcessor::analyze() {
     }
   }
   return false;
+}
+
+bool ImageProcessor::processImagePair(int currentImageNumber) {
+  this->logger.log("Entering processImagePair");
+  std::filesystem::path imageDir = foodItem.getImagePath();
+
+  // Construct expected filenames
+  std::filesystem::path topImage =
+      imageDir / (std::to_string(currentImageNumber) + "_top.jpg");
+  std::filesystem::path sideImage =
+      imageDir / (std::to_string(currentImageNumber) + "_side.jpg");
+  this->logger.log("Looking for image: " + topImage.string());
+  this->logger.log("Looking for image: " + topImage.string());
+  bool topExists  = std::filesystem::exists(topImage);
+  bool sideExists = std::filesystem::exists(sideImage);
+
+  // Ensure both images exist before processing
+  if (topExists && sideExists) {
+    if (this->modelHandler.classifyObject(topImage, this->foodItem) ||
+        this->modelHandler.classifyObject(sideImage, this->foodItem)) {
+      return true; // Successfully classified object
+    }
+  }
+
+  return false; // Images missing or classification failed
 }
 
 struct FoodItem& ImageProcessor::getFoodItem() { return this->foodItem; }
