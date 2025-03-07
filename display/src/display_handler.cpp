@@ -50,7 +50,6 @@ void DisplayHandler::handle() {
     }
   }
 }
-}
 
 /**
  * Indicate to hardware that the user has placed an item on the platform and would like to
