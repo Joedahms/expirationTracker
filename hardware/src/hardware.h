@@ -27,7 +27,7 @@ private:
   zmqpp::socket requestDisplaySocket;
   zmqpp::socket replySocket;
 
-  const std::string IMAGE_DIRECTORY = "/home/pi/Documents/raspi-yolo/images/temp/";
+  std::filesystem::path IMAGE_DIRECTORY;
 
   // // Code for Geromy
   // const std::string IMAGE_DIRECTORY =

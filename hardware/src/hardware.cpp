@@ -13,7 +13,8 @@
 Hardware::Hardware(zmqpp::context& context)
     : requestVisionSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
-      replySocket(context, zmqpp::socket_type::reply), logger("hardware_log.txt") {
+      replySocket(context, zmqpp::socket_type::reply), logger("hardware_log.txt"),
+      IMAGE_DIRECTORY(std::filesystem::current_path() / "/tmp/images/") {
   try {
     this->requestVisionSocket.connect(ExternalEndpoints::visionEndpoint);
     this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
@@ -207,14 +208,16 @@ void Hardware::rotateAndCapture() {
  */
 bool Hardware::takePhotos(int angle) {
   this->logger.log("Taking photos at position: " + std::to_string(angle));
-  std::string cmd0     = "rpicam-jpeg --camera 0";
-  std::string cmd1     = "rpicam-jpeg --camera 1";
-  std::string np       = " --nopreview";
-  std::string res      = " --width 2304 --height 1296";
-  std::string out      = " --output ";
-  std::string to       = " --timeout 50"; // DO NOT SET TO 0! Will cause infinite preview!
-  std::string topPhoto = this->IMAGE_DIRECTORY + std::to_string(angle) + "_top.jpg";
-  std::string sidePhoto = this->IMAGE_DIRECTORY + std::to_string(angle) + "_side.jpg";
+  std::string cmd0 = "rpicam-jpeg --camera 0";
+  std::string cmd1 = "rpicam-jpeg --camera 1";
+  std::string np   = " --nopreview";
+  std::string res  = " --width 2304 --height 1296";
+  std::string out  = " --output ";
+  std::string to   = " --timeout 50"; // DO NOT SET TO 0! Will cause infinite preview!
+  std::string topPhoto =
+      this->IMAGE_DIRECTORY.string() + std::to_string(angle) + "_top.jpg";
+  std::string sidePhoto =
+      this->IMAGE_DIRECTORY.string() + std::to_string(angle) + "_side.jpg";
 
   std::string command0 = cmd0 + np + res + out + topPhoto + to;
   std::string command1 = cmd0 + np + res + out + sidePhoto + to;
@@ -236,7 +239,8 @@ bool Hardware::takePhotos(int angle) {
  */
 bool Hardware::capturePhoto(int angle) {
   this->logger.log("Capturing photo at position: " + std::to_string(angle));
-  std::string fileName = this->IMAGE_DIRECTORY + std::to_string(angle) + "_test.jpg";
+  std::string fileName =
+      this->IMAGE_DIRECTORY.string() + std::to_string(angle) + "_test.jpg";
 
   std::string command = "rpicam-jpeg -n -t 50 1920:1080:12:U --output " + fileName;
   system(command.c_str());
