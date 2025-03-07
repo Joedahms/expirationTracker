@@ -15,6 +15,14 @@ Hardware::Hardware(zmqpp::context& context)
       requestDisplaySocket(context, zmqpp::socket_type::request),
       replySocket(context, zmqpp::socket_type::reply), logger("hardware_log.txt"),
       IMAGE_DIRECTORY(std::filesystem::current_path() / "tmp/images/") {
+  if (!std::filesystem::exists(IMAGE_DIRECTORY)) {
+    if (std::filesystem::create_directories(IMAGE_DIRECTORY)) {
+      this->logger.log("Created directory: " + IMAGE_DIRECTORY.string());
+    }
+    else {
+      this->logger.log("Failed to create directory: " + IMAGE_DIRECTORY.string());
+    }
+  }
   try {
     this->requestVisionSocket.connect(ExternalEndpoints::visionEndpoint);
     this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
