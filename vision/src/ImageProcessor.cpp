@@ -29,8 +29,7 @@ ImageProcessor::ImageProcessor(zmqpp::context& context)
 void ImageProcessor::process() {
   this->logger.log("Entering process");
 
-  this->logger.log(
-      std::format("Opening directory: {}", foodItem.getImagePath().string()));
+  this->logger.log("Opening directory: " + foodItem.getImagePath().string());
   if (!isValidDirectory(foodItem.getImagePath())) {
     LOG(FATAL) << "Failed to open image directory";
     return;
