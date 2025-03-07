@@ -76,10 +76,9 @@ void Hardware::sendStartToVision() {
   const std::chrono::time_point<std::chrono::system_clock> now{
       std::chrono::system_clock::now()};
 
-  std::filesystem::path filePath       = "../tmp/images/";
   std::chrono::year_month_day scanDate = std::chrono::floor<std::chrono::days>(now);
 
-  FoodItem foodItem(filePath, scanDate, this->itemWeight);
+  FoodItem foodItem(IMAGE_DIRECTORY, scanDate, this->itemWeight);
 
   std::string response;
   response = sendFoodItem(this->requestVisionSocket, foodItem);
