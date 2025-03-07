@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <fstream>
 #include <glog/logging.h>
+#include <optional>
 #include <string>
 
 #include "../../food_item.h"

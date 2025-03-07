@@ -1,8 +1,6 @@
 #ifndef FOOD_ITEM_H
 #define FOOD_ITEM_H
 
-#define START_SCAN "start scan"
-
 #include <chrono>
 #include <filesystem>
 #include <memory>
@@ -23,7 +21,7 @@ public:
 
   std::string categoryToString();
 
-  // print food item
+  // TODO print food item
 
   int getId() const;
   std::filesystem::path getImagePath() const;

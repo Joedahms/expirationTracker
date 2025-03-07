@@ -3,8 +3,6 @@
 
 #include <zmqpp/zmqpp.hpp>
 
-void engineEntry(const zmqpp::context& context,
-                 const std::string& displayEndpoint,
-                 const std::string& engineEndpoint);
+void engineEntry(const zmqpp::context& context, const std::string& engineEndpoint);
 
 #endif

@@ -5,6 +5,6 @@
 
 #include "../../endpoints.h"
 
-void displayEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints);
+void displayEntry(zmqpp::context& context);
 
 #endif

@@ -42,7 +42,9 @@ protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS fooditem.proto)
 add_executable(expirationTracker 
   main.cpp
   food_item.cpp
+  endpoints.cpp
   
+
   # Display process after forked from main
   display/src/display_entry.cpp
   # Handler for messages from other processes and the display engine

@@ -5,16 +5,15 @@
  * @param externalEndpoints Endpoints to the main components of the system (vision,
  * hardware, and display)
  */
-ImageProcessor::ImageProcessor(zmqpp::context& context,
-                               const struct ExternalEndpoints& externalEndpoints)
-    : externalEndpoints(externalEndpoints), logger("image_processor.txt"),
+ImageProcessor::ImageProcessor(zmqpp::context& context)
+    : logger("image_processor.txt"),
       requestHardwareSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
       replySocket(context, zmqpp::socket_type::reply), modelHandler(context) {
   try {
-    this->requestHardwareSocket.connect(this->externalEndpoints.hardwareEndpoint);
-    this->requestDisplaySocket.connect(this->externalEndpoints.displayEndpoint);
-    this->replySocket.bind(this->externalEndpoints.visionEndpoint);
+    this->requestHardwareSocket.connect(ExternalEndpoints::hardwareEndpoint);
+    this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
+    this->replySocket.bind(ExternalEndpoints::visionEndpoint);
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
   }
@@ -38,20 +37,13 @@ void ImageProcessor::process() {
   bool detectedFoodItem = analyze();
   this->logger.log("Successfully analyzed all images");
 
-  tellHardwareToStop();
-
-  if (!detectedFoodItem) {
-    tellDisplayWeFailed();
-    return;
+  // Move this into analyze
+  if (detectedFoodItem) {
+    detectionSucceeded();
   }
-
-  /*
-  // TODO
-  // send display the food item
-  // TODO  printFoodItem(foodItem);
-  sendFoodItem(this->requestDisplaySocket, this->foodItem);
-  this->logger.log("Sent detected food item to display");
-  */
+  else {
+    detectionFailed();
+  }
 }
 
 /**
@@ -93,58 +85,68 @@ bool ImageProcessor::analyze() {
   return false;
 }
 
-/**
- * Tells hardware to stop taking images. Waits for response.
- */
-void ImageProcessor::tellHardwareToStop() {
-  // Tell hardware to stop
+struct FoodItem& ImageProcessor::getFoodItem() { return this->foodItem; }
+void ImageProcessor::setFoodItem(struct FoodItem& foodItem) { this->foodItem = foodItem; }
+
+void ImageProcessor::detectionSucceeded() {
+  this->logger.log("Item successfully detected");
+  stopHardware();
+  foodItemToDisplay();
+}
+
+void ImageProcessor::detectionFailed() {
+  this->logger.log("Item not successfully detected");
+
+  this->logger.log("Sending detection failed to display");
+  this->requestDisplaySocket.send(Messages::ITEM_DETECTION_FAILED);
+  std::string response;
+  this->requestDisplaySocket.receive(response);
+
+  if (response == Messages::AFFIRMATIVE) {
+    this->logger.log("Display received failure message");
+  }
+  else {
+    LOG(FATAL) << "Received invalid message from display";
+  }
+}
+
+void ImageProcessor::foodItemToDisplay() {
+  this->logger.log("Indicating detection success to display");
+  this->requestDisplaySocket.send(Messages::ITEM_DETECTION_SUCCEEDED);
+  std::string response;
+  this->requestDisplaySocket.receive(response);
+  if (response == Messages::AFFIRMATIVE) {
+    this->logger.log("Success indicated to display, sending detected food item");
+    response = sendFoodItem(this->requestDisplaySocket, this->foodItem);
+    if (response == Messages::AFFIRMATIVE) {
+      this->logger.log("Detected food item sent successfully");
+    }
+    else {
+      LOG(FATAL) << "Detected food item transmission failure";
+    }
+  }
+}
+
+void ImageProcessor::stopHardware() {
   bool hardwareStopping = false;
   while (hardwareStopping == false) {
-    this->logger.log("Sending stop signal to hardware");
-    this->requestHardwareSocket.send("item identified");
+    this->logger.log("Sending stop signal hardware");
+    this->requestHardwareSocket.send(Messages::ITEM_DETECTION_SUCCEEDED);
     this->logger.log("Sent stop signal to hardware");
+
     std::string response;
     this->requestHardwareSocket.receive(response);
-    if (response != "retransmit") {
-      hardwareStopping = true;
+
+    if (response == Messages::AFFIRMATIVE) {
       this->logger.log("Hardware received stop signal");
+      hardwareStopping = true;
+    }
+    else if (response == Messages::RETRANSMIT) {
+      this->logger.log("Hardware requested retransmission");
     }
     else {
-      this->logger.log("Hardware did not receive stop signal, retrying");
+      this->logger.log("Received invalid message from hardware");
+      LOG(FATAL) << "Received invalid message from hardware";
     }
   }
 }
-
-/**
- * Tells display we failed to ID object. Waits for response.
- */
-void ImageProcessor::tellDisplayWeFailed() {
-  this->logger.log("Item not successfully detected");
-  // Tell display we failed
-  bool notifiedDisplayOfFailure = false;
-  std::string response;
-  while (!notifiedDisplayOfFailure) {
-    this->logger.log("Notifying display of failure");
-    this->requestHardwareSocket.send("item identification failed");
-    this->logger.log("Send notification to display");
-    this->requestHardwareSocket.receive(response);
-    if (response != "retransmit") {
-      notifiedDisplayOfFailure = true;
-      this->logger.log("Display received notification");
-    }
-    else {
-      this->logger.log("Display did not receive notification, retrying");
-    }
-  }
-}
-
-/**
- * Return the food item
- * @return whether FoodItem is successfully identified
- */
-FoodItem& ImageProcessor::getFoodItem() { return this->foodItem; }
-
-/**
- * set the food item entirely
- */
-void ImageProcessor::setFoodItem(struct FoodItem& foodItem) { this->foodItem = foodItem; }

@@ -12,8 +12,7 @@
 
 class ImageProcessor {
 public:
-  explicit ImageProcessor(zmqpp::context& context,
-                          const struct ExternalEndpoints& externalEndpoints);
+  explicit ImageProcessor(zmqpp::context& context);
   void process();
   bool analyze();
   struct FoodItem& getFoodItem();
@@ -22,8 +21,6 @@ public:
   void tellDisplayWeFailed();
 
 private:
-  ExternalEndpoints externalEndpoints;
-
   Logger logger;
 
   zmqpp::socket requestHardwareSocket;
@@ -34,6 +31,12 @@ private:
   FoodItem foodItem;
 
   const int MAX_IMAGE_COUNT = 16;
+
+  void detectionSucceeded();
+  void detectionFailed();
+
+  void foodItemToDisplay();
+  void stopHardware();
 };
 
 #endif

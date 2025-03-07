@@ -6,16 +6,15 @@
 
 #include "../../endpoints.h"
 #include "../../food_item.h"
+#include "../../logger.h"
 
 class DisplayHandler {
 public:
-  DisplayHandler(zmqpp::context& context,
-                 struct ExternalEndpoints externalEndpoints,
-                 const std::string& engineEndpoint);
+  DisplayHandler(zmqpp::context& context, const std::string& engineEndpoint);
   void handle();
 
 private:
-  ExternalEndpoints externalEndpoints;
+  Logger logger;
   const std::string engineEndpoint;
 
   zmqpp::socket requestEngineSocket;
@@ -24,7 +23,10 @@ private:
 
   zmqpp::socket replySocket;
 
-  void sendStartSignal();
+  void startSignalToHardware();
+  void receiveFromVision();
+  void detectionFailure();
+  void detectionSuccess();
 };
 
 #endif

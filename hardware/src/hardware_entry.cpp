@@ -22,13 +22,13 @@
  * TODO Add an infinite loop so that more than one food item can be scanned per
  * execution.
  */
-void hardwareEntry(zmqpp::context& context, struct ExternalEndpoints externalEndpoints) {
+void hardwareEntry(zmqpp::context& context) {
   Logger logger("hardware_entry.txt");
   logger.log("Within hardware process");
   // TODO - Add a function to initialize motor and weight sensor.
   // TODO - Setup communication with Arduino for weight.
 
-  Hardware hardware(context, externalEndpoints);
+  Hardware hardware(context);
   bool startSignalReceived = false;
   int startSignalTimeoutMs = 1000;
   while (1) {

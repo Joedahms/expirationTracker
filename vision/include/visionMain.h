@@ -10,6 +10,8 @@
 #include "../include/ImageProcessor.h"
 #include "../include/helperFunctions.h"
 
+void visionEntry(zmqpp::context& context);
+bool startPythonServer(Logger& logger);
 constexpr int MAX_SERVER_RETRIES = 5;
 
 void visionEntry(zmqpp::context&, const ExternalEndpoints&);

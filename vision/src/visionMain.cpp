@@ -4,21 +4,21 @@
  * Entry into the vision code. Only called from main after vision child process is
  * forked.
  *
- * @param context The zeroMQ context with which to creates with
+ * @param context The zeroMQ context with which to create sockets with
  * @param externalEndpoints Endpoints to the main components of the system (vision,
  * hardware, and display)
  * @return None
  */
-void visionEntry(zmqpp::context& context, const ExternalEndpoints& externalEndpoints) {
+void visionEntry(zmqpp::context& context) {
   Logger logger("vision_entry.txt");
   logger.log("Within vision process");
 
   attemptStartPythonServer(logger);
 
-  ImageProcessor processor(context, externalEndpoints);
+  ImageProcessor processor(context);
 
   zmqpp::socket replySocket(context, zmqpp::socket_type::reply);
-  replySocket.bind(externalEndpoints.visionEndpoint);
+  replySocket.bind(ExternalEndpoints::visionEndpoint);
 
   zmqpp::poller poller;
   poller.add(replySocket);
@@ -27,8 +27,9 @@ void visionEntry(zmqpp::context& context, const ExternalEndpoints& externalEndpo
     FoodItem foodItem;
     logger.log("Waiting for start signal from Hardware");
 
-    while (!startSignalCheck(replySocket, logger, foodItem, poller))
+    while (startSignalCheck(replySocket, logger, foodItem, poller) == false) {
       ;
+    }
     processor.setFoodItem(foodItem);
     processor.process();
   }
@@ -50,7 +51,7 @@ bool startSignalCheck(zmqpp::socket& replySocket,
   try {
     if (poller.poll(1000)) {
       if (poller.has_input(replySocket)) {
-        receiveFoodItem(replySocket, "got it", foodItem);
+        receiveFoodItem(replySocket, Messages::AFFIRMATIVE, foodItem);
         logger.log("Received start signal from hardware");
         return true;
       }

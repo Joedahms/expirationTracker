@@ -1,6 +1,7 @@
 #include <filesystem>
 #include <glog/logging.h>
 
+#include "../../endpoints.h"
 #include "../../food_item.h"
 #include "hardware.h"
 
@@ -9,16 +10,14 @@
  * @param externalEndpoints Endpoints to the main components of the system (vision,
  * hardware, and display)
  */
-Hardware::Hardware(zmqpp::context& context,
-                   const struct ExternalEndpoints& externalEndpoints)
-    : externalEndpoints(externalEndpoints),
-      requestVisionSocket(context, zmqpp::socket_type::request),
+Hardware::Hardware(zmqpp::context& context)
+    : requestVisionSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
       replySocket(context, zmqpp::socket_type::reply), logger("hardware_log.txt") {
   try {
-    this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
-    this->requestDisplaySocket.connect(this->externalEndpoints.displayEndpoint);
-    this->replySocket.bind(this->externalEndpoints.hardwareEndpoint);
+    this->requestVisionSocket.connect(ExternalEndpoints::visionEndpoint);
+    this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
+    this->replySocket.bind(ExternalEndpoints::hardwareEndpoint);
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
   }
@@ -44,7 +43,7 @@ bool Hardware::checkStartSignal(int timeoutMs) {
         std::string request;
         this->replySocket.receive(request);
         receivedRequest = true;
-        this->replySocket.send("got it"); // Respond to display
+        this->replySocket.send(Messages::AFFIRMATIVE); // Respond to display
         this->logger.log("Received start signal from display");
       }
     }
@@ -63,8 +62,8 @@ bool Hardware::checkStartSignal(int timeoutMs) {
  * @param weight The weight of the object on the platform.
  * @return None
  */
-void Hardware::sendDataToVision() {
-  this->logger.log("Sending images from hardware to vision");
+void Hardware::sendStartToVision() {
+  this->logger.log("Sending start signal to vision");
   const std::chrono::time_point<std::chrono::system_clock> now{
       std::chrono::system_clock::now()};
 
@@ -73,10 +72,14 @@ void Hardware::sendDataToVision() {
 
   FoodItem foodItem(filePath, scanDate, this->itemWeight);
 
-  this->requestVisionSocket.connect(this->externalEndpoints.visionEndpoint);
-  sendFoodItem(this->requestVisionSocket, foodItem);
-
-  this->logger.log("Done sending images from hardware to vision");
+  std::string response;
+  response = sendFoodItem(this->requestVisionSocket, foodItem);
+  if (response == Messages::AFFIRMATIVE) {
+    this->logger.log("Successfully sent start signal to vision");
+  }
+  else {
+    LOG(FATAL) << "Error sending start signal to vision";
+  }
 }
 
 /**
@@ -159,7 +162,7 @@ void Hardware::rotateAndCapture() {
 
     // Initiate scan
     if (angle == 0) {
-      sendDataToVision();
+      sendStartToVision();
     }
 
     this->logger.log("Rotating platform");
@@ -175,16 +178,16 @@ void Hardware::rotateAndCapture() {
     std::string request;
     receivedRequest = this->replySocket.receive(request, true);
     if (receivedRequest) {
-      if (request == "item identified") {
+      if (request == Messages::ITEM_DETECTION_SUCCEEDED) {
         this->logger.log("Received stop signal from vision");
-        this->replySocket.send("got it");
+        this->replySocket.send(Messages::AFFIRMATIVE);
         receivedStopSignal = true;
       }
       else {
         // Could skip receivedStopSignal and this else statement and just break if "item
         // identified"
         this->logger.log("Received other from vision");
-        this->replySocket.send("retransmit");
+        this->replySocket.send(Messages::RETRANSMIT);
       }
     }
     if (receivedStopSignal) {
