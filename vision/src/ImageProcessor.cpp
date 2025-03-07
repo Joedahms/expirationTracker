@@ -64,7 +64,6 @@ bool ImageProcessor::analyze() {
       if (toLowerCase(entry.path().extension()) != ".jpg") {
         continue;
       }
-      this->logger.log("Analyzing path: " + entry.path().string());
       if (++imageCounter > this->MAX_IMAGE_COUNT) {
         if (objectDetected) {
           this->logger.log("Object expiration date not found");
@@ -74,6 +73,7 @@ bool ImageProcessor::analyze() {
         }
         return false;
       }
+      this->logger.log("Analyzing path: " + entry.path().string());
       continue;
       // Only runs text atm
       if (!objectDetected) {

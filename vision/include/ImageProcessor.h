@@ -30,7 +30,7 @@ private:
   ModelHandler modelHandler;
   FoodItem foodItem;
 
-  const int MAX_IMAGE_COUNT = 16;
+  const int MAX_IMAGE_COUNT = 8;
 
   void detectionSucceeded();
   void detectionFailed();
