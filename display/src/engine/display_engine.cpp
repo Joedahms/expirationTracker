@@ -220,6 +220,7 @@ void DisplayEngine::handleEvents() {
       if (messageFromDisplay == Messages::ITEM_DETECTION_SUCCEEDED) {
         this->logger.log("New food item received, switching to item list state");
         this->engineState = EngineState::ITEM_LIST;
+        this->replySocket.send(Messages::AFFIRMATIVE);
       }
       else {
         LOG(FATAL) << "Invalid message received from display";
