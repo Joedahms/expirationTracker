@@ -4,7 +4,7 @@
  * Entry into the vision code. Only called from main after vision child process is
  * forked.
  *
- * @param context The zeroMQ context with which to creates with
+ * @param context The zeroMQ context with which to create sockets with
  * @param externalEndpoints Endpoints to the main components of the system (vision,
  * hardware, and display)
  * @return None
