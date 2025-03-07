@@ -27,7 +27,7 @@ ImageProcessor::ImageProcessor(zmqpp::context& context)
  * @return None
  */
 void ImageProcessor::process() {
-  this->logger.log("Vision analyzing all images");
+  this->logger.log("Entering process");
 
   this->logger.log(
       std::format("Opening directory: {}", foodItem.getImagePath().string()));
@@ -55,6 +55,7 @@ void ImageProcessor::process() {
  * @return Whether FoodItem is successfully identified
  */
 bool ImageProcessor::analyze() {
+  this->logger.log("Entering analyze");
   int imageCounter    = 0;
   bool objectDetected = false;
 
@@ -64,7 +65,7 @@ bool ImageProcessor::analyze() {
       if (toLowerCase(entry.path().extension()) != ".jpg") {
         continue;
       }
-
+      this->logger.log("Analyzing path: " + entry.path().string());
       if (++imageCounter > this->MAX_IMAGE_COUNT) {
         if (objectDetected) {
           this->logger.log("Object expiration date not found");
@@ -74,7 +75,7 @@ bool ImageProcessor::analyze() {
         }
         return false;
       }
-
+      continue;
       // Only runs text atm
       if (!objectDetected) {
         if (this->modelHandler.classifyObject(entry.path(), this->foodItem)) {
