@@ -12,9 +12,8 @@ void Mediator::addDropdown(std::shared_ptr<Dropdown> dropDown) {
   dropDown->setMediator(shared_from_this());
 }
 
-void Mediator::notify(std::shared_ptr<Element> sender,
-                      const std::string& event,
-                      const std::string& data) {
+void Mediator::notify(std::shared_ptr<Element> sender, const std::string& event) {
   if (event == "sort_changed") {
+    std::cout << "sort changed" << std::endl;
   }
 }

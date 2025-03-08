@@ -21,7 +21,7 @@ private:
   std::chrono::steady_clock::time_point currentUpdate;
   SDL_Point mousePosition;
 
-  Mediator mediator;
+  std::shared_ptr<Mediator> mediator;
 };
 
 #endif

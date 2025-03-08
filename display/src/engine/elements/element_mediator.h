@@ -12,9 +12,7 @@ class Mediator : public std::enable_shared_from_this<Mediator> {
 public:
   void addScrollBox(std::shared_ptr<ScrollBox> scrollBox);
   void addDropdown(std::shared_ptr<Dropdown> dropDown);
-  void notify(std::shared_ptr<Element> sender,
-              const std::string& event,
-              const std::string& data);
+  void notify(std::shared_ptr<Element> sender, const std::string& event);
 
 private:
   std::shared_ptr<ScrollBox> scrollBox;

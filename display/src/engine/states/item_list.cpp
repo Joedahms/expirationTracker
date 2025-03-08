@@ -20,6 +20,8 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
 
   this->displayGlobal = displayGlobal;
 
+  this->mediator = std::make_shared<Mediator>();
+
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
   previousUpdate             = std::chrono::steady_clock::now();
 
@@ -37,7 +39,7 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
       std::make_shared<ScrollBox>(this->displayGlobal, scrollBoxRect);
   scrollBox->setPanelHeight(30);
   scrollBox->addBorder(1);
-  this->mediator.addScrollBox(scrollBox);
+  this->mediator->addScrollBox(scrollBox);
   this->rootElement->addElement(std::move(scrollBox));
   this->rootElement->update();
 
@@ -45,7 +47,8 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
       std::make_shared<Dropdown>(this->displayGlobal, SDL_Rect{450, 0, 0, 0}, "Sort by:");
   std::shared_ptr<Button> sortByExpirationLowToHigh = std::make_shared<Button>(
       this->displayGlobal, SDL_Rect{0, 0, 0, 0}, "Expiration Date - Highest to Lowest",
-      SDL_Point{0, 0}, [this]() {});
+      SDL_Point{0, 0}, "sort_changed");
+  sortByExpirationLowToHigh->initialize();
   std::shared_ptr<Button> sortByExpirationHighToLow = std::make_shared<Button>(
       this->displayGlobal, SDL_Rect{0, 0, 0, 0}, "Expiration Date - Lowest to Highest",
       SDL_Point{0, 0}, [this]() {});
@@ -53,7 +56,7 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
   sortBy->addOption(std::move(sortByExpirationLowToHigh));
   sortBy->update();
   sortBy->addOption(std::move(sortByExpirationHighToLow));
-  this->mediator.addDropdown(sortBy);
+  this->mediator->addDropdown(sortBy);
   this->rootElement->addElement(std::move(sortBy));
 }
 

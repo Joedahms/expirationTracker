@@ -23,6 +23,13 @@ public:
          const SDL_Point& textPadding,
          std::function<void()> callback);
 
+  Button(struct DisplayGlobal displayGlobal,
+         const SDL_Rect& boundaryRectangle,
+         const std::string& textContent,
+         const SDL_Point& textPadding,
+         const std::string& notifyMessage);
+
+  void initialize();
   void updateSelf() override;
   void renderSelf() const override;
   void handleEventSelf(const SDL_Event& event) override;
@@ -33,6 +40,7 @@ private:
   SDL_Color defaultColor;
   SDL_Color hoveredColor;
   SDL_Point textPadding = {0, 0};
+  std::string notifyMessage;
 };
 
 #endif

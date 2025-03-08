@@ -55,6 +55,7 @@ DisplayEngine::DisplayEngine(const char* windowTitle,
   this->itemList  = std::make_unique<ItemList>(this->displayGlobal);
 
   displayIsRunning = true;
+  this->logger.log("Engine is running");
 }
 
 /**
@@ -75,7 +76,7 @@ SDL_Window* DisplayEngine::setupWindow(const char* windowTitle,
                                        int screenWidth,
                                        int screenHeight,
                                        bool fullscreen) {
-  LOG(INFO) << "Creating SDL display window";
+  this->logger.log("Creating SDL display window");
 
   int flags = 0;
   if (fullscreen) {

@@ -48,6 +48,50 @@ Button::Button(struct DisplayGlobal displayGlobal,
   addElement(std::move(text));
 }
 
+Button::Button(struct DisplayGlobal displayGlobal,
+               const SDL_Rect& boundaryRectangle,
+               const std::string& textContent,
+               const SDL_Point& textPadding,
+               const std::string& notifyMessage)
+    : textPadding(textPadding), notifyMessage(notifyMessage) {
+  this->displayGlobal = displayGlobal;
+
+  setupPosition(boundaryRectangle);
+
+  // Colors
+  this->backgroundColor = {255, 0, 0, 255}; // Red
+  this->hoveredColor    = {0, 255, 0, 255}; // Green
+  this->defaultColor    = {255, 0, 0, 255}; // Red
+
+  // Button Text
+  SDL_Color textColor        = {255, 255, 0, 255}; // Yellow
+  SDL_Rect textRect          = {textPadding.x, textPadding.y, 0, 0};
+  std::unique_ptr<Text> text = std::make_unique<Text>(
+      this->displayGlobal, textRect, "../display/fonts/16020_FUTURAM.ttf",
+      textContent.c_str(), 24, textColor);
+  text->setCentered();
+
+  // Size based on text
+  if (this->boundaryRectangle.w == 0 && this->boundaryRectangle.h == 0) {
+    SDL_Rect textboundaryRectangle = text->getBoundaryRectangle();
+    this->boundaryRectangle.w      = textboundaryRectangle.w + textPadding.x;
+    this->boundaryRectangle.h      = textboundaryRectangle.h + textPadding.y;
+  }
+
+  addElement(std::move(text));
+}
+
+void Button::initialize() {
+  this->onClick = [this]() {
+    if (auto mediatorShared = this->mediator.lock()) {
+      mediatorShared->notify(shared_from_this(), this->notifyMessage);
+    }
+    else {
+      // uh oh
+    }
+  };
+}
+
 /**
  * Change color if the cursor is hovered over the button.
  *

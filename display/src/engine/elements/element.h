@@ -11,7 +11,7 @@
  * Defines the interface for an SDL element. This is any basic shape or texture to be
  * rendered to the screen.
  */
-class Element {
+class Element : public std::enable_shared_from_this<Element> {
 public:
   virtual ~Element() = default;
   virtual void addElement(std::shared_ptr<Element> element) {}
