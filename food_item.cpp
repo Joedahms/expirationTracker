@@ -15,7 +15,7 @@
  * @param category Enum to convert
  * @return The string version
  */
-std::string FoodItem::categoryToString() {
+std::string FoodItem::categoryToString() const {
   switch (this->category) {
   case FoodCategories::unknown:
     return "unknown";
@@ -26,6 +26,29 @@ std::string FoodItem::categoryToString() {
   default:
     return "invalid";
   }
+}
+
+void FoodItem::logToFile(Logger& logger) const {
+  logger.log("======== FoodItem Details ========");
+  logger.log("ID: " + std::to_string(this->id));
+  logger.log("Name: " + this->name);
+  logger.log("ImagePath: " + this->imagePath.string());
+
+  logger.log("Category: " + categoryToString());
+
+  auto scan = this->scanDate;
+  logger.log("Scan Date: " + std::to_string(static_cast<int>(scan.year())) + "-" +
+             std::to_string(static_cast<unsigned>(scan.month())) + "-" +
+             std::to_string(static_cast<unsigned>(scan.day())));
+
+  auto exp = this->expirationDate;
+  logger.log("Expiration Date: " + std::to_string(static_cast<int>(exp.year())) + "-" +
+             std::to_string(static_cast<unsigned>(exp.month())) + "-" +
+             std::to_string(static_cast<unsigned>(exp.day())));
+
+  logger.log("Weight: " + std::to_string(this->weight) + " kg");
+  logger.log("Quantity: " + std::to_string(this->quantity));
+  logger.log("==================================");
 }
 
 int FoodItem::getId() const { return this->id; }
@@ -59,25 +82,6 @@ void FoodItem::setQuantity(const int& quantity) { this->quantity = quantity; }
  *
  * @param item food item to print
  */
-/*
-void printFoodItem(const FoodItem& item) {
-  std::cout << "Food Item Details:\n";
-  std::cout << "ID: " << item.id << "\n";
-  std::cout << "Name: " << item.name << "\n";
-  std::cout << "Category: " << foodCategoryToString(item.category)
-            << "\n"; // Adjust based on enum to string conversion
-  std::cout << "Scan Date: " << static_cast<int>(item.scanDate.year()) << "-"
-            << static_cast<unsigned>(item.scanDate.month()) << "-"
-            << static_cast<unsigned>(item.scanDate.day()) << "\n";
-  std::cout << "Expiration Date: " << static_cast<int>(item.expirationDate.year()) << "-"
-            << static_cast<unsigned>(item.expirationDate.month()) << "-"
-            << static_cast<unsigned>(item.expirationDate.day()) << "\n";
-  std::cout << "Weight: " << item.weight << " grams\n";
-  std::cout << "Quantity: " << item.quantity << "\n";
-  std::cout << "Image Directory: " << item.imageDirectory.string() << "\n";
-  std::cout << "Absolute Path: " << item.absolutePath.string() << "\n";
-}
-*/
 
 std::string sendFoodItem(zmqpp::socket& socket, const FoodItem& foodItem) {
   FoodItemProto::FoodItem protoFoodItem = convertToProto(foodItem);

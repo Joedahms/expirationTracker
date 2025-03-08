@@ -125,7 +125,9 @@ void DisplayHandler::detectionSuccess() {
   FoodItem foodItem;
   receiveFoodItem(this->replySocket, Messages::AFFIRMATIVE, foodItem);
 
-  this->logger.log("Food item received, storing in database");
+  this->logger.log("Food item received: ");
+  foodItem.logToFile(this->logger);
+  this->logger.log("Storing food item in database");
   sqlite3* database = nullptr;
   openDatabase(&database);
   storeFoodItem(database, foodItem);
