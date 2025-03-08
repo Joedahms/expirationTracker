@@ -133,6 +133,8 @@ void ImageProcessor::foodItemToDisplay() {
   this->requestDisplaySocket.receive(response);
   if (response == Messages::AFFIRMATIVE) {
     this->logger.log("Success indicated to display, sending detected food item");
+    this->logger.log("Sending detected food item to display: ");
+    this->foodItem.logToFile(this->logger);
     response = sendFoodItem(this->requestDisplaySocket, this->foodItem);
     if (response == Messages::AFFIRMATIVE) {
       this->logger.log("Detected food item sent successfully");

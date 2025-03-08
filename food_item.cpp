@@ -28,7 +28,7 @@ std::string FoodItem::categoryToString() const {
   }
 }
 
-void FoodItem::logToFile(Logger& logger) const {
+void FoodItem::logToFile(const Logger& logger) const {
   logger.log("======== FoodItem Details ========");
   logger.log("ID: " + std::to_string(this->id));
   logger.log("Name: " + this->name);

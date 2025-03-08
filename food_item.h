@@ -23,7 +23,7 @@ public:
   std::string categoryToString() const;
 
   // TODO print food item
-  void logToFile(Logger& logger) const;
+  void logToFile(const Logger& logger) const;
   int getId() const;
   std::filesystem::path getImagePath() const;
   std::string getName() const;
