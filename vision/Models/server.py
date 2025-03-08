@@ -77,6 +77,7 @@ def run_server():
             
             print(f"Image decoded. Now beginning AI processing.")
             # Display image
+            plt.figure(figsize=(10,10))
             plt.imshow(image)
             plt.axis('off')
             plt.title("Processing Image")
