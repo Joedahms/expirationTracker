@@ -120,9 +120,10 @@ void DisplayHandler::detectionFailure() {
  * @return None
  */
 void DisplayHandler::detectionSuccess() {
+  this->replySocket.send(Messages::AFFIRMATIVE);
+
   this->logger.log("Item detection succeeded, receiving food item");
   FoodItem foodItem;
-  this->replySocket.send(Messages::AFFIRMATIVE);
   bool foodItemReceived = false;
   while (foodItemReceived == false) {
     foodItemReceived =
