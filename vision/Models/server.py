@@ -4,6 +4,7 @@ import struct
 import cv2
 import numpy as np
 import socket
+import matplotlib.pyplot as plt
 from easyOCR import performOCR
 
 PORT = "5555" #zeroMQ port
@@ -75,13 +76,16 @@ def run_server():
                 continue
             
             print(f"Image decoded. Now beginning AI processing.")
-            cv2.imshow("Processing Image", image)
-            cv2.waitKey(1)  # Allows the window to update
+            # Display image
+            plt.imshow(image)
+            plt.axis('off')
+            plt.title("Processing Image")
+            plt.show(block=False)
             
             # Perform OCR
             result = performOCR(image)
 
-            cv2.destroyAllWindows()
+            plt.close()
 
             print(f"Processing complete. Sending result back.")
             # Send response
