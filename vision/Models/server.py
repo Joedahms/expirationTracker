@@ -60,11 +60,13 @@ def run_server():
             # Receive image data (blocking receive)
             msg_parts = socket.recv_multipart()  
 
-            print(f"Request received! {img_size} bytes. Unpacking image.")
+            print(f"Request received!")
             img_size = struct.unpack("Q", msg_parts[0])[0]
             img_data = msg_parts[1]
 
-            print(f"Image unpacked. Decoding image.")
+            print(f"Image is {img_size} bytes!")
+
+            print(f"Decoding image.")
             # Decode image
             image = cv2.imdecode(np.frombuffer(img_data, dtype=np.uint8), cv2.IMREAD_COLOR)
             if image is None:
