@@ -39,7 +39,7 @@ void DisplayHandler::handle() {
   while (true) {
     std::string receivedMessage;
     this->replySocket.receive(receivedMessage);
-    this->logger.log("received message from socket");
+    this->logger.log("received message from socket: " + receivedMessage);
     // Engine wants to start a new scan
     if (receivedMessage == Messages::START_SCAN) {
       startSignalToHardware();
