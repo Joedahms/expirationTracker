@@ -39,14 +39,14 @@ void DisplayHandler::handle() {
   while (true) {
     std::string receivedMessage;
     this->replySocket.receive(receivedMessage);
-
+    this->logger.log("received message from socket: " + receivedMessage);
     // Engine wants to start a new scan
     if (receivedMessage == Messages::START_SCAN) {
       startSignalToHardware();
       receiveFromVision();
     }
     else {
-      LOG(FATAL) << "Unexpected message received";
+      LOG(FATAL) << "Unexpected message received: " << receivedMessage;
     }
   }
 }
@@ -88,6 +88,7 @@ void DisplayHandler::receiveFromVision() {
   this->logger.log("Waiting for message from vision");
   std::string request;
   this->replySocket.receive(request);
+  this->logger.log("Message received: " + request);
   if (request == Messages::ITEM_DETECTION_FAILED) {
     detectionFailure();
   }
@@ -120,11 +121,18 @@ void DisplayHandler::detectionFailure() {
  */
 void DisplayHandler::detectionSuccess() {
   this->replySocket.send(Messages::AFFIRMATIVE);
+
   this->logger.log("Item detection succeeded, receiving food item");
   FoodItem foodItem;
-  receiveFoodItem(this->replySocket, Messages::AFFIRMATIVE, foodItem);
+  bool foodItemReceived = false;
+  while (foodItemReceived == false) {
+    foodItemReceived =
+        receiveFoodItem(this->replySocket, Messages::AFFIRMATIVE, foodItem);
+  }
 
-  this->logger.log("Food item received, storing in database");
+  this->logger.log("Food item received: ");
+  foodItem.logToFile(this->logger);
+  this->logger.log("Storing food item in database");
   sqlite3* database = nullptr;
   openDatabase(&database);
   storeFoodItem(database, foodItem);
