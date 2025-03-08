@@ -88,6 +88,7 @@ void DisplayHandler::receiveFromVision() {
   this->logger.log("Waiting for message from vision");
   std::string request;
   this->replySocket.receive(request);
+  this->logger.log("Message received: ", request);
   if (request == Messages::ITEM_DETECTION_FAILED) {
     detectionFailure();
   }
