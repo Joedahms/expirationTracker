@@ -10,8 +10,10 @@
 /**
  * @param displayGlobal Global display variables.
  */
-MainMenu::MainMenu(struct DisplayGlobal displayGlobal) {
+MainMenu::MainMenu(struct DisplayGlobal displayGlobal) : logger(DisplayGlobal::logger) {
   this->currentState = EngineState::MAIN_MENU;
+
+  this->logger.log("test");
 
   this->displayGlobal        = displayGlobal;
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);

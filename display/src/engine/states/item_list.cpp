@@ -16,6 +16,7 @@
  * @param displayGlobal Global display variables.
  */
 ItemList::ItemList(struct DisplayGlobal displayGlobal) {
+  // ItemList::ItemList(struct DisplayGlobal displayGlobal) {
   this->currentState = EngineState::ITEM_LIST;
 
   this->displayGlobal = displayGlobal;

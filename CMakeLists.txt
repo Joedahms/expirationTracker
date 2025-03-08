@@ -45,6 +45,7 @@ add_executable(expirationTracker
   endpoints.cpp
   
 
+  display/src/engine/display_global.cpp
   # Display process after forked from main
   display/src/display_entry.cpp
   # Handler for messages from other processes and the display engine
