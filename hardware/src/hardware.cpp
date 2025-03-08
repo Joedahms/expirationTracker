@@ -13,7 +13,30 @@
 Hardware::Hardware(zmqpp::context& context)
     : requestVisionSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
-      replySocket(context, zmqpp::socket_type::reply), logger("hardware_log.txt") {
+      replySocket(context, zmqpp::socket_type::reply), logger("hardware_log.txt"),
+      imageDirectory(std::filesystem::current_path() / "tmp/images/") {
+  if (!std::filesystem::exists(imageDirectory)) {
+    if (std::filesystem::create_directories(imageDirectory)) {
+      this->logger.log("Created directory: " + imageDirectory.string());
+    }
+    else {
+      this->logger.log("Failed to create directory: " + imageDirectory.string());
+    }
+  }
+  else if (!imageDirectory.empty()) {
+    // did not properly shutdown last time
+    try {
+      for (const auto& entry : std::filesystem::directory_iterator(imageDirectory)) {
+        if (entry.is_regular_file()) {
+          std::string ext = entry.path().extension().string();
+          std::filesystem::remove(entry.path());
+          this->logger.log("Deleted: " + entry.path().string());
+        }
+      }
+    } catch (const std::filesystem::filesystem_error& e) {
+      this->logger.log("Error deleting files: " + std::string(e.what()));
+    }
+  }
   try {
     this->requestVisionSocket.connect(ExternalEndpoints::visionEndpoint);
     this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
@@ -67,10 +90,9 @@ void Hardware::sendStartToVision() {
   const std::chrono::time_point<std::chrono::system_clock> now{
       std::chrono::system_clock::now()};
 
-  std::filesystem::path filePath       = "../images/temp";
   std::chrono::year_month_day scanDate = std::chrono::floor<std::chrono::days>(now);
 
-  FoodItem foodItem(filePath, scanDate, this->itemWeight);
+  FoodItem foodItem(this->imageDirectory, scanDate, this->itemWeight);
 
   std::string response;
   response = sendFoodItem(this->requestVisionSocket, foodItem);
