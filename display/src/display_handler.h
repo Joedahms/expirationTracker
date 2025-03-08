@@ -23,7 +23,10 @@ private:
 
   zmqpp::socket replySocket;
 
-  void sendStartSignal();
+  void startSignalToHardware();
+  void receiveFromVision();
+  void detectionFailure();
+  void detectionSuccess();
 };
 
 #endif

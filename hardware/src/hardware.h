@@ -27,11 +27,7 @@ private:
   zmqpp::socket requestDisplaySocket;
   zmqpp::socket replySocket;
 
-  std::filesystem::path IMAGE_DIRECTORY;
-
-  // // Code for Geromy
-  // const std::string IMAGE_DIRECTORY =
-  //     "/home/geromy/Desktop/Project/raspi-yolo/images/temp/";
+  std::filesystem::path imageDirectory;
 
   float itemWeight = 0;
 

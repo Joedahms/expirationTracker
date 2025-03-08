@@ -47,6 +47,11 @@ sudo make install
 cd ../../..
 rm -rf zero
 
+#mDNS
+sudo apt install avahi-daemon
+sudo systemctl enable avahi-daemon
+sudo systemctl start avahi-daemon
+
 # Python virtual envrionment
 mkdir build
 cd build

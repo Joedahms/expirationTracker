@@ -152,21 +152,7 @@ void DisplayEngine::checkState() {
     this->engineState = this->mainMenu->getCurrentState();
 
     if (this->engineState == EngineState::SCANNING) {
-      this->logger.log("Scan initialized, sending start signal to display");
-      try {
-        this->requestSocket.send(Messages::START_SCAN);
-        std::string response;
-        this->requestSocket.receive(response);
-        if (response == Messages::AFFIRMATIVE) {
-          this->logger.log(
-              "Start signal successfully sent to display, in scanning state");
-        }
-        else {
-          LOG(FATAL) << "Invalid response received from display";
-        }
-      } catch (const zmqpp::exception& e) {
-        LOG(FATAL) << e.what();
-      }
+      startSignalToDisplay();
     }
 
     this->mainMenu->setCurrentState(EngineState::MAIN_MENU);
@@ -344,4 +330,21 @@ void DisplayEngine::clean() {
   SDL_DestroyRenderer(this->displayGlobal.renderer);
   SDL_Quit();
   LOG(INFO) << "DisplayEngine cleaned";
+}
+
+void DisplayEngine::startSignalToDisplay() {
+  this->logger.log("Scan initialized, sending start signal to display");
+  try {
+    this->requestSocket.send(Messages::START_SCAN);
+    std::string response;
+    this->requestSocket.receive(response);
+    if (response == Messages::AFFIRMATIVE) {
+      this->logger.log("Start signal successfully sent to display, in scanning state");
+    }
+    else {
+      LOG(FATAL) << "Invalid response received from display";
+    }
+  } catch (const zmqpp::exception& e) {
+    LOG(FATAL) << e.what();
+  }
 }

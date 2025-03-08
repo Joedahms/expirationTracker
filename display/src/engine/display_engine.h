@@ -70,6 +70,8 @@ private:
   std::unique_ptr<ItemList> itemList;
 
   bool displayIsRunning = false;
+
+  void startSignalToDisplay();
 };
 
 #endif

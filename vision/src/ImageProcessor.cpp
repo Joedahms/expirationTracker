@@ -45,6 +45,22 @@ void ImageProcessor::process() {
   else {
     detectionFailed();
   }
+
+  try {
+    for (const auto& entry : std::filesystem::directory_iterator(
+             this->foodItem.getImagePath().parent_path())) {
+      if (entry.is_regular_file()) {
+        std::string ext = entry.path().extension().string();
+        if (ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".bmp" ||
+            ext == ".gif" || ext == ".tiff") {
+          std::filesystem::remove(entry.path());
+          std::cout << "Deleted: " << entry.path() << std::endl;
+        }
+      }
+    }
+  } catch (const std::filesystem::filesystem_error& e) {
+    std::cerr << "Error: " << e.what() << std::endl;
+  }
 }
 
 /**
@@ -152,6 +168,8 @@ void ImageProcessor::foodItemToDisplay() {
   this->requestDisplaySocket.receive(response);
   if (response == Messages::AFFIRMATIVE) {
     this->logger.log("Success indicated to display, sending detected food item");
+    this->logger.log("Sending detected food item to display: ");
+    this->foodItem.logToFile(this->logger);
     response = sendFoodItem(this->requestDisplaySocket, this->foodItem);
     if (response == Messages::AFFIRMATIVE) {
       this->logger.log("Detected food item sent successfully");

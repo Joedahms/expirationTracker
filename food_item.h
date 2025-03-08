@@ -8,6 +8,7 @@
 #include <zmqpp/zmqpp.hpp>
 
 #include "fooditem.pb.h"
+#include "logger.h"
 
 enum class FoodCategories { unknown, unpackaged, packaged };
 
@@ -19,10 +20,10 @@ public:
            const float& weight)
       : imagePath(imagePath), scanDate(scanDate), weight(weight) {}
 
-  std::string categoryToString();
+  std::string categoryToString() const;
 
   // TODO print food item
-
+  void logToFile(const Logger& logger) const;
   int getId() const;
   std::filesystem::path getImagePath() const;
   std::string getName() const;
