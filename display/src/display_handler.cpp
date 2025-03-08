@@ -46,7 +46,7 @@ void DisplayHandler::handle() {
       receiveFromVision();
     }
     else {
-      LOG(FATAL) << "Unexpected message received";
+      LOG(FATAL) << "Unexpected message received: " << receivedMessage;
     }
   }
 }
