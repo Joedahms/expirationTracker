@@ -39,12 +39,12 @@ def wait_for_pi_discovery():
                 print(f"Received discovery request from {client_addr[0]}")
                 sock.sendto(server_ip.encode(), client_addr)  # Send server IP back
                 sock.close()
-                return  # Return Pi's IP to start ZeroMQ
+                return
         except Exception as e:
             print(f"UDP error: {e}")
 
 def run_server():
-    pi_ip = wait_for_pi_discovery()  # Wait for Raspberry Pi discovery
+    wait_for_pi_discovery()  # Wait for Raspberry Pi discovery
     ADDRESS = f"tcp://0.0.0.0:{PORT}"  # Bind ZeroMQ to communicate with Pi
 
     # Create ZeroMQ context and socket
