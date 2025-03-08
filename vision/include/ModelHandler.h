@@ -1,20 +1,26 @@
 #ifndef MODEL_HANDLER_H
 #define MODEL_HANDLER_H
 
-#include "../../food_item.h"
-#include "ObjectClassifier.h"
-#include "TextClassifier.h"
 #include <filesystem>
 #include <glog/logging.h>
-class ModelHandler {
-private:
-  ObjectClassifier objectClassifier;
-  TextClassifier textClassifier;
 
+#include "../../food_item.h"
+#include "../../logger.h"
+#include "ObjectClassifier.h"
+#include "TextClassifier.h"
+#include "externalEndpoints.h"
+
+class ModelHandler {
 public:
-  ModelHandler(FoodItem&);
-  bool classifyObject(const std::filesystem::path&);
+  ModelHandler(zmqpp::context&);
+  bool classifyObject(const std::filesystem::path&, FoodItem&);
   bool extractExpirationDate(const std::filesystem::path&) const;
+  std::string discoverServerViaUDP();
+
+private:
+  Logger logger;
+
+  TextClassifier textClassifier;
 };
 
 #endif

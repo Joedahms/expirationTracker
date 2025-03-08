@@ -1,25 +1,42 @@
 #ifndef IMAGE_PROCESSOR_H
 #define IMAGE_PROCESSOR_H
 
-#include "../../food_item.h"
-#include "../../pipes.h"
-#include "ModelHandler.h"
-#include "helperFunctions.h"
 #include <glog/logging.h>
 #include <thread>
 
-class ImageProcessor {
-private:
-  ModelHandler modelHandler;
-  const struct Pipes& pipes;
-  struct FoodItem& foodItem;
+#include "../../endpoints.h"
+#include "../../food_item.h"
+#include "../../logger.h"
+#include "ModelHandler.h"
+#include "helperFunctions.h"
 
+class ImageProcessor {
 public:
+  explicit ImageProcessor(zmqpp::context& context);
   void process();
   bool analyze();
-  explicit ImageProcessor(const struct Pipes&, FoodItem& foodItem);
   struct FoodItem& getFoodItem();
   void setFoodItem(struct FoodItem&);
+  void tellHardwareToStop();
+  void tellDisplayWeFailed();
+
+private:
+  Logger logger;
+
+  zmqpp::socket requestHardwareSocket;
+  zmqpp::socket requestDisplaySocket;
+  zmqpp::socket replySocket;
+
+  ModelHandler modelHandler;
+  FoodItem foodItem;
+
+  const int MAX_IMAGE_COUNT = 16;
+
+  void detectionSucceeded();
+  void detectionFailed();
+
+  void foodItemToDisplay();
+  void stopHardware();
 };
 
 #endif

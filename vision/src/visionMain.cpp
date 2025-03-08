@@ -4,71 +4,64 @@
  * Entry into the vision code. Only called from main after vision child process is
  * forked.
  *
- * Input:
- * @param pipes Pipes for vision to communicate with the other processes
- * Output: None
+ * @param context The zeroMQ context with which to create sockets with
+ * @param externalEndpoints Endpoints to the main components of the system (vision,
+ * hardware, and display)
+ * @return None
  */
-void visionEntry(struct Pipes pipes) {
-  LOG(INFO) << "Within vision process";
-  closeUnusedPipes(pipes);
+void visionEntry(zmqpp::context& context) {
+  Logger logger("vision_entry.txt");
+  logger.log("Within vision process");
 
-  int maxRetries = 5;
-  int retryCount = 0;
+  ImageProcessor processor(context);
 
-  while (!startPythonServer()) {
-    retryCount++;
+  zmqpp::socket replySocket(context, zmqpp::socket_type::reply);
+  replySocket.bind(ExternalEndpoints::visionEndpoint);
 
-    if (retryCount >= maxRetries) {
-      LOG(FATAL) << "ERROR: Failed to start Python server after " << retryCount
-                 << " attempts.";
-      exit(1); // Stop the program if the server cannot start
-    }
+  zmqpp::poller poller;
+  poller.add(replySocket);
 
-    LOG(WARNING) << "Python server failed to start. Retrying in 2 seconds... ("
-                 << retryCount << "/" << maxRetries << ")";
-    sleep(2); // Wait 2 seconds before retrying
-  }
-
-  sleep(5); // Wait 5 sec to ensure Python server starts
-
-  struct FoodItem foodItem;
-  ImageProcessor processor = ImageProcessor(pipes, foodItem);
-  // Wait for start signal from Display with 0.5sec sleep
   while (1) {
-    LOG(INFO) << "Waiting for start signal from Hardware";
-    if (receiveFoodItem(foodItem, pipes.hardwareToVision[READ], (struct timeval){1, 0})) {
-      LOG(INFO) << "Vision Received all images from hardware";
-      processor.setFoodItem(foodItem);
-      processor.process();
+    FoodItem foodItem;
+    logger.log("Waiting for start signal from Hardware");
+
+    while (startSignalCheck(replySocket, logger, foodItem, poller) == false) {
+      ;
     }
-    else {
-      usleep(500000);
-    }
+    processor.setFoodItem(foodItem);
+    processor.process();
   }
 }
 
 /**
- * Start the python server for hosting models
+ * polls for 1000ms for socket activity and then checks replySocket for input
  *
- * @return success for fail
+ * @param replySocket replySocket to check for input on
+ * @param logger Logger being used to log visionMain
+ * @param foodItem foodItem to return with data
+ * @param poller poller to use for polling socket activity
+ * @return whether start signal was received or not
  */
-bool startPythonServer() {
-  pid_t pid = fork();
-
-  if (pid == -1) {
-    LOG(FATAL) << "ERROR: Failed to fork process: " << strerror(errno);
+bool startSignalCheck(zmqpp::socket& replySocket,
+                      const Logger& logger,
+                      FoodItem& foodItem,
+                      zmqpp::poller& poller) {
+  try {
+    if (poller.poll(1000)) {
+      if (poller.has_input(replySocket)) {
+        receiveFoodItem(replySocket, Messages::AFFIRMATIVE, foodItem);
+        logger.log("Received start signal from hardware: ");
+        foodItem.logToFile(logger);
+        return true;
+      }
+      return false;
+    }
+    else {
+      logger.log("Did not receive start signal from hardware");
+      return false;
+    }
+  } catch (const zmqpp::exception& e) {
+    LOG(FATAL) << e.what();
     return false;
-  }
-  if (pid == 0) { // Child process
-    LOG(INFO) << "Starting Python server...";
-    char* args[] = {(char*)"./models-venv/bin/python3",
-                    (char*)"../vision/Models/server.py", nullptr};
-    execvp(args[0], args);
-    LOG(INFO) << "ERROR: execvp() failed to start Python server.";
-    exit(1); // Exit child process if execvp fails
-  }
-  else { // Parent process
-    LOG(INFO) << "Python server started with PID: " << pid;
-    return true;
   }
 }

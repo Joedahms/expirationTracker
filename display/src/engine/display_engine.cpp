@@ -4,7 +4,8 @@
 #include <glog/logging.h>
 #include <iostream>
 
-#include "../../../pipes.h"
+#include "../../../endpoints.h"
+
 #include "display_engine.h"
 #include "display_global.h"
 #include "states/state.h"
@@ -24,7 +25,22 @@ DisplayEngine::DisplayEngine(const char* windowTitle,
                              int screenWidth,
                              int screenHeight,
                              bool fullscreen,
-                             struct DisplayGlobal displayGlobal) {
+                             struct DisplayGlobal displayGlobal,
+                             const zmqpp::context& context,
+                             const std::string& displayEndpoint,
+                             const std::string& engineEndpoint)
+    : replySocket(context, zmqpp::socket_type::reply),
+      requestSocket(context, zmqpp::socket_type::request),
+      DISPLAY_ENDPOINT(displayEndpoint), ENGINE_ENDPOINT(engineEndpoint),
+      logger("display_engine.txt") {
+  // Setup sockets
+  try {
+    this->requestSocket.connect(this->DISPLAY_ENDPOINT);
+    this->replySocket.bind(this->ENGINE_ENDPOINT);
+  } catch (const zmqpp::exception& e) {
+    LOG(FATAL) << e.what();
+  }
+
   this->displayGlobal = displayGlobal;
   this->displayGlobal.window =
       setupWindow(windowTitle, windowXPosition, windowYPosition, screenWidth,
@@ -130,14 +146,13 @@ void DisplayEngine::initializeEngine(SDL_Window* window) {
  * @param None
  * @return None
  */
-void DisplayEngine::checkState(int* engineToDisplay, int* displayToEngine) {
+void DisplayEngine::checkState() {
   switch (this->engineState) {
   case EngineState::MAIN_MENU:
     this->engineState = this->mainMenu->getCurrentState();
 
     if (this->engineState == EngineState::SCANNING) {
-      LOG(INFO) << "Scan initialized, engine switching to scanning state";
-      writeString(engineToDisplay[WRITE], START_SCAN);
+      startSignalToDisplay();
     }
 
     this->mainMenu->setCurrentState(EngineState::MAIN_MENU);
@@ -172,7 +187,7 @@ void DisplayEngine::checkState(int* engineToDisplay, int* displayToEngine) {
  * @param displayToEngine Pipe from the display to the displayEngine
  * @return None
  */
-void DisplayEngine::handleEvents(int* engineToDisplay, int* displayToEngine) {
+void DisplayEngine::handleEvents() {
   switch (this->engineState) {
   case EngineState::MAIN_MENU:
     this->mainMenu->handleEvents(&this->displayIsRunning);
@@ -182,30 +197,19 @@ void DisplayEngine::handleEvents(int* engineToDisplay, int* displayToEngine) {
     {
       this->scanning->handleEvents(&this->displayIsRunning);
 
-      struct timeval timeout;
-      timeout.tv_sec  = 0;
-      timeout.tv_usec = 100;
-
-      int pipeToRead = displayToEngine[READ];
-      fd_set readPipeSet;
-      FD_ZERO(&readPipeSet);
-      FD_SET(pipeToRead, &readPipeSet);
-
-      // Check pipe for data
-      int pipeReady = select(pipeToRead + 1, &readPipeSet, NULL, NULL, &timeout);
-
-      if (pipeReady == -1) {
-        LOG(FATAL) << "Select error";
-      }
-      else if (pipeReady == 0) { // No data available
+      bool gotMessageFromDisplay = false;
+      std::string messageFromDisplay;
+      gotMessageFromDisplay = this->replySocket.receive(messageFromDisplay, true);
+      if (gotMessageFromDisplay == false) {
         break;
       }
-      if (FD_ISSET(pipeToRead, &readPipeSet)) { // Data available
-        std::string fromDisplay = readString(displayToEngine[READ]);
-        if (fromDisplay == "ID successful") {
-          LOG(INFO) << "New item received, switching to item list state";
-          this->engineState = EngineState::ITEM_LIST;
-        }
+      if (messageFromDisplay == Messages::ITEM_DETECTION_SUCCEEDED) {
+        this->logger.log("New food item received, switching to item list state");
+        this->engineState = EngineState::ITEM_LIST;
+        this->replySocket.send(Messages::AFFIRMATIVE);
+      }
+      else {
+        LOG(FATAL) << "Invalid message received from display";
       }
       break;
     }
@@ -326,4 +330,21 @@ void DisplayEngine::clean() {
   SDL_DestroyRenderer(this->displayGlobal.renderer);
   SDL_Quit();
   LOG(INFO) << "DisplayEngine cleaned";
+}
+
+void DisplayEngine::startSignalToDisplay() {
+  this->logger.log("Scan initialized, sending start signal to display");
+  try {
+    this->requestSocket.send(Messages::START_SCAN);
+    std::string response;
+    this->requestSocket.receive(response);
+    if (response == Messages::AFFIRMATIVE) {
+      this->logger.log("Start signal successfully sent to display, in scanning state");
+    }
+    else {
+      LOG(FATAL) << "Invalid response received from display";
+    }
+  } catch (const zmqpp::exception& e) {
+    LOG(FATAL) << e.what();
+  }
 }

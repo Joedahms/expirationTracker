@@ -3,42 +3,43 @@ import re
 import sys
 import cv2
 import numpy as np
+from foodClasses import textClasses, pluMapping
 
 try:
-    reader = easyocr.Reader(['en'], gpu=False)
+    reader = easyocr.Reader(['en'], gpu=True)
 except Exception as e:
     raise(f"ERROR: OCR model loading failed: {str(e)}")
 
-classification_keywords = {
-    "milk", "cheese", "bread", "eggs", "yogurt", "butter", "juice", "meat", "chicken",
-    "fish", "cereal", "pasta", "rice", "flour", "sugar", "salt", "pepper", "coffee",
-    "tea", "honey", "jam", "peanut butter", "chocolate", "candy", "cookies", "crackers",
-    "granola", "oats", "popcorn", "chips", "pancake mix", "syrup", "beans", "corn",
-    "tomatoes", "tuna", "soup", "fruit", "vegetables", "meals", "pizza", "fries",
-    "ice cream", "energy bars", "protein powder", "noodles", "ketchup", "mayonnaise",
-    "mustard", "soy sauce", "hot sauce", "dressing", "oil", "vinegar", "pudding",
-    "whipped cream", "sour cream", "tofu", "bacon"
-}
+def cleanText(text):
+    """ Normalize and clean extracted OCR text while keeping numbers. """
+    return re.sub(r'[^a-zA-Z0-9\s]', '', text).strip().lower()
 
-def clean_text(text):
-    """ Normalize and clean extracted OCR text. """
-    return re.sub(r'[^a-zA-Z\s]', '', text).strip().lower()
-
-def is_text_class(text):
+def isFoodClass(text):
     """ Check if extracted text belongs to a known classification. """
-    words = clean_text(text).split()
-    
+    words = cleanText(text).split()
     for word in words:
-        if len(word) > 2 and word in classification_keywords:
+        if(len(word) == 4 and word.isdigit() and int(word) in pluMapping):
+            return {"type": "classification", "value": pluMapping.get(int(word))}
+        if len(word) > 2 and word in textClasses:
             return {"type": "classification", "value": word}  # Return food category
 
     return None
 
-def preprocess_image(image_path):
-    img = cv2.imread(image_path)
-
+def preprocessImage(img):
+    print("Preprocessing image")
+    
     if img is None:
         return("Image not found")
+    
+    # Ensure minimum width while maintaining aspect ratio
+    min_width = 600
+    height, width = img.shape[:2]
+    
+    if width < min_width:
+        scale = min_width / width
+        new_width = int(width * scale)
+        new_height = int(height * scale)
+        img = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
 
     # Convert to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -68,19 +69,24 @@ def preprocess_image(image_path):
     # Apply the mask
     processed = cv2.bitwise_and(gray, gray, mask=mask)
 
+    print("Image Preprocessed")
     return processed  # Return improved image as a NumPy array
     
-def perform_ocr(image_path):
-    processed_image = preprocess_image(image_path)
+def performOCR(image_path):
+    print("Performing OCR")
+    processed_image = preprocessImage(image_path)
     if isinstance(processed_image, str):
         return(f"ERROR: {processed_image}")
 
     try:
+        print("Reading text");
         results = reader.readtext(processed_image, detail=0, paragraph=True, text_threshold=0.8)
+        print("Text read");
 
         # Filter only valid classifications
-        filtered_results = [is_text_class(text) for text in results if is_text_class(text)]
+        filtered_results = [isFoodClass(text) for text in results if isFoodClass(text)]
 
+        print("OCR performed")
         if filtered_results:
             for result in filtered_results:
                 return(f"CLASSIFICATION: {result['value']}")

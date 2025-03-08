@@ -1,30 +1,38 @@
 #ifndef IMODEL_H
 #define IMODEL_H
 
-#include "../../food_item.h"
-#include "helperFunctions.h"
 #include <filesystem>
 #include <fstream>
 #include <glog/logging.h>
+#include <opencv2/opencv.hpp>
+#include <optional>
 #include <string>
 
-#define PIPE_IN  "/tmp/image_pipe"
-#define PIPE_OUT "/tmp/result_pipe"
+#include "../../food_item.h"
+#include "../../logger.h"
+#include "helperFunctions.h"
 
 enum TaskType { unknown, CLS, OCR, EXP };
 
 class IModel {
-protected:
-  FoodItem& foodItem;
-  std::string readResponse() const;
-  void sendRequest(const TaskType&, const std::filesystem::path&) const;
-  std::string taskTypeToString(const TaskType&) const;
-  virtual std::string runModel(const std::filesystem::path&) const = 0;
-  virtual bool handleClassification(const std::filesystem::path&)  = 0;
-
 public:
-  explicit IModel(FoodItem& foodItem) : foodItem(foodItem) {}
+  IModel(const std::string& logFileName, zmqpp::context& context)
+      : logger(logFileName), requestSocket(context, zmqpp::socket_type::request),
+        replySocket(context, zmqpp::socket_type::reply) {}
   virtual ~IModel() = default;
+  void connectToServer(std::string&);
+
+protected:
+  Logger logger;
+  zmqpp::socket requestSocket;
+  zmqpp::socket replySocket;
+
+  virtual std::string runModel(const std::filesystem::path&) = 0;
+  virtual std::optional<std::string> handleClassification(
+      const std::filesystem::path&) = 0;
+
+  std::string sendRequest(const TaskType&, const std::filesystem::path&);
+  std::string taskTypeToString(const TaskType&) const;
 };
 
-#endif // IMODEL_H
+#endif
