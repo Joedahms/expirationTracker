@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <fstream>
 #include <glog/logging.h>
+#include <opencv2/opencv.hpp>
 #include <optional>
 #include <string>
 
@@ -19,6 +20,7 @@ public:
       : logger(logFileName), requestSocket(context, zmqpp::socket_type::request),
         replySocket(context, zmqpp::socket_type::reply) {}
   virtual ~IModel() = default;
+  void connectToServer(std::string&);
 
 protected:
   Logger logger;

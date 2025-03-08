@@ -13,7 +13,30 @@
 Hardware::Hardware(zmqpp::context& context)
     : requestVisionSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
-      replySocket(context, zmqpp::socket_type::reply), logger("hardware_log.txt") {
+      replySocket(context, zmqpp::socket_type::reply), logger("hardware_log.txt"),
+      imageDirectory(std::filesystem::current_path() / "tmp/images/") {
+  if (!std::filesystem::exists(imageDirectory)) {
+    if (std::filesystem::create_directories(imageDirectory)) {
+      this->logger.log("Created directory: " + imageDirectory.string());
+    }
+    else {
+      this->logger.log("Failed to create directory: " + imageDirectory.string());
+    }
+  }
+  else if (!imageDirectory.empty()) {
+    // did not properly shutdown last time
+    try {
+      for (const auto& entry : std::filesystem::directory_iterator(imageDirectory)) {
+        if (entry.is_regular_file()) {
+          std::string ext = entry.path().extension().string();
+          std::filesystem::remove(entry.path());
+          this->logger.log("Deleted: " + entry.path().string());
+        }
+      }
+    } catch (const std::filesystem::filesystem_error& e) {
+      this->logger.log("Error deleting files: " + std::string(e.what()));
+    }
+  }
   try {
     this->requestVisionSocket.connect(ExternalEndpoints::visionEndpoint);
     this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
@@ -67,10 +90,9 @@ void Hardware::sendStartToVision() {
   const std::chrono::time_point<std::chrono::system_clock> now{
       std::chrono::system_clock::now()};
 
-  std::filesystem::path filePath       = "../images/temp";
   std::chrono::year_month_day scanDate = std::chrono::floor<std::chrono::days>(now);
 
-  FoodItem foodItem(filePath, scanDate, this->itemWeight);
+  FoodItem foodItem(this->imageDirectory, scanDate, this->itemWeight);
 
   std::string response;
   response = sendFoodItem(this->requestVisionSocket, foodItem);
@@ -207,14 +229,16 @@ void Hardware::rotateAndCapture() {
  */
 bool Hardware::takePhotos(int angle) {
   this->logger.log("Taking photos at position: " + std::to_string(angle));
-  std::string cmd0     = "rpicam-jpeg --camera 0";
-  std::string cmd1     = "rpicam-jpeg --camera 1";
-  std::string np       = " --nopreview";
-  std::string res      = " --width 2304 --height 1296";
-  std::string out      = " --output ";
-  std::string to       = " --timeout 50"; // DO NOT SET TO 0! Will cause infinite preview!
-  std::string topPhoto = this->IMAGE_DIRECTORY + std::to_string(angle) + "_top.jpg";
-  std::string sidePhoto = this->IMAGE_DIRECTORY + std::to_string(angle) + "_side.jpg";
+  std::string cmd0 = "rpicam-jpeg --camera 0";
+  std::string cmd1 = "rpicam-jpeg --camera 1";
+  std::string np   = " --nopreview";
+  std::string res  = " --width 2304 --height 1296";
+  std::string out  = " --output ";
+  std::string to   = " --timeout 50"; // DO NOT SET TO 0! Will cause infinite preview!
+  std::string topPhoto =
+      this->imageDirectory.string() + std::to_string(angle) + "_top.jpg";
+  std::string sidePhoto =
+      this->imageDirectory.string() + std::to_string(angle) + "_side.jpg";
 
   std::string command0 = cmd0 + np + res + out + topPhoto + to;
   std::string command1 = cmd0 + np + res + out + sidePhoto + to;
@@ -236,7 +260,8 @@ bool Hardware::takePhotos(int angle) {
  */
 bool Hardware::capturePhoto(int angle) {
   this->logger.log("Capturing photo at position: " + std::to_string(angle));
-  std::string fileName = this->IMAGE_DIRECTORY + std::to_string(angle) + "_test.jpg";
+  std::string fileName =
+      this->imageDirectory.string() + std::to_string(angle) + "_test.jpg";
 
   std::string command = "rpicam-jpeg -n -t 50 1920:1080:12:U --output " + fileName;
   system(command.c_str());

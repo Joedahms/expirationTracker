@@ -39,3 +39,7 @@ std::string IModel::taskTypeToString(const TaskType& taskType) const {
     return "unknown";
   }
 }
+
+void IModel::connectToServer(std::string& serverAddress) {
+  this->requestSocket.connect(serverAddress);
+}
