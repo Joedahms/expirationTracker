@@ -54,48 +54,55 @@ def run_server():
     
     print(f"Server started on {ADDRESS}")
     
+    poller = zmq.Poller()
+    poller.register(socket, zmq.POLLIN)
+
     try:
         while True:
             print("Waiting for image from Raspberry Pi...")
 
-            # Receive image data (blocking receive)
-            msg_parts = socket.recv_multipart()  
+            socks = dict(poller.poll(1000))  # 1-second timeout
 
-            print(f"Request received!")
-            img_size = struct.unpack("Q", msg_parts[0])[0]
-            img_data = msg_parts[1]
+            if socket in socks and socks[socket] == zmq.POLLIN:
+                # Receive image data (blocking receive)
+                msg_parts = socket.recv_multipart()  
+                print(f"Request received!")
 
-            print(f"Image is {img_size} bytes!")
+                img_size = struct.unpack("Q", msg_parts[0])[0]
+                img_data = msg_parts[1]
 
-            print(f"Decoding image.")
-            # Decode image
-            image = cv2.imdecode(np.frombuffer(img_data, dtype=np.uint8), cv2.IMREAD_COLOR)
-            if image is None:
-                print("Error: Failed to decode image.")
-                socket.send_string("ERROR: Image decoding failed")
-                continue
-            
-            print(f"Image decoded. Now beginning AI processing.")
-            # Display image
-            plt.figure(figsize=(10,10))
-            plt.imshow(image)
-            plt.axis('off')
-            plt.title("Processing Image")
-            plt.show(block=False)
-            
-            # Perform OCR
-            result = performOCR(image)
+                print(f"Image is {img_size} bytes!")
 
-            plt.title(f"Result found: {result}")
-            plt.draw()
-            plt.pause(10)
-            plt.close()
+                print(f"Decoding image.")
+                # Decode image
+                image = cv2.imdecode(np.frombuffer(img_data, dtype=np.uint8), cv2.IMREAD_COLOR)
+                if image is None:
+                    print("Error: Failed to decode image.")
+                    socket.send_string("ERROR: Image decoding failed")
+                    continue
+                
+                print(f"Image decoded. Now beginning AI processing.")
+                # Display image
+                plt.figure(figsize=(10,10))
+                plt.imshow(image)
+                plt.axis('off')
+                plt.title("Processing Image")
+                plt.show(block=False)
 
-            print(f"Processing complete. Sending result back.")
-            # Send response
-            socket.send_string(result)
-            print(f"Sent response: {result[:50]}...")
-    
+                # Perform OCR
+                result = performOCR(image)
+
+                plt.title(f"Result found: {result}")
+                plt.draw()
+                plt.pause(10)
+                plt.close()
+
+                print(f"Processing complete. Sending result back.")
+                # Send response
+                socket.send_string(result)
+                print(f"Sent response: {result[:50]}...")
+            else:
+                pass
     except KeyboardInterrupt:
         print("Server interrupted")
     finally:
