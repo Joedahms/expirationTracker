@@ -12,8 +12,6 @@
 #include "../../logger.h"
 #include "helperFunctions.h"
 
-#define SERVER_ADDRESS "tcp://raspberrypi.local:5555" // mDNS to auto-resolve desktop
-
 enum TaskType { unknown, CLS, OCR, EXP };
 
 class IModel {
@@ -22,6 +20,7 @@ public:
       : logger(logFileName), requestSocket(context, zmqpp::socket_type::request),
         replySocket(context, zmqpp::socket_type::reply) {}
   virtual ~IModel() = default;
+  void connectToServer(std::string&);
 
 protected:
   Logger logger;

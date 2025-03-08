@@ -9,7 +9,6 @@ TextClassifier::TextClassifier(zmqpp::context& context,
                                const std::string& textClassifierEndpoint)
     : IModel("text_classifer.txt", context) {
   try {
-    this->requestSocket.connect(SERVER_ADDRESS);
     this->replySocket.bind(textClassifierEndpoint);
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
@@ -54,7 +53,10 @@ std::string TextClassifier::runModel(const std::filesystem::path& imagePath) {
   // Encode image as JPG
   this->logger.log("Compressing image");
   std::vector<uchar> encoded_image;
-  cv::imencode(".jpg", image, encoded_image);
+  if (!cv::imencode(".jpg", image, encoded_image)) {
+    LOG(FATAL) << "Error: Image encoding failed.";
+    return "IMAGE_ENCODE_ERROR";
+  }
   this->logger.log("Image Compressed");
 
   // Get image size
@@ -62,8 +64,6 @@ std::string TextClassifier::runModel(const std::filesystem::path& imagePath) {
 
   // Create ZeroMQ message
   zmqpp::message message;
-  zmqpp::message response;
-  std::string classID;
   message << img_size;                             // First frame: image size
   message.add_raw(encoded_image.data(), img_size); // Second frame: image bytes
 
@@ -79,10 +79,9 @@ std::string TextClassifier::runModel(const std::filesystem::path& imagePath) {
     response.get(extractedText, 0);
 
     this->logger.log("Received OCR result: " + extractedText);
+    return extractedText;
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << "ZeroMQ error: " << e.what();
     return "ZMQ_ERROR";
   }
-
-  return classID;
 }

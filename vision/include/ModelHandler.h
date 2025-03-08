@@ -15,6 +15,7 @@ public:
   ModelHandler(zmqpp::context&);
   bool classifyObject(const std::filesystem::path&, FoodItem&);
   bool extractExpirationDate(const std::filesystem::path&) const;
+  std::string discoverServerViaUDP();
 
 private:
   Logger logger;
