@@ -67,13 +67,22 @@ std::string TextClassifier::runModel(const std::filesystem::path& imagePath) {
   message << img_size;                             // First frame: image size
   message.add_raw(encoded_image.data(), img_size); // Second frame: image bytes
 
-  // Send message
-  this->logger.log("Sending image to model");
-  this->requestSocket.send(message);
-  this->logger.log("Image successfully sent to model. Bytes: " + img_size);
-  this->requestSocket.receive(response);
-  response.get(classID, 0);
-  this->logger.log("Received class back from model: " + classID);
+  try {
+    this->logger.log("Sending image to model");
+    this->requestSocket.send(message);
+    this->logger.log("Image sent successfully. Bytes: " + std::to_string(img_size));
+
+    // Receive OCR result
+    zmqpp::message response;
+    this->requestSocket.receive(response);
+    std::string extractedText;
+    response.get(extractedText, 0);
+
+    this->logger.log("Received OCR result: " + extractedText);
+  } catch (const zmqpp::exception& e) {
+    LOG(FATAL) << "ZeroMQ error: " << e.what();
+    return "ZMQ_ERROR";
+  }
 
   return classID;
 }
