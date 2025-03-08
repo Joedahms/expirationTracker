@@ -19,23 +19,22 @@ def run_server():
     try:
         while True:
             print("Waiting for image from Raspberry Pi...")
-            # Receive message (multipart: [size, image bytes])
-            msg_parts = socket.recv_multipart()
 
-            # Extract image size
-            img_size = struct.unpack("Q", msg_parts[0])[0]  # First frame: uint64_t size
+            # Use poll() to check for messages (prevents blocking)
+            if socket.poll(1000):  # 1000 ms timeout (1 sec)
+                msg_parts = socket.recv_multipart()
 
-            # Extract image data
-            img_data = msg_parts[1]  # Second frame: byte data
+                img_size = struct.unpack("Q", msg_parts[0])[0]
+                img_data = msg_parts[1]
 
-            print(f"Request received! {img_size} bytes.")
-            # Convert byte data to OpenCV image
-            image = cv2.imdecode(np.frombuffer(img_data, dtype=np.uint8), cv2.IMREAD_COLOR)
-            result = performOCR(image)  # Calls OCR module
-            
-            # Send response back to client
-            socket.send_string(result)
-            print(f"Sent response: {result[:50]}...")  # Print first 50 chars
+                print(f"Request received! {img_size} bytes.")
+                image = cv2.imdecode(np.frombuffer(img_data, dtype=np.uint8), cv2.IMREAD_COLOR)
+                result = performOCR(image)
+
+                socket.send_string(result)
+                print(f"Sent response: {result[:50]}...")
+            else:
+                print("No incoming data, server still running...")
     
     except KeyboardInterrupt:
         print("Server interrupted")
