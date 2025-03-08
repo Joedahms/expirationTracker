@@ -1,20 +1,35 @@
 #include "../include/ModelHandler.h"
 
-ModelHandler::ModelHandler(struct FoodItem& foodItem)
-    : objectClassifier(foodItem), textClassifier(foodItem) {}
+ModelHandler::ModelHandler(zmqpp::context& context)
+    : logger("model_handler.txt"),
+      textClassifier(context,
+                     VisionExternalEndpoints::textClassifierEndpoint,
+                     VisionExternalEndpoints::pythonServerEndpoint) {}
 
 /**
- * Run both object classification and text extraction to attempt to identify the item.
+ * Run text extraction to attempt to identify the item. Upon success, update the given
+ * FoodItem
  *
  * Input:
- * @param imagePath path to the image you wish to extract text from
- * @return whether successful or not
+ * @param imagePath Path to the image to extract text from
+ * @param foodItem foodItem to update
+ * @return Whether classification was successful or not
  */
-bool ModelHandler::classifyObject(const std::filesystem::path& imagePath) {
-  bool objectIdentified = this->objectClassifier.handleClassification(imagePath);
-  if (!objectIdentified) {
-    // try text extraction for classification
-    objectIdentified = this->textClassifier.handleClassification(imagePath);
+bool ModelHandler::classifyObject(const std::filesystem::path& imagePath,
+                                  FoodItem& foodItem) {
+  this->logger.log("Running text classificiation");
+  auto result = this->textClassifier.handleClassification(imagePath);
+  this->logger.log("Text classification complete");
+
+  // update foodItem
+  if (result) {
+    foodItem.setName(result.value());
+    foodItem.setImagePath(std::filesystem::absolute(imagePath));
+    foodItem.setCategory(FoodCategories::packaged);
+    foodItem.setQuantity(1);
+    foodItem.setExpirationDate(std::chrono::year_month_day{
+        std::chrono::year{2025}, std::chrono::month{3}, std::chrono::day{15}});
+    return true;
   }
-  return objectIdentified;
+  return false;
 }

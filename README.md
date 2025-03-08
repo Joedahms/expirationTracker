@@ -17,37 +17,21 @@ for controlling all hardware components such as the cameras, weight sensor, and 
 - Logan Pelkey (Software, Vision)
 - Joe Dahms (Software Display)
 
-# Setup instructions
-
-## Install necessary dependencies
-#### Refresh local package information:
-$ sudo apt update
-#### Install build tools
-$ sudo apt install make g++ cmake
-#### Install Google logging library
-$ sudo apt install libgoogle-glog-dev
-#### Install SDL
-$ sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev  
-#### Install OPENCV
-$ sudo apt install libopencv-dev
-#### Install SQLite
-$ sudo apt install sqlite3 libsqlite3-dev
-#### Install mesa
-$ sudo add-apt-repository ppa:kisak/kisak-mesa
-
-## Setup Python virual environment
-NOTE: To setup the Python virtual environment you must be in the build directory.
-#### Create the virtual environment
-$ python3 -m venv models-venv
-#### Activate it
-$ source models-venv/bin/activate
-#### Install EasyOCR inside the virtual environment
-$ pip install easyocr
-#### Install Efficientnet within the virtual environment
-$ pip install efficientnet
-#### Install Tensorflow
-$ pip install tensorflow
-
+# Setup
+````plaintext
+sudo chmod 777 install.sh
+./install.sh \
+````
+### WiringPi Setup
+#### For if you just need to make a file
+````plaintet
+gcc -o myapp myapp.cpp -l wiringPi
+````
+# Usage
+````plaintet
+source models-venv/bin/activate
+$ ./expirationTracker
+````
 # Developer Notes
 ## Function Comment Format (javadoc)
 /**  
@@ -58,5 +42,4 @@ $ pip install tensorflow
  \* @param Name of Input 2 Description of Input 2  
  \* @return Description of return value
  */  
-
-
+ 

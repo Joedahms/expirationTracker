@@ -27,23 +27,6 @@ bool hasFiles(const std::filesystem::path& dirPath) {
 }
 
 /**
- * Wrapper method to close pipes for vision
- *
- * Input:
- * @param pipes pipe struct to close from
- * Output: none
- */
-void closeUnusedPipes(struct Pipes& pipes) {
-  // Close write end of read pipes
-  close(pipes.displayToVision[WRITE]);
-  close(pipes.hardwareToVision[WRITE]);
-
-  // Close read end of write pipes
-  close(pipes.visionToDisplay[READ]);
-  close(pipes.visionToHardware[READ]);
-}
-
-/**
  * convert string to all lowercase
  *
  * Input:
