@@ -23,7 +23,7 @@ Hardware::Hardware(zmqpp::context& context)
   }
 }
 
-/*
+/**
  * Checks for a start signal from the display.
  * Used to start the scan process
  *
@@ -56,7 +56,7 @@ bool Hardware::checkStartSignal(int timeoutMs) {
   }
 }
 
-/*
+/**
  * Sends the photo directory and weight data to the AI Vision system.
  *
  * @param weight The weight of the object on the platform.
@@ -90,14 +90,6 @@ void Hardware::sendStartToVision() {
  *
  * TODO Handle no weight on platform
  */
-/*
- * Function call to controls routine:
- * Checks weight
- * weight = ~0 -> error to Display
- * weight = +int -> start scan
- *
- * @return bool
- * */
 bool Hardware::startScan() {
   this->logger.log("Starting scan");
 
@@ -135,7 +127,7 @@ bool Hardware::checkWeight() {
   return true;
 }
 
-/*
+/**
  * Rotates platform in 45-degree increments, captures images, and sends the
  * data to the AI Vision system until a full 360-degree rotation is complete.
  * The process can be stopped early if AI Vision sends a "STOP" signal
@@ -160,7 +152,7 @@ void Hardware::rotateAndCapture() {
     //   this->logger.log("Error taking a photo");
     // }
 
-    // Initiate scan
+    // Initiate image scanning on server
     if (angle == 0) {
       sendStartToVision();
     }
@@ -184,8 +176,6 @@ void Hardware::rotateAndCapture() {
         receivedStopSignal = true;
       }
       else {
-        // Could skip receivedStopSignal and this else statement and just break if "item
-        // identified"
         this->logger.log("Received other from vision");
         this->replySocket.send(Messages::RETRANSMIT);
       }
@@ -198,7 +188,7 @@ void Hardware::rotateAndCapture() {
   }
 }
 
-/*
+/**
  * Takes two photos, one top & side, saves them to the image directory, and logs
  * Note: current "top camera" is ribbon port closer to USB
  *
@@ -227,7 +217,7 @@ bool Hardware::takePhotos(int angle) {
   return true;
 }
 
-/*
+/**
  * Test Function
  * Captures a photo at the given angle and saves it to the image directory
  *
