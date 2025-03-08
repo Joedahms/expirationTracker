@@ -20,9 +20,8 @@ def run_server():
         while True:
             print("Waiting for image from Raspberry Pi...")
 
-            # Use poll() to check for messages (prevents blocking)
-            if socket.poll(1000):  # 1000 ms timeout (1 sec)
-                msg_parts = socket.recv_multipart()
+            try:
+                msg_parts = socket.recv_multipart(flags=zmq.NOBLOCK)  # Non-blocking receive
 
                 img_size = struct.unpack("Q", msg_parts[0])[0]
                 img_data = msg_parts[1]
@@ -33,7 +32,8 @@ def run_server():
 
                 socket.send_string(result)
                 print(f"Sent response: {result[:50]}...")
-            else:
+                
+            except zmq.Again:  # Timeout reached
                 print("No incoming data, server still running...")
     
     except KeyboardInterrupt:
