@@ -2,14 +2,9 @@
 #define ITEM_LIST_H
 
 #include <chrono>
-#include <memory>
-#include <sqlite3.h>
-#include <vector>
 
-#include "../../../../food_item.h"
+#include "../../engine/elements/element_mediator.h"
 #include "../display_global.h"
-#include "../elements/scroll_box.h"
-#include "../elements/text.h"
 #include "state.h"
 
 /**
@@ -25,6 +20,8 @@ private:
   std::chrono::steady_clock::time_point previousUpdate;
   std::chrono::steady_clock::time_point currentUpdate;
   SDL_Point mousePosition;
+
+  Mediator mediator;
 };
 
 #endif

@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "../display_global.h"
+#include "element_mediator.h"
 
 /**
  * Defines the interface for an SDL element. This is any basic shape or texture to be
@@ -13,7 +14,7 @@
 class Element {
 public:
   virtual ~Element() = default;
-  virtual void addElement(std::unique_ptr<Element> element) {}
+  virtual void addElement(std::shared_ptr<Element> element) {}
   virtual void update();
   virtual void render() const;
   virtual void handleEvent(const SDL_Event& event) = 0;
@@ -21,6 +22,7 @@ public:
   virtual std::string getContent() const;
   virtual void setContent(const std::string& content) {}
 
+  void setMediator(std::shared_ptr<Mediator> mediator);
   void setParent(Element* parent);
 
   SDL_Point getPositionRelativeToParent();
@@ -46,6 +48,7 @@ public:
 
 protected:
   struct DisplayGlobal displayGlobal;
+  int id                             = -1;
   SDL_Rect boundaryRectangle         = {0, 0, 0, 0};
   SDL_Point positionRelativeToParent = {0, 0};
   Element* parent                    = nullptr;
@@ -54,6 +57,8 @@ protected:
   bool centerWithinParent            = false;
   bool centerVerticalWithinParent    = false;
   bool centerHorizontalWithinParent  = false;
+
+  std::weak_ptr<Mediator> mediator;
 
   void setupPosition(const SDL_Rect& boundaryRectangle);
   void hasParentUpdate();

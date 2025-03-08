@@ -27,31 +27,33 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
   rootRectangle.w        = windowSurface->w;
   rootRectangle.h        = windowSurface->h;
   std::cout << rootRectangle.w << std::endl;
-  this->rootElement = std::make_unique<Container>(rootRectangle);
+  this->rootElement = std::make_shared<Container>(rootRectangle);
 
   SDL_Rect scrollBoxRect = {0, 0, 400, 100};
   int windowWidth, windowHeight;
   SDL_GetWindowSize(this->displayGlobal.window, &windowWidth, &windowHeight);
   scrollBoxRect.h = windowHeight - 1;
-  std::unique_ptr<ScrollBox> scrollBox =
-      std::make_unique<ScrollBox>(this->displayGlobal, scrollBoxRect);
+  std::shared_ptr<ScrollBox> scrollBox =
+      std::make_shared<ScrollBox>(this->displayGlobal, scrollBoxRect);
   scrollBox->setPanelHeight(30);
   scrollBox->addBorder(1);
+  this->mediator.addScrollBox(scrollBox);
   this->rootElement->addElement(std::move(scrollBox));
   this->rootElement->update();
 
-  std::unique_ptr<Dropdown> sortBy =
-      std::make_unique<Dropdown>(this->displayGlobal, SDL_Rect{450, 0, 0, 0}, "Sort by:");
-  std::unique_ptr<Button> sortByExpirationLowToHigh = std::make_unique<Button>(
+  std::shared_ptr<Dropdown> sortBy =
+      std::make_shared<Dropdown>(this->displayGlobal, SDL_Rect{450, 0, 0, 0}, "Sort by:");
+  std::shared_ptr<Button> sortByExpirationLowToHigh = std::make_shared<Button>(
       this->displayGlobal, SDL_Rect{0, 0, 0, 0}, "Expiration Date - Highest to Lowest",
       SDL_Point{0, 0}, [this]() {});
-  std::unique_ptr<Button> sortByExpirationHighToLow = std::make_unique<Button>(
+  std::shared_ptr<Button> sortByExpirationHighToLow = std::make_shared<Button>(
       this->displayGlobal, SDL_Rect{0, 0, 0, 0}, "Expiration Date - Lowest to Highest",
       SDL_Point{0, 0}, [this]() {});
 
   sortBy->addOption(std::move(sortByExpirationLowToHigh));
   sortBy->update();
   sortBy->addOption(std::move(sortByExpirationHighToLow));
+  this->mediator.addDropdown(sortBy);
   this->rootElement->addElement(std::move(sortBy));
 }
 
