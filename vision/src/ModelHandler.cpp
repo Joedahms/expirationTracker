@@ -2,9 +2,7 @@
 
 ModelHandler::ModelHandler(zmqpp::context& context)
     : logger("model_handler.txt"),
-      textClassifier(context,
-                     VisionExternalEndpoints::textClassifierEndpoint,
-                     VisionExternalEndpoints::pythonServerEndpoint) {}
+      textClassifier(context, VisionExternalEndpoints::textClassifierEndpoint) {}
 
 /**
  * Run text extraction to attempt to identify the item. Upon success, update the given

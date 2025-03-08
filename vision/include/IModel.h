@@ -4,12 +4,15 @@
 #include <filesystem>
 #include <fstream>
 #include <glog/logging.h>
+#include <opencv2/opencv.hpp>
 #include <optional>
 #include <string>
 
 #include "../../food_item.h"
 #include "../../logger.h"
 #include "helperFunctions.h"
+
+#define SERVER_ADDRESS "tcp://raspberrypi.local:5555" // mDNS to auto-resolve desktop
 
 enum TaskType { unknown, CLS, OCR, EXP };
 

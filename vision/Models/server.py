@@ -1,44 +1,37 @@
 import os
 import zmq
-from easyOCR import performOCR, performOCRWithZooming
-#from efficientNet import classify_image
+import struct
+import cv2
+import numpy as np
+from easyOCR import performOCR
+
+PORT = "5555"
+ADDRESS = f"tcp://0.0.0.0:{PORT}"  # Bind to all interfaces
 
 def run_server():
     # Create ZeroMQ context and socket
     context = zmq.Context()
     socket = context.socket(zmq.REP)
+    socket.bind(ADDRESS)
     
-    # Bind socket to an endpoint
-    # Using IPC transport for local interprocess communication
-    endpoint = "ipc:///tmp/python_server_endpoint"
-    socket.bind(endpoint)
-    
-    print(f"Server started on {endpoint}")
+    print(f"Server started on {ADDRESS}")
     
     try:
         while True:
-            print(f"Waiting for request");
-            # Wait for request from client
-            request = socket.recv_string()
-            print(f"Received request: {request}")
+            print("Waiting for image from Raspberry Pi...")
+            # Receive message (multipart: [size, image bytes])
+            msg_parts = socket.recv_multipart()
 
-            # Check for exit command
-            if request == "exit":
-                socket.send_string("Server shutting down")
-                break
-            
-            # Process the request
-            parts = request.split(" ", 1)
-            if len(parts) != 2:
-                result = "ERROR: Invalid request format"
-            else:
-                task_type, image_path = parts
-                if task_type == "OCR":
-                    result = performOCR(image_path)  # Calls OCR module
-                #elif task_type == "CLS":
-                    #result = classify_image(image_path)  # Calls classifier module
-                else:
-                    result = f"ERROR: Unknown task type '{task_type}'"
+            # Extract image size
+            img_size = struct.unpack("Q", msg_parts[0])[0]  # First frame: uint64_t size
+
+            # Extract image data
+            img_data = msg_parts[1]  # Second frame: byte data
+
+            print(f"Request received! {img_size} bytes.")
+            # Convert byte data to OpenCV image
+            image = cv2.imdecode(np.frombuffer(img_data, dtype=np.uint8), cv2.IMREAD_COLOR)
+            result = performOCR(image)  # Calls OCR module
             
             # Send response back to client
             socket.send_string(result)

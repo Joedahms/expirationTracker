@@ -6,11 +6,10 @@
  * @param pythonServerEndpoint Endpont of the python server
  */
 TextClassifier::TextClassifier(zmqpp::context& context,
-                               const std::string& textClassifierEndpoint,
-                               const std::string& pythonServerEndpoint)
+                               const std::string& textClassifierEndpoint)
     : IModel("text_classifer.txt", context) {
   try {
-    this->requestSocket.connect(pythonServerEndpoint);
+    this->requestSocket.connect(SERVER_ADDRESS);
     this->replySocket.bind(textClassifierEndpoint);
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
@@ -44,12 +43,37 @@ std::optional<std::string> TextClassifier::handleClassification(
  */
 std::string TextClassifier::runModel(const std::filesystem::path& imagePath) {
   this->logger.log("Entering runModel");
-
-  std::string result = sendRequest(TaskType::OCR, imagePath);
-
-  if (result.find("ERROR") != std::string::npos) {
-    LOG(FATAL) << result;
+  // Load image
+  this->logger.log("Loading image");
+  cv::Mat image = cv::imread(imagePath);
+  if (image.empty()) {
+    LOG(FATAL) << "Error: Could not load image.";
+    return "SHIIIIII";
   }
-  this->logger.log("Result from running model: " + result);
-  return result;
+  this->logger.log("Image loaded");
+  // Encode image as JPG
+  this->logger.log("Compressing image");
+  std::vector<uchar> encoded_image;
+  cv::imencode(".jpg", image, encoded_image);
+  this->logger.log("Image Compressed");
+
+  // Get image size
+  uint64_t img_size = encoded_image.size();
+
+  // Create ZeroMQ message
+  zmqpp::message message;
+  zmqpp::message response;
+  std::string classID;
+  message << img_size;                             // First frame: image size
+  message.add_raw(encoded_image.data(), img_size); // Second frame: image bytes
+
+  // Send message
+  this->logger.log("Sending image to model");
+  this->requestSocket.send(message);
+  this->logger.log("Image successfully sent to model. Bytes: " + img_size);
+  this->requestSocket.receive(response);
+  response.get(classID, 0);
+  this->logger.log("Received class back from model: " + classID);
+
+  return classID;
 }
