@@ -85,6 +85,9 @@ def run_server():
             # Perform OCR
             result = performOCR(image)
 
+            plt.title(f"Result found: {result}")
+            plt.draw()
+            plt.pause(10)
             plt.close()
 
             print(f"Processing complete. Sending result back.")
