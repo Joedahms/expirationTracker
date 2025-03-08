@@ -74,9 +74,14 @@ def run_server():
                 socket.send_string("ERROR: Image decoding failed")
                 continue
             
-            print(f"Image decoding. Now beginning AI processing.")
+            print(f"Image decoded. Now beginning AI processing.")
+            cv2.imshow("Processing Image", image)
+            cv2.waitKey(1)  # Allows the window to update
+            
             # Perform OCR
             result = performOCR(image)
+
+            cv2.destroyAllWindows()
 
             print(f"Processing complete. Sending result back.")
             # Send response
