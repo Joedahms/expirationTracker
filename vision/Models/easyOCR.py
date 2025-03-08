@@ -6,7 +6,7 @@ import numpy as np
 from foodClasses import textClasses, pluMapping
 
 try:
-    reader = easyocr.Reader(['en'], gpu=False)
+    reader = easyocr.Reader(['en'], gpu=True)
 except Exception as e:
     raise(f"ERROR: OCR model loading failed: {str(e)}")
 
