@@ -123,7 +123,11 @@ void DisplayHandler::detectionSuccess() {
   this->logger.log("Item detection succeeded, receiving food item");
   FoodItem foodItem;
   this->replySocket.send(Messages::AFFIRMATIVE);
-  receiveFoodItem(this->replySocket, Messages::AFFIRMATIVE, foodItem);
+  bool foodItemReceived = false;
+  while (foodItemReceived == false) {
+    foodItemReceived =
+        receiveFoodItem(this->replySocket, Messages::AFFIRMATIVE, foodItem);
+  }
 
   this->logger.log("Food item received: ");
   foodItem.logToFile(this->logger);
