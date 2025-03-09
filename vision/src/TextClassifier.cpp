@@ -27,8 +27,8 @@ std::optional<std::string> TextClassifier::handleClassification(
   auto result = this->runModel(imagePath);
 
   std::string detectedClass = std::string(result);
-  if (detectedClass.find("CLASSIFICATION") != std::string::npos) {
-    return removePrefix(detectedClass, "CLASSIFICATION: ");
+  if (!detectedClass.empty()) {
+    return detectedClass;
   }
   return std::nullopt;
 }
@@ -82,10 +82,27 @@ std::string TextClassifier::runModel(const std::filesystem::path& imagePath) {
     std::string expirationDate     = "";
     try {
       nlohmann::json formatText = nlohmann::json::parse(extractedText);
-      foodClassification        = formatText["Food Labels"];
-      expirationDate            = formatText["Expiration Date"];
+
+      if (formatText.contains("Food Labels")) {
+        if (formatText["Food Labels"].is_array()) {
+          for (const auto& label : formatText["Food Labels"]) {
+            if (!foodClassification.empty()) {
+              foodClassification += ", ";
+            }
+            foodClassification += label.get<std::string>();
+          }
+        }
+        else {
+          foodClassification = formatText["Food Labels"].get<std::string>();
+        }
+      }
+
+      if (formatText.contains("Expiration Date")) {
+        expirationDate = formatText["Expiration Date"];
+      }
+
     } catch (nlohmann::json::parse_error& e) {
-      std::cerr << "JSON Parse Error: " << e.what() << std::endl;
+      LOG(FATAL) << "JSON Parse Error: " << e.what();
     }
 
     this->logger.log("Received classification result: " + foodClassification);

@@ -113,10 +113,15 @@ def performOCR(image):
             if classification:
                 food_labels.append(classification["value"])
 
-        return {
-            "Food Labels": food_labels if food_labels else "No food classification found",
-            "Expiration Date": expiration_date
-        }
+        result = {}
+
+        if food_labels:
+            result["Food Labels"] = food_labels
+
+        if expiration_date and expiration_date != "No expiration date detected":
+            result["Expiration Date"] = expiration_date
+
+        return result  # Only includes keys if values exist
 
     except Exception as e:
         return {"Error": str(e)}
