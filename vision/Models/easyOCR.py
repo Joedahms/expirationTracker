@@ -25,21 +25,40 @@ def isFoodClass(text):
 
     return None
 
+def extract_expiration_date(text_list):
+    """Extract expiration dates from text using various formats."""
+
+    # Common expiration date patterns
+    date_patterns = [
+        r'(\b\d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b)',  # MM/DD/YYYY or DD/MM/YYYY or YYYY/MM/DD
+        r'(\b\d{4}[./-]\d{1,2}[./-]\d{1,2}\b)',  # YYYY-MM-DD or YYYY/MM/DD
+        r'(\b\d{1,2} [A-Za-z]{3,} \d{2,4}\b)',  # 12 Jan 2024 or 5 July 23
+        r'(\b[A-Za-z]{3,} \d{1,2},? \d{2,4}\b)',  # Jan 12, 2024 or July 5 23
+        r'(\b\d{1,2}[./-]\d{1,2}\b)',  # MM/DD or DD/MM (common short format)
+        r'(\bEXP:? \d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b)',  # EXP 12/01/2024
+        r'(\bBest Before:? \d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b)',  # Best Before 01-2025
+        r'(\bUse By:? \d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b)',  # Use By 12-2023
+        r'(\bSell By:? \d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b)',  # Sell By 03/25
+        r'(\bExp:? \d{1,2}[./-]\d{1,2}\b)',  # Exp 12/23
+        r'(\bEXP:? \d{1,2}[./-]\d{1,2}\b)',  # EXP 12-23
+    ]
+
+    detected_dates = []
+
+    # Check each text line for expiration date patterns
+    for text in text_list:
+        for pattern in date_patterns:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                detected_dates.append(match.group(1))
+
+    return detected_dates if detected_dates else "No expiration date detected"
+
 def preprocessImage(img):
     print("Preprocessing image")
     
     if img is None:
         return("Image not found")
-    
-    # Ensure minimum width while maintaining aspect ratio
-    min_width = 600
-    height, width = img.shape[:2]
-    
-    if width < min_width:
-        scale = min_width / width
-        new_width = int(width * scale)
-        new_height = int(height * scale)
-        img = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
 
     # Convert to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -72,25 +91,32 @@ def preprocessImage(img):
     print("Image Preprocessed")
     return processed  # Return improved image as a NumPy array
     
-def performOCR(image_path):
+def performOCR(image):
     print("Performing OCR")
-    processed_image = preprocessImage(image_path)
+    processed_image = preprocessImage(image)
     if isinstance(processed_image, str):
         return(f"ERROR: {processed_image}")
 
     try:
-        print("Reading text");
-        results = reader.readtext(processed_image, detail=0, paragraph=True, text_threshold=0.8)
-        print("Text read");
+        print("Reading text...")
+        results = reader.readtext(processed_image, detail=0, paragraph=True, text_threshold=0.7)
+        print("Text read")
 
-        # Filter only valid classifications
-        filtered_results = [isFoodClass(text) for text in results if isFoodClass(text)]
+        # Extract expiration date
+        expiration_date = extract_expiration_date(results)
 
-        print("OCR performed")
-        if filtered_results:
-            for result in filtered_results:
-                return(f"CLASSIFICATION: {result['value']}")
-        else:
-            return("INFO: No valid classifications found")
+        print(f"\n\nRESULTS: {results}\n\n")
+        # Extract PLU codes and classify food labels
+        food_labels = []
+        for text in results:
+            classification = isFoodClass(text)
+            if classification:
+                food_labels.append(classification["value"])
+
+        return {
+            "Food Labels": food_labels if food_labels else "No food classification found",
+            "Expiration Date": expiration_date
+        }
+
     except Exception as e:
-        return(f"ERROR: {str(e)}")
+        return {"Error": str(e)}

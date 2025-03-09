@@ -78,8 +78,17 @@ std::string TextClassifier::runModel(const std::filesystem::path& imagePath) {
     std::string extractedText;
     response.get(extractedText, 0);
 
-    this->logger.log("Received OCR result: " + extractedText);
-    return extractedText;
+    std::string foodLabel = "";
+    try {
+      nlohmann::json formatText = nlohmann::json::parse(extractedText);
+      foodLabel                 = formatText["Food Labels"];
+    } catch (nlohmann::json::parse_error& e) {
+      std::cerr << "JSON Parse Error: " << e.what() << std::endl;
+    }
+
+    this->logger.log("Received OCR result: " + foodLabel);
+
+    return foodLabel;
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << "ZeroMQ error: " << e.what();
     return "ZMQ_ERROR";

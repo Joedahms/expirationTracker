@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <fstream>
 #include <glog/logging.h>
+#include <nlohmann/json.hpp>
 #include <opencv2/opencv.hpp>
 #include <optional>
 #include <string>
