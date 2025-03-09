@@ -21,9 +21,9 @@ Button::Button(struct DisplayGlobal displayGlobal,
                const SDL_Point& textPadding,
                std::function<void()> callback,
                const std::string& logFile)
-    : textPadding(textPadding), onClick(callback) {
+    : textContent(textContent), textPadding(textPadding), onClick(callback) {
   this->logger = std::make_unique<Logger>(logFile);
-  this->logger->log("Constructing " + textContent + " button");
+  this->logger->log("Constructing " + this->textContent + " button");
 
   this->displayGlobal = displayGlobal;
 
@@ -39,7 +39,7 @@ Button::Button(struct DisplayGlobal displayGlobal,
   SDL_Rect textRect          = {textPadding.x, textPadding.y, 0, 0};
   std::unique_ptr<Text> text = std::make_unique<Text>(
       this->displayGlobal, textRect, "../display/fonts/16020_FUTURAM.ttf",
-      textContent.c_str(), 24, textColor);
+      this->textContent.c_str(), 24, textColor);
   text->setCentered();
 
   // Size based on text
@@ -50,7 +50,7 @@ Button::Button(struct DisplayGlobal displayGlobal,
   }
 
   addElement(std::move(text));
-  this->logger->log(textContent + " button constructed");
+  this->logger->log(this->textContent + " button constructed");
 }
 
 Button::Button(struct DisplayGlobal displayGlobal,
@@ -59,9 +59,9 @@ Button::Button(struct DisplayGlobal displayGlobal,
                const SDL_Point& textPadding,
                const std::string& notifyMessage,
                const std::string& logFile)
-    : textPadding(textPadding), notifyMessage(notifyMessage) {
+    : textContent(textContent), textPadding(textPadding), notifyMessage(notifyMessage) {
   this->logger = std::make_unique<Logger>(logFile);
-  this->logger->log("Constructing " + textContent + " button");
+  this->logger->log("Constructing " + this->textContent + " button");
 
   this->displayGlobal = displayGlobal;
 
@@ -77,7 +77,7 @@ Button::Button(struct DisplayGlobal displayGlobal,
   SDL_Rect textRect          = {textPadding.x, textPadding.y, 0, 0};
   std::unique_ptr<Text> text = std::make_unique<Text>(
       this->displayGlobal, textRect, "../display/fonts/16020_FUTURAM.ttf",
-      textContent.c_str(), 24, textColor);
+      this->textContent.c_str(), 24, textColor);
   text->setCentered();
 
   // Size based on text
@@ -88,18 +88,28 @@ Button::Button(struct DisplayGlobal displayGlobal,
   }
 
   addElement(std::move(text));
-  this->logger->log(textContent + " button constructed");
+  this->logger->log(this->textContent + " button constructed");
 }
 
 void Button::initialize() {
+  this->logger->log("Initializing " + this->textContent + " button");
+
   this->onClick = [this]() {
     if (auto mediatorShared = this->mediator.lock()) {
+      this->logger->log(this->textContent + " button notifying mediator with message " +
+                        this->notifyMessage);
+
       mediatorShared->notify(shared_from_this(), this->notifyMessage);
+
+      this->logger->log(this->textContent + " button successfully notified mediator");
     }
     else {
+      this->logger->log(this->textContent + " button unable to get mediator lock");
       // uh oh
     }
   };
+
+  this->logger->log("Successfully initialized " + this->textContent + " button");
 }
 
 /**
@@ -115,6 +125,7 @@ void Button::updateSelf() {
 
   // Change color if hovered
   if (checkHovered()) {
+    this->logger->log(this->textContent + " button hovered");
     this->backgroundColor = this->hoveredColor;
   }
   else {
@@ -145,7 +156,9 @@ void Button::renderSelf() const {
 void Button::handleEventSelf(const SDL_Event& event) {
   if (event.type == SDL_MOUSEBUTTONDOWN) {
     if (checkHovered() == true) {
+      this->logger->log(this->textContent + " button clicked");
       onClick();
+      this->logger->log(this->textContent + " button click callback successful");
     }
   }
 }

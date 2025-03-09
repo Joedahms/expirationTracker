@@ -51,6 +51,7 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger(LogFiles::itemLi
       this->displayGlobal, SDL_Rect{0, 0, 0, 0}, "Expiration Date - Highest to Lowest",
       SDL_Point{0, 0}, "sort_changed", LogFiles::itemList);
   sortByExpirationLowToHigh->initialize();
+  this->mediator->addButton(sortByExpirationLowToHigh);
   std::shared_ptr<Button> sortByExpirationHighToLow = std::make_shared<Button>(
       this->displayGlobal, SDL_Rect{0, 0, 0, 0}, "Expiration Date - Lowest to Highest",
       SDL_Point{0, 0}, [this]() {}, LogFiles::itemList);

@@ -37,6 +37,7 @@ public:
   void handleEventSelf(const SDL_Event& event) override;
 
 private:
+  std::string textContent;
   std::function<void()> onClick;
   SDL_Color backgroundColor;
   SDL_Color defaultColor;
