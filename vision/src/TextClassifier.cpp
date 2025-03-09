@@ -77,16 +77,19 @@ std::string TextClassifier::runModel(const std::filesystem::path& imagePath) {
     this->requestSocket.receive(response);
     std::string extractedText;
     response.get(extractedText, 0);
-
-    std::string foodLabel = "";
+    this->logger.log("Received raw OCR result:" + extractedText);
+    std::string foodClassification = "";
+    std::string expirationDate     = "";
     try {
       nlohmann::json formatText = nlohmann::json::parse(extractedText);
-      foodLabel                 = formatText["Food Labels"];
+      foodClassification        = formatText["Food Labels"];
+      expirationDate            = formatText["Expiration Date"];
     } catch (nlohmann::json::parse_error& e) {
       std::cerr << "JSON Parse Error: " << e.what() << std::endl;
     }
 
-    this->logger.log("Received OCR result: " + foodLabel);
+    this->logger.log("Received classification result: " + foodClassification);
+    this->logger.log("Received expiration date result: " + expirationDate);
 
     return foodLabel;
   } catch (const zmqpp::exception& e) {
