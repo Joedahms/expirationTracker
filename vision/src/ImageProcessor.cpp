@@ -94,6 +94,7 @@ bool ImageProcessor::analyze() {
       //  Only runs text atm
       if (!objectDetected) {
         if (this->modelHandler.classifyObject(entry.path(), this->foodItem)) {
+          this->logger.log("Detection successful. Exiting analyze method");
           objectDetected = true;
           return true;
         }
