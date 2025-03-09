@@ -20,7 +20,7 @@ void Mediator::addDropdown(std::shared_ptr<Dropdown> dropDown) {
 }
 
 void Mediator::notify(std::shared_ptr<Element> sender, const std::string& event) {
-  if (event == "sort_changed") {
-    std::cout << "sort changed" << std::endl;
+  if (event == "low to high") {
+    std::cout << "low to high" << std::endl;
   }
 }
