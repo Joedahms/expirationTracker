@@ -91,7 +91,7 @@ std::string TextClassifier::runModel(const std::filesystem::path& imagePath) {
     this->logger.log("Received classification result: " + foodClassification);
     this->logger.log("Received expiration date result: " + expirationDate);
 
-    return foodLabel;
+    return foodClassification;
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << "ZeroMQ error: " << e.what();
     return "ZMQ_ERROR";
