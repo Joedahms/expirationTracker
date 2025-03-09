@@ -15,8 +15,8 @@
 /**
  * @param displayGlobal Global display variables.
  */
-ItemList::ItemList(struct DisplayGlobal displayGlobal) {
-  // ItemList::ItemList(struct DisplayGlobal displayGlobal) {
+ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger("item_list_state.txt") {
+  this->logger.log("Constructing item list state");
   this->currentState = EngineState::ITEM_LIST;
 
   this->displayGlobal = displayGlobal;
@@ -59,6 +59,8 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) {
   sortBy->addOption(std::move(sortByExpirationHighToLow));
   this->mediator->addDropdown(sortBy);
   this->rootElement->addElement(std::move(sortBy));
+
+  this->logger.log("Item list state constructed");
 }
 
 /**
@@ -71,6 +73,7 @@ EngineState ItemList::checkKeystates() {
   const Uint8* keystates = SDL_GetKeyboardState(NULL);
 
   if (keystates[SDL_SCANCODE_ESCAPE]) {
+    this->logger.log("Escape key pressed in item list");
     return EngineState::PAUSE_MENU;
   }
 

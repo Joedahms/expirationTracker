@@ -43,6 +43,7 @@ add_executable(expirationTracker
   main.cpp
   food_item.cpp
   endpoints.cpp
+  logger.cpp
   
 
   display/src/engine/display_global.cpp

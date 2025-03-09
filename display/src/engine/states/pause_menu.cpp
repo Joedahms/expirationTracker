@@ -10,7 +10,10 @@
  * @param displayGlobal Global display variables
  * @return None
  */
-PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
+PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal)
+    : logger("pause_menu_state.txt") {
+  this->logger.log("Constructing pause menu state");
+
   this->currentState         = EngineState::PAUSE_MENU;
   this->displayGlobal        = displayGlobal;
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
@@ -45,6 +48,8 @@ PauseMenu::PauseMenu(struct DisplayGlobal displayGlobal) {
       [this]() { this->currentState = EngineState::MAIN_MENU; });
   mainMenuButton->setCenteredHorizontal();
   this->rootElement->addElement(std::move(mainMenuButton));
+
+  this->logger.log("Constructed pause menu state");
 }
 
 /**

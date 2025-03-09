@@ -27,6 +27,13 @@ public:
          const SDL_Rect& boundaryRectangle,
          const std::string& textContent,
          const SDL_Point& textPadding,
+         std::function<void()> callback,
+         const std::string& logFile);
+
+  Button(struct DisplayGlobal displayGlobal,
+         const SDL_Rect& boundaryRectangle,
+         const std::string& textContent,
+         const SDL_Point& textPadding,
          const std::string& notifyMessage);
 
   void initialize();

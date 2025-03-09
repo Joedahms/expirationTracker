@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <memory>
 
+#include "../../../../logger.h"
 #include "../display_global.h"
 #include "element_mediator.h"
 
@@ -47,6 +48,7 @@ public:
   void renderBorder() const;
 
 protected:
+  std::unique_ptr<Logger> logger;
   struct DisplayGlobal displayGlobal;
   int id                             = -1;
   SDL_Rect boundaryRectangle         = {0, 0, 0, 0};

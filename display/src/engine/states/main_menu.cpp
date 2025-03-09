@@ -10,10 +10,9 @@
 /**
  * @param displayGlobal Global display variables.
  */
-MainMenu::MainMenu(struct DisplayGlobal displayGlobal) : logger(DisplayGlobal::logger) {
+MainMenu::MainMenu(struct DisplayGlobal displayGlobal) : logger("main_menu_state.txt") {
+  this->logger.log("Constructing main menu state");
   this->currentState = EngineState::MAIN_MENU;
-
-  this->logger.log("test");
 
   this->displayGlobal        = displayGlobal;
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
@@ -37,7 +36,7 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) : logger(DisplayGlobal::l
   SDL_Rect newScanButtonRectangle       = {200, 150, 200, 50};
   std::unique_ptr<Button> newScanButton = std::make_unique<Button>(
       this->displayGlobal, newScanButtonRectangle, "Scan New Item", SDL_Point{10, 10},
-      [this]() { this->currentState = EngineState::SCANNING; });
+      [this]() { this->currentState = EngineState::SCANNING; }, "main_menu_state.txt");
   newScanButton->setCenteredHorizontal();
   rootElement->addElement(std::move(newScanButton));
 
@@ -48,6 +47,8 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) : logger(DisplayGlobal::l
       SDL_Point{10, 10}, [this]() { this->currentState = EngineState::ITEM_LIST; });
   viewStoredButton->setCenteredHorizontal();
   rootElement->addElement(std::move(viewStoredButton));
+
+  this->logger.log("Main menu state successfully constructed");
 }
 
 /**

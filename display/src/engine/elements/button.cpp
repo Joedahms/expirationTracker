@@ -48,6 +48,51 @@ Button::Button(struct DisplayGlobal displayGlobal,
   addElement(std::move(text));
 }
 
+/**
+ * @param displayGlobal Global display variables
+ * @param boundaryRectangle Rectangle to describe the position relative to parent element
+ * as well as the width and height. The x and y parameters of the rectangle are used as
+ * the position relative to the parent.
+ * @param textContent The text to print in the middle of the button
+ * @param textPadding How offset the text should be from parent
+ * @param callback The callback function to execute when the button is clicked
+ */
+Button::Button(struct DisplayGlobal displayGlobal,
+               const SDL_Rect& boundaryRectangle,
+               const std::string& textContent,
+               const SDL_Point& textPadding,
+               std::function<void()> callback,
+               const std::string& logFile)
+    : textPadding(textPadding), onClick(callback) {
+  this->logger = std::make_unique<Logger>(logFile);
+  this->logger->log("test");
+  this->displayGlobal = displayGlobal;
+
+  setupPosition(boundaryRectangle);
+
+  // Colors
+  this->backgroundColor = {255, 0, 0, 255}; // Red
+  this->hoveredColor    = {0, 255, 0, 255}; // Green
+  this->defaultColor    = {255, 0, 0, 255}; // Red
+
+  // Button Text
+  SDL_Color textColor        = {255, 255, 0, 255}; // Yellow
+  SDL_Rect textRect          = {textPadding.x, textPadding.y, 0, 0};
+  std::unique_ptr<Text> text = std::make_unique<Text>(
+      this->displayGlobal, textRect, "../display/fonts/16020_FUTURAM.ttf",
+      textContent.c_str(), 24, textColor);
+  text->setCentered();
+
+  // Size based on text
+  if (this->boundaryRectangle.w == 0 && this->boundaryRectangle.h == 0) {
+    SDL_Rect textboundaryRectangle = text->getBoundaryRectangle();
+    this->boundaryRectangle.w      = textboundaryRectangle.w + textPadding.x;
+    this->boundaryRectangle.h      = textboundaryRectangle.h + textPadding.y;
+  }
+
+  addElement(std::move(text));
+}
+
 Button::Button(struct DisplayGlobal displayGlobal,
                const SDL_Rect& boundaryRectangle,
                const std::string& textContent,
