@@ -49,6 +49,8 @@ public:
 
 protected:
   std::unique_ptr<Logger> logger;
+  std::string logFile;
+
   struct DisplayGlobal displayGlobal;
   int id                             = -1;
   SDL_Rect boundaryRectangle         = {0, 0, 0, 0};

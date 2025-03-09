@@ -37,7 +37,7 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) : logger(LogFiles::mainMe
   SDL_Rect newScanButtonRectangle       = {200, 150, 200, 50};
   std::unique_ptr<Button> newScanButton = std::make_unique<Button>(
       this->displayGlobal, newScanButtonRectangle, "Scan New Item", SDL_Point{10, 10},
-      [this]() { this->currentState = EngineState::SCANNING; }, "main_menu_state.txt");
+      [this]() { this->currentState = EngineState::SCANNING; }, LogFiles::mainMenu);
   newScanButton->setCenteredHorizontal();
   rootElement->addElement(std::move(newScanButton));
 
@@ -45,7 +45,8 @@ MainMenu::MainMenu(struct DisplayGlobal displayGlobal) : logger(LogFiles::mainMe
   SDL_Rect viewStoredButtonRectangle       = {200, 210, 200, 50};
   std::unique_ptr<Button> viewStoredButton = std::make_unique<Button>(
       this->displayGlobal, viewStoredButtonRectangle, "View Stored Items",
-      SDL_Point{10, 10}, [this]() { this->currentState = EngineState::ITEM_LIST; });
+      SDL_Point{10, 10}, [this]() { this->currentState = EngineState::ITEM_LIST; },
+      LogFiles::mainMenu);
   viewStoredButton->setCenteredHorizontal();
   rootElement->addElement(std::move(viewStoredButton));
 

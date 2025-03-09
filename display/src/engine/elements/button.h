@@ -21,12 +21,6 @@ public:
          const SDL_Rect& boundaryRectangle,
          const std::string& textContent,
          const SDL_Point& textPadding,
-         std::function<void()> callback);
-
-  Button(struct DisplayGlobal displayGlobal,
-         const SDL_Rect& boundaryRectangle,
-         const std::string& textContent,
-         const SDL_Point& textPadding,
          std::function<void()> callback,
          const std::string& logFile);
 
@@ -34,7 +28,8 @@ public:
          const SDL_Rect& boundaryRectangle,
          const std::string& textContent,
          const SDL_Point& textPadding,
-         const std::string& notifyMessage);
+         const std::string& notifyMessage,
+         const std::string& logFile);
 
   void initialize();
   void updateSelf() override;

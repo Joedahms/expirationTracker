@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "../../../../food_item.h"
+#include "../../log_files.h"
 #include "../../sql_food.h"
 #include "../display_global.h"
 #include "../elements/dropdown.h"
@@ -15,7 +16,7 @@
 /**
  * @param displayGlobal Global display variables.
  */
-ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger("item_list_state.txt") {
+ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger(LogFiles::itemList) {
   this->logger.log("Constructing item list state");
   this->currentState = EngineState::ITEM_LIST;
 
@@ -37,7 +38,7 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger("item_list_state
   SDL_GetWindowSize(this->displayGlobal.window, &windowWidth, &windowHeight);
   scrollBoxRect.h = windowHeight - 1;
   std::shared_ptr<ScrollBox> scrollBox =
-      std::make_shared<ScrollBox>(this->displayGlobal, scrollBoxRect);
+      std::make_shared<ScrollBox>(this->displayGlobal, scrollBoxRect, LogFiles::itemList);
   scrollBox->setPanelHeight(30);
   scrollBox->addBorder(1);
   this->mediator->addScrollBox(scrollBox);
@@ -48,11 +49,11 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger("item_list_state
       std::make_shared<Dropdown>(this->displayGlobal, SDL_Rect{450, 0, 0, 0}, "Sort by:");
   std::shared_ptr<Button> sortByExpirationLowToHigh = std::make_shared<Button>(
       this->displayGlobal, SDL_Rect{0, 0, 0, 0}, "Expiration Date - Highest to Lowest",
-      SDL_Point{0, 0}, "sort_changed");
+      SDL_Point{0, 0}, "sort_changed", LogFiles::itemList);
   sortByExpirationLowToHigh->initialize();
   std::shared_ptr<Button> sortByExpirationHighToLow = std::make_shared<Button>(
       this->displayGlobal, SDL_Rect{0, 0, 0, 0}, "Expiration Date - Lowest to Highest",
-      SDL_Point{0, 0}, [this]() {});
+      SDL_Point{0, 0}, [this]() {}, LogFiles::itemList);
 
   sortBy->addOption(std::move(sortByExpirationLowToHigh));
   sortBy->update();

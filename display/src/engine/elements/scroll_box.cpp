@@ -19,10 +19,13 @@
  * height
  */
 ScrollBox::ScrollBox(struct DisplayGlobal displayGlobal,
-                     const SDL_Rect& boundaryRectangle) {
+                     const SDL_Rect& boundaryRectangle,
+                     const std::string& logFile) {
   this->displayGlobal     = displayGlobal;
   this->previousUpdate    = std::chrono::steady_clock::now();
   this->boundaryRectangle = boundaryRectangle;
+  this->logFile           = logFile;
+  this->logger            = std::make_unique<Logger>(logFile);
 }
 
 void ScrollBox::setPanelHeight(int panelHeight) { this->panelHeight = panelHeight; }
@@ -89,8 +92,8 @@ void ScrollBox::refreshPanels() {
   SDL_Rect boundaryRectangle = {0, topPanelPosition, 0, this->panelHeight};
 
   for (auto& foodItem : allFoodItems) {
-    std::unique_ptr<Panel> newPanel =
-        std::make_unique<Panel>(this->displayGlobal, boundaryRectangle, foodItem.getId());
+    std::unique_ptr<Panel> newPanel = std::make_unique<Panel>(
+        this->displayGlobal, boundaryRectangle, foodItem.getId(), this->logFile);
     boundaryRectangle.y += panelHeight;
 
     newPanel->addFoodItem(foodItem, SDL_Point{0, 0});

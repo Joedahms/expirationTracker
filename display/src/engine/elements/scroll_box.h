@@ -18,7 +18,9 @@
  */
 class ScrollBox : public CompositeElement {
 public:
-  ScrollBox(struct DisplayGlobal displayGlobal, const SDL_Rect& boundaryRectangle);
+  ScrollBox(struct DisplayGlobal displayGlobal,
+            const SDL_Rect& boundaryRectangle,
+            const std::string& logFile);
 
   void setPanelHeight(int panelHeight);
   void addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectangle);
