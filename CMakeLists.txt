@@ -46,6 +46,8 @@ add_executable(expirationTracker
   logger.cpp
   
 
+  display/src/log_files.cpp
+
   display/src/engine/display_global.cpp
   # Display process after forked from main
   display/src/display_entry.cpp

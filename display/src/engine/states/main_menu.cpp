@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 
+#include "../../log_files.h"
 #include "../display_global.h"
 #include "../elements/composite_element.h"
 #include "main_menu.h"
@@ -10,7 +11,7 @@
 /**
  * @param displayGlobal Global display variables.
  */
-MainMenu::MainMenu(struct DisplayGlobal displayGlobal) : logger("main_menu_state.txt") {
+MainMenu::MainMenu(struct DisplayGlobal displayGlobal) : logger(LogFiles::mainMenu) {
   this->logger.log("Constructing main menu state");
   this->currentState = EngineState::MAIN_MENU;
 
