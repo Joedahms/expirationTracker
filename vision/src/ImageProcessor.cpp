@@ -74,15 +74,6 @@ bool ImageProcessor::analyze() {
   int imageCounter    = 0;
   bool objectDetected = false;
 
-  std::filesystem::path imageDir = foodItem.getImagePath();
-  for (int i = 0; i < 2; i++) {
-    // cycle through all angles twice
-    for (int j = 0; j < 7; j++) {
-      // cycle through angles 0-7
-      processImagePair(j);
-    }
-  }
-
   while (!objectDetected) {
     for (const auto& entry :
          std::filesystem::directory_iterator(foodItem.getImagePath())) {
