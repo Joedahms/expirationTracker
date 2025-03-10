@@ -5,7 +5,7 @@ import sys
 import cv2
 import numpy as np
 from foodClasses import textClasses, pluMapping
-import matplotlib as plt
+import matplotlib.pyplot as plt
 
 try:
     reader = easyocr.Reader(['en'])
