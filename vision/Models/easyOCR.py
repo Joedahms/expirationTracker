@@ -105,10 +105,10 @@ def performOCR(image):
 
     try:
         print("Detecting text...")
-        boundingBoxes = yolo.predict(image)
+        boundingBoxes = yolo(image)
         print("Text detected!")
         print("Reading text...")
-        for box in boundingBoxes.data.boxes:  # Use .boxes.data instead of .xyxy
+        for box in boundingBoxes.boxes:  # Use .boxes.data instead of .xyxy
             x1, y1, x2, y2 = box.xyxy
 
             # Draw rectangle
