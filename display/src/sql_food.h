@@ -4,6 +4,8 @@
 #include <sqlite3.h>
 #include <vector>
 
+#include "../src/engine/elements/sort_method.h"
+
 void openDatabase(sqlite3**);
 void storeFoodItem(sqlite3*, struct FoodItem);
 
@@ -17,7 +19,7 @@ int readAllFoodItemsCallback(void* foodItemVector,
                              char** columns,
                              char** columnNames);
 
-std::vector<FoodItem> readAllFoodItemsSorted();
+std::vector<FoodItem> readAllFoodItemsSorted(SortMethod sortMethod);
 int readAllFoodItemsSortedCallback(void* foodItemVector,
                                    int numColumns,
                                    char** columns,

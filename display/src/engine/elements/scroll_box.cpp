@@ -91,7 +91,7 @@ void ScrollBox::renderSelf() const {}
  */
 void ScrollBox::refreshPanels() {
   // std::vector<FoodItem> allFoodItems = readAllFoodItems();
-  std::vector<FoodItem> allFoodItems = readAllFoodItemsSorted();
+  std::vector<FoodItem> allFoodItems = readAllFoodItemsSorted(this->sortMethod);
 
   this->children.clear();
   SDL_Rect boundaryRectangle = {0, topPanelPosition, 0, this->panelHeight};

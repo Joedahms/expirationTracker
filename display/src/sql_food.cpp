@@ -211,45 +211,34 @@ int readAllFoodItemsCallback(void* foodItemVector,
  * @return Vector of food item objects, each corresponding to a food item read from the
  * database.
  */
-std::vector<FoodItem> readAllFoodItemsSorted() {
+std::vector<FoodItem> readAllFoodItemsSorted(SortMethod sortMethod) {
+  std::string sqlSortMethod;
+  switch (sortMethod) {
+  case SortMethod::LOW_TO_HIGH:
+    sqlSortMethod = "ASC";
+    break;
+  case SortMethod::HIGH_TO_LOW:
+    sqlSortMethod = "DESC";
+    break;
+  default:
+    LOG(FATAL) << "Invalid sort method";
+  }
+
+  std::string readSortedQuery = "SELECT * FROM foodItems ORDER BY scanDateYear " +
+                                sqlSortMethod + ", scanDateMonth " + sqlSortMethod +
+                                ", scanDateDay " + sqlSortMethod + ";";
+
   sqlite3* database = nullptr;
   openDatabase(&database);
 
-  char* errorMessage    = nullptr;
-  const char* selectAll = "SELECT * FROM foodItems ORDER BY scanDateDay DESC;";
+  char* errorMessage = nullptr;
 
   std::vector<FoodItem> allFoodItems;
-  int sqlReturn = sqlite3_exec(database, selectAll, readAllFoodItemsCallback,
-                               &allFoodItems, &errorMessage);
+  int sqlReturn = sqlite3_exec(database, readSortedQuery.c_str(),
+                               readAllFoodItemsCallback, &allFoodItems, &errorMessage);
 
   sqlite3_close(database);
   return allFoodItems;
-}
-
-/**
- * Callback function for reading a food item by its id.
- *
- * @param foodItemVector Vector to store read food items into
- * @param numColumns How many columns in the table
- * @param columns The values stored in the columns
- * @param columnNames The names of the columns
- * @return Always 0
- */
-int readAllFoodItemsSortedCallback(void* foodItemVector,
-                                   int numColumns,
-                                   char** columns,
-                                   char** columnNames) {
-  std::vector<FoodItem>* allFoodItems =
-      static_cast<std::vector<FoodItem>*>(foodItemVector);
-  struct FoodItem foodItem;
-
-  for (int i = 0; i < numColumns; i++) {
-    std::string columnValue(columns[i], strlen(columns[i]));
-    std::string columnName(columnNames[i], strlen(columnNames[i]));
-    setFoodItem(foodItem, columnValue, columnName);
-  }
-  allFoodItems->push_back(foodItem);
-  return 0;
 }
 
 /**
