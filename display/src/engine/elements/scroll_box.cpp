@@ -52,7 +52,7 @@ void ScrollBox::updateSelf() {
       this->currentUpdate - this->previousUpdate);
 
   // 1 or more seconds since last update
-  if (updateDifference.count() > 1) {
+  if (updateDifference.count() > 3) {
     refreshPanels();
     this->previousUpdate = this->currentUpdate;
   }

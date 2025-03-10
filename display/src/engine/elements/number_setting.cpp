@@ -76,10 +76,10 @@ void NumberSetting::updateSelf() {
 
   FoodItem foodItem    = readFoodItemById(this->settingId);
   int foodItemQuantity = foodItem.getQuantity();
-  if (foodItemQuantity != this->settingValue) {
-    if (foodItemQuantity == 0) {
-      deleteById(this->settingId);
-    }
+  if (foodItemQuantity == 0) {
+    deleteById(this->settingId);
+  }
+  else if (foodItemQuantity != this->settingValue) {
     updateFoodItemQuantity(this->settingId, this->settingValue);
   }
   else {
