@@ -105,14 +105,18 @@ def performOCR(image):
 
     try:
         print("Detecting text...")
-        boundingBoxes = yolo(image)
+        boundingBoxes = yolo(image)[0] #yolo(image) returns a list of 'results', we should only have one because only a single image
         print("Text detected!")
         print("Reading text...")
         for box in boundingBoxes.boxes:  # Use .boxes.data instead of .xyxy
-            x1, y1, x2, y2 = box.xyxy
-
+            x1, y1, x2, y2 = map(int, box.xyxy[0])  # Extract bounding box as integers
+            confidence = float(box.conf[0])  # Get confidence score
+            class_id = int(box.cls[0])  # Get class ID
+            class_name = yolo.names[class_id]
             # Draw rectangle
             cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            label = f"{class_name} ({confidence:.2f})"
+            cv2.putText(image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
             # Crop detected text
             cropped_text = image[y1:y2, x1:x2]
