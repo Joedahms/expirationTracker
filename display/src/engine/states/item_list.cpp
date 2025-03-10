@@ -22,7 +22,7 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger(LogFiles::itemLi
 
   this->displayGlobal = displayGlobal;
 
-  this->mediator = std::make_shared<Mediator>();
+  this->mediator = std::make_shared<Mediator>(LogFiles::itemList);
 
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
   previousUpdate             = std::chrono::steady_clock::now();

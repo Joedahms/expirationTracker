@@ -1,8 +1,13 @@
+#include <glog/logging.h>
+
 #include "button.h"
 #include "dropdown.h"
 #include "element.h"
 #include "element_mediator.h"
 #include "scroll_box.h"
+#include "sort_method.h"
+
+Mediator::Mediator(const std::string& logFile) : logger(logFile) {}
 
 void Mediator::addButton(std::shared_ptr<Button> button) {
   this->button = button;
@@ -21,6 +26,14 @@ void Mediator::addDropdown(std::shared_ptr<Dropdown> dropDown) {
 
 void Mediator::notify(std::shared_ptr<Element> sender, const std::string& event) {
   if (event == "low to high") {
-    std::cout << "low to high" << std::endl;
+    this->logger.log("Mediator received low to high notification");
+    this->scrollBox->setSortMethod(SortMethod::LOW_TO_HIGH);
+  }
+  else if (event == "high to low") {
+    this->logger.log("Mediator received high to low notification");
+    this->scrollBox->setSortMethod(SortMethod::HIGH_TO_LOW);
+  }
+  else {
+    LOG(FATAL) << "Mediator received invalid notification";
   }
 }

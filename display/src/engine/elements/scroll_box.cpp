@@ -17,6 +17,7 @@
  * @param displayGlobal
  * @param boundaryRectangle Rectangle defining offset within parent (if any) and width +
  * height
+ * @param logFile The logfile to write logs to
  */
 ScrollBox::ScrollBox(struct DisplayGlobal displayGlobal,
                      const SDL_Rect& boundaryRectangle,
@@ -35,6 +36,9 @@ void ScrollBox::setPanelHeight(int panelHeight) { this->panelHeight = panelHeigh
  * corresponds to one food item. Therefore there will be as many panels in the scroll box
  * as there are food items passed. Don't want to refresh panels constantly (will cause
  * program to crash), so only refresh on a set interval.
+ *
+ * @param None
+ * @return None
  */
 void ScrollBox::updateSelf() {
   if (parent) {
@@ -130,5 +134,20 @@ void ScrollBox::scrollDown() {
     SDL_Point currPanelRelativePosition = currPanel->getPositionRelativeToParent();
     currPanelRelativePosition.y += this->scrollAmount;
     currPanel->setPositionRelativeToParent(currPanelRelativePosition);
+  }
+}
+
+void ScrollBox::setSortMethod(SortMethod sortMethod) {
+  switch (sortMethod) {
+  case SortMethod::LOW_TO_HIGH:
+    this->sortMethod = SortMethod::LOW_TO_HIGH;
+    this->logger->log("Scrollbox sort method changed to low to high");
+    break;
+  case SortMethod::HIGH_TO_LOW:
+    this->sortMethod = SortMethod::HIGH_TO_LOW;
+    this->logger->log("Scrollbox sort method changed to high to low");
+    break;
+  default:
+    LOG(FATAL) << "Attempt to set sort method to invalid method";
   }
 }
