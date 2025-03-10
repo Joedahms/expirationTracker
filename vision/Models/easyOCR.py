@@ -105,23 +105,22 @@ def performOCR(image):
 
     try:
         print("Detecting text...")
-        result = yolo(image)[0] #yolo(image) returns a list of 'results', we should only have one because only a single image
+        result = yolo(processed_image)[0] #yolo(image) returns a list of 'results', we should only have one because only a single image
         print("Text detected!")
         print("Reading text...")
         for box in result.boxes:  # Use .boxes.data instead of .xyxy
             bbox = box.xyxy[0].tolist()  # Convert tensor to list safely
-            print(f"BBOX LENGTH: {len(bbox)}")
             x1, y1, x2, y2 = map(int, bbox)  # Extract bounding box as integers
             confidence = float(box.conf[0])  # Get confidence score
             class_id = int(box.cls[0])  # Get class ID
             class_name = yolo.names[class_id]
             # Draw rectangle
-            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv2.rectangle(processed_image, (x1, y1), (x2, y2), (0, 255, 0), 2)
             label = f"{class_name} ({confidence:.2f})"
-            cv2.putText(image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            cv2.putText(processed_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
             # Crop detected text
-            cropped_text = image[y1:y2, x1:x2]
+            cropped_text = processed_image[y1:y2, x1:x2]
 
             # Recognize text using EasyOCR
             text_results = reader.readtext(cropped_text, detail=0, paragraph=True, text_threshold=0.7)
@@ -131,7 +130,7 @@ def performOCR(image):
 
         # Display image using Matplotlib
         plt.figure(figsize=(10, 6))
-        plt.imshow(image)
+        plt.imshow(processed_image)
         plt.axis('off')  # Hide axes
         plt.title("YOLO Text Detection")
         plt.show()
