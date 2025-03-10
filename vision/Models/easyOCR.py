@@ -106,10 +106,10 @@ def performOCR(image):
     try:
 
         print("Detecting text...")
-        boundingBoxes = model(image)
+        boundingBoxes = model(image)[0]
         print("Text detected!")
         print("Reading text...")
-        for box in boundingBoxes.xyxy[0]:  # Bounding boxes from YOLO
+        for box in boundingBoxes.xyxy:  # Bounding boxes from YOLO
             x1, y1, x2, y2, conf, cls = map(int, box)  # Convert bounding box to integers
 
             # Draw rectangle
