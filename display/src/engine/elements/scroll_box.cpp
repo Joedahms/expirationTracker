@@ -151,4 +151,6 @@ void ScrollBox::setSortMethod(SortMethod sortMethod) {
   default:
     LOG(FATAL) << "Attempt to set sort method to invalid method";
   }
+
+  refreshPanels();
 }

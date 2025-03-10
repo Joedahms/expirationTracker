@@ -23,7 +23,6 @@ Button::Button(struct DisplayGlobal displayGlobal,
                const std::string& logFile)
     : textContent(textContent), textPadding(textPadding), onClick(callback) {
   this->logger = std::make_unique<Logger>(logFile);
-  this->logger->log("Constructing " + this->textContent + " button");
 
   this->displayGlobal = displayGlobal;
 
@@ -50,7 +49,6 @@ Button::Button(struct DisplayGlobal displayGlobal,
   }
 
   addElement(std::move(text));
-  this->logger->log(this->textContent + " button constructed");
 }
 
 Button::Button(struct DisplayGlobal displayGlobal,
