@@ -8,7 +8,8 @@
 #include "state.h"
 
 /**
- * State where all stored food items are displayed.
+ * State where all stored food items are displayed. Items are displayed in a scrollbox and
+ * a dropdown is used to change the ordering of the food items in the scroll box.
  */
 class ItemList : public State {
 public:

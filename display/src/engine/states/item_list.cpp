@@ -66,7 +66,6 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger(LogFiles::itemLi
   sortBy->addOption(std::move(sortByExpirationLowToHigh));
   sortBy->update();
   sortBy->addOption(std::move(sortByExpirationHighToLow));
-  this->mediator->addDropdown(sortBy);
   this->rootElement->addElement(std::move(sortBy));
 
   this->logger.log("Item list state constructed");

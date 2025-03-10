@@ -19,11 +19,13 @@ void Mediator::addScrollBox(std::shared_ptr<ScrollBox> scrollBox) {
   scrollBox->setMediator(shared_from_this());
 }
 
-void Mediator::addDropdown(std::shared_ptr<Dropdown> dropDown) {
-  this->dropDown = dropDown;
-  dropDown->setMediator(shared_from_this());
-}
-
+/**
+ * Alert the scrollbox that a new sort method is to be used.
+ *
+ * @param sender Which element sent the message to the mediator (currently unused)
+ * @param event The message sent to the mediator
+ * @return None
+ */
 void Mediator::notify(std::shared_ptr<Element> sender, const std::string& event) {
   if (event == "low to high") {
     this->logger.log("Mediator received low to high notification");

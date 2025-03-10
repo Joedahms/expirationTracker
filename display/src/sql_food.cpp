@@ -205,9 +205,9 @@ int readAllFoodItemsCallback(void* foodItemVector,
 }
 
 /**
- * Read all food items currently stored in the database.
+ * Read all food items currently stored in the database, sorted by date.
  *
- * @param None
+ * @param sortMethod The method by which the read items should be sorted
  * @return Vector of food item objects, each corresponding to a food item read from the
  * database.
  */
