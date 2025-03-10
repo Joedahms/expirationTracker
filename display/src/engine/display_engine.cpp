@@ -50,8 +50,9 @@ DisplayEngine::DisplayEngine(const char* windowTitle,
   initializeEngine(this->displayGlobal.window);
 
   // Initialize states
-  this->scanning = std::make_unique<Scanning>(this->displayGlobal);
-  this->itemList = std::make_unique<ItemList>(this->displayGlobal);
+  this->scanning   = std::make_unique<Scanning>(this->displayGlobal);
+  this->itemList   = std::make_unique<ItemList>(this->displayGlobal);
+  this->zeroWeight = std::make_unique<ZeroWeight>(this->displayGlobal);
 
   displayIsRunning = true;
   this->logger.log("Engine is constructed and now running");
@@ -159,6 +160,22 @@ void DisplayEngine::checkState() {
     this->itemList->setCurrentState(EngineState::ITEM_LIST);
     break;
 
+  case EngineState::ZERO_WEIGHT:
+    this->engineState = this->zeroWeight->getCurrentState();
+
+    // override
+    if (this->engineState == EngineState::SCANNING) {
+      sendZeroWeightResponse(Messages::OVERRIDE);
+    }
+
+    // cancel
+    else if (this->engineState == EngineState::ITEM_LIST) {
+      sendZeroWeightResponse(Messages::CANCEL);
+    }
+
+    this->zeroWeight->setCurrentState(EngineState::ZERO_WEIGHT);
+    break;
+
   default:
     std::cout << engineStateToString(this->engineState) << std::endl;
     LOG(FATAL) << "Invalid state";
@@ -200,6 +217,10 @@ void DisplayEngine::handleEvents() {
     this->itemList->handleEvents(&this->displayIsRunning);
     break;
 
+  case EngineState::ZERO_WEIGHT:
+    this->zeroWeight->handleEvents(&this->displayIsRunning);
+    break;
+
   default:
     LOG(FATAL) << "Invalid state";
     break;
@@ -222,6 +243,8 @@ void DisplayEngine::checkKeystates() {
   case EngineState::ITEM_LIST:
     this->engineState = this->itemList->checkKeystates();
     break;
+
+    // Zero weight
 
   default:
     LOG(FATAL) << "Invalid state";
@@ -247,6 +270,10 @@ void DisplayEngine::update() {
     this->itemList->update();
     break;
 
+  case EngineState::ZERO_WEIGHT:
+    this->zeroWeight->update();
+    break;
+
   default:
     LOG(FATAL) << "Invalid state";
     break;
@@ -267,6 +294,10 @@ void DisplayEngine::renderState() {
 
   case EngineState::ITEM_LIST:
     this->itemList->render();
+    break;
+
+  case EngineState::ZERO_WEIGHT:
+    this->zeroWeight->render();
     break;
 
   default:
@@ -296,6 +327,28 @@ void DisplayEngine::startSignalToDisplay() {
     this->requestSocket.receive(response);
     if (response == Messages::AFFIRMATIVE) {
       this->logger.log("Start signal successfully sent to display, in scanning state");
+    }
+    else if (response == Messages::ZERO_WEIGHT) {
+      this->logger.log(
+          "Received zero weight back from display, switching to zero weight state");
+      this->engineState = EngineState::ZERO_WEIGHT;
+    }
+    else {
+      LOG(FATAL) << "Invalid response received from display";
+    }
+  } catch (const zmqpp::exception& e) {
+    LOG(FATAL) << e.what();
+  }
+}
+
+void sendZeroWeightResponse(const std::string& zeroWeightResponse) {
+  this->logger.log("Sending zero weight response: " + zeroWeightResponse + " to display");
+  try {
+    this->requestSocket.send(zeroWeightResponse);
+    std::string response;
+    this->requestSocket.receive(response);
+    if (response == Messages::AFFIRMATIVE) {
+      this->logger.log("Zero weight response successfully sent to display");
     }
     else {
       LOG(FATAL) << "Invalid response received from display";

@@ -35,6 +35,7 @@ void hardwareEntry(zmqpp::context& context) {
     startSignalReceived = false;
     while (startSignalReceived == false) {
       logger.log("Waiting for start signal from display");
+
       startSignalReceived = hardware.checkStartSignal(startSignalTimeoutMs);
       if (startSignalReceived == false) {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));

@@ -30,8 +30,7 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger(LogFiles::itemLi
   SDL_Rect rootRectangle = {0, 0, 0, 0};
   rootRectangle.w        = windowSurface->w;
   rootRectangle.h        = windowSurface->h;
-  std::cout << rootRectangle.w << std::endl;
-  this->rootElement = std::make_shared<Container>(rootRectangle);
+  this->rootElement      = std::make_shared<Container>(rootRectangle);
 
   // Start Scan
   SDL_Rect newScanButtonRectangle       = {200, 150, 200, 50};

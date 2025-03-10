@@ -64,10 +64,12 @@ private:
   // States
   std::unique_ptr<Scanning> scanning;
   std::unique_ptr<ItemList> itemList;
+  std::unique_ptr<ZeroWeight> zeroWeight;
 
   bool displayIsRunning = false;
 
   void startSignalToDisplay();
+  void sendZeroWeightResponse(const std::string& zeroWeightResponse);
 };
 
 #endif

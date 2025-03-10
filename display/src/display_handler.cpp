@@ -40,10 +40,39 @@ void DisplayHandler::handle() {
     std::string receivedMessage;
     this->replySocket.receive(receivedMessage);
     this->logger.log("received message from socket: " + receivedMessage);
+
     // Engine wants to start a new scan
     if (receivedMessage == Messages::START_SCAN) {
-      startSignalToHardware();
-      receiveFromVision();
+      std::string startResponse = startSignalToHardware();
+      if (startResponse == Messages::AFFIRMATIVE) {
+        // Success
+        receiveFromVision();
+      }
+      else if (startResponse == Messages::ZERO_WEIGHT) {
+        this->replySocket.send(Messages::ZERO_WEIGHT);
+        std::string zeroWeightResponse;
+        this->replySocket.receive(zeroWeightResponse);
+        if (zeroWeightResponse == Messages::RETRY) {
+          this->replySocket.send(Messages::AFFIRMATIVE);
+          continue;
+        }
+        else if (zeroWeightResponse == Messages::OVERRIDE) {
+          this->replySocket.send(Messages::AFFIRMATIVE);
+          this->requestHardwareSocket.send(Messages::OVERRIDE);
+          std::string overrideResponse;
+          this->replySocket.receive(overrideResponse);
+          receiveFromVision();
+        }
+        else if (zeroWeightResponse == Messages::CANCEL) {
+          this->replySocket.send(Messages::AFFIRMATIVE);
+          this->requestHardwareSocket.send(Messages::CANCEL);
+          std::string overrideResponse;
+          this->replySocket.receive(overrideResponse);
+        }
+        else {
+          LOG(FATAL) << "Unexpected message received: " << receivedMessage;
+        }
+      }
     }
     else {
       LOG(FATAL) << "Unexpected message received: " << receivedMessage;
@@ -56,12 +85,13 @@ void DisplayHandler::handle() {
  * scan it.
  *
  * @param None
- * @return None
+ * @return True if hardware started scan. False if hardware not able to start scan.
  */
-void DisplayHandler::startSignalToHardware() {
+std::string DisplayHandler::startSignalToHardware() {
   this->logger.log("Received start scan from engine");
+
   try {
-    this->logger.log("Telling hardware to start scan");
+    this->logger.log("Requesting that hardware start scan");
     this->replySocket.send(Messages::AFFIRMATIVE);
     this->requestHardwareSocket.send(Messages::START_SCAN);
 
@@ -69,6 +99,11 @@ void DisplayHandler::startSignalToHardware() {
     this->requestHardwareSocket.receive(hardwareResponse);
     if (hardwareResponse == Messages::AFFIRMATIVE) {
       this->logger.log("Hardware starting scan");
+      return Messages::AFFIRMATIVE;
+    }
+    else if (hardwareResponse == Messages::ZERO_WEIGHT) {
+      this->logger.log("Hardware indicated zero weight on platform");
+      return Messages::ZERO_WEIGHT;
     }
     else {
       LOG(FATAL) << "Received invalid response from hardware after sending start signal";

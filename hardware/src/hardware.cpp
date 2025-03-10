@@ -65,9 +65,29 @@ bool Hardware::checkStartSignal(int timeoutMs) {
       if (poller.has_input(this->replySocket)) {
         std::string request;
         this->replySocket.receive(request);
-        receivedRequest = true;
-        this->replySocket.send(Messages::AFFIRMATIVE); // Respond to display
-        this->logger.log("Received start signal from display");
+
+        this->logger.log("Received start signal from display, checking weight");
+        if (checkWeight() == false) {
+          this->logger.log("Informing display that no weight detected on plaform");
+          this->replySocket.send(Messages::ZERO_WEIGHT);
+          std::string zeroWeightResponse;
+          this->replySocket.receive(zeroWeightResponse);
+          if (zeroWeightResponse == Messages::RETRY) {
+          }
+          else if (zeroWeightResponse == Messages::OVERRIDE) {
+          }
+          else if (zeroWeightResponse == Messages::CANCEL) {
+          }
+          else {
+            // ruh roh
+          }
+          // Check that is a valid zero weight response
+        }
+        else {
+          receivedRequest = true;
+          this->replySocket.send(Messages::AFFIRMATIVE); // Respond to display
+          this->logger.log("Weight non zero, starting scan");
+        }
       }
     }
     else {
@@ -123,6 +143,7 @@ void Hardware::sendStartToVision() {
 bool Hardware::startScan() {
   this->logger.log("Starting scan");
 
+  /*
   this->logger.log("Checking weight");
   if (checkWeight() == false) {
     // TODO handle no weight on platform
@@ -133,6 +154,7 @@ bool Hardware::startScan() {
     this->logger.log("No weight detected on platform");
     return false;
   }
+*/
 
   rotateAndCapture();
   this->logger.log("Scan complete");
