@@ -126,7 +126,7 @@ def performOCR(image):
             # Recognize text using EasyOCR
             text_results = reader.readtext(cropped_text, detail=0, paragraph=True, text_threshold=0.7)
 
-            for _, text, confidence in text_results:
+            for text in text_results:
                 print(f"Detected Text: {text} (Confidence: {confidence:.2f})")
 
         # Display image using Matplotlib
