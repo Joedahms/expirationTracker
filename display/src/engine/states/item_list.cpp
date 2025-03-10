@@ -33,6 +33,14 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger(LogFiles::itemLi
   std::cout << rootRectangle.w << std::endl;
   this->rootElement = std::make_shared<Container>(rootRectangle);
 
+  // Start Scan
+  SDL_Rect newScanButtonRectangle       = {200, 150, 200, 50};
+  std::unique_ptr<Button> newScanButton = std::make_unique<Button>(
+      this->displayGlobal, newScanButtonRectangle, "Scan New Item", SDL_Point{10, 10},
+      [this]() { this->currentState = EngineState::SCANNING; }, LogFiles::itemList);
+  newScanButton->setCenteredHorizontal();
+  rootElement->addElement(std::move(newScanButton));
+
   // Scrollbox
   SDL_Rect scrollBoxRect = {0, 0, 400, 100};
   int windowWidth, windowHeight;
@@ -80,10 +88,12 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger(LogFiles::itemLi
 EngineState ItemList::checkKeystates() {
   const Uint8* keystates = SDL_GetKeyboardState(NULL);
 
+  /*
   if (keystates[SDL_SCANCODE_ESCAPE]) {
     this->logger.log("Escape key pressed in item list");
     return EngineState::PAUSE_MENU;
   }
+  */
 
   return EngineState::ITEM_LIST;
 }
