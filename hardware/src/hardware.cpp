@@ -86,7 +86,6 @@ bool Hardware::checkStartSignal(int timeoutMs) {
  * @return None
  */
 void Hardware::sendStartToVision() {
-  this->logger.log("Sending start signal to vision");
   const std::chrono::time_point<std::chrono::system_clock> now{
       std::chrono::system_clock::now()};
 
@@ -95,6 +94,8 @@ void Hardware::sendStartToVision() {
   FoodItem foodItem(this->imageDirectory, scanDate, this->itemWeight);
 
   std::string response;
+  this->logger.log("Sending start signal to vision: ");
+  foodItem.logToFile(this->logger);
   response = sendFoodItem(this->requestVisionSocket, foodItem);
   if (response == Messages::AFFIRMATIVE) {
     this->logger.log("Successfully sent start signal to vision");
