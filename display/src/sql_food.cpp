@@ -179,6 +179,80 @@ std::vector<FoodItem> readAllFoodItems() {
 }
 
 /**
+ * Callback function for reading a food item by its id.
+ *
+ * @param foodItemVector Vector to store read food items into
+ * @param numColumns How many columns in the table
+ * @param columns The values stored in the columns
+ * @param columnNames The names of the columns
+ * @return Always 0
+ */
+int readAllFoodItemsCallback(void* foodItemVector,
+                             int numColumns,
+                             char** columns,
+                             char** columnNames) {
+  std::vector<FoodItem>* allFoodItems =
+      static_cast<std::vector<FoodItem>*>(foodItemVector);
+  struct FoodItem foodItem;
+
+  for (int i = 0; i < numColumns; i++) {
+    std::string columnValue(columns[i], strlen(columns[i]));
+    std::string columnName(columnNames[i], strlen(columnNames[i]));
+    setFoodItem(foodItem, columnValue, columnName);
+  }
+  allFoodItems->push_back(foodItem);
+  return 0;
+}
+
+/**
+ * Read all food items currently stored in the database.
+ *
+ * @param None
+ * @return Vector of food item objects, each corresponding to a food item read from the
+ * database.
+ */
+std::vector<FoodItem> readAllFoodItemsSorted() {
+  sqlite3* database = nullptr;
+  openDatabase(&database);
+
+  char* errorMessage    = nullptr;
+  const char* selectAll = "SELECT * FROM foodItems ORDER BY scanDateDay DESC;";
+
+  std::vector<FoodItem> allFoodItems;
+  int sqlReturn = sqlite3_exec(database, selectAll, readAllFoodItemsCallback,
+                               &allFoodItems, &errorMessage);
+
+  sqlite3_close(database);
+  return allFoodItems;
+}
+
+/**
+ * Callback function for reading a food item by its id.
+ *
+ * @param foodItemVector Vector to store read food items into
+ * @param numColumns How many columns in the table
+ * @param columns The values stored in the columns
+ * @param columnNames The names of the columns
+ * @return Always 0
+ */
+int readAllFoodItemsSortedCallback(void* foodItemVector,
+                                   int numColumns,
+                                   char** columns,
+                                   char** columnNames) {
+  std::vector<FoodItem>* allFoodItems =
+      static_cast<std::vector<FoodItem>*>(foodItemVector);
+  struct FoodItem foodItem;
+
+  for (int i = 0; i < numColumns; i++) {
+    std::string columnValue(columns[i], strlen(columns[i]));
+    std::string columnName(columnNames[i], strlen(columnNames[i]));
+    setFoodItem(foodItem, columnValue, columnName);
+  }
+  allFoodItems->push_back(foodItem);
+  return 0;
+}
+
+/**
  * Read a food item from the database by its id. Since the ID is the primary key in the
  * database, only one food item will be returned.
  *
@@ -201,25 +275,6 @@ FoodItem readFoodItemById(const int& id) {
 
   sqlite3_close(database);
   return foodItem;
-}
-
-void updateFoodItemQuantity(const int& id, const int& newQuantity) {
-  sqlite3* database = nullptr;
-  openDatabase(&database);
-  char* errorMessage = nullptr;
-
-  std::stringstream updateId;
-  updateId << "UPDATE foodItems SET quantity = " << newQuantity << " WHERE id = " << id
-           << ";";
-
-  FoodItem foodItem;
-  int sqlReturn =
-      sqlite3_exec(database, updateId.str().c_str(), nullptr, nullptr, &errorMessage);
-  if (sqlReturn != SQLITE_OK) {
-    LOG(FATAL) << "Error updating food item";
-  }
-
-  sqlite3_close(database);
 }
 
 /**
@@ -245,28 +300,21 @@ int readFoodItemByIdCallback(void* passedFoodItem,
   return 0;
 }
 
-/**
- * Callback function for reading a food item by its id.
- *
- * @param foodItemVector Vector to store read food items into
- * @param numColumns How many columns in the table
- * @param columns The values stored in the columns
- * @param columnNames The names of the columns
- * @return Always 0
- */
-int readAllFoodItemsCallback(void* foodItemVector,
-                             int numColumns,
-                             char** columns,
-                             char** columnNames) {
-  std::vector<FoodItem>* allFoodItems =
-      static_cast<std::vector<FoodItem>*>(foodItemVector);
-  struct FoodItem foodItem;
+void updateFoodItemQuantity(const int& id, const int& newQuantity) {
+  sqlite3* database = nullptr;
+  openDatabase(&database);
+  char* errorMessage = nullptr;
 
-  for (int i = 0; i < numColumns; i++) {
-    std::string columnValue(columns[i], strlen(columns[i]));
-    std::string columnName(columnNames[i], strlen(columnNames[i]));
-    setFoodItem(foodItem, columnValue, columnName);
+  std::stringstream updateId;
+  updateId << "UPDATE foodItems SET quantity = " << newQuantity << " WHERE id = " << id
+           << ";";
+
+  FoodItem foodItem;
+  int sqlReturn =
+      sqlite3_exec(database, updateId.str().c_str(), nullptr, nullptr, &errorMessage);
+  if (sqlReturn != SQLITE_OK) {
+    LOG(FATAL) << "Error updating food item";
   }
-  allFoodItems->push_back(foodItem);
-  return 0;
+
+  sqlite3_close(database);
 }
