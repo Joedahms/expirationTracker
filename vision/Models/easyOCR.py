@@ -12,7 +12,7 @@ try:
 except Exception as e:
     raise(f"ERROR: OCR model loading failed: {str(e)}")
 try:
-    model = YOLO('yolov8_text.pt')
+    model = YOLO('yolov8s.pt')
 except Exception as e:
     raise(f"ERROR: OCR model loading failed: {str(e)}")
 
@@ -123,7 +123,7 @@ def performOCR(image):
             plt.show()
             plt.pause(10)
             plt.close
-            
+
             # Crop detected text
             cropped_text = image[y1:y2, x1:x2]
 
