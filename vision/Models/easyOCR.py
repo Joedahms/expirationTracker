@@ -100,12 +100,13 @@ def preprocessImage(img):
 def performOCR(image):
     print("Performing OCR")
     processed_image = preprocessImage(image)
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     if isinstance(processed_image, str):
         return(f"ERROR: {processed_image}")
 
     try:
         print("Detecting text...")
-        result = yolo(processed_image)[0] #yolo(image) returns a list of 'results', we should only have one because only a single image
+        result = yolo(image)[0] #yolo(image) returns a list of 'results', we should only have one because only a single image
         print("Text detected!")
         print("Reading text...")
         for box in result.boxes:  # Use .boxes.data instead of .xyxy
@@ -115,9 +116,9 @@ def performOCR(image):
             class_id = int(box.cls[0])  # Get class ID
             class_name = yolo.names[class_id]
             # Draw rectangle
-            cv2.rectangle(processed_image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv2.rectangle(image_rgb, (x1, y1), (x2, y2), (0, 255, 0), 2)
             label = f"{class_name} ({confidence:.2f})"
-            cv2.putText(processed_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            cv2.putText(image_rgb, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
             # Crop detected text
             cropped_text = processed_image[y1:y2, x1:x2]
@@ -130,7 +131,7 @@ def performOCR(image):
 
         # Display image using Matplotlib
         plt.figure(figsize=(10, 6))
-        plt.imshow(processed_image)
+        plt.imshow(image_rgb)
         plt.axis('off')  # Hide axes
         plt.title("YOLO Text Detection")
         plt.show()
