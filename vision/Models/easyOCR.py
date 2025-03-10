@@ -108,11 +108,8 @@ def performOCR(image):
         boundingBoxes = yolo.predict(image)
         print("Text detected!")
         print("Reading text...")
-        for box in boundingBoxes.boxes:  # Use .boxes.data instead of .xyxy
-            print(box.tolist())
-            x1, y1, x2, y2 = box.xyxy.tolist()[0]
-            conf = box.conf.item()
-            class_id = int(box.cls.item())
+        for box in boundingBoxes.data.boxes:  # Use .boxes.data instead of .xyxy
+            x1, y1, x2, y2 = box.xyxy
 
             # Draw rectangle
             cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
