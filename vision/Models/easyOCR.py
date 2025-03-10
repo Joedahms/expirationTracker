@@ -109,7 +109,9 @@ def performOCR(image):
         print("Text detected!")
         print("Reading text...")
         for box in result.boxes:  # Use .boxes.data instead of .xyxy
-            x1, y1, x2, y2 = map(int, box.xyxy)  # Extract bounding box as integers
+            bbox = box.xyxy[0].tolist()  # Convert tensor to list safely
+            print(f"BBOX LENGTH: {len(bbox)}")
+            x1, y1, x2, y2 = map(int, bbox)  # Extract bounding box as integers
             confidence = float(box.conf[0])  # Get confidence score
             class_id = int(box.cls[0])  # Get class ID
             class_name = yolo.names[class_id]
