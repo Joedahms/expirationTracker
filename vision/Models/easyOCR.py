@@ -12,7 +12,7 @@ try:
 except Exception as e:
     raise(f"ERROR: OCR model loading failed: {str(e)}")
 try:
-    model = YOLO('yolov8s.pt')
+    yolo = YOLO('yolov8s.pt')
 except Exception as e:
     raise(f"ERROR: OCR model loading failed: {str(e)}")
 
@@ -104,22 +104,18 @@ def performOCR(image):
         return(f"ERROR: {processed_image}")
 
     try:
-        class_names = model.names  # Dictionary mapping class indices to class names
         print("Detecting text...")
-        boundingBoxes = model(image)[0]
+        boundingBoxes = yolo.predict(image)
         print("Text detected!")
         print("Reading text...")
         for box in boundingBoxes.boxes:  # Use .boxes.data instead of .xyxy
+            print(box.tolist())
             x1, y1, x2, y2 = box.xyxy.tolist()[0]
             conf = box.conf.item()
             class_id = int(box.cls.item())
-            class_name = class_names[int(class_id)]  # Get class label
-            
+
             # Draw rectangle
             cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
-             # Add label with class name and confidence score
-            label = f"{class_name} ({conf:.2f})"
-            cv2.putText(image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
             # Crop detected text
             cropped_text = image[y1:y2, x1:x2]
