@@ -24,6 +24,9 @@ struct Messages {
 
   // Start the scan of a new food item
   static const std::string START_SCAN;
+
+  // Cancel a scan while it is underway
+  static const std::string CANCEL_SCAN;
 };
 
 #endif

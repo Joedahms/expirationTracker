@@ -9,3 +9,4 @@ const std::string Messages::ITEM_DETECTION_FAILED    = "item detection failed";
 const std::string Messages::ITEM_DETECTION_SUCCEEDED = "detection successful";
 const std::string Messages::RETRANSMIT               = "retransmit";
 const std::string Messages::START_SCAN               = "start scan";
+const std::string Messages::CANCEL_SCAN              = "cancel scan";

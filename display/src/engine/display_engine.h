@@ -72,6 +72,7 @@ private:
   bool displayIsRunning = false;
 
   void startSignalToDisplay();
+  void stopSignalToVision();
 };
 
 #endif
