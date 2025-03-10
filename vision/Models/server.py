@@ -89,7 +89,7 @@ def run_server():
                 print(f"Processing complete. Sending result back.")
                 # Send response
                 socket.send_string(result)
-                print(f"Sent response: {result[:50]}...")
+                print(f"Sent response: {result}")
             else:
                 pass
     except KeyboardInterrupt:
