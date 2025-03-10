@@ -33,28 +33,35 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger(LogFiles::itemLi
   std::cout << rootRectangle.w << std::endl;
   this->rootElement = std::make_shared<Container>(rootRectangle);
 
+  // Scrollbox
   SDL_Rect scrollBoxRect = {0, 0, 400, 100};
   int windowWidth, windowHeight;
   SDL_GetWindowSize(this->displayGlobal.window, &windowWidth, &windowHeight);
   scrollBoxRect.h = windowHeight - 1;
   std::shared_ptr<ScrollBox> scrollBox =
       std::make_shared<ScrollBox>(this->displayGlobal, scrollBoxRect, LogFiles::itemList);
+
   scrollBox->setPanelHeight(30);
   scrollBox->addBorder(1);
   this->mediator->addScrollBox(scrollBox);
   this->rootElement->addElement(std::move(scrollBox));
   this->rootElement->update();
 
+  // Dropdown
   std::shared_ptr<Dropdown> sortBy =
       std::make_shared<Dropdown>(this->displayGlobal, SDL_Rect{450, 0, 0, 0}, "Sort by:");
+
   std::shared_ptr<Button> sortByExpirationLowToHigh = std::make_shared<Button>(
       this->displayGlobal, SDL_Rect{0, 0, 0, 0}, "Expiration Date - Lowest to Highest",
       SDL_Point{0, 0}, "low to high", LogFiles::itemList);
   sortByExpirationLowToHigh->initialize();
   this->mediator->addButton(sortByExpirationLowToHigh);
+
   std::shared_ptr<Button> sortByExpirationHighToLow = std::make_shared<Button>(
       this->displayGlobal, SDL_Rect{0, 0, 0, 0}, "Expiration Date - Highest to Lowest",
-      SDL_Point{0, 0}, [this]() {}, LogFiles::itemList);
+      SDL_Point{0, 0}, "high to low", LogFiles::itemList);
+  sortByExpirationHighToLow->initialize();
+  this->mediator->addButton(sortByExpirationHighToLow);
 
   sortBy->addOption(std::move(sortByExpirationLowToHigh));
   sortBy->update();

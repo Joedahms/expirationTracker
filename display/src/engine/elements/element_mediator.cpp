@@ -10,7 +10,7 @@
 Mediator::Mediator(const std::string& logFile) : logger(logFile) {}
 
 void Mediator::addButton(std::shared_ptr<Button> button) {
-  this->button = button;
+  this->buttons.push_back(button);
   button->setMediator(shared_from_this());
 }
 

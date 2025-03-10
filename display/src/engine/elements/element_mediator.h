@@ -19,7 +19,7 @@ public:
 
 private:
   Logger logger;
-  std::shared_ptr<Button> button;
+  std::vector<std::shared_ptr<Button>> buttons;
   std::shared_ptr<ScrollBox> scrollBox;
   std::shared_ptr<Dropdown> dropDown;
 };
