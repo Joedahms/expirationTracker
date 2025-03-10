@@ -104,17 +104,20 @@ def performOCR(image):
         return(f"ERROR: {processed_image}")
 
     try:
-
+        class_names = model.names  # Dictionary mapping class indices to class names
         print("Detecting text...")
         boundingBoxes = model(image)[0]
         print("Text detected!")
         print("Reading text...")
         for box in boundingBoxes.boxes.data:  # Use .boxes.data instead of .xyxy
-            x1, y1, x2, y2, conf, cls = map(int, box[:6])  # Convert to integers
-
+            x1, y1, x2, y2, conf, cls = box[:6]  # Extract bounding box coordinates and class
+            x1, y1, x2, y2 = map(int, [x1, y1, x2, y2])  # Convert to integers
+            class_name = class_names[int(cls)]  # Get class label
             # Draw rectangle
             cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
-
+             # Add label with class name and confidence score
+            label = f"{class_name} ({conf:.2f})"
+            cv2.putText(image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
             # Crop detected text
             cropped_text = image[y1:y2, x1:x2]
@@ -134,7 +137,7 @@ def performOCR(image):
         plt.pause(10)
         plt.close
         print("Text read!")
-        
+
         # Extract expiration date
         expiration_date = extract_expiration_date(text_results)
 
