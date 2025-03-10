@@ -109,10 +109,12 @@ def performOCR(image):
         boundingBoxes = model(image)[0]
         print("Text detected!")
         print("Reading text...")
-        for box in boundingBoxes.boxes.data:  # Use .boxes.data instead of .xyxy
-            x1, y1, x2, y2, conf, cls = box[:6]  # Extract bounding box coordinates and class
-            x1, y1, x2, y2 = map(int, [x1, y1, x2, y2])  # Convert to integers
-            class_name = class_names[int(cls)]  # Get class label
+        for box in boundingBoxes.boxes:  # Use .boxes.data instead of .xyxy
+            x1, y1, x2, y2 = box.xyxy.tolist()[0]
+            conf = box.conf.item()
+            class_id = int(box.cls.item())
+            class_name = class_names[int(class_id)]  # Get class label
+            
             # Draw rectangle
             cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
              # Add label with class name and confidence score
