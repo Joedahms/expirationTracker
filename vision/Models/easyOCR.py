@@ -1,12 +1,18 @@
 import easyocr
+from ultralytics import YOLO
 import re
 import sys
 import cv2
 import numpy as np
 from foodClasses import textClasses, pluMapping
+import matplotlib as plt
 
 try:
-    reader = easyocr.Reader(['en'], gpu=True)
+    reader = easyocr.Reader(['en'])
+except Exception as e:
+    raise(f"ERROR: OCR model loading failed: {str(e)}")
+try:
+    model = YOLO('yolov8_text.pt')
 except Exception as e:
     raise(f"ERROR: OCR model loading failed: {str(e)}")
 
@@ -98,17 +104,43 @@ def performOCR(image):
         return(f"ERROR: {processed_image}")
 
     try:
+
+        print("Detecting text...")
+        boundingBoxes = model(image)
+        print("Text detected!")
         print("Reading text...")
-        results = reader.readtext(processed_image, detail=0, paragraph=True, text_threshold=0.7)
-        print("Text read")
+        for box in boundingBoxes.xyxy[0]:  # Bounding boxes from YOLO
+            x1, y1, x2, y2, conf, cls = map(int, box)  # Convert bounding box to integers
 
+            # Draw rectangle
+            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
+            # Display image using Matplotlib
+            plt.figure(figsize=(10, 6))
+            plt.imshow(image)
+            plt.axis('off')  # Hide axes
+            plt.title("YOLO Text Detection")
+            plt.show()
+            plt.pause(10)
+            plt.close
+            
+            # Crop detected text
+            cropped_text = image[y1:y2, x1:x2]
+
+            # Recognize text using EasyOCR
+            text_results = reader.readtext(cropped_text, detail=0, paragraph=True, text_threshold=0.7)
+
+            for _, text, confidence in text_results:
+                print(f"Detected Text: {text} (Confidence: {confidence:.2f})")
+
+        print("Text read!")
         # Extract expiration date
-        expiration_date = extract_expiration_date(results)
+        expiration_date = extract_expiration_date(text_results)
 
-        print(f"\n\nRESULTS: {results}\n\n")
+        print(f"\n\nRESULTS: {text_results}\n\n")
         # Extract PLU codes and classify food labels
         food_labels = []
-        for text in results:
+        for text in text_results:
             classification = isFoodClass(text)
             if classification:
                 food_labels.append(classification["value"])
