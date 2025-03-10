@@ -109,20 +109,12 @@ def performOCR(image):
         boundingBoxes = model(image)[0]
         print("Text detected!")
         print("Reading text...")
-        for box in boundingBoxes.xyxy:  # Bounding boxes from YOLO
-            x1, y1, x2, y2, conf, cls = map(int, box)  # Convert bounding box to integers
+        for box in boundingBoxes.boxes.data:  # Use .boxes.data instead of .xyxy
+            x1, y1, x2, y2, conf, cls = map(int, box[:6])  # Convert to integers
 
             # Draw rectangle
             cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-            # Display image using Matplotlib
-            plt.figure(figsize=(10, 6))
-            plt.imshow(image)
-            plt.axis('off')  # Hide axes
-            plt.title("YOLO Text Detection")
-            plt.show()
-            plt.pause(10)
-            plt.close
 
             # Crop detected text
             cropped_text = image[y1:y2, x1:x2]
@@ -133,7 +125,16 @@ def performOCR(image):
             for _, text, confidence in text_results:
                 print(f"Detected Text: {text} (Confidence: {confidence:.2f})")
 
+        # Display image using Matplotlib
+        plt.figure(figsize=(10, 6))
+        plt.imshow(image)
+        plt.axis('off')  # Hide axes
+        plt.title("YOLO Text Detection")
+        plt.show()
+        plt.pause(10)
+        plt.close
         print("Text read!")
+        
         # Extract expiration date
         expiration_date = extract_expiration_date(text_results)
 
