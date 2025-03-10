@@ -136,7 +136,7 @@ def performOCR(image):
         plt.title("YOLO Text Detection")
         plt.show()
         plt.pause(10)
-        plt.close
+        plt.close()
         print("Text read!")
 
         # Extract expiration date
