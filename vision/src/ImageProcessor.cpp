@@ -90,9 +90,11 @@ void ImageProcessor::processImagePair(int currentImageNumber,
   ClassifyObjectReturn topImageReturn =
       this->modelHandler.classifyObject(topImage, this->foodItem);
   if (sideImageReturn.foodItem || topImageReturn.foodItem) {
+    this->logger.log("Food item found.");
     classifyObjectReturn.foodItem = true;
   }
   if (sideImageReturn.expirationDate || topImageReturn.foodItem) {
+    this->logger.log("Expiration date found.");
     classifyObjectReturn.expirationDate = true;
   }
   return;
