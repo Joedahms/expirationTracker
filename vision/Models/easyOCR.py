@@ -152,6 +152,7 @@ def performOCR(image):
         for box in modelResult.boxes:
             classID = int(box.cls[0])
             className = yolo.names[classID]
+            print(f"CLASS NAME : {className}\n\nCLASS ID : {classID}\n\n")
             if classID in openImageFoodItemList:
                 print(f"Recognized {className}...")
                 foodLabels.append(className)
