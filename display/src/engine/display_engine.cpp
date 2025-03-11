@@ -244,10 +244,11 @@ void DisplayEngine::checkKeystates() {
     this->engineState = this->itemList->checkKeystates();
     break;
 
-    // Zero weight
+  case EngineState::ZERO_WEIGHT:
+    break;
 
   default:
-    LOG(FATAL) << "Invalid state";
+    LOG(FATAL) << "Invalid state " << engineStateToString(this->engineState);
     break;
   }
 }
