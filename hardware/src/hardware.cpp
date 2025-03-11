@@ -70,8 +70,12 @@ bool Hardware::checkStartSignal(int timeoutMs) {
         if (checkWeight() == false) {
           this->logger.log("Informing display that no weight detected on plaform");
           this->replySocket.send(Messages::ZERO_WEIGHT);
+          this->logger.log("Informed display that no weight detected on platform");
           std::string zeroWeightResponse;
+          this->logger.log("Waiting for zero weight response from display");
           this->replySocket.receive(zeroWeightResponse);
+          this->logger.log("Received zero weight response from display " +
+                           zeroWeightResponse);
           if (zeroWeightResponse == Messages::RETRY) {
             // TODO figure out retry
           }
@@ -175,7 +179,7 @@ bool Hardware::startScan() {
  *      2. integrate code to check weight from Arduino Read from weight sensor
  */
 bool Hardware::checkWeight() {
-  this->itemWeight = 1; // set to 1 for testing
+  this->itemWeight = 0; // set to 0 for testing
   if (this->itemWeight <= 0) {
     // May need to adjust up because the scale is likely sensitive to vibrations
     return false;

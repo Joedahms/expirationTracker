@@ -39,7 +39,7 @@ void DisplayHandler::handle() {
   while (true) {
     std::string receivedMessage;
     this->replySocket.receive(receivedMessage);
-    this->logger.log("received message from socket: " + receivedMessage);
+    this->logger.log("Received message from socket: " + receivedMessage);
 
     // Engine wants to start a new scan, decide what to send back to it
     if (receivedMessage == Messages::START_SCAN) {
@@ -50,7 +50,9 @@ void DisplayHandler::handle() {
       }
       else if (startResponse == Messages::ZERO_WEIGHT) {
         // Tell engine no weight on platform and wait for next step
+        this->logger.log("Indicating to engine that no weight on platform");
         this->replySocket.send(Messages::ZERO_WEIGHT);
+        this->logger.log("Indicated to engine that no weight on platform");
         std::string zeroWeightResponse;
         this->replySocket.receive(zeroWeightResponse);
 
@@ -97,7 +99,6 @@ std::string DisplayHandler::startSignalToHardware() {
 
   try {
     this->logger.log("Requesting that hardware start scan");
-    this->replySocket.send(Messages::AFFIRMATIVE);
     this->requestHardwareSocket.send(Messages::START_SCAN);
 
     std::string hardwareResponse;
