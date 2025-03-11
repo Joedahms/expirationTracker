@@ -23,20 +23,6 @@ Hardware::Hardware(zmqpp::context& context)
       this->logger.log("Failed to create directory: " + imageDirectory.string());
     }
   }
-  else if (!imageDirectory.empty()) {
-    // did not properly shutdown last time
-    try {
-      for (const auto& entry : std::filesystem::directory_iterator(imageDirectory)) {
-        if (entry.is_regular_file()) {
-          std::string ext = entry.path().extension().string();
-          std::filesystem::remove(entry.path());
-          this->logger.log("Deleted: " + entry.path().string());
-        }
-      }
-    } catch (const std::filesystem::filesystem_error& e) {
-      this->logger.log("Error deleting files: " + std::string(e.what()));
-    }
-  }
   try {
     this->requestVisionSocket.connect(ExternalEndpoints::visionEndpoint);
     this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
@@ -122,7 +108,19 @@ void Hardware::sendStartToVision() {
  * */
 bool Hardware::startScan() {
   this->logger.log("Starting scan");
-
+  if (!this->imageDirectory.empty()) {
+    this->logger.log("Clearing directory");
+    try {
+      for (const auto& entry : std::filesystem::directory_iterator(imageDirectory)) {
+        if (entry.is_regular_file()) {
+          std::filesystem::remove(entry.path());
+          this->logger.log("Deleted: " + entry.path().string());
+        }
+      }
+    } catch (const std::filesystem::filesystem_error& e) {
+      this->logger.log("Error deleting files: " + std::string(e.what()));
+    }
+  }
   this->logger.log("Checking weight");
   if (checkWeight() == false) {
     // TODO handle no weight on platform
@@ -231,7 +229,7 @@ bool Hardware::takePhotos(int angle) {
   this->logger.log("Taking photos at position: " + std::to_string(angle));
   std::string cmd0 = "rpicam-jpeg --camera 0";
   std::string cmd1 = "rpicam-jpeg --camera 1";
-  std::string np   = " --preview 0,0,640,480";
+  std::string np   = " --fullscreen";
   std::string res  = " --width 4608 --height 2592";
   std::string out  = " --output ";
   std::string to   = " --timeout 50"; // DO NOT SET TO 0! Will cause infinite preview!
