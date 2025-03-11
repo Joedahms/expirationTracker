@@ -138,7 +138,7 @@ def performOCR(image):
     result = {}
     foodLabels = []
     text_results = []
-    
+
     processedImage = preprocessImage(image)
     if isinstance(processedImage, str):
         return(f"ERROR: {processedImage}")
@@ -146,10 +146,10 @@ def performOCR(image):
 
     try:
         print("Running YOLO to detect object...")
-        result = yolo(image)[0] #yolo(image) returns a list of 'results', we should only have one because only a single image
+        modelResult = yolo(image)[0] #yolo(image) returns a list of 'results', we should only have one because only a single image
         print("Detection complete. Filtering objects...")
 
-        for box in result.boxes:
+        for box in modelResult.boxes:
             classID = int(box.cls[0])
             className = yolo.names[classID]
             if classID in openImageFoodItemList:
