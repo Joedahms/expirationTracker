@@ -4,7 +4,7 @@ import re
 import sys
 import cv2
 import numpy as np
-from foodClasses import textClasses, pluMapping
+from foodClasses import textClasses, pluMapping, openImageFoodItemList, openImagePackageItemList
 import matplotlib.pyplot as plt
 
 try:
@@ -24,39 +24,61 @@ def isFoodClass(text):
     """ Check if extracted text belongs to a known classification. """
     words = cleanText(text).split()
     for word in words:
-        if(len(word) == 4 and word.isdigit() and int(word) in pluMapping):
-            return {"type": "classification", "value": pluMapping.get(int(word))}
         if len(word) > 2 and word in textClasses:
             return {"type": "classification", "value": word}  # Return food category
 
     return None
 
+def isPLUClass(text):
+    words = cleanText(text).split()
+    for word in words:
+        if(len(word) == 4 and word.isdigit() and int(word) in pluMapping):
+            return {"type": "classification", "value": pluMapping.get(int(word))}
+        
+    return None
+
 def extract_expiration_date(text_list):
-    """Extract expiration dates from text using various formats."""
+    """Extract expiration dates from text using various formats while ensuring valid months."""
+
+    # List of valid month abbreviations and full names
+    valid_months = {
+        "jan", "feb", "mar", "apr", "may", "jun", 
+        "jul", "aug", "sep", "oct", "nov", "dec",
+        "january", "february", "march", "april", "may", "june",
+        "july", "august", "september", "october", "november", "december"
+    }
 
     # Common expiration date patterns
     date_patterns = [
-        r'(\b\d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b)',  # MM/DD/YYYY or DD/MM/YYYY or YYYY/MM/DD
-        r'(\b\d{4}[./-]\d{1,2}[./-]\d{1,2}\b)',  # YYYY-MM-DD or YYYY/MM/DD
-        r'(\b\d{1,2} [A-Za-z]{3,} \d{2,4}\b)',  # 12 Jan 2024 or 5 July 23
-        r'(\b[A-Za-z]{3,} \d{1,2},? \d{2,4}\b)',  # Jan 12, 2024 or July 5 23
-        r'(\b\d{1,2}[./-]\d{1,2}\b)',  # MM/DD or DD/MM (common short format)
-        r'(\bEXP:? \d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b)',  # EXP 12/01/2024
-        r'(\bBest Before:? \d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b)',  # Best Before 01-2025
-        r'(\bUse By:? \d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b)',  # Use By 12-2023
-        r'(\bSell By:? \d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b)',  # Sell By 03/25
-        r'(\bExp:? \d{1,2}[./-]\d{1,2}\b)',  # Exp 12/23
-        r'(\bEXP:? \d{1,2}[./-]\d{1,2}\b)',  # EXP 12-23
+        re.compile(r'(\b\d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b)', re.IGNORECASE),  # MM/DD/YYYY or DD/MM/YYYY or YYYY/MM/DD
+        re.compile(r'(\b\d{4}[./-]\d{1,2}[./-]\d{1,2}\b)', re.IGNORECASE),  # YYYY-MM-DD or YYYY/MM/DD
+        re.compile(r'(\b\d{1,2} ([A-Za-z]{3,}) \d{2,4}\b)', re.IGNORECASE),  # 12 Jan 2024 or 5 July 23
+        re.compile(r'(\b[A-Za-z]{3,} \d{1,2},? \d{2,4}\b)', re.IGNORECASE),  # Jan 12, 2024 or July 5 23
+        re.compile(r'(\b\d{1,2}[./-]\d{1,2}\b)', re.IGNORECASE),  # MM/DD or DD/MM (short format)
+        re.compile(r'(\bEXP:? \d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b)', re.IGNORECASE),  # EXP 12/01/2024
+        re.compile(r'(\bBest Before:? \d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b)', re.IGNORECASE),  # Best Before 01-2025
+        re.compile(r'(\bUse By:? \d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b)', re.IGNORECASE),  # Use By 12-2023
+        re.compile(r'(\bSell By:? \d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b)', re.IGNORECASE),  # Sell By 03/25
+        re.compile(r'(\bExp:? \d{1,2}[./-]\d{1,2}\b)', re.IGNORECASE),  # Exp 12/23
+        re.compile(r'(\bEXP:? \d{1,2}[./-]\d{1,2}\b)', re.IGNORECASE),  # EXP 12-23
     ]
 
     detected_dates = []
 
-    # Check each text line for expiration date patterns
     for text in text_list:
         for pattern in date_patterns:
-            match = re.search(pattern, text, re.IGNORECASE)
+            match = pattern.search(text)
             if match:
-                detected_dates.append(match.group(1))
+                date_string = match.group(1)
+
+                # Extract month if applicable and validate it
+                month_match = re.search(r'([A-Za-z]{3,})', date_string)
+                if month_match:
+                    month_text = month_match.group(1).lower()
+                    if month_text not in valid_months:
+                        continue  # Skip invalid month entries
+
+                detected_dates.append(date_string)
 
     return detected_dates if detected_dates else "No expiration date detected"
 
@@ -99,61 +121,65 @@ def preprocessImage(img):
     
 def performOCR(image):
     print("Performing OCR")
-    processed_image = preprocessImage(image)
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    if isinstance(processed_image, str):
-        return(f"ERROR: {processed_image}")
+    result = {}
+    foodLabels = []
+
+    processedImage = preprocessImage(image)
+    if isinstance(processedImage, str):
+        return(f"ERROR: {processedImage}")
 
     try:
-        print("Detecting text...")
+        print("Running YOLO to detect object...")
         result = yolo(image)[0] #yolo(image) returns a list of 'results', we should only have one because only a single image
-        print("Text detected!")
-        print("Reading text...")
-        for box in result.boxes:  # Use .boxes.data instead of .xyxy
-            bbox = box.xyxy[0].tolist()  # Convert tensor to list safely
-            x1, y1, x2, y2 = map(int, bbox)  # Extract bounding box as integers
-            confidence = float(box.conf[0])  # Get confidence score
-            class_id = int(box.cls[0])  # Get class ID
-            class_name = yolo.names[class_id]
-            # Draw rectangle
-            cv2.rectangle(image_rgb, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            label = f"{class_name} ({confidence:.2f})"
-            cv2.putText(image_rgb, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        print("Detection complete. Filtering objects...")
 
-            # Crop detected text
-            cropped_text = processed_image[y1:y2, x1:x2]
+        for box in result.boxes:
+            classID = int(box.cls[0])
+            className = yolo.names[classID]
+            if classID in openImageFoodItemList:
+                #recognized produce/food item
+                foodLabels.append(className)
+                result["Food Labels"] = foodLabels
+                return result
+            
+            elif classID in openImagePackageItemList:
+                print(f"Reading {className}...")
+                #crop if bottle or box is detected to read specific location
+                bbox = box.xyxy[0].tolist()
+                x1, y1, x2, y2 = map(int, bbox)
 
-            # Recognize text using EasyOCR
-            text_results = reader.readtext(cropped_text, detail=0, paragraph=True, text_threshold=0.7)
+                # Crop detected text
+                cropped_text = processedImage[y1:y2, x1:x2]
 
+                # Recognize text using EasyOCR
+                text_results = reader.readtext(cropped_text, detail=0, paragraph=True, text_threshold=0.7)
+
+                print(f"Reading {className} complete!")
+
+
+        if text_results is None:
+            print("No known objects detected. Scanning image for text.")
+            text_results = reader.readtext(processedImage, detail=0, paragraph=True, text_threshold=0.7)
+            # no package or bottle detected. maybe PLU?
+            print("Scan complete.")
             for text in text_results:
-                print(f"Detected Text: {text} (Confidence: {confidence:.2f})")
+                classification = isPLUClass(text)
+                if classification:
+                    foodLabels.append(classification["value"])
+                    result["Food Labels"] = foodLabels
+                    return result
 
-        # Display image using Matplotlib
-        plt.figure(figsize=(10, 6))
-        plt.imshow(image_rgb)
-        plt.axis('off')  # Hide axes
-        plt.title("YOLO Text Detection")
-        plt.show()
-        plt.pause(10)
-        plt.close()
-        print("Text read!")
+        # Check for food class
+        for text in text_results:
+            classification = isFoodClass(text)
+            if classification:
+                foodLabels.append(classification["value"])
 
         # Extract expiration date
         expiration_date = extract_expiration_date(text_results)
 
-        print(f"\n\nRESULTS: {text_results}\n\n")
-        # Extract PLU codes and classify food labels
-        food_labels = []
-        for text in text_results:
-            classification = isFoodClass(text)
-            if classification:
-                food_labels.append(classification["value"])
-
-        result = {}
-
-        if food_labels:
-            result["Food Labels"] = food_labels
+        if foodLabels:
+            result["Food Labels"] = foodLabels
 
         if expiration_date and expiration_date != "No expiration date detected":
             result["Expiration Date"] = expiration_date
