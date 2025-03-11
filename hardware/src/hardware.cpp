@@ -232,7 +232,7 @@ bool Hardware::takePhotos(int angle) {
   std::string np   = " --fullscreen";
   std::string res  = " --width 4608 --height 2592";
   std::string out  = " --output ";
-  std::string to   = " --timeout 50"; // DO NOT SET TO 0! Will cause infinite preview!
+  std::string to   = " --timeout 5000"; // DO NOT SET TO 0! Will cause infinite preview!
   std::string topPhoto =
       this->imageDirectory.string() + std::to_string(angle) + "_top.jpg";
   std::string sidePhoto =
