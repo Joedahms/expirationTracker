@@ -137,10 +137,12 @@ def performOCR(image):
     print("Performing OCR")
     result = {}
     foodLabels = []
-
+    text_results = []
+    
     processedImage = preprocessImage(image)
     if isinstance(processedImage, str):
         return(f"ERROR: {processedImage}")
+
 
     try:
         print("Running YOLO to detect object...")
