@@ -106,6 +106,7 @@ std::string TextClassifier::runModel(const std::filesystem::path& imagePath) {
   this->logger.log("Loading image");
   cv::Mat image = cv::imread(imagePath);
   if (image.empty()) {
+    this->logger.log("Error loading image" + imagePath.string());
     LOG(FATAL) << "Error: Could not load image.";
     return "SHIIIIII";
   }
