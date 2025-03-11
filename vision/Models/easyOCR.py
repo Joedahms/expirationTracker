@@ -94,7 +94,7 @@ def extract_expiration_date(text_list):
                 except (ValueError, TypeError):
                     continue  # Skip invalid dates
 
-    return detected_dates if detected_dates else ["No expiration date detected"]
+    return detected_dates
 
 def preprocessImage(img):
     print("Preprocessing image")
@@ -153,7 +153,7 @@ def performOCR(image):
             classID = int(box.cls[0])
             className = yolo.names[classID]
             if classID in openImageFoodItemList:
-                #recognized produce/food item
+                print(f"Recognized {className}...")
                 foodLabels.append(className)
                 result["Food Labels"] = foodLabels
                 return result
@@ -173,7 +173,7 @@ def performOCR(image):
                 print(f"Reading {className} complete!")
 
 
-        if text_results is None:
+        if not text_results:
             print("No known objects detected. Scanning image for text.")
             text_results = reader.readtext(processedImage, detail=0, paragraph=True, text_threshold=0.7)
             # no package or bottle detected. maybe PLU?
@@ -197,7 +197,7 @@ def performOCR(image):
         if foodLabels:
             result["Food Labels"] = foodLabels
 
-        if expiration_date and expiration_date != "No expiration date detected":
+        if expiration_date:
             result["Expiration Date"] = expiration_date
 
         return result  # Only includes keys if values exist
