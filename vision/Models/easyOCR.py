@@ -1,5 +1,6 @@
 import easyocr
 from ultralytics import YOLO
+from datetime import datetime
 import re
 import sys
 import cv2
@@ -38,29 +39,23 @@ def isPLUClass(text):
     return None
 
 def extract_expiration_date(text_list):
-    """Extract expiration dates from text using various formats while ensuring valid months."""
-
+    """Extract expiration dates from text and normalize them to YYYY/MM/DD format."""
+    
     # List of valid month abbreviations and full names
     valid_months = {
-        "jan", "feb", "mar", "apr", "may", "jun", 
-        "jul", "aug", "sep", "oct", "nov", "dec",
-        "january", "february", "march", "april", "may", "june",
-        "july", "august", "september", "october", "november", "december"
+        "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
+        "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
+        "january": 1, "february": 2, "march": 3, "april": 4, "may": 5, "june": 6,
+        "july": 7, "august": 8, "september": 9, "october": 10, "november": 11, "december": 12
     }
 
     # Common expiration date patterns
     date_patterns = [
-        re.compile(r'(\b\d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b)', re.IGNORECASE),  # MM/DD/YYYY or DD/MM/YYYY or YYYY/MM/DD
-        re.compile(r'(\b\d{4}[./-]\d{1,2}[./-]\d{1,2}\b)', re.IGNORECASE),  # YYYY-MM-DD or YYYY/MM/DD
-        re.compile(r'(\b\d{1,2} ([A-Za-z]{3,}) \d{2,4}\b)', re.IGNORECASE),  # 12 Jan 2024 or 5 July 23
-        re.compile(r'(\b[A-Za-z]{3,} \d{1,2},? \d{2,4}\b)', re.IGNORECASE),  # Jan 12, 2024 or July 5 23
-        re.compile(r'(\b\d{1,2}[./-]\d{1,2}\b)', re.IGNORECASE),  # MM/DD or DD/MM (short format)
-        re.compile(r'(\bEXP:? \d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b)', re.IGNORECASE),  # EXP 12/01/2024
-        re.compile(r'(\bBest Before:? \d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b)', re.IGNORECASE),  # Best Before 01-2025
-        re.compile(r'(\bUse By:? \d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b)', re.IGNORECASE),  # Use By 12-2023
-        re.compile(r'(\bSell By:? \d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b)', re.IGNORECASE),  # Sell By 03/25
-        re.compile(r'(\bExp:? \d{1,2}[./-]\d{1,2}\b)', re.IGNORECASE),  # Exp 12/23
-        re.compile(r'(\bEXP:? \d{1,2}[./-]\d{1,2}\b)', re.IGNORECASE),  # EXP 12-23
+        re.compile(r'\b(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})\b'),  # MM/DD/YYYY or DD/MM/YYYY or YYYY/MM/DD
+        re.compile(r'\b(\d{4})[./-](\d{1,2})[./-](\d{1,2})\b'),  # YYYY-MM-DD or YYYY/MM/DD
+        re.compile(r'\b(\d{1,2}) ([A-Za-z]{3,}) (\d{2,4})\b', re.IGNORECASE),  # 12 Jan 2024 or 5 July 23
+        re.compile(r'\b([A-Za-z]{3,}) (\d{1,2}),? (\d{2,4})\b', re.IGNORECASE),  # Jan 12, 2024 or July 5 23
+        re.compile(r'\b(\d{1,2})[./-](\d{1,2})\b'),  # MM/DD or DD/MM (short format)
     ]
 
     detected_dates = []
@@ -69,18 +64,37 @@ def extract_expiration_date(text_list):
         for pattern in date_patterns:
             match = pattern.search(text)
             if match:
-                date_string = match.group(1)
+                groups = match.groups()
+                
+                try:
+                    if len(groups) == 3:
+                        if groups[0].isalpha():  # Format: "Jan 12, 2024"
+                            month = valid_months.get(groups[0].lower())
+                            day, year = int(groups[1]), int(groups[2])
+                        elif groups[1].isalpha():  # Format: "12 Jan 2024"
+                            month = valid_months.get(groups[1].lower())
+                            day, year = int(groups[0]), int(groups[2])
+                        else:  # Format: "MM/DD/YYYY" or "DD/MM/YYYY"
+                            first, second, third = map(int, groups)
+                            if first > 31:  # Assume YYYY/MM/DD
+                                year, month, day = first, second, third
+                            elif third > 31:  # Assume MM/DD/YYYY
+                                month, day, year = first, second, third
+                            else:  # Assume DD/MM/YYYY
+                                day, month, year = first, second, third
+                    elif len(groups) == 2:  # Short format "MM/DD"
+                        month, day = map(int, groups)
+                        year = datetime.today().year  # Assume current year
+                    
+                    if year < 100:  # Convert two-digit years to four-digit
+                        year += 2000 if year < 50 else 1900
 
-                # Extract month if applicable and validate it
-                month_match = re.search(r'([A-Za-z]{3,})', date_string)
-                if month_match:
-                    month_text = month_match.group(1).lower()
-                    if month_text not in valid_months:
-                        continue  # Skip invalid month entries
+                    normalized_date = f"{year:04d}/{month:02d}/{day:02d}"
+                    detected_dates.append(normalized_date)
+                except (ValueError, TypeError):
+                    continue  # Skip invalid dates
 
-                detected_dates.append(date_string)
-
-    return detected_dates if detected_dates else "No expiration date detected"
+    return detected_dates if detected_dates else ["No expiration date detected"]
 
 def preprocessImage(img):
     print("Preprocessing image")

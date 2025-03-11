@@ -66,21 +66,45 @@ std::string ModelHandler::discoverServerViaUDP() {
  * @param foodItem foodItem to update
  * @return Whether classification was successful or not
  */
-bool ModelHandler::classifyObject(const std::filesystem::path& imagePath,
-                                  FoodItem& foodItem) {
+ClassifyObjectReturn ModelHandler::classifyObject(const std::filesystem::path& imagePath,
+                                                  FoodItem& foodItem) {
+  ClassifyObjectReturn classifyObjectReturn{false, false};
   this->logger.log("Running text classificiation");
-  auto result = this->textClassifier.handleClassification(imagePath);
+  OCRResult result = this->textClassifier.handleClassification(imagePath);
   this->logger.log("Text classification complete");
 
   // update foodItem
-  if (result) {
-    foodItem.setName(result.value());
+  if (result.hasFoodItems()) {
+    classifyObjectReturn.foodItem = true;
+    std::string firstFoodItem     = result.getFoodItems()[0];
+    foodItem.setName(firstFoodItem);
     foodItem.setImagePath(std::filesystem::absolute(imagePath));
-    foodItem.setCategory(FoodCategories::packaged);
     foodItem.setQuantity(1);
-    foodItem.setExpirationDate(std::chrono::year_month_day{
-        std::chrono::year{2025}, std::chrono::month{3}, std::chrono::day{15}});
-    return true;
+    if (knownFoodData.find(firstFoodItem) != knownFoodData.end()) {
+      // classified food item is some sort of produce
+      foodItem.setCategory(FoodCategories::unpackaged);
+      foodItem.setExpirationDate(
+          calculateExpirationDate(foodItem.getScanDate(), foodItem.getName()));
+      classifyObjectReturn.expirationDate = true;
+    }
+    else {
+      foodItem.setCategory(FoodCategories::packaged);
+    }
   }
-  return false;
+  else if (result.hasExpirationDates()) {
+    // OCR return expiration date in form YYYY/MM/DD
+    foodItem.setExpirationDate(
+        this->extractExpirationDate(result.getExpirationDates()[0]));
+    classifyObjectReturn.expirationDate = true;
+  }
+  return classifyObjectReturn;
+}
+
+std::chrono::year_month_day ModelHandler::extractExpirationDate(
+    const std::string& expDate) {
+  std::istringstream iss(expDate);
+  int year, month, day;
+  char delim1 = '/';
+  iss >> year >> delim1 >> month >> delim1 >> day;
+  return {std::chrono::year{year}, std::chrono::month{month}, std::chrono::day{day}};
 }

@@ -21,16 +21,76 @@ TextClassifier::TextClassifier(zmqpp::context& context,
  * @param imagePath Path to the image to extract text from
  * @return pair <item identification success/fail, string>
  */
-std::optional<std::string> TextClassifier::handleClassification(
-    const std::filesystem::path& imagePath) {
+OCRResult TextClassifier::handleClassification(const std::filesystem::path& imagePath) {
   this->logger.log("Entering handleClassification, running model");
   auto result = this->runModel(imagePath);
+  this->logger.log("Model run, classification received.");
 
-  std::string detectedClass = std::string(result);
-  if (!detectedClass.empty()) {
-    return detectedClass;
+  std::vector<std::string> foodVector;
+  std::vector<std::string> expVector;
+  OCRResult OCRResult;
+
+  if (result.empty()) {
+    return OCRResult;
   }
-  return std::nullopt;
+
+  std::stringstream ss(result);
+  std::string token;
+
+  // Check if expiration date is present
+  size_t expPos = result.find(", Exp:");
+  if (expPos != std::string::npos) {
+    // Extract expiration date part
+    std::string foodPart = result.substr(0, expPos);
+    std::string expPart  = result.substr(expPos + 7); // Skip ", Exp: "
+
+    // Split food classifications (", " separated)
+    std::stringstream foodStream(foodPart);
+    std::string token;
+    while (getline(foodStream, token, ',')) {
+      if (!token.empty()) {
+        foodVector.push_back(token);
+      }
+    }
+
+    for (auto& food : foodVector) {
+      food.erase(0, food.find_first_not_of(" ")); // Trim leading spaces
+      food.erase(food.find_last_not_of(" ") + 1); // Trim trailing spaces
+    }
+
+    // Split expiration dates (", " separated)
+    std::stringstream expStream(expPart);
+    while (getline(expStream, token, ',')) {
+      if (!token.empty()) {
+        expVector.push_back(token);
+      }
+    }
+
+    for (auto& exp : expVector) {
+      exp.erase(0, exp.find_first_not_of(" ")); // Trim leading spaces
+      exp.erase(exp.find_last_not_of(" ") + 1); // Trim trailing spaces
+    }
+  }
+  else {
+    // No expiration date, only food classification
+    std::stringstream foodStream(result);
+    std::string token;
+    while (getline(foodStream, token, ',')) {
+      if (!token.empty()) {
+        foodVector.push_back(token);
+      }
+    }
+
+    for (auto& food : foodVector) {
+      food.erase(0, food.find_first_not_of(" ")); // Trim leading spaces
+      food.erase(food.find_last_not_of(" ") + 1); // Trim trailing spaces
+    }
+  }
+
+  OCRResult.setFoodItems(foodVector);
+  OCRResult.setExpirationDates(expVector);
+
+  return OCRResult;
 }
 
 /**
@@ -83,32 +143,53 @@ std::string TextClassifier::runModel(const std::filesystem::path& imagePath) {
     try {
       nlohmann::json formatText = nlohmann::json::parse(extractedText);
 
-      if (formatText.contains("Food Labels")) {
-        if (formatText["Food Labels"].is_array()) {
-          for (const auto& label : formatText["Food Labels"]) {
-            if (!foodClassification.empty()) {
-              foodClassification += ", ";
-            }
-            foodClassification += label.get<std::string>();
+      if (formatText.contains("Food Labels") && formatText["Food Labels"].is_array()) {
+        for (const auto& label : formatText["Food Labels"]) {
+          if (!foodClassification.empty()) {
+            foodClassification += ", ";
           }
-        }
-        else {
-          foodClassification = formatText["Food Labels"].get<std::string>();
+          foodClassification += label.get<std::string>();
         }
       }
 
-      if (formatText.contains("Expiration Date")) {
-        expirationDate = formatText["Expiration Date"];
+      if (formatText.contains("Expiration Date") &&
+          formatText["Expiration Date"].is_array()) {
+        std::vector<std::string> dateList =
+            formatText["Expiration Date"].get<std::vector<std::string>>();
+
+        // Join expiration dates if multiple exist
+        expirationDate = "";
+        for (const std::string& date : dateList) {
+          if (!expirationDate.empty()) {
+            expirationDate += ", ";
+          }
+          expirationDate += date;
+        }
       }
 
-    } catch (nlohmann::json::parse_error& e) {
+    } catch (const nlohmann::json::parse_error& e) {
       LOG(FATAL) << "JSON Parse Error: " << e.what();
+      return "JSON_PARSE_ERROR";
+    } catch (const std::exception& e) {
+      LOG(FATAL) << "General Error: " << e.what();
+      return "GENERAL_JSON_ERROR";
     }
 
     this->logger.log("Received classification result: " + foodClassification);
     this->logger.log("Received expiration date result: " + expirationDate);
 
-    return foodClassification;
+    if (!foodClassification.empty() && !expirationDate.empty()) {
+      return foodClassification + ", Exp: " + expirationDate;
+    }
+    else if (!foodClassification.empty()) {
+      return foodClassification;
+    }
+    else if (!expirationDate.empty()) {
+      return "Exp: " + expirationDate;
+    }
+    else {
+      return "";
+    }
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << "ZeroMQ error: " << e.what();
     return "ZMQ_ERROR";

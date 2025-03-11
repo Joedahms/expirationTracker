@@ -37,7 +37,7 @@ void ImageProcessor::process() {
 
   bool detectedFoodItem = analyze();
   this->logger.log("Successfully analyzed all images");
-  stopHardware();
+
   // Move this into analyze
   if (detectedFoodItem) {
     detectionSucceeded();
@@ -71,40 +71,19 @@ void ImageProcessor::process() {
  */
 bool ImageProcessor::analyze() {
   this->logger.log("Entering analyze");
-  int imageCounter    = 0;
-  bool objectDetected = false;
-
-  while (!objectDetected) {
-    for (const auto& entry :
-         std::filesystem::directory_iterator(foodItem.getImagePath())) {
-      if (toLowerCase(entry.path().extension()) != ".jpg") {
-        continue;
-      }
-      if (++imageCounter > this->MAX_IMAGE_COUNT) {
-        if (objectDetected) {
-          this->logger.log("Object expiration date not found");
-        }
-        else {
-          this->logger.log("Object not able to be classified");
-        }
-        return false;
-      }
-      this->logger.log("Analyzing path: " + entry.path().string());
-      // continue;
-      //  Only runs text atm
-      if (!objectDetected) {
-        if (this->modelHandler.classifyObject(entry.path(), this->foodItem)) {
-          this->logger.log("Detection successful. Exiting analyze method");
-          objectDetected = true;
-          return true;
-        }
-      }
+  int imageCounter = 0;
+  ClassifyObjectReturn classifyObjectReturn{false, false};
+  for (int i = 0; i < 7; i++) {
+    processImagePair(imageCounter, classifyObjectReturn);
+    if (classifyObjectReturn.foodItem && classifyObjectReturn.expirationDate) {
+      return true;
     }
   }
   return false;
 }
 
-bool ImageProcessor::processImagePair(int currentImageNumber) {
+void ImageProcessor::processImagePair(int currentImageNumber,
+                                      ClassifyObjectReturn& classifyObjectReturn) {
   this->logger.log("Entering processImagePair");
   std::filesystem::path imageDir = foodItem.getImagePath();
 
@@ -115,18 +94,25 @@ bool ImageProcessor::processImagePair(int currentImageNumber) {
       imageDir / (std::to_string(currentImageNumber) + "_side.jpg");
   this->logger.log("Looking for image: " + topImage.string());
   this->logger.log("Looking for image: " + topImage.string());
-  bool topExists  = std::filesystem::exists(topImage);
-  bool sideExists = std::filesystem::exists(sideImage);
+  bool topExists  = false;
+  bool sideExists = false;
 
-  // Ensure both images exist before processing
-  if (topExists && sideExists) {
-    if (this->modelHandler.classifyObject(topImage, this->foodItem) ||
-        this->modelHandler.classifyObject(sideImage, this->foodItem)) {
-      return true; // Successfully classified object
-    }
+  while (!topExists && !sideExists) {
+    topExists  = std::filesystem::exists(topImage);
+    sideExists = std::filesystem::exists(sideImage);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
-
-  return false; // Images missing or classification failed
+  ClassifyObjectReturn sideImageReturn =
+      this->modelHandler.classifyObject(sideImage, this->foodItem);
+  ClassifyObjectReturn topImageReturn =
+      this->modelHandler.classifyObject(topImage, this->foodItem);
+  if (sideImageReturn.foodItem || topImageReturn.foodItem) {
+    classifyObjectReturn.foodItem = true;
+  }
+  if (sideImageReturn.expirationDate || topImageReturn.foodItem) {
+    classifyObjectReturn.expirationDate = true;
+  }
+  return;
 }
 
 struct FoodItem& ImageProcessor::getFoodItem() { return this->foodItem; }
@@ -134,6 +120,7 @@ void ImageProcessor::setFoodItem(struct FoodItem& foodItem) { this->foodItem = f
 
 void ImageProcessor::detectionSucceeded() {
   this->logger.log("Item successfully detected");
+  stopHardware();
   foodItemToDisplay();
 }
 
