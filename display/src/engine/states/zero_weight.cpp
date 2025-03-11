@@ -15,16 +15,19 @@ ZeroWeight::ZeroWeight(struct DisplayGlobal displayGlobal)
   this->rootElement          = std::make_shared<Container>(rootRectangle);
 
   std::shared_ptr<Button> retryButton = std::make_shared<Button>(
-      this->displayGlobal, SDL_Rect{0, 0, 0, 0}, "Retry", SDL_Point{0, 0},
+      this->displayGlobal, SDL_Rect{0, 50, 0, 0}, "Retry", SDL_Point{0, 0},
       [this]() { retry(); }, LogFiles::zeroWeight);
+  retryButton->setCenteredHorizontal();
 
   std::shared_ptr<Button> overrideButton = std::make_shared<Button>(
-      this->displayGlobal, SDL_Rect{0, 0, 0, 0}, "Override", SDL_Point{0, 0},
+      this->displayGlobal, SDL_Rect{0, 150, 0, 0}, "Override", SDL_Point{0, 0},
       [this]() { override(); }, LogFiles::zeroWeight);
+  overrideButton->setCenteredHorizontal();
 
   std::shared_ptr<Button> cancelButton = std::make_shared<Button>(
-      this->displayGlobal, SDL_Rect{0, 0, 0, 0}, "Cancel", SDL_Point{0, 0},
+      this->displayGlobal, SDL_Rect{0, 250, 0, 0}, "Cancel", SDL_Point{0, 0},
       [this]() { cancel(); }, LogFiles::zeroWeight);
+  cancelButton->setCenteredHorizontal();
 
   this->rootElement->addElement(retryButton);
   this->rootElement->addElement(overrideButton);

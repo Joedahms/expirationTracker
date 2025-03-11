@@ -324,10 +324,11 @@ void DisplayEngine::startSignalToDisplay() {
   this->logger.log("Scan initialized, sending start signal to display");
   try {
     this->requestSocket.send(Messages::START_SCAN);
+    this->logger.log("Start signal successfully sent to display, waiting for response");
     std::string response;
     this->requestSocket.receive(response);
     if (response == Messages::AFFIRMATIVE) {
-      this->logger.log("Start signal successfully sent to display, in scanning state");
+      this->logger.log("Received affirmative from display");
     }
     else if (response == Messages::ZERO_WEIGHT) {
       this->logger.log(
@@ -335,7 +336,8 @@ void DisplayEngine::startSignalToDisplay() {
       this->engineState = EngineState::ZERO_WEIGHT;
     }
     else {
-      LOG(FATAL) << "Invalid response received from display";
+      this->logger.log("Received invalid response from display: " + response);
+      LOG(FATAL) << "Invalid response received from display " << response;
     }
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();

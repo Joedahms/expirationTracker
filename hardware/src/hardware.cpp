@@ -85,7 +85,8 @@ bool Hardware::checkStartSignal(int timeoutMs) {
             this->logger.log("Display decided to override zero weight, starting scan");
           }
           else if (zeroWeightResponse == Messages::CANCEL) {
-            ;
+            this->replySocket.send(Messages::AFFIRMATIVE);
+            this->logger.log("Display decided to cancel, aborting scan");
           }
           else {
             // TODO handle invalid zero weight response

@@ -38,6 +38,7 @@ DisplayHandler::DisplayHandler(zmqpp::context& context, const std::string& engin
 void DisplayHandler::handle() {
   while (true) {
     std::string receivedMessage;
+    this->logger.log("Listening for messages");
     this->replySocket.receive(receivedMessage);
     this->logger.log("Received message from socket: " + receivedMessage);
 
@@ -57,24 +58,35 @@ void DisplayHandler::handle() {
         this->replySocket.receive(zeroWeightResponse);
 
         if (zeroWeightResponse == Messages::RETRY) {
+          this->logger.log("Received retry from engine, sending affirmative back");
           // TODO figure out how to retry
           this->replySocket.send(Messages::AFFIRMATIVE);
+          this->logger.log("Affirmative sent");
           continue;
         }
         else if (zeroWeightResponse == Messages::OVERRIDE) {
+          this->logger.log("Received override from engine, sending affirmative back");
           this->replySocket.send(Messages::AFFIRMATIVE);
+          this->logger.log("Affirmative sent, sending override request to hardware");
           this->requestHardwareSocket.send(Messages::OVERRIDE);
+          this->logger.log("Sent override request to hardware");
           std::string overrideResponse;
-          this->replySocket.receive(overrideResponse);
-          // TODO handle overrideResponse
+          this->requestHardwareSocket.receive(overrideResponse);
+          // TODO check overrideResponse
+          this->logger.log(
+              "Hardware received override request, waiting for request from vision");
           receiveFromVision();
         }
         else if (zeroWeightResponse == Messages::CANCEL) {
+          this->logger.log("Received cancel from engine, sending affirmative back");
           this->replySocket.send(Messages::AFFIRMATIVE);
+          this->logger.log("Affirmative sent, sending cancel request to hardware");
           this->requestHardwareSocket.send(Messages::CANCEL);
+          this->logger.log("Sent cancel request to hardware");
           std::string cancelResponse;
-          this->replySocket.receive(cancelResponse);
-          // TODO handle cancelResponse
+          this->requestHardwareSocket.receive(cancelResponse);
+          // TODO check cancelResponse
+          this->logger.log("Hardware received cancel request");
         }
         else {
           LOG(FATAL) << "Unexpected message received: " << receivedMessage;
