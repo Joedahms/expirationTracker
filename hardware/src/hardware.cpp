@@ -231,7 +231,7 @@ bool Hardware::takePhotos(int angle) {
   this->logger.log("Taking photos at position: " + std::to_string(angle));
   std::string cmd0 = "rpicam-jpeg --camera 0";
   std::string cmd1 = "rpicam-jpeg --camera 1";
-  std::string np   = " --nopreview";
+  std::string np   = " --preview 0,0,640,480";
   std::string res  = " --width 4608 --height 2592";
   std::string out  = " --output ";
   std::string to   = " --timeout 50"; // DO NOT SET TO 0! Will cause infinite preview!
