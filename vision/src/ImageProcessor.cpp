@@ -71,10 +71,9 @@ void ImageProcessor::process() {
  */
 bool ImageProcessor::analyze() {
   this->logger.log("Entering analyze");
-  int imageCounter = 0;
   ClassifyObjectReturn classifyObjectReturn{false, false};
   for (int i = 0; i < 7; i++) {
-    processImagePair(imageCounter, classifyObjectReturn);
+    processImagePair(i, classifyObjectReturn);
     if (classifyObjectReturn.foodItem && classifyObjectReturn.expirationDate) {
       return true;
     }
