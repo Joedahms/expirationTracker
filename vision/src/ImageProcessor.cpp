@@ -76,11 +76,11 @@ void ImageProcessor::processImagePair(int currentImageNumber,
   std::filesystem::path sideImage =
       imageDir / (std::to_string(currentImageNumber) + "_side.jpg");
   this->logger.log("Looking for image: " + topImage.string());
-  this->logger.log("Looking for image: " + topImage.string());
+  this->logger.log("Looking for image: " + sideImage.string());
   bool topExists  = false;
   bool sideExists = false;
 
-  while (!topExists && !sideExists) {
+  while (!(topExists && sideExists)) { // Wait until BOTH images exist
     topExists  = std::filesystem::exists(topImage);
     sideExists = std::filesystem::exists(sideImage);
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
