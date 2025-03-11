@@ -341,7 +341,7 @@ void DisplayEngine::startSignalToDisplay() {
   }
 }
 
-void sendZeroWeightResponse(const std::string& zeroWeightResponse) {
+void DisplayEngine::sendZeroWeightResponse(const std::string& zeroWeightResponse) {
   this->logger.log("Sending zero weight response: " + zeroWeightResponse + " to display");
   try {
     this->requestSocket.send(zeroWeightResponse);

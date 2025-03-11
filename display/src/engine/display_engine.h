@@ -12,6 +12,7 @@
 
 #include "states/item_list.h"
 #include "states/scanning.h"
+#include "states/zero_weight.h"
 
 #include "display_global.h"
 #include "engine_state.h"

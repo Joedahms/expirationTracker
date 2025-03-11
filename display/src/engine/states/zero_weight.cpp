@@ -1,3 +1,4 @@
+#include "../../log_files.h"
 #include "zero_weight.h"
 
 ZeroWeight::ZeroWeight(struct DisplayGlobal displayGlobal)
@@ -36,7 +37,7 @@ void ZeroWeight::override() { this->currentState = EngineState::SCANNING; }
 
 void ZeroWeight::cancel() { this->currentState = EngineState::ITEM_LIST; }
 
-void ItemList::render() const {
+void ZeroWeight::render() const {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background
   SDL_RenderClear(this->displayGlobal.renderer);
   this->rootElement->render();

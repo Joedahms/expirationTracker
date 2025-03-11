@@ -47,8 +47,8 @@ Hardware::Hardware(zmqpp::context& context)
 }
 
 /*
- * Checks for a start signal from the display.
- * Used to start the scan process
+ * Checks for a start signal from the display. Return if have not received a message by
+ * the timeout.
  *
  * @param None
  * @return bool - True if start signal received, false otherwise
@@ -73,15 +73,19 @@ bool Hardware::checkStartSignal(int timeoutMs) {
           std::string zeroWeightResponse;
           this->replySocket.receive(zeroWeightResponse);
           if (zeroWeightResponse == Messages::RETRY) {
+            // TODO figure out retry
           }
           else if (zeroWeightResponse == Messages::OVERRIDE) {
+            receivedRequest = true;
+            this->replySocket.send(Messages::AFFIRMATIVE);
+            this->logger.log("Display decided to override zero weight, starting scan");
           }
           else if (zeroWeightResponse == Messages::CANCEL) {
+            ;
           }
           else {
-            // ruh roh
+            // TODO handle invalid zero weight response
           }
-          // Check that is a valid zero weight response
         }
         else {
           receivedRequest = true;

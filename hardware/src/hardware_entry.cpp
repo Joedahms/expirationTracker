@@ -31,6 +31,7 @@ void hardwareEntry(zmqpp::context& context) {
   Hardware hardware(context);
   bool startSignalReceived = false;
   int startSignalTimeoutMs = 1000;
+
   while (1) {
     startSignalReceived = false;
     while (startSignalReceived == false) {

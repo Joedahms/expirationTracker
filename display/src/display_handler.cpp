@@ -41,18 +41,21 @@ void DisplayHandler::handle() {
     this->replySocket.receive(receivedMessage);
     this->logger.log("received message from socket: " + receivedMessage);
 
-    // Engine wants to start a new scan
+    // Engine wants to start a new scan, decide what to send back to it
     if (receivedMessage == Messages::START_SCAN) {
       std::string startResponse = startSignalToHardware();
       if (startResponse == Messages::AFFIRMATIVE) {
-        // Success
+        // Success, weight on platform
         receiveFromVision();
       }
       else if (startResponse == Messages::ZERO_WEIGHT) {
+        // Tell engine no weight on platform and wait for next step
         this->replySocket.send(Messages::ZERO_WEIGHT);
         std::string zeroWeightResponse;
         this->replySocket.receive(zeroWeightResponse);
+
         if (zeroWeightResponse == Messages::RETRY) {
+          // TODO figure out how to retry
           this->replySocket.send(Messages::AFFIRMATIVE);
           continue;
         }
@@ -61,13 +64,15 @@ void DisplayHandler::handle() {
           this->requestHardwareSocket.send(Messages::OVERRIDE);
           std::string overrideResponse;
           this->replySocket.receive(overrideResponse);
+          // TODO handle overrideResponse
           receiveFromVision();
         }
         else if (zeroWeightResponse == Messages::CANCEL) {
           this->replySocket.send(Messages::AFFIRMATIVE);
           this->requestHardwareSocket.send(Messages::CANCEL);
-          std::string overrideResponse;
-          this->replySocket.receive(overrideResponse);
+          std::string cancelResponse;
+          this->replySocket.receive(cancelResponse);
+          // TODO handle cancelResponse
         }
         else {
           LOG(FATAL) << "Unexpected message received: " << receivedMessage;
