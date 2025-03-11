@@ -30,7 +30,9 @@ OCRResult TextClassifier::handleClassification(const std::filesystem::path& imag
   std::vector<std::string> expVector;
   OCRResult OCRResult;
 
-  if (result.empty()) {
+  if (result.empty() || (result.find("ERROR") != std::string::npos)) {
+    this->logger.log("Received empty or Error in runModel: " + result);
+    LOG(FATAL) << "Received error from runModel.";
     return OCRResult;
   }
 
@@ -108,7 +110,7 @@ std::string TextClassifier::runModel(const std::filesystem::path& imagePath) {
   if (image.empty()) {
     this->logger.log("Error loading image" + imagePath.string());
     LOG(FATAL) << "Error: Could not load image.";
-    return "SHIIIIII";
+    return "ERROR";
   }
   this->logger.log("Image loaded");
   // Encode image as JPG
@@ -136,12 +138,25 @@ std::string TextClassifier::runModel(const std::filesystem::path& imagePath) {
     // Receive OCR result
     zmqpp::message response;
     this->requestSocket.receive(response);
+
+    if (response.parts() == 0) {
+      this->logger.log("No response received from OCR server");
+      LOG(FATAL) << "No response received from OCR server";
+      return "NO_RESPONSE";
+    }
+
     std::string extractedText;
     response.get(extractedText, 0);
     this->logger.log("Received raw OCR result:" + extractedText);
     std::string foodClassification = "";
     std::string expirationDate     = "";
     try {
+      if (extractedText.empty() || extractedText[0] != '{') {
+        this->logger.log("Invalid JSON received: " + extractedText);
+        LOG(FATAL) << "Invalid JSON received: " << extractedText;
+        return "INVALID_JSON";
+      }
+
       nlohmann::json formatText = nlohmann::json::parse(extractedText);
 
       if (formatText.contains("Food Labels") && formatText["Food Labels"].is_array()) {
