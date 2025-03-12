@@ -46,10 +46,12 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger("scanning_state.
 EngineState Scanning::checkKeystates() {
   const Uint8* keystates = SDL_GetKeyboardState(NULL);
 
+  /*
   if (keystates[SDL_SCANCODE_ESCAPE]) {
     this->logger.log("Escape key pressed in scanning state");
     return EngineState::PAUSE_MENU;
   }
+  */
 
   return EngineState::SCANNING;
 }

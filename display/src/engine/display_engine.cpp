@@ -50,10 +50,8 @@ DisplayEngine::DisplayEngine(const char* windowTitle,
   initializeEngine(this->displayGlobal.window);
 
   // Initialize states
-  this->mainMenu  = std::make_unique<MainMenu>(this->displayGlobal);
-  this->scanning  = std::make_unique<Scanning>(this->displayGlobal);
-  this->pauseMenu = std::make_unique<PauseMenu>(this->displayGlobal);
-  this->itemList  = std::make_unique<ItemList>(this->displayGlobal);
+  this->scanning = std::make_unique<Scanning>(this->displayGlobal);
+  this->itemList = std::make_unique<ItemList>(this->displayGlobal);
 
   displayIsRunning = true;
   this->logger.log("Engine is constructed and now running");
@@ -91,7 +89,7 @@ SDL_Window* DisplayEngine::setupWindow(const char* windowTitle,
     LOG(FATAL) << "Error setting up SDL display window";
   }
 
-  LOG(INFO) << "SDL display window created";
+  this->logger.log("SDL display window created");
 }
 
 /**
@@ -101,7 +99,7 @@ SDL_Window* DisplayEngine::setupWindow(const char* windowTitle,
  * @return None
  */
 void DisplayEngine::initializeEngine(SDL_Window* window) {
-  LOG(INFO) << "Initializing engine";
+  this->logger.log("Initializing engine");
   try {
     int sdlInitReturn = SDL_Init(SDL_INIT_EVERYTHING);
     if (sdlInitReturn != 0) {
@@ -111,10 +109,8 @@ void DisplayEngine::initializeEngine(SDL_Window* window) {
     LOG(FATAL) << "Failed to initialize engine";
     exit(1);
   }
-  LOG(INFO) << "engine initialized";
 
   // Create renderer
-  LOG(INFO) << "Creating renderer";
   try {
     this->displayGlobal.renderer = SDL_CreateRenderer(
         window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
@@ -126,10 +122,8 @@ void DisplayEngine::initializeEngine(SDL_Window* window) {
     LOG(FATAL) << "Error creating renderer";
     exit(1);
   }
-  LOG(INFO) << "Renderer created";
 
   // Initialize TTF
-  LOG(INFO) << "Initializing TTF";
   try {
     int ttfInitReturn = TTF_Init();
     if (ttfInitReturn == -1) {
@@ -139,7 +133,7 @@ void DisplayEngine::initializeEngine(SDL_Window* window) {
     LOG(FATAL) << "Failed to initialize TTF";
     exit(1);
   }
-  LOG(INFO) << "TTF initialized";
+  this->logger.log("Engine initialized");
 }
 
 /**
@@ -150,28 +144,18 @@ void DisplayEngine::initializeEngine(SDL_Window* window) {
  */
 void DisplayEngine::checkState() {
   switch (this->engineState) {
-  case EngineState::MAIN_MENU:
-    this->engineState = this->mainMenu->getCurrentState();
-
-    if (this->engineState == EngineState::SCANNING) {
-      startSignalToDisplay();
-    }
-
-    this->mainMenu->setCurrentState(EngineState::MAIN_MENU);
-    break;
-
   case EngineState::SCANNING:
     this->engineState = this->scanning->getCurrentState();
     this->scanning->setCurrentState(EngineState::SCANNING);
     break;
 
-  case EngineState::PAUSE_MENU:
-    this->engineState = this->pauseMenu->getCurrentState();
-    this->pauseMenu->setCurrentState(EngineState::PAUSE_MENU);
-    break;
-
   case EngineState::ITEM_LIST:
     this->engineState = this->itemList->getCurrentState();
+
+    if (this->engineState == EngineState::SCANNING) {
+      startSignalToDisplay();
+    }
+
     this->itemList->setCurrentState(EngineState::ITEM_LIST);
     break;
 
@@ -191,10 +175,6 @@ void DisplayEngine::checkState() {
  */
 void DisplayEngine::handleEvents() {
   switch (this->engineState) {
-  case EngineState::MAIN_MENU:
-    this->mainMenu->handleEvents(&this->displayIsRunning);
-    break;
-
   case EngineState::SCANNING:
     {
       this->scanning->handleEvents(&this->displayIsRunning);
@@ -216,10 +196,6 @@ void DisplayEngine::handleEvents() {
       break;
     }
 
-  case EngineState::PAUSE_MENU:
-    this->pauseMenu->handleEvents(&this->displayIsRunning);
-    break;
-
   case EngineState::ITEM_LIST:
     this->itemList->handleEvents(&this->displayIsRunning);
     break;
@@ -239,14 +215,8 @@ void DisplayEngine::handleEvents() {
  */
 void DisplayEngine::checkKeystates() {
   switch (this->engineState) {
-  case EngineState::MAIN_MENU:
-    break;
-
   case EngineState::SCANNING:
     this->engineState = this->scanning->checkKeystates();
-    break;
-
-  case EngineState::PAUSE_MENU:
     break;
 
   case EngineState::ITEM_LIST:
@@ -269,16 +239,8 @@ void DisplayEngine::checkKeystates() {
  */
 void DisplayEngine::update() {
   switch (this->engineState) {
-  case EngineState::MAIN_MENU:
-    this->mainMenu->update();
-    break;
-
   case EngineState::SCANNING:
     this->scanning->update();
-    break;
-
-  case EngineState::PAUSE_MENU:
-    this->pauseMenu->update();
     break;
 
   case EngineState::ITEM_LIST:
@@ -299,16 +261,8 @@ void DisplayEngine::update() {
  */
 void DisplayEngine::renderState() {
   switch (this->engineState) {
-  case EngineState::MAIN_MENU:
-    this->mainMenu->render();
-    break;
-
   case EngineState::SCANNING:
     this->scanning->render();
-    break;
-
-  case EngineState::PAUSE_MENU:
-    this->pauseMenu->render();
     break;
 
   case EngineState::ITEM_LIST:
