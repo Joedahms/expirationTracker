@@ -173,6 +173,7 @@ void DisplayEngine::checkState() {
     else if (this->zeroWeight->getRetryScan()) {
       sendZeroWeightResponse(Messages::RETRY);
       this->zeroWeight->setRetryScan(false);
+      startSignalToDisplay();
     }
 
     this->zeroWeight->setCurrentState(EngineState::ZERO_WEIGHT);
@@ -330,7 +331,6 @@ void DisplayEngine::startSignalToDisplay() {
     std::string response;
     this->requestSocket.receive(response);
     if (response == Messages::AFFIRMATIVE) {
-      scanStartedOrCancelled = true;
       this->logger.log("Received affirmative from display");
     }
     else if (response == Messages::ZERO_WEIGHT) {
@@ -338,6 +338,8 @@ void DisplayEngine::startSignalToDisplay() {
           "Received zero weight back from display, switching to zero weight state");
       this->engineState = EngineState::ZERO_WEIGHT;
       // At this point need to check if display sends back affirmative or zero weight
+      // Break out response checking (if else if) and call it on some interval if in zero
+      // weight state?
     }
     else {
       this->logger.log("Received invalid response from display: " + response);

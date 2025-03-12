@@ -86,10 +86,6 @@ bool Hardware::checkStartSignal(int timeoutMs) {
               this->replySocket.send(Messages::AFFIRMATIVE);
               this->logger.log("Display decided to retry");
               continue;
-              // Issue with continuing is that reply socket will try to send before
-              // receiving
-              //
-              // May need to receive at the top of the while loop
             }
             else if (zeroWeightResponse == Messages::OVERRIDE) {
               receivedRequest        = true;
