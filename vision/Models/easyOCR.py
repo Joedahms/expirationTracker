@@ -13,7 +13,7 @@ try:
 except Exception as e:
     raise(f"ERROR: OCR model loading failed: {str(e)}")
 try:
-    yolo = YOLO('yolov8m-oiv7.pt')
+    yolo = YOLO('yolov8x-oiv7.pt')
 except Exception as e:
     raise(f"ERROR: OCR model loading failed: {str(e)}")
 
