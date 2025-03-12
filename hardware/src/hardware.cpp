@@ -63,39 +63,54 @@ bool Hardware::checkStartSignal(int timeoutMs) {
 
     if (poller.poll(timeoutMs)) {
       if (poller.has_input(this->replySocket)) {
-        std::string request;
-        this->replySocket.receive(request);
+        bool weightIsZero           = false;
+        bool zeroWeightDecisionMade = false;
+        while (weightIsZero == true || zeroWeightDecisionMade == false) {
+          std::string request;
+          this->replySocket.receive(request);
 
-        this->logger.log("Received start signal from display, checking weight");
-        if (checkWeight() == false) {
-          this->logger.log("Informing display that no weight detected on plaform");
-          this->replySocket.send(Messages::ZERO_WEIGHT);
-          this->logger.log("Informed display that no weight detected on platform");
-          std::string zeroWeightResponse;
-          this->logger.log("Waiting for zero weight response from display");
-          this->replySocket.receive(zeroWeightResponse);
-          this->logger.log("Received zero weight response from display " +
-                           zeroWeightResponse);
-          if (zeroWeightResponse == Messages::RETRY) {
-            // TODO figure out retry
-          }
-          else if (zeroWeightResponse == Messages::OVERRIDE) {
-            receivedRequest = true;
-            this->replySocket.send(Messages::AFFIRMATIVE);
-            this->logger.log("Display decided to override zero weight, starting scan");
-          }
-          else if (zeroWeightResponse == Messages::CANCEL) {
-            this->replySocket.send(Messages::AFFIRMATIVE);
-            this->logger.log("Display decided to cancel, aborting scan");
+          this->logger.log("Received start signal from display, checking weight");
+
+          weightIsZero = !checkWeight();
+          if (weightIsZero) {
+            this->logger.log("Informing display that no weight detected on plaform");
+            this->replySocket.send(Messages::ZERO_WEIGHT);
+            this->logger.log("Informed display that no weight detected on platform");
+            std::string zeroWeightResponse;
+            this->logger.log("Waiting for zero weight response from display");
+            this->replySocket.receive(zeroWeightResponse);
+            this->logger.log("Received zero weight response from display " +
+                             zeroWeightResponse);
+
+            if (zeroWeightResponse == Messages::RETRY) {
+              this->replySocket.send(Messages::AFFIRMATIVE);
+              this->logger.log("Display decided to retry");
+              continue;
+              // Issue with continuing is that reply socket will try to send before
+              // receiving
+              //
+              // May need to receive at the top of the while loop
+            }
+            else if (zeroWeightResponse == Messages::OVERRIDE) {
+              receivedRequest        = true;
+              zeroWeightDecisionMade = true;
+              this->replySocket.send(Messages::AFFIRMATIVE);
+              this->logger.log("Display decided to override zero weight, starting scan");
+            }
+            else if (zeroWeightResponse == Messages::CANCEL) {
+              zeroWeightDecisionMade = true;
+              this->replySocket.send(Messages::AFFIRMATIVE);
+              this->logger.log("Display decided to cancel, aborting scan");
+            }
+            else {
+              // TODO handle invalid zero weight response
+            }
           }
           else {
-            // TODO handle invalid zero weight response
+            receivedRequest = true;
+            this->replySocket.send(Messages::AFFIRMATIVE); // Respond to display
+            this->logger.log("Weight non zero, starting scan");
           }
-        }
-        else {
-          receivedRequest = true;
-          this->replySocket.send(Messages::AFFIRMATIVE); // Respond to display
-          this->logger.log("Weight non zero, starting scan");
         }
       }
     }

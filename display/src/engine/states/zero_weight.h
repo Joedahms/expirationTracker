@@ -8,9 +8,13 @@ public:
   ZeroWeight(struct DisplayGlobal displayGlobal);
   void render() const override;
 
+  void setRetryScan(bool retryScan);
+  bool getRetryScan();
+
 private:
   Logger logger;
 
+  bool retryScan = false;
   void retry();
   void override();
   void cancel();

@@ -44,52 +44,36 @@ void DisplayHandler::handle() {
 
     // Engine wants to start a new scan, decide what to send back to it
     if (receivedMessage == Messages::START_SCAN) {
-      std::string startResponse = startSignalToHardware();
-      if (startResponse == Messages::AFFIRMATIVE) {
-        // Success, weight on platform
-        receiveFromVision();
-      }
-      else if (startResponse == Messages::ZERO_WEIGHT) {
-        // Tell engine no weight on platform and wait for next step
-        this->logger.log("Indicating to engine that no weight on platform");
-        this->replySocket.send(Messages::ZERO_WEIGHT);
-        this->logger.log("Indicated to engine that no weight on platform");
-        std::string zeroWeightResponse;
-        this->replySocket.receive(zeroWeightResponse);
-
-        if (zeroWeightResponse == Messages::RETRY) {
-          this->logger.log("Received retry from engine, sending affirmative back");
-          // TODO figure out how to retry
-          this->replySocket.send(Messages::AFFIRMATIVE);
-          this->logger.log("Affirmative sent");
-          continue;
-        }
-        else if (zeroWeightResponse == Messages::OVERRIDE) {
-          this->logger.log("Received override from engine, sending affirmative back");
-          this->replySocket.send(Messages::AFFIRMATIVE);
-          this->logger.log("Affirmative sent, sending override request to hardware");
-          this->requestHardwareSocket.send(Messages::OVERRIDE);
-          this->logger.log("Sent override request to hardware");
-          std::string overrideResponse;
-          this->requestHardwareSocket.receive(overrideResponse);
-          // TODO check overrideResponse
-          this->logger.log(
-              "Hardware received override request, waiting for request from vision");
+      bool scanStartedOrCancelled = false;
+      while (scanStartedOrCancelled == false) {
+        std::string startResponse = startSignalToHardware();
+        if (startResponse == Messages::AFFIRMATIVE) {
+          // Success, weight on platform
           receiveFromVision();
         }
-        else if (zeroWeightResponse == Messages::CANCEL) {
-          this->logger.log("Received cancel from engine, sending affirmative back");
-          this->replySocket.send(Messages::AFFIRMATIVE);
-          this->logger.log("Affirmative sent, sending cancel request to hardware");
-          this->requestHardwareSocket.send(Messages::CANCEL);
-          this->logger.log("Sent cancel request to hardware");
-          std::string cancelResponse;
-          this->requestHardwareSocket.receive(cancelResponse);
-          // TODO check cancelResponse
-          this->logger.log("Hardware received cancel request");
-        }
-        else {
-          LOG(FATAL) << "Unexpected message received: " << receivedMessage;
+        else if (startResponse == Messages::ZERO_WEIGHT) {
+          // Tell engine no weight on platform and wait for next step
+          this->logger.log("Indicating to engine that no weight on platform");
+          this->replySocket.send(Messages::ZERO_WEIGHT);
+          this->logger.log("Indicated to engine that no weight on platform");
+          std::string zeroWeightResponse;
+          this->replySocket.receive(zeroWeightResponse);
+
+          if (zeroWeightResponse == Messages::RETRY) {
+            zeroWeightRetry();
+            // Loop again
+          }
+          else if (zeroWeightResponse == Messages::OVERRIDE) {
+            scanStartedOrCancelled = true;
+            zeroWeightOverride();
+          }
+          else if (zeroWeightResponse == Messages::CANCEL) {
+            scanStartedOrCancelled = true;
+            zeroWeightCancel();
+          }
+          else {
+            LOG(FATAL) << "Unexpected message received: " << receivedMessage;
+          }
         }
       }
     }
@@ -205,4 +189,41 @@ void DisplayHandler::detectionSuccess() {
   else {
     LOG(FATAL) << "Unexpected message received";
   }
+}
+
+void DisplayHandler::zeroWeightRetry() {
+  this->logger.log("Received retry from engine, sending affirmative back");
+  // TODO figure out how to retry
+  this->replySocket.send(Messages::AFFIRMATIVE);
+  this->logger.log("Affirmative sent, sending retry request to hardware");
+  this->requestHardwareSocket.send(Messages::RETRY);
+  this->logger.log("Sent retry request to hardware");
+  std::string retryResponse;
+  this->requestHardwareSocket.receive(retryResponse);
+  this->logger.log("Hardware received retry request");
+}
+
+void DisplayHandler::zeroWeightOverride() {
+  this->logger.log("Received override from engine, sending affirmative back");
+  this->replySocket.send(Messages::AFFIRMATIVE);
+  this->logger.log("Affirmative sent, sending override request to hardware");
+  this->requestHardwareSocket.send(Messages::OVERRIDE);
+  this->logger.log("Sent override request to hardware");
+  std::string overrideResponse;
+  this->requestHardwareSocket.receive(overrideResponse);
+  // TODO check overrideResponse
+  this->logger.log("Hardware received override request, waiting for request from vision");
+  receiveFromVision();
+}
+
+void DisplayHandler::zeroWeightCancel() {
+  this->logger.log("Received cancel from engine, sending affirmative back");
+  this->replySocket.send(Messages::AFFIRMATIVE);
+  this->logger.log("Affirmative sent, sending cancel request to hardware");
+  this->requestHardwareSocket.send(Messages::CANCEL);
+  this->logger.log("Sent cancel request to hardware");
+  std::string cancelResponse;
+  this->requestHardwareSocket.receive(cancelResponse);
+  // TODO check cancelResponse
+  this->logger.log("Hardware received cancel request");
 }

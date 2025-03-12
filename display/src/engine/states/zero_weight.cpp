@@ -34,7 +34,10 @@ ZeroWeight::ZeroWeight(struct DisplayGlobal displayGlobal)
   this->rootElement->addElement(cancelButton);
 }
 
-void ZeroWeight::retry() {}
+void ZeroWeight::setRetryScan(bool retryScan) { this->retryScan = retryScan; }
+bool ZeroWeight::getRetryScan() { return this->retryScan; }
+
+void ZeroWeight::retry() { this->retryScan = true; }
 
 void ZeroWeight::override() { this->currentState = EngineState::SCANNING; }
 

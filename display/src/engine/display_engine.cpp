@@ -162,15 +162,17 @@ void DisplayEngine::checkState() {
 
   case EngineState::ZERO_WEIGHT:
     this->engineState = this->zeroWeight->getCurrentState();
-
     // override
     if (this->engineState == EngineState::SCANNING) {
       sendZeroWeightResponse(Messages::OVERRIDE);
     }
-
     // cancel
     else if (this->engineState == EngineState::ITEM_LIST) {
       sendZeroWeightResponse(Messages::CANCEL);
+    }
+    else if (this->zeroWeight->getRetryScan()) {
+      sendZeroWeightResponse(Messages::RETRY);
+      this->zeroWeight->setRetryScan(false);
     }
 
     this->zeroWeight->setCurrentState(EngineState::ZERO_WEIGHT);
@@ -328,12 +330,14 @@ void DisplayEngine::startSignalToDisplay() {
     std::string response;
     this->requestSocket.receive(response);
     if (response == Messages::AFFIRMATIVE) {
+      scanStartedOrCancelled = true;
       this->logger.log("Received affirmative from display");
     }
     else if (response == Messages::ZERO_WEIGHT) {
       this->logger.log(
           "Received zero weight back from display, switching to zero weight state");
       this->engineState = EngineState::ZERO_WEIGHT;
+      // At this point need to check if display sends back affirmative or zero weight
     }
     else {
       this->logger.log("Received invalid response from display: " + response);

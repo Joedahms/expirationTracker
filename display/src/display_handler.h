@@ -27,6 +27,10 @@ private:
   void receiveFromVision();
   void detectionFailure();
   void detectionSuccess();
+
+  void zeroWeightRetry();
+  void zeroWeightOverride();
+  void zeroWeightCancel();
 };
 
 #endif
