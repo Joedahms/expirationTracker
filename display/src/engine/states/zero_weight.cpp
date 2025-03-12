@@ -1,5 +1,5 @@
-#include "../../log_files.h"
 #include "zero_weight.h"
+#include "../../log_files.h"
 
 ZeroWeight::ZeroWeight(struct DisplayGlobal displayGlobal)
     : logger(LogFiles::zeroWeight) {

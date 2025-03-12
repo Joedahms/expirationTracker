@@ -1,5 +1,5 @@
-#include "composite_element.h"
 #include "dropdown.h"
+#include "composite_element.h"
 
 /**
  * @param displayGlobal Global display variables
