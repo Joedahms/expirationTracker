@@ -298,11 +298,27 @@ void updateFoodItemQuantity(const int& id, const int& newQuantity) {
   updateId << "UPDATE foodItems SET quantity = " << newQuantity << " WHERE id = " << id
            << ";";
 
-  FoodItem foodItem;
   int sqlReturn =
       sqlite3_exec(database, updateId.str().c_str(), nullptr, nullptr, &errorMessage);
   if (sqlReturn != SQLITE_OK) {
     LOG(FATAL) << "Error updating food item";
+  }
+
+  sqlite3_close(database);
+}
+
+void deleteById(const int& id) {
+  sqlite3* database = nullptr;
+  openDatabase(&database);
+  char* errorMessage = nullptr;
+
+  std::string deleteQuery =
+      "DELETE FROM foodItems WHERE id = " + std::to_string(id) + ";";
+
+  int sqlReturn =
+      sqlite3_exec(database, deleteQuery.c_str(), nullptr, nullptr, &errorMessage);
+  if (sqlReturn != SQLITE_OK) {
+    LOG(FATAL) << "Error deleting food item";
   }
 
   sqlite3_close(database);
