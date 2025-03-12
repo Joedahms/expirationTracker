@@ -51,8 +51,8 @@ void ScrollBox::updateSelf() {
   updateDifference = std::chrono::duration_cast<std::chrono::seconds>(
       this->currentUpdate - this->previousUpdate);
 
-  // 5 or more seconds since last update
-  if (updateDifference.count() > 5) {
+  // 1 or more seconds since last update
+  if (updateDifference.count() > 3) {
     refreshPanels();
     this->previousUpdate = this->currentUpdate;
   }
