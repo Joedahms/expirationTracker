@@ -171,9 +171,8 @@ bool Hardware::startScan() {
     this->logger.log("No weight detected on platform");
     return false;
   }
-  */
 
-      rotateAndCapture();
+  rotateAndCapture();
   this->logger.log("Scan complete");
   return true;
 }
