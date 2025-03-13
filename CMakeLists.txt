@@ -90,7 +90,6 @@ add_executable(expirationTracker
   vision/src/ImageProcessor.cpp
   vision/src/IModel.cpp
   vision/src/ModelHandler.cpp
-  vision/src/ObjectClassifier.cpp
   vision/src/TextClassifier.cpp
   vision/src/visionMain.cpp
   vision/src/OCRResult.cpp
