@@ -205,5 +205,7 @@ openImageFoodItemList = {
 
 openImagePackageItemList = {
     57: "Bottle",
-    62: "Box"
+    62: "Box",
+    394: "Plastic bag",
+    535: "Tin can"
 }
