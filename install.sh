@@ -47,10 +47,8 @@ sudo make install
 cd ../../..
 rm -rf zero
 
-#mDNS
-sudo apt install avahi-daemon
-sudo systemctl enable avahi-daemon
-sudo systemctl start avahi-daemon
+#json
+sudo apt install nlohmann-json3-dev
 
 # Python virtual envrionment
 mkdir build
