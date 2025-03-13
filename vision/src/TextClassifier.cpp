@@ -29,6 +29,13 @@ OCRResult TextClassifier::handleClassification(const std::filesystem::path& imag
   this->logger.log("Output handled. Returning OCRResult to model handler.");
 }
 
+/**
+ * Handle string built from running model
+ *
+ * Input:
+ * @param result String returned from runModel
+ * @return OCRResult containing food and expiration date vectors
+ */
 OCRResult TextClassifier::handleRunModelReturn(const std::string& result) {
   this->logger.log("Entering handleRunModelReturn.");
   std::vector<std::string> foodVector;
