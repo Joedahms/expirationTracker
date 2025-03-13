@@ -23,17 +23,22 @@ TextClassifier::TextClassifier(zmqpp::context& context,
  */
 OCRResult TextClassifier::handleClassification(const std::filesystem::path& imagePath) {
   this->logger.log("Entering handleClassification, running model");
-  auto result = this->runModel(imagePath);
-  this->logger.log("Model run, classification received.");
+  std::string result = this->runModel(imagePath);
+  this->logger.log("Model ran, classification received. Handling output.");
+  OCRResult handled = this->handleRunModelReturn(result);
+  this->logger.log("Output handled. Returning OCRResult to model handler.");
+}
 
+OCRResult TextClassifier::handleRunModelReturn(const std::string& result) {
+  this->logger.log("Entering handleRunModelReturn.");
   std::vector<std::string> foodVector;
   std::vector<std::string> expVector;
-  OCRResult OCRResult;
+  OCRResult OCRresult;
 
   if (result.empty() || (result.find("ERROR") != std::string::npos)) {
     this->logger.log("Received empty or Error in runModel: " + result);
     LOG(FATAL) << "Received error from runModel.";
-    return OCRResult;
+    return OCRresult;
   }
 
   std::stringstream ss(result);
@@ -42,6 +47,7 @@ OCRResult TextClassifier::handleClassification(const std::filesystem::path& imag
   // Check if expiration date is present
   size_t expPos = result.find(", Exp:");
   if (expPos != std::string::npos) {
+    this->logger.log("Expiration date result received. Extracting...");
     // Extract expiration date part
     std::string foodPart = result.substr(0, expPos);
     std::string expPart  = result.substr(expPos + 7); // Skip ", Exp: "
@@ -74,6 +80,7 @@ OCRResult TextClassifier::handleClassification(const std::filesystem::path& imag
     }
   }
   else {
+    this->logger.log("No expiration date received. Extracting food only...");
     // No expiration date, only food classification
     std::stringstream foodStream(result);
     std::string token;
@@ -89,10 +96,10 @@ OCRResult TextClassifier::handleClassification(const std::filesystem::path& imag
     }
   }
 
-  OCRResult.setFoodItems(foodVector);
-  OCRResult.setExpirationDates(expVector);
-
-  return OCRResult;
+  OCRresult.setFoodItems(foodVector);
+  OCRresult.setExpirationDates(expVector);
+  this->logger.log("Model output handled return result to classification handler.");
+  return OCRresult;
 }
 
 /**

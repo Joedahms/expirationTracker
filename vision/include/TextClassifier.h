@@ -9,9 +9,7 @@ public:
 
   std::string runModel(const std::filesystem::path&) override;
   OCRResult handleClassification(const std::filesystem::path&) override;
-
-private:
-  FoodItem foodItem;
+  OCRResult handleRunModelReturn(const std::string&);
 };
 
 #endif
