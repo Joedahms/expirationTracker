@@ -83,6 +83,7 @@ add_executable(expirationTracker
   display/src/engine/states/state.cpp
   display/src/engine/states/scanning.cpp
   display/src/engine/states/item_list.cpp
+  display/src/engine/states/zero_weight.cpp
 
   # Vision process after forked from main
   vision/src/helperFunctions.cpp

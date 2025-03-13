@@ -12,6 +12,7 @@
 
 #include "states/item_list.h"
 #include "states/scanning.h"
+#include "states/zero_weight.h"
 
 #include "display_global.h"
 #include "engine_state.h"
@@ -64,10 +65,12 @@ private:
   // States
   std::unique_ptr<Scanning> scanning;
   std::unique_ptr<ItemList> itemList;
+  std::unique_ptr<ZeroWeight> zeroWeight;
 
   bool displayIsRunning = false;
 
   void startSignalToDisplay();
+  void sendZeroWeightResponse(const std::string& zeroWeightResponse);
 };
 
 #endif

@@ -3,7 +3,7 @@
 
 #include <string>
 
-enum class EngineState { MAIN_MENU, SCANNING, PAUSE_MENU, ITEM_LIST };
+enum class EngineState { SCANNING, ITEM_LIST, ZERO_WEIGHT };
 
 std::string engineStateToString(EngineState engineState);
 

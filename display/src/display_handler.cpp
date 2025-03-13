@@ -38,12 +38,44 @@ DisplayHandler::DisplayHandler(zmqpp::context& context, const std::string& engin
 void DisplayHandler::handle() {
   while (true) {
     std::string receivedMessage;
+    this->logger.log("Listening for messages");
     this->replySocket.receive(receivedMessage);
-    this->logger.log("received message from socket: " + receivedMessage);
-    // Engine wants to start a new scan
+    this->logger.log("Received message from socket: " + receivedMessage);
+
+    // Engine wants to start a new scan, decide what to send back to it
     if (receivedMessage == Messages::START_SCAN) {
-      startSignalToHardware();
-      receiveFromVision();
+      //      bool scanStartedOrCancelled = false;
+      //     while (scanStartedOrCancelled == false) {
+      std::string startResponse = startSignalToHardware();
+      if (startResponse == Messages::AFFIRMATIVE) {
+        // Success, weight on platform
+        receiveFromVision();
+      }
+      else if (startResponse == Messages::ZERO_WEIGHT) {
+        // Tell engine no weight on platform and wait for next step
+        this->logger.log("Indicating to engine that no weight on platform");
+        this->replySocket.send(Messages::ZERO_WEIGHT);
+        this->logger.log("Indicated to engine that no weight on platform");
+        std::string zeroWeightResponse;
+        this->replySocket.receive(zeroWeightResponse);
+
+        if (zeroWeightResponse == Messages::RETRY) {
+          zeroWeightRetry();
+          // Loop again
+        }
+        else if (zeroWeightResponse == Messages::OVERRIDE) {
+          //          scanStartedOrCancelled = true;
+          zeroWeightOverride();
+        }
+        else if (zeroWeightResponse == Messages::CANCEL) {
+          //         scanStartedOrCancelled = true;
+          zeroWeightCancel();
+        }
+        else {
+          LOG(FATAL) << "Unexpected message received: " << receivedMessage;
+        }
+      }
+      //}
     }
     else {
       LOG(FATAL) << "Unexpected message received: " << receivedMessage;
@@ -56,19 +88,24 @@ void DisplayHandler::handle() {
  * scan it.
  *
  * @param None
- * @return None
+ * @return True if hardware started scan. False if hardware not able to start scan.
  */
-void DisplayHandler::startSignalToHardware() {
+std::string DisplayHandler::startSignalToHardware() {
   this->logger.log("Received start scan from engine");
+
   try {
-    this->logger.log("Telling hardware to start scan");
-    this->replySocket.send(Messages::AFFIRMATIVE);
+    this->logger.log("Requesting that hardware start scan");
     this->requestHardwareSocket.send(Messages::START_SCAN);
 
     std::string hardwareResponse;
     this->requestHardwareSocket.receive(hardwareResponse);
     if (hardwareResponse == Messages::AFFIRMATIVE) {
       this->logger.log("Hardware starting scan");
+      return Messages::AFFIRMATIVE;
+    }
+    else if (hardwareResponse == Messages::ZERO_WEIGHT) {
+      this->logger.log("Hardware indicated zero weight on platform");
+      return Messages::ZERO_WEIGHT;
     }
     else {
       LOG(FATAL) << "Received invalid response from hardware after sending start signal";
@@ -152,4 +189,41 @@ void DisplayHandler::detectionSuccess() {
   else {
     LOG(FATAL) << "Unexpected message received";
   }
+}
+
+void DisplayHandler::zeroWeightRetry() {
+  this->logger.log("Received retry from engine, sending affirmative back");
+  // TODO figure out how to retry
+  this->replySocket.send(Messages::AFFIRMATIVE);
+  this->logger.log("Affirmative sent, sending retry request to hardware");
+  this->requestHardwareSocket.send(Messages::RETRY);
+  this->logger.log("Sent retry request to hardware");
+  std::string retryResponse;
+  this->requestHardwareSocket.receive(retryResponse);
+  this->logger.log("Hardware received retry request");
+}
+
+void DisplayHandler::zeroWeightOverride() {
+  this->logger.log("Received override from engine, sending affirmative back");
+  this->replySocket.send(Messages::AFFIRMATIVE);
+  this->logger.log("Affirmative sent, sending override request to hardware");
+  this->requestHardwareSocket.send(Messages::OVERRIDE);
+  this->logger.log("Sent override request to hardware");
+  std::string overrideResponse;
+  this->requestHardwareSocket.receive(overrideResponse);
+  // TODO check overrideResponse
+  this->logger.log("Hardware received override request, waiting for request from vision");
+  receiveFromVision();
+}
+
+void DisplayHandler::zeroWeightCancel() {
+  this->logger.log("Received cancel from engine, sending affirmative back");
+  this->replySocket.send(Messages::AFFIRMATIVE);
+  this->logger.log("Affirmative sent, sending cancel request to hardware");
+  this->requestHardwareSocket.send(Messages::CANCEL);
+  this->logger.log("Sent cancel request to hardware");
+  std::string cancelResponse;
+  this->requestHardwareSocket.receive(cancelResponse);
+  // TODO check cancelResponse
+  this->logger.log("Hardware received cancel request");
 }
