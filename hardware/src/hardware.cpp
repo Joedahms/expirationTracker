@@ -65,7 +65,7 @@ bool Hardware::checkStartSignal(int timeoutMs) {
       if (poller.has_input(this->replySocket)) {
         bool weightIsZero           = false;
         bool zeroWeightDecisionMade = false;
-        while (weightIsZero == true || zeroWeightDecisionMade == false) {
+        while (weightIsZero == true && zeroWeightDecisionMade == false) {
           std::string request;
           this->replySocket.receive(request);
 
