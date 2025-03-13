@@ -11,11 +11,11 @@ import matplotlib.pyplot as plt
 try:
     reader = easyocr.Reader(['en'])
 except Exception as e:
-    raise(f"ERROR: OCR model loading failed: {str(e)}")
+    raise Exception(f"ERROR: OCR model loading failed: {str(e)}")
 try:
     yolo = YOLO('yolov8x-oiv7.pt')
 except Exception as e:
-    raise(f"ERROR: OCR model loading failed: {str(e)}")
+    raise Exception(f"ERROR: YOLO model loading failed: {str(e)}")
 
 def cleanText(text):
     """ Normalize and clean extracted OCR text while keeping numbers. """
