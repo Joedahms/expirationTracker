@@ -63,16 +63,16 @@ bool Hardware::checkStartSignal(int timeoutMs) {
 
     if (poller.poll(timeoutMs)) {
       if (poller.has_input(this->replySocket)) {
-        bool weightIsZero           = false;
+        bool nonzeroWeight          = false;
         bool zeroWeightDecisionMade = false;
-        while (weightIsZero == true && zeroWeightDecisionMade == false) {
+        while (nonzeroWeight == false && zeroWeightDecisionMade == false) {
           std::string request;
           this->replySocket.receive(request);
 
           this->logger.log("Received start signal from display, checking weight");
 
-          weightIsZero = !checkWeight();
-          if (weightIsZero) {
+          nonzeroWeight = checkWeight();
+          if (nonzeroWeight == false) {
             this->logger.log("Informing display that no weight detected on plaform");
             this->replySocket.send(Messages::ZERO_WEIGHT);
             this->logger.log("Informed display that no weight detected on platform");
