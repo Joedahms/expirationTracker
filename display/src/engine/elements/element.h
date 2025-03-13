@@ -36,16 +36,18 @@ public:
 
   void setCenteredVertical();
   bool checkCenterVertical();
-  void centerVertical();
 
   void setCenteredHorizontal();
   bool checkCenterHorizontal();
-  void centerHorizontal();
 
   bool checkHovered();
 
   void addBorder(const int& borderThickness);
   void renderBorder() const;
+
+private:
+  void centerVertical();
+  void centerHorizontal();
 
 protected:
   std::unique_ptr<Logger> logger;

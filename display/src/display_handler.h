@@ -23,10 +23,14 @@ private:
 
   zmqpp::socket replySocket;
 
-  void startSignalToHardware();
+  std::string startSignalToHardware();
   void receiveFromVision();
   void detectionFailure();
   void detectionSuccess();
+
+  void zeroWeightRetry();
+  void zeroWeightOverride();
+  void zeroWeightCancel();
 };
 
 #endif
