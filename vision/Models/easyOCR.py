@@ -2,11 +2,10 @@ import easyocr
 from ultralytics import YOLO
 from datetime import datetime
 import re
-import sys
 import cv2
 import numpy as np
 from foodClasses import textClasses, pluMapping, openImageFoodItemList, openImagePackageItemList
-import matplotlib.pyplot as plt
+import os
 
 try:
     reader = easyocr.Reader(['en'])
@@ -149,24 +148,53 @@ def performOCR(image):
         #run yolo on unprocessed image
         modelResults = yolo(image, conf=.5) #yolo(image) returns a list of 'results', we should only have one because only a single image
         print("Detection complete. Filtering objects...")
+        # Load the image using OpenCV
+        processedImage = cv2.imread(image)
+
+        # Get script directory and define output path
+        scriptDir = os.path.dirname(os.path.abspath(__file__))
+        outputPath = os.path.join(scriptDir, "img", "output.jpg")
+
+        # Ensure the output directory exists
+        os.makedirs(os.path.dirname(outputPath), exist_ok=True)
+
         for modelResult in modelResults:
             for box in modelResult.boxes:
-                #cycle through detection boxes from model
+
                 classID = int(box.cls[0])
                 className = yolo.names[classID]
+                conf = box.conf[0].item()  # Confidence score
+
+                # Extract bounding box coordinates
+                bbox = box.xyxy[0].tolist()
+                x1, y1, x2, y2 = map(int, bbox)
+
+                # Ensure coordinates are within image bounds
+                h, w, _ = processedImage.shape
+                x1, y1, x2, y2 = max(0, x1), max(0, y1), min(w, x2), min(h, y2)
+
+                # Draw bounding box
+                cv2.rectangle(processedImage, (x1, y1), (x2, y2), (0, 255, 0), 3)
+
+                # Prepare label text
+                labelText = f"{className} {conf:.2f}"
+                fontScale = 1
+                fontThickness = 3
+                textSize, _ = cv2.getTextSize(labelText, cv2.FONT_HERSHEY_SIMPLEX, fontScale, fontThickness)
+
+                # Draw background rectangle for better readability
+                cv2.rectangle(processedImage, (x1, y1 - textSize[1] - 10), (x1 + textSize[0] + 10, y1), (0, 255, 0), -1)
+                cv2.putText(processedImage, labelText, (x1 + 5, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (0, 0, 0), fontThickness)
+
                 if classID in openImageFoodItemList:
                     #if detected known food item (mostly produce)
                     print(f"Recognized {className}...")
                     foodLabels.append(className)
                     result["Food Labels"] = foodLabels
-                    return result
 
                 elif classID in openImagePackageItemList:
                     #if detected known packaging item
                     print(f"Extracting text from {className}...")
-                    #crop if bottle or box is detected to read specific location
-                    bbox = box.xyxy[0].tolist()
-                    x1, y1, x2, y2 = map(int, bbox)
 
                     # Crop detected text
                     croppedText = processedImage[y1:y2, x1:x2]
@@ -176,7 +204,7 @@ def performOCR(image):
 
                     print("Text extraction complete!")
 
-
+        cv2.imwrite(outputPath, image)
         if textResults is None:
             print("No known objects detected. Scanning image for text.")
             textResults = reader.readtext(processedImage, detail=0, paragraph=True, text_threshold=0.5)
