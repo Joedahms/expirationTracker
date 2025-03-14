@@ -15,8 +15,8 @@ public:
   inline bool hasExpirationDates() const { return !expirationDates.empty(); }
   std::vector<std::string> getFoodItems();
   std::vector<std::string> getExpirationDates();
-  void setFoodItems(std::vector<std::string>&);
-  void setExpirationDates(std::vector<std::string>&);
+  void setFoodItems(std::vector<std::string>);
+  void setExpirationDates(std::vector<std::string>);
 };
 
 #endif

@@ -7,9 +7,8 @@ class TextClassifier : public IModel {
 public:
   TextClassifier(zmqpp::context&, const std::string&);
 
-  std::string runModel(const std::filesystem::path&) override;
+  OCRResult runModel(const std::filesystem::path&) override;
   OCRResult handleClassification(const std::filesystem::path&) override;
-  OCRResult handleRunModelReturn(const std::string&);
 };
 
 #endif

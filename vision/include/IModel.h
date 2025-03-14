@@ -29,7 +29,7 @@ protected:
   zmqpp::socket requestSocket;
   zmqpp::socket replySocket;
 
-  virtual std::string runModel(const std::filesystem::path&)           = 0;
+  virtual OCRResult runModel(const std::filesystem::path&)             = 0;
   virtual OCRResult handleClassification(const std::filesystem::path&) = 0;
 
   std::string sendRequest(const TaskType&, const std::filesystem::path&);
