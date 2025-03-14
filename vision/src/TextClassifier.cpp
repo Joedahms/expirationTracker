@@ -48,6 +48,11 @@ OCRResult TextClassifier::handleRunModelReturn(const std::string& result) {
     return OCRresult;
   }
 
+  if (result == Messages::ITEM_DETECTION_FAILED) {
+    this->logger.log("No detection made.");
+    return OCRresult;
+  }
+
   std::stringstream ss(result);
   std::string token;
 
@@ -218,7 +223,7 @@ std::string TextClassifier::runModel(const std::filesystem::path& imagePath) {
       return "Exp: " + expirationDate;
     }
     else {
-      return "";
+      return Messages::ITEM_DETECTION_FAILED;
     }
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << "ZeroMQ error: " << e.what();
