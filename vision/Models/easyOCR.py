@@ -146,7 +146,7 @@ def performOCR(image):
     try:
         print("Running YOLO to detect object...")
         #run yolo on unprocessed image
-        modelResults = yolo(image, conf=.5) #yolo(image) returns a list of 'results', we should only have one because only a single image
+        modelResult = yolo(image, conf=.5)[0] #yolo(image) returns a list of 'results', we should only have one because only a single image
         print("Detection complete. Filtering objects...")
         # Load the image using OpenCV
         processedImage = cv2.imread(image)
@@ -158,8 +158,7 @@ def performOCR(image):
         # Ensure the output directory exists
         os.makedirs(os.path.dirname(outputPath), exist_ok=True)
 
-        for modelResult in modelResults:
-            for box in modelResult.boxes:
+        for box in modelResult.boxes:
 
                 classID = int(box.cls[0])
                 className = yolo.names[classID]
