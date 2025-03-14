@@ -147,39 +147,39 @@ def performOCR(image):
     try:
         print("Running YOLO to detect object...")
         #run yolo on unprocessed image
-        modelResult = yolo(image)[0] #yolo(image) returns a list of 'results', we should only have one because only a single image
+        modelResults = yolo(image, conf=.5) #yolo(image) returns a list of 'results', we should only have one because only a single image
         print("Detection complete. Filtering objects...")
+        for modelResult in modelResults:
+            for box in modelResult.boxes:
+                #cycle through detection boxes from model
+                classID = int(box.cls[0])
+                className = yolo.names[classID]
+                if classID in openImageFoodItemList:
+                    #if detected known food item (mostly produce)
+                    print(f"Recognized {className}...")
+                    foodLabels.append(className)
+                    result["Food Labels"] = foodLabels
+                    return result
 
-        for box in modelResult.boxes:
-            #cycle through detection boxes from model
-            classID = int(box.cls[0])
-            className = yolo.names[classID]
-            if classID in openImageFoodItemList:
-                #if detected known food item (mostly produce)
-                print(f"Recognized {className}...")
-                foodLabels.append(className)
-                result["Food Labels"] = foodLabels
-                return result
-            
-            elif classID in openImagePackageItemList:
-                #if detected known packaging item
-                print(f"Extracting text from {className}...")
-                #crop if bottle or box is detected to read specific location
-                bbox = box.xyxy[0].tolist()
-                x1, y1, x2, y2 = map(int, bbox)
+                elif classID in openImagePackageItemList:
+                    #if detected known packaging item
+                    print(f"Extracting text from {className}...")
+                    #crop if bottle or box is detected to read specific location
+                    bbox = box.xyxy[0].tolist()
+                    x1, y1, x2, y2 = map(int, bbox)
 
-                # Crop detected text
-                croppedText = processedImage[y1:y2, x1:x2]
+                    # Crop detected text
+                    croppedText = processedImage[y1:y2, x1:x2]
 
-                # Recognize text using EasyOCR
-                textResults = reader.readtext(croppedText, detail=0, paragraph=True, text_threshold=0.7)
+                    # Recognize text using EasyOCR
+                    textResults = reader.readtext(croppedText, detail=0, paragraph=True, text_threshold=0.5)
 
-                print("Text extraction complete!")
+                    print("Text extraction complete!")
 
 
         if textResults is None:
             print("No known objects detected. Scanning image for text.")
-            textResults = reader.readtext(processedImage, detail=0, paragraph=True, text_threshold=0.7)
+            textResults = reader.readtext(processedImage, detail=0, paragraph=True, text_threshold=0.5)
             # no package or bottle detected. maybe PLU?
             print("Scan complete.")
             for text in textResults:
