@@ -148,6 +148,7 @@ void Hardware::sendStartToVision() {
  * */
 bool Hardware::startScan() {
   this->logger.log("Starting scan");
+
   if (!this->imageDirectory.empty()) {
     this->logger.log("Clearing directory");
     try {
@@ -160,16 +161,6 @@ bool Hardware::startScan() {
     } catch (const std::filesystem::filesystem_error& e) {
       this->logger.log("Error deleting files: " + std::string(e.what()));
     }
-  }
-  this->logger.log("Checking weight");
-  if (checkWeight() == false) {
-    // TODO handle no weight on platform
-    // Send error to display
-    // Possible pattern HW error msg -> Display message with 3 options:
-    // 1. Retry 2. Skip/Override 3. Cancel
-    // Response from Display will then decide action
-    this->logger.log("No weight detected on platform");
-    return false;
   }
 
   rotateAndCapture();
