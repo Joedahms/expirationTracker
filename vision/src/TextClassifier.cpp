@@ -70,6 +70,7 @@ OCRResult TextClassifier::handleRunModelReturn(const std::string& result) {
     std::string token;
     while (getline(foodStream, token, ',')) {
       if (!token.empty()) {
+        this->logger.log("Extracted food item: " + token);
         foodVector.push_back(token);
       }
     }
@@ -83,6 +84,7 @@ OCRResult TextClassifier::handleRunModelReturn(const std::string& result) {
     std::stringstream expStream(expPart);
     while (getline(expStream, token, ',')) {
       if (!token.empty()) {
+        this->logger.log("Extracted expiration date: " + token);
         expVector.push_back(token);
       }
     }
@@ -99,6 +101,7 @@ OCRResult TextClassifier::handleRunModelReturn(const std::string& result) {
     std::string token;
     while (getline(foodStream, token, ',')) {
       if (!token.empty()) {
+        this->logger.log("Extracted food item: " + token);
         foodVector.push_back(token);
       }
     }
