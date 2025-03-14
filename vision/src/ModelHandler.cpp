@@ -81,7 +81,6 @@ ClassifyObjectReturn ModelHandler::classifyObject(const std::filesystem::path& i
     // right now just grab the first food item. Later handle weight
     std::string firstFoodItem = result.getFoodItems()[0];
     foodItem.setName(firstFoodItem);
-    foodItem.setImagePath(std::filesystem::absolute(imagePath));
     foodItem.setQuantity(1);
     if (knownFoodData.find(firstFoodItem) != knownFoodData.end()) {
       this->logger.log("Unpackaged item detected.");
