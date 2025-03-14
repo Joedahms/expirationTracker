@@ -102,7 +102,7 @@ std::string removePrefix(const std::string& string, const std::string& prefix) {
  * @return updated string with prefix removed
  */
 std::string joinVector(const std::vector<std::string>& vec,
-                       const std::string& delimiter = ", ") {
+                       const std::string& delimiter) {
   if (vec.empty())
     return "";
 

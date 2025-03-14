@@ -115,11 +115,11 @@ OCRResult TextClassifier::runModel(const std::filesystem::path& imagePath) {
     this->logger.log("Received classification result: " +
                      (classifications.getFoodItems().empty()
                           ? "None"
-                          : joinVector(classifications.getFoodItems())));
+                          : joinVector(classifications.getFoodItems(), ", ")));
     this->logger.log("Received expiration date result: " +
                      (classifications.getExpirationDates().empty()
                           ? "None"
-                          : joinVector(classifications.getExpirationDates())));
+                          : joinVector(classifications.getExpirationDates(), ", ")));
 
     return classifications;
   } catch (const zmqpp::exception& e) {
