@@ -99,7 +99,7 @@ void ImageProcessor::processImagePair(int currentImageNumber,
     this->logger.log("Food item found.");
     classifyObjectReturn.foodItem = true;
   }
-  if (sideImageReturn.expirationDate || topImageReturn.foodItem) {
+  if (sideImageReturn.expirationDate || topImageReturn.expirationDate) {
     this->logger.log("Expiration date found.");
     classifyObjectReturn.expirationDate = true;
   }
