@@ -11,9 +11,8 @@
 #include "../../../logger.h"
 
 #include "states/item_list.h"
-#include "states/main_menu.h"
-#include "states/pause_menu.h"
 #include "states/scanning.h"
+#include "states/zero_weight.h"
 
 #include "display_global.h"
 #include "engine_state.h"
@@ -61,17 +60,17 @@ private:
   const std::string& DISPLAY_ENDPOINT;
   const std::string& ENGINE_ENDPOINT;
 
-  EngineState engineState = EngineState::MAIN_MENU;
+  EngineState engineState = EngineState::ITEM_LIST;
 
   // States
-  std::unique_ptr<MainMenu> mainMenu;
   std::unique_ptr<Scanning> scanning;
-  std::unique_ptr<PauseMenu> pauseMenu;
   std::unique_ptr<ItemList> itemList;
+  std::unique_ptr<ZeroWeight> zeroWeight;
 
   bool displayIsRunning = false;
 
   void startSignalToDisplay();
+  void sendZeroWeightResponse(const std::string& zeroWeightResponse);
 };
 
 #endif

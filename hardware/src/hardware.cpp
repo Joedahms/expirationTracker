@@ -47,8 +47,8 @@ Hardware::Hardware(zmqpp::context& context)
 }
 
 /**
- * Checks for a start signal from the display.
- * Used to start the scan process
+ * Checks for a start signal from the display. Return if have not received a message by
+ * the timeout.
  *
  * @param None
  * @return bool - True if start signal received, false otherwise
@@ -63,11 +63,51 @@ bool Hardware::checkStartSignal(int timeoutMs) {
 
     if (poller.poll(timeoutMs)) {
       if (poller.has_input(this->replySocket)) {
-        std::string request;
-        this->replySocket.receive(request);
-        receivedRequest = true;
-        this->replySocket.send(Messages::AFFIRMATIVE); // Respond to display
-        this->logger.log("Received start signal from display");
+        bool weightIsZero           = false;
+        bool zeroWeightDecisionMade = false;
+        while (weightIsZero == true || zeroWeightDecisionMade == false) {
+          std::string request;
+          this->replySocket.receive(request);
+
+          this->logger.log("Received start signal from display, checking weight");
+
+          weightIsZero = !checkWeight();
+          if (weightIsZero) {
+            this->logger.log("Informing display that no weight detected on plaform");
+            this->replySocket.send(Messages::ZERO_WEIGHT);
+            this->logger.log("Informed display that no weight detected on platform");
+            std::string zeroWeightResponse;
+            this->logger.log("Waiting for zero weight response from display");
+            this->replySocket.receive(zeroWeightResponse);
+            this->logger.log("Received zero weight response from display " +
+                             zeroWeightResponse);
+
+            if (zeroWeightResponse == Messages::RETRY) {
+              this->replySocket.send(Messages::AFFIRMATIVE);
+              this->logger.log("Display decided to retry");
+              continue;
+            }
+            else if (zeroWeightResponse == Messages::OVERRIDE) {
+              receivedRequest        = true;
+              zeroWeightDecisionMade = true;
+              this->replySocket.send(Messages::AFFIRMATIVE);
+              this->logger.log("Display decided to override zero weight, starting scan");
+            }
+            else if (zeroWeightResponse == Messages::CANCEL) {
+              zeroWeightDecisionMade = true;
+              this->replySocket.send(Messages::AFFIRMATIVE);
+              this->logger.log("Display decided to cancel, aborting scan");
+            }
+            else {
+              // TODO handle invalid zero weight response
+            }
+          }
+          else {
+            receivedRequest = true;
+            this->replySocket.send(Messages::AFFIRMATIVE); // Respond to display
+            this->logger.log("Weight non zero, starting scan");
+          }
+        }
       }
     }
     else {
@@ -115,6 +155,7 @@ void Hardware::sendStartToVision() {
 bool Hardware::startScan() {
   this->logger.log("Starting scan");
 
+  /*
   this->logger.log("Checking weight");
   if (checkWeight() == false) {
     // TODO handle no weight on platform
@@ -125,6 +166,7 @@ bool Hardware::startScan() {
     this->logger.log("No weight detected on platform");
     return false;
   }
+*/
 
   rotateAndCapture();
   this->logger.log("Scan complete");
@@ -141,7 +183,7 @@ bool Hardware::startScan() {
  *      2. integrate code to check weight from Arduino Read from weight sensor
  */
 bool Hardware::checkWeight() {
-  this->itemWeight = 1; // set to 1 for testing
+  this->itemWeight = 0; // set to 0 for testing
   if (this->itemWeight <= 0) {
     // May need to adjust up because the scale is likely sensitive to vibrations
     return false;
