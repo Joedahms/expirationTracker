@@ -27,6 +27,7 @@ OCRResult TextClassifier::handleClassification(const std::filesystem::path& imag
   this->logger.log("Model ran, classification received. Handling output.");
   OCRResult handled = this->handleRunModelReturn(result);
   this->logger.log("Output handled. Returning OCRResult to model handler.");
+  return handled;
 }
 
 /**
