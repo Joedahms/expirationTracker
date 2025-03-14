@@ -62,7 +62,8 @@ bool ImageProcessor::analyze() {
     if (classifyObjectReturn.foodItem && classifyObjectReturn.expirationDate) {
       this->logger.log(
           "Both food item and expiration date detected. Returning to processor.");
-          std::filesystem::path imagePath = foodItem.getImagePath() / (std::to_string(i) + ".jpg";
+      std::filesystem::path imagePath =
+          foodItem.getImagePath() / (std::to_string(i) + ".jpg");
       this->foodItem.setImagePath(std::filesystem::absolute(imagePath));
       return true;
     }
