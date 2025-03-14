@@ -146,19 +146,29 @@ def performOCR(image):
     try:
         print("Running YOLO to detect object...")
         #run yolo on unprocessed image
-        modelResult = yolo(image, conf=.5)[0] #yolo(image) returns a list of 'results', we should only have one because only a single image
+        modelResults = yolo(image, conf=.5) #yolo(image) returns a list of 'results', we should only have one because only a single image
         print("Detection complete. Filtering objects...")
         # Load the image using OpenCV
         processedImage = cv2.imread(image)
 
         # Get script directory and define output path
         scriptDir = os.path.dirname(os.path.abspath(__file__))
-        outputPath = os.path.join(scriptDir, "img", "output.jpg")
+        outputDir = os.path.join(scriptDir, "img")
+        outputPath = os.path.join(outputDir, "output.jpg")
 
-        # Ensure the output directory exists
-        os.makedirs(os.path.dirname(outputPath), exist_ok=True)
+        # Ensure the output directory exists (explicit check)
+        try:
+            if not os.path.exists(outputDir):
+                os.makedirs(outputDir)
+                print(f"✅ Created directory: {outputDir}")
+            else:
+                print(f"✅ Directory already exists: {outputDir}")
+        except Exception as e:
+            print(f"❌ Error creating directory {outputDir}: {e}")
+            exit(1)  # Exit script if directory creation fails
 
-        for box in modelResult.boxes:
+        for modelResult in modelResults:
+            for box in modelResult.boxes:
 
                 classID = int(box.cls[0])
                 className = yolo.names[classID]
@@ -203,7 +213,11 @@ def performOCR(image):
 
                     print("Text extraction complete!")
 
-        cv2.imwrite(outputPath, image)
+        success = cv2.imwrite(outputPath, processedImage)
+        if not success:
+            print(f"❌ Failed to save output image to {outputPath}")
+        else:
+            print(f"✅ Output image saved to: {outputPath}")
         if textResults is None:
             print("No known objects detected. Scanning image for text.")
             textResults = reader.readtext(processedImage, detail=0, paragraph=True, text_threshold=0.5)
