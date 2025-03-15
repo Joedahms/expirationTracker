@@ -1,5 +1,7 @@
 #include <filesystem>
 #include <glog/logging.h>
+#include <wiringPi.h>
+#include <unistd.h>
 
 #include "../../endpoints.h"
 #include "../../food_item.h"
@@ -44,6 +46,29 @@ Hardware::Hardware(zmqpp::context& context)
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
   }
+}
+
+/**
+ * Initializes GPIO and sensors.
+ * 
+ * @return None
+ */
+void initializeSensors() {
+  // Uses BCM numbering of the GPIOs and directly accesses the GPIO registers.
+  wiringPiSetupPinType(WPI_PIN_BCM);
+
+  this->logger.log("Motor System Initialization");
+  // Setup DC Motor Driver Pins
+  pinMode(MOTOR_IN1, OUTPUT);
+  pinMode(MOTOR_IN2, OUTPUT);
+  // Frequency and pulse break ratio can be configured
+  // pinMode(MOTOR_ENA, PWM_OUTPUT);
+
+  digitalWrite(MOTOR_IN1, LOW);
+  digitalWrite(MOTOR_IN2, LOW);
+  // pwmWrite(MOTOR_ENA, ###);
+
+  this->logger.log("Motor System Initialized.");
 }
 
 /**
@@ -222,7 +247,7 @@ void Hardware::rotateAndCapture() {
     }
 
     this->logger.log("Rotating platform");
-    // TODO rotateMotor();
+    rotateMotor();
 
     // Swap comment lines below if you don't want to wait on realistic motor rotation time
     // usleep(500);
@@ -281,6 +306,38 @@ bool Hardware::takePhotos(int angle) {
   this->logger.log("Exiting takePhotos at angle: " + std::to_string(angle));
   // Always returns true
   return true;
+}
+
+/**
+ * Controls platform rotation with L298N motor driver.
+ * Rotates for a fixed duration.
+ * Timing will need to be adjusted.
+ * HIGH,LOW == forward LOW,HIGH == backwards
+ * @param clockwise Boolean; true for clockwise, false for counterclockwise
+ *
+ * @return None
+ */
+// likely needs to be updated after testing to confirm direction
+void rotateMotor(bool clockwise) {
+  if (clockwise) {
+    this->logger.log("Rotating clockwise.");
+    digitalWrite(MOTOR_IN1, HIGH);
+    digitalWrite(MOTOR_IN2, LOW);
+    //pwmWrite(MOTOR_ENA, 255); // Adjust speed
+    usleep(1875000);             // Rotate duration
+    digitalWrite(MOTOR_IN1, LOW);
+    digitalWrite(MOTOR_IN2, LOW); // HIGH,HIGH || LOW,LOW == off
+  }
+  else {
+    this->logger.log("Rotating counter-clockwise.");
+    digitalWrite(MOTOR_IN1, LOW);
+    digitalWrite(MOTOR_IN2, HIGH);
+    //pwmWrite(MOTOR_ENA, 255);
+    usleep(1875000);
+    digitalWrite(MOTOR_IN1, LOW);
+    digitalWrite(MOTOR_IN2, LOW);
+  }
+  LOG(INFO) << "Rotation complete.";
 }
 
 /**

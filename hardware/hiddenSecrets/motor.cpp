@@ -9,7 +9,7 @@
 
 #define MOTOR_IN1 23 // GPIO Pin for L298N IN1
 #define MOTOR_IN2 24 // GPIO Pin for L298N IN2
-#define MOTOR_ENA 25 // GPIO Pin forL298N enable (PWM Speed Control)
+#define MOTOR_ENA 18 // GPIO Pin forL298N enable (PWM Speed Control)
 
 /**
  * Initializes GPIO, hardware and sensors.
@@ -19,19 +19,17 @@
  */
 void setupMotor() {
   LOG(INFO) << "Motor System Initialization...";
-
-  // uses BCM numbering of the GPIOs and directly accesses the GPIO registers.
-  wiringPiSetupGpio();
-
-  // pin mode ..(INPUT, OUTPUT, PWM_OUTPUT, GPIO_CLOCK)
+  // Uses BCM numbering of the GPIOs and directly accesses the GPIO registers.
+  wiringPiSetupPinType(WPI_PIN_BCM);
   // Setup DC Motor Driver Pins
   pinMode(MOTOR_IN1, OUTPUT);
   pinMode(MOTOR_IN2, OUTPUT);
-  pinMode(MOTOR_ENA, OUTPUT); // PWM_OUTPUT?
+  // Frequency and pulse break ratio can be configured
+  pinMode(MOTOR_ENA, PWM_OUTPUT);
 
   digitalWrite(MOTOR_IN1, LOW);
   digitalWrite(MOTOR_IN2, LOW);
-  analogWrite(MOTOR_ENA, 128); // Set inital speed to 50% (0-255 range)
+  pwmWrite(MOTOR_ENA, 128); // Set inital speed to 50% (0-255 range)
 
   LOG(INFO) << "Motor System Initialized.";
 }
