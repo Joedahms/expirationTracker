@@ -25,7 +25,7 @@
 void hardwareEntry(zmqpp::context& context) {
   Logger logger("hardware_entry.txt");
   logger.log("Within hardware process");
-  // TODO - Add a function to initialize motor and weight sensor.
+  hardware.initializeSensors();
   // TODO - Setup communication with Arduino for weight.
 
   Hardware hardware(context);

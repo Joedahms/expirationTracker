@@ -1,7 +1,7 @@
 #include <filesystem>
 #include <glog/logging.h>
-#include <wiringPi.h>
 #include <unistd.h>
+#include <wiringPi.h>
 
 #include "../../endpoints.h"
 #include "../../food_item.h"
@@ -50,7 +50,7 @@ Hardware::Hardware(zmqpp::context& context)
 
 /**
  * Initializes GPIO and sensors.
- * 
+ *
  * @return None
  */
 void initializeSensors() {
@@ -323,8 +323,8 @@ void rotateMotor(bool clockwise) {
     this->logger.log("Rotating clockwise.");
     digitalWrite(MOTOR_IN1, HIGH);
     digitalWrite(MOTOR_IN2, LOW);
-    //pwmWrite(MOTOR_ENA, 255); // Adjust speed
-    usleep(1875000);             // Rotate duration
+    // pwmWrite(MOTOR_ENA, 255); // Adjust speed
+    usleep(1875000); // Rotate duration
     digitalWrite(MOTOR_IN1, LOW);
     digitalWrite(MOTOR_IN2, LOW); // HIGH,HIGH || LOW,LOW == off
   }
@@ -332,7 +332,7 @@ void rotateMotor(bool clockwise) {
     this->logger.log("Rotating counter-clockwise.");
     digitalWrite(MOTOR_IN1, LOW);
     digitalWrite(MOTOR_IN2, HIGH);
-    //pwmWrite(MOTOR_ENA, 255);
+    // pwmWrite(MOTOR_ENA, 255);
     usleep(1875000);
     digitalWrite(MOTOR_IN1, LOW);
     digitalWrite(MOTOR_IN2, LOW);
