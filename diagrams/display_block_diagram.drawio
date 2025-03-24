@@ -37,6 +37,15 @@
         <mxCell id="Z9ru_VuTjuzVVLZ6QAJo-10" value="Touchscreen" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="380" y="160" width="120" height="60" as="geometry" />
         </mxCell>
+        <mxCell id="Z9ru_VuTjuzVVLZ6QAJo-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Z9ru_VuTjuzVVLZ6QAJo-12" target="Z9ru_VuTjuzVVLZ6QAJo-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Z9ru_VuTjuzVVLZ6QAJo-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="Z9ru_VuTjuzVVLZ6QAJo-12" target="Z9ru_VuTjuzVVLZ6QAJo-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Z9ru_VuTjuzVVLZ6QAJo-12" value="Display Entry" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="160" y="150" width="120" height="60" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
