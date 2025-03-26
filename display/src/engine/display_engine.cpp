@@ -331,7 +331,7 @@ void DisplayEngine::clean() {
 void DisplayEngine::stopSignalToVision() {
   this->logger.log("Scan cancelled, sending cancel scan signal to vision");
   try {
-    this->requestSocket.send(Messages::CANCEL_SCAN);
+    this->requestSocket.send(Messages::CANCEL);
     std::string response;
     this->requestSocket.receive(response);
     if (response == Messages::AFFIRMATIVE) {
