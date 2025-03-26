@@ -282,6 +282,10 @@ void DisplayEngine::handleEvents() {
     this->zeroWeight->handleEvents(&this->displayIsRunning);
     break;
 
+  case EngineState::CANCEL_SCAN_CONFIRMATION:
+    this->cancelScanConfirmation->handleEvents(&this->displayIsRunning);
+    break;
+
   default:
     LOG(FATAL) << "Invalid state";
     break;
@@ -306,6 +310,9 @@ void DisplayEngine::checkKeystates() {
     break;
 
   case EngineState::ZERO_WEIGHT:
+    break;
+
+  case EngineState::CANCEL_SCAN_CONFIRMATION:
     break;
 
   default:
@@ -336,6 +343,10 @@ void DisplayEngine::update() {
     this->zeroWeight->update();
     break;
 
+  case EngineState::CANCEL_SCAN_CONFIRMATION:
+    this->cancelScanConfirmation->update();
+    break;
+
   default:
     LOG(FATAL) << "Invalid state";
     break;
@@ -360,6 +371,10 @@ void DisplayEngine::renderState() {
 
   case EngineState::ZERO_WEIGHT:
     this->zeroWeight->render();
+    break;
+
+  case EngineState::CANCEL_SCAN_CONFIRMATION:
+    this->cancelScanConfirmation->render();
     break;
 
   default:
