@@ -69,6 +69,11 @@ private:
   std::unique_ptr<ZeroWeight> zeroWeight;
   std::unique_ptr<CancelScanConfirmation> cancelScanConfirmation;
 
+  void checkScanning();
+  void checkItemList();
+  void checkZeroWeight();
+  void checkCancelScanConfirmation();
+
   bool displayIsRunning = false;
 
   void startSignalToDisplay();
