@@ -62,8 +62,8 @@ bool ImageProcessor::analyze() {
   for (int i = 0; i < 7; i++) {
     if (poller.poll(1000)) {
       if (poller.has_input(replySocket)) {
-        this->logger.log("Received signal from Display")
-            receiveFoodItem(replySocket, Messages::AFFIRMATIVE, foodItem);
+        this->logger.log("Received signal from Display");
+        receiveFoodItem(replySocket, Messages::AFFIRMATIVE, foodItem);
         logger.log("Received start signal from hardware: ");
         foodItem.logToFile(logger);
         return true;
