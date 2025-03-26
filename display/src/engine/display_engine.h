@@ -78,7 +78,7 @@ private:
 
   void startSignalToDisplay();
   void sendZeroWeightResponse(const std::string& zeroWeightResponse);
-  void stopSignalToVision();
+  void scanCancelledToDisplayHandler();
 };
 
 #endif

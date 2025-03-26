@@ -180,6 +180,7 @@ void DisplayEngine::checkScanning() {
   this->engineState = this->scanning->getCurrentState();
 
   if (this->engineState == EngineState::CANCEL_SCAN_CONFIRMATION) {
+    scanCancelledToDisplayHandler();
     // stopSignalToVision();
   }
 
@@ -396,15 +397,15 @@ void DisplayEngine::clean() {
   LOG(INFO) << "DisplayEngine cleaned";
 }
 
-void DisplayEngine::stopSignalToVision() {
+void DisplayEngine::scanCancelledToDisplayHandler() {
   this->logger.log("Scan cancelled, sending cancel scan signal to display handler");
   try {
-    this->requestSocket.send(Messages::CANCEL);
+    this->requestSocket.send(Messages::SCAN_CANCELLED);
     std::string response;
     this->requestSocket.receive(response);
     if (response == Messages::AFFIRMATIVE) {
-      this->logger.log(
-          "Cancel scan signal successfully sent to display handler, in main menu state");
+      this->logger.log("Cancel scan signal successfully sent to display handler, in "
+                       "cancel scan confirmation state");
     }
     else {
       LOG(FATAL) << "Invalid response received from display handler";
