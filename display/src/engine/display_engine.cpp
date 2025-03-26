@@ -50,10 +50,9 @@ DisplayEngine::DisplayEngine(const char* windowTitle,
   initializeEngine(this->displayGlobal.window);
 
   // Initialize states
-  this->mainMenu  = std::make_unique<MainMenu>(this->displayGlobal);
-  this->scanning  = std::make_unique<Scanning>(this->displayGlobal);
-  this->pauseMenu = std::make_unique<PauseMenu>(this->displayGlobal);
-  this->itemList  = std::make_unique<ItemList>(this->displayGlobal);
+  this->scanning   = std::make_unique<Scanning>(this->displayGlobal);
+  this->itemList   = std::make_unique<ItemList>(this->displayGlobal);
+  this->zeroWeight = std::make_unique<ZeroWeight>(this->displayGlobal);
 
   displayIsRunning = true;
   this->logger.log("Engine is constructed and now running");
@@ -91,7 +90,7 @@ SDL_Window* DisplayEngine::setupWindow(const char* windowTitle,
     LOG(FATAL) << "Error setting up SDL display window";
   }
 
-  LOG(INFO) << "SDL display window created";
+  this->logger.log("SDL display window created");
 }
 
 /**
@@ -101,7 +100,7 @@ SDL_Window* DisplayEngine::setupWindow(const char* windowTitle,
  * @return None
  */
 void DisplayEngine::initializeEngine(SDL_Window* window) {
-  LOG(INFO) << "Initializing engine";
+  this->logger.log("Initializing engine");
   try {
     int sdlInitReturn = SDL_Init(SDL_INIT_EVERYTHING);
     if (sdlInitReturn != 0) {
@@ -111,10 +110,8 @@ void DisplayEngine::initializeEngine(SDL_Window* window) {
     LOG(FATAL) << "Failed to initialize engine";
     exit(1);
   }
-  LOG(INFO) << "engine initialized";
 
   // Create renderer
-  LOG(INFO) << "Creating renderer";
   try {
     this->displayGlobal.renderer = SDL_CreateRenderer(
         window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
@@ -126,10 +123,8 @@ void DisplayEngine::initializeEngine(SDL_Window* window) {
     LOG(FATAL) << "Error creating renderer";
     exit(1);
   }
-  LOG(INFO) << "Renderer created";
 
   // Initialize TTF
-  LOG(INFO) << "Initializing TTF";
   try {
     int ttfInitReturn = TTF_Init();
     if (ttfInitReturn == -1) {
@@ -139,7 +134,7 @@ void DisplayEngine::initializeEngine(SDL_Window* window) {
     LOG(FATAL) << "Failed to initialize TTF";
     exit(1);
   }
-  LOG(INFO) << "TTF initialized";
+  this->logger.log("Engine initialized");
 }
 
 /**
@@ -150,16 +145,6 @@ void DisplayEngine::initializeEngine(SDL_Window* window) {
  */
 void DisplayEngine::checkState() {
   switch (this->engineState) {
-  case EngineState::MAIN_MENU:
-    this->engineState = this->mainMenu->getCurrentState();
-
-    if (this->engineState == EngineState::SCANNING) {
-      startSignalToDisplay();
-    }
-
-    this->mainMenu->setCurrentState(EngineState::MAIN_MENU);
-    break;
-
   case EngineState::SCANNING:
     this->engineState = this->scanning->getCurrentState();
 
@@ -170,14 +155,33 @@ void DisplayEngine::checkState() {
     this->scanning->setCurrentState(EngineState::SCANNING);
     break;
 
-  case EngineState::PAUSE_MENU:
-    this->engineState = this->pauseMenu->getCurrentState();
-    this->pauseMenu->setCurrentState(EngineState::PAUSE_MENU);
-    break;
-
   case EngineState::ITEM_LIST:
     this->engineState = this->itemList->getCurrentState();
+
+    if (this->engineState == EngineState::SCANNING) {
+      startSignalToDisplay();
+    }
+
     this->itemList->setCurrentState(EngineState::ITEM_LIST);
+    break;
+
+  case EngineState::ZERO_WEIGHT:
+    this->engineState = this->zeroWeight->getCurrentState();
+    // override
+    if (this->engineState == EngineState::SCANNING) {
+      sendZeroWeightResponse(Messages::OVERRIDE);
+    }
+    // cancel
+    else if (this->engineState == EngineState::ITEM_LIST) {
+      sendZeroWeightResponse(Messages::CANCEL);
+    }
+    else if (this->zeroWeight->getRetryScan()) {
+      sendZeroWeightResponse(Messages::RETRY);
+      this->zeroWeight->setRetryScan(false);
+      startSignalToDisplay();
+    }
+
+    this->zeroWeight->setCurrentState(EngineState::ZERO_WEIGHT);
     break;
 
   default:
@@ -196,10 +200,6 @@ void DisplayEngine::checkState() {
  */
 void DisplayEngine::handleEvents() {
   switch (this->engineState) {
-  case EngineState::MAIN_MENU:
-    this->mainMenu->handleEvents(&this->displayIsRunning);
-    break;
-
   case EngineState::SCANNING:
     {
       this->scanning->handleEvents(&this->displayIsRunning);
@@ -221,12 +221,12 @@ void DisplayEngine::handleEvents() {
       break;
     }
 
-  case EngineState::PAUSE_MENU:
-    this->pauseMenu->handleEvents(&this->displayIsRunning);
-    break;
-
   case EngineState::ITEM_LIST:
     this->itemList->handleEvents(&this->displayIsRunning);
+    break;
+
+  case EngineState::ZERO_WEIGHT:
+    this->zeroWeight->handleEvents(&this->displayIsRunning);
     break;
 
   default:
@@ -244,22 +244,19 @@ void DisplayEngine::handleEvents() {
  */
 void DisplayEngine::checkKeystates() {
   switch (this->engineState) {
-  case EngineState::MAIN_MENU:
-    break;
-
   case EngineState::SCANNING:
     this->engineState = this->scanning->checkKeystates();
-    break;
-
-  case EngineState::PAUSE_MENU:
     break;
 
   case EngineState::ITEM_LIST:
     this->engineState = this->itemList->checkKeystates();
     break;
 
+  case EngineState::ZERO_WEIGHT:
+    break;
+
   default:
-    LOG(FATAL) << "Invalid state";
+    LOG(FATAL) << "Invalid state " << engineStateToString(this->engineState);
     break;
   }
 }
@@ -274,20 +271,16 @@ void DisplayEngine::checkKeystates() {
  */
 void DisplayEngine::update() {
   switch (this->engineState) {
-  case EngineState::MAIN_MENU:
-    this->mainMenu->update();
-    break;
-
   case EngineState::SCANNING:
     this->scanning->update();
     break;
 
-  case EngineState::PAUSE_MENU:
-    this->pauseMenu->update();
-    break;
-
   case EngineState::ITEM_LIST:
     this->itemList->update();
+    break;
+
+  case EngineState::ZERO_WEIGHT:
+    this->zeroWeight->update();
     break;
 
   default:
@@ -304,20 +297,16 @@ void DisplayEngine::update() {
  */
 void DisplayEngine::renderState() {
   switch (this->engineState) {
-  case EngineState::MAIN_MENU:
-    this->mainMenu->render();
-    break;
-
   case EngineState::SCANNING:
     this->scanning->render();
     break;
 
-  case EngineState::PAUSE_MENU:
-    this->pauseMenu->render();
-    break;
-
   case EngineState::ITEM_LIST:
     this->itemList->render();
+    break;
+
+  case EngineState::ZERO_WEIGHT:
+    this->zeroWeight->render();
     break;
 
   default:
@@ -361,10 +350,37 @@ void DisplayEngine::startSignalToDisplay() {
   this->logger.log("Scan initialized, sending start signal to display");
   try {
     this->requestSocket.send(Messages::START_SCAN);
+    this->logger.log("Start signal successfully sent to display, waiting for response");
     std::string response;
     this->requestSocket.receive(response);
     if (response == Messages::AFFIRMATIVE) {
-      this->logger.log("Start signal successfully sent to display, in scanning state");
+      this->logger.log("Received affirmative from display");
+    }
+    else if (response == Messages::ZERO_WEIGHT) {
+      this->logger.log(
+          "Received zero weight back from display, switching to zero weight state");
+      this->engineState = EngineState::ZERO_WEIGHT;
+      // At this point need to check if display sends back affirmative or zero weight
+      // Break out response checking (if else if) and call it on some interval if in zero
+      // weight state?
+    }
+    else {
+      this->logger.log("Received invalid response from display: " + response);
+      LOG(FATAL) << "Invalid response received from display " << response;
+    }
+  } catch (const zmqpp::exception& e) {
+    LOG(FATAL) << e.what();
+  }
+}
+
+void DisplayEngine::sendZeroWeightResponse(const std::string& zeroWeightResponse) {
+  this->logger.log("Sending zero weight response: " + zeroWeightResponse + " to display");
+  try {
+    this->requestSocket.send(zeroWeightResponse);
+    std::string response;
+    this->requestSocket.receive(response);
+    if (response == Messages::AFFIRMATIVE) {
+      this->logger.log("Zero weight response successfully sent to display");
     }
     else {
       LOG(FATAL) << "Invalid response received from display";

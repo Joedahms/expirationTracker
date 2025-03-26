@@ -33,4 +33,6 @@ int readFoodItemByIdCallback(void* passedFoodItem,
 
 void updateFoodItemQuantity(const int& id, const int& newQuantity);
 
+void deleteById(const int& id);
+
 #endif

@@ -25,8 +25,12 @@ struct Messages {
   // Start the scan of a new food item
   static const std::string START_SCAN;
 
-  // Cancel a scan while it is underway
-  static const std::string CANCEL_SCAN;
+  // Indicate that there is nothing on the platform
+  static const std::string ZERO_WEIGHT;
+
+  static const std::string RETRY;
+  static const std::string OVERRIDE;
+  static const std::string CANCEL;
 };
 
 #endif

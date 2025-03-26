@@ -30,7 +30,7 @@ NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal,
   addElement(std::move(decreaseButton));
 
   std::unique_ptr<Text> text = std::make_unique<Text>(displayGlobal, SDL_Rect{0, 0, 0, 0},
-                                                      displayGlobal.futuramFontPath, "0",
+                                                      DisplayGlobal::futuramFontPath, "0",
                                                       24, SDL_Color{0, 255, 0, 255});
   addElement(std::move(text));
 
@@ -74,8 +74,12 @@ void NumberSetting::updateSelf() {
     this->children[i]->setPositionRelativeToParent(childRelativePosition);
   }
 
-  FoodItem foodItem = readFoodItemById(this->settingId);
-  if (foodItem.getQuantity() != this->settingValue) {
+  FoodItem foodItem    = readFoodItemById(this->settingId);
+  int foodItemQuantity = foodItem.getQuantity();
+  if (foodItemQuantity == 0) {
+    deleteById(this->settingId);
+  }
+  else if (foodItemQuantity != this->settingValue) {
     updateFoodItemQuantity(this->settingId, this->settingValue);
   }
   else {
