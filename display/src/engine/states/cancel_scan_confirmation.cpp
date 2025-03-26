@@ -32,7 +32,7 @@ CancelScanConfirmation::CancelScanConfirmation(struct DisplayGlobal displayGloba
   yesButton->setCenteredHorizontal();
   rootElement->addElement(std::move(yesButton));
 
-  SDL_Rect noButtonRectangle       = {0, 150, 0, 0};
+  SDL_Rect noButtonRectangle       = {0, 200, 0, 0};
   std::unique_ptr<Button> noButton = std::make_unique<Button>(
       this->displayGlobal, noButtonRectangle, "No", SDL_Point{10, 10},
       [this]() { this->currentState = EngineState::SCANNING; },
