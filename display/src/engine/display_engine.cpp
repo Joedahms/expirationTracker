@@ -148,8 +148,8 @@ void DisplayEngine::checkState() {
   case EngineState::SCANNING:
     this->engineState = this->scanning->getCurrentState();
 
-    if (this->engineState == EngineState::MAIN_MENU) {
-      stopSignalToVision();
+    if (this->engineState == EngineState::CANCEL_SCAN_CONFIRMATION) {
+      // stopSignalToVision();
     }
 
     this->scanning->setCurrentState(EngineState::SCANNING);
@@ -329,17 +329,17 @@ void DisplayEngine::clean() {
 }
 
 void DisplayEngine::stopSignalToVision() {
-  this->logger.log("Scan cancelled, sending cancel scan signal to vision");
+  this->logger.log("Scan cancelled, sending cancel scan signal to display handler");
   try {
     this->requestSocket.send(Messages::CANCEL);
     std::string response;
     this->requestSocket.receive(response);
     if (response == Messages::AFFIRMATIVE) {
       this->logger.log(
-          "Cancel scan signal successfully sent to vision, in main menu state");
+          "Cancel scan signal successfully sent to display handler, in main menu state");
     }
     else {
-      LOG(FATAL) << "Invalid response received from vision";
+      LOG(FATAL) << "Invalid response received from display handler";
     }
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();

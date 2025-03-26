@@ -44,31 +44,28 @@ void DisplayHandler::handle() {
 
     // Engine wants to start a new scan, decide what to send back to it
     if (receivedMessage == Messages::START_SCAN) {
-      //      bool scanStartedOrCancelled = false;
-      //     while (scanStartedOrCancelled == false) {
       std::string startResponse = startSignalToHardware();
-      if (startResponse == Messages::AFFIRMATIVE) {
-        // Success, weight on platform
+
+      if (startResponse == Messages::AFFIRMATIVE) { // Success, weight on platform
         receiveFromVision();
+        // handle scanning
       }
       else if (startResponse == Messages::ZERO_WEIGHT) {
         // Tell engine no weight on platform and wait for next step
         this->logger.log("Indicating to engine that no weight on platform");
         this->replySocket.send(Messages::ZERO_WEIGHT);
         this->logger.log("Indicated to engine that no weight on platform");
+
         std::string zeroWeightResponse;
         this->replySocket.receive(zeroWeightResponse);
 
         if (zeroWeightResponse == Messages::RETRY) {
           zeroWeightRetry();
-          // Loop again
         }
         else if (zeroWeightResponse == Messages::OVERRIDE) {
-          //          scanStartedOrCancelled = true;
           zeroWeightOverride();
         }
         else if (zeroWeightResponse == Messages::CANCEL) {
-          //         scanStartedOrCancelled = true;
           zeroWeightCancel();
         }
         else {

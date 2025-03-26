@@ -12,7 +12,7 @@
 /**
  * @param displayGlobal Global variables
  */
-Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger("scanning_state.txt") {
+Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger(LogFiles::SCANNING) {
   this->logger.log("Constructing scanning state");
 
   this->currentState         = EngineState::SCANNING;
@@ -37,7 +37,8 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger("scanning_state.
   SDL_Rect cancelScanButtonRectangle       = {0, 150, 0, 0};
   std::unique_ptr<Button> cancelScanButton = std::make_unique<Button>(
       this->displayGlobal, cancelScanButtonRectangle, "Cancel Scan", SDL_Point{10, 10},
-      [this]() { this->currentState = EngineState::MAIN_MENU; }, LogFiles::scanning);
+      [this]() { this->currentState = EngineState::CANCEL_SCAN_CONFIRMATION; },
+      LogFiles::SCANNING);
   cancelScanButton->setCenteredHorizontal();
   rootElement->addElement(std::move(cancelScanButton));
 

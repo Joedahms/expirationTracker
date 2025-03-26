@@ -44,9 +44,6 @@ add_executable(expirationTracker
   food_item.cpp
   endpoints.cpp
   logger.cpp
-  
-
-
 
   # Display process after forked from main
   display/src/display_entry.cpp
@@ -84,6 +81,7 @@ add_executable(expirationTracker
   display/src/engine/states/scanning.cpp
   display/src/engine/states/item_list.cpp
   display/src/engine/states/zero_weight.cpp
+  display/src/engine/states/cancel_scan_confirmation.cpp
 
   # Vision process after forked from main
   vision/src/helperFunctions.cpp
@@ -93,6 +91,7 @@ add_executable(expirationTracker
   vision/src/TextClassifier.cpp
   vision/src/visionMain.cpp
   vision/src/OCRResult.cpp
+  
   #Hardware process after forked from main
   hardware/src/hardware_entry.cpp
   hardware/src/hardware.cpp
