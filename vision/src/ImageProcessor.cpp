@@ -5,8 +5,8 @@
  * @param externalEndpoints Endpoints to the main components of the system (vision,
  * hardware, and display)
  */
-ImageProcessor::ImageProcessor(zmqpp::context& context, zmqpp::poller& poller)
-    : logger("image_processor.txt"), cancelRequested(false), sharedPoller(poller),
+ImageProcessor::ImageProcessor(zmqpp::context& context)
+    : logger("image_processor.txt"), cancelRequested(false),
       requestHardwareSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
       replySocket(context, zmqpp::socket_type::reply), modelHandler(context) {
@@ -179,8 +179,11 @@ void ImageProcessor::stopHardware() {
 
 bool ImageProcessor::isCancelRequested() {
   logger.log("Entering isCancelRequested.");
-  if (this->sharedPoller.poll(1000)) {
-    if (this->sharedPoller.has_input(replySocket)) {
+  zmqpp::poller poller;
+  poller.add(replySocket);
+
+  if (poller.poll(1000)) {
+    if (poller.has_input(replySocket)) {
       logger.log("reply socket has input.");
       zmqpp::message msg;
       this->replySocket.receive(msg);
