@@ -185,12 +185,14 @@ bool ImageProcessor::isCancelRequested() {
     if (poller.has_input(replySocket)) {
       logger.log("reply socket has input.");
       zmqpp::message msg;
-      replySocket.receive(msg);
+      this->replySocket.receive(msg);
       std::string command;
       msg >> command;
 
       if (command == Messages::SCAN_CANCELLED) {
         logger.log("Cancel scan command received.");
+        logger.log("Telling display message received.");
+        this->replySocket.send(Messages::AFFIRMATIVE);
         logger.log("Canceling scan...");
         return true;
       }
