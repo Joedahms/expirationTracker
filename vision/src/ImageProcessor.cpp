@@ -197,6 +197,6 @@ bool ImageProcessor::isCancelRequested() {
         return true;
       }
     }
-    return false;
   }
+  return false;
 }
