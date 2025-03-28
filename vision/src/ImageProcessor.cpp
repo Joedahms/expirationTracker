@@ -57,17 +57,8 @@ bool ImageProcessor::analyze() {
   this->logger.log("Entering analyze");
   ClassifyObjectReturn classifyObjectReturn{false, false};
   this->logger.log("Beginning image processing.");
-  zmqpp::poller poller;
-  poller.add(replySocket);
   for (int i = 0; i < 7; i++) {
-    if (poller.poll(1000)) {
-      if (poller.has_input(replySocket)) {
-        this->logger.log("Received signal from Display");
-        receiveFoodItem(replySocket, Messages::AFFIRMATIVE, foodItem);
-        logger.log("Received start signal from hardware: ");
-        foodItem.logToFile(logger);
-        return true;
-      }
+    if (isCancelRequested()) {
       return false;
     }
     processImagePair(i, classifyObjectReturn);
@@ -183,5 +174,27 @@ void ImageProcessor::stopHardware() {
       this->logger.log("Received invalid message from hardware");
       LOG(FATAL) << "Received invalid message from hardware";
     }
+  }
+}
+
+bool ImageProcessor::isCancelRequested() {
+  logger.log("Entering isCancelRequested.");
+  zmqpp::poller poller;
+  poller.add(replySocket);
+  if (poller.poll(1000)) {
+    if (poller.has_input(replySocket)) {
+      logger.log("reply socket has input.");
+      zmqpp::message msg;
+      replySocket.receive(msg);
+      std::string command;
+      msg >> command;
+
+      if (command == Messages::SCAN_CANCELLED) {
+        logger.log("Cancel scan command received.");
+        logger.log("Canceling scan...");
+        return true;
+      }
+    }
+    return false;
   }
 }

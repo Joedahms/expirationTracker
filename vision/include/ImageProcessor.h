@@ -14,18 +14,13 @@ class ImageProcessor {
 public:
   explicit ImageProcessor(zmqpp::context& context);
   void process();
-  bool analyze();
   struct FoodItem& getFoodItem();
   void setFoodItem(struct FoodItem&);
-  void processImagePair(int, ClassifyObjectReturn&);
 
 private:
   Logger logger;
 
-  std::atomic_bool cancelRequested;
-  void requestCancel() { cancelRequested = true; }
-  void resetCancel() { cancelRequested = false; }
-  bool isCancelRequested() const { return cancelRequested.load(); }
+  bool cancelRequested;
 
   zmqpp::socket requestHardwareSocket;
   zmqpp::socket requestDisplaySocket;
@@ -38,6 +33,10 @@ private:
 
   void detectionSucceeded();
   void detectionFailed();
+  bool analyze();
+  void processImagePair(int, ClassifyObjectReturn&);
+
+  bool isCancelRequested();
 
   void foodItemToDisplay();
   void stopHardware();

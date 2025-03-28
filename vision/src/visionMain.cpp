@@ -13,10 +13,10 @@ void visionEntry(zmqpp::context& context) {
   Logger logger("vision_entry.txt");
   logger.log("Within vision process");
 
-  ImageProcessor processor(context);
-
   zmqpp::socket replySocket(context, zmqpp::socket_type::reply);
   replySocket.bind(ExternalEndpoints::visionEndpoint);
+
+  ImageProcessor processor(context);
 
   zmqpp::poller poller;
   poller.add(replySocket);
