@@ -10,6 +10,8 @@ public:
   LoadingBar(struct DisplayGlobal displayGlobal,
              const SDL_Rect boundaryRectangle,
              const int& borderThickness,
+             const float& totalTimeSeconds,
+             const float& updatePeriodMs,
              const std::string& logFile);
 
   void update() override;

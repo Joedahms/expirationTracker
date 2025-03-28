@@ -6,9 +6,13 @@
 void State::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
   while (SDL_PollEvent(&event) != 0) { // While there are events in the queue
+    std::cout << "here" << std::endl;
     if (event.type == SDL_QUIT) {
       *displayIsRunning = false;
       break;
+    }
+    if (event.type == SDL_FINGERDOWN) {
+      std::cout << "finger down" << std::endl;
     }
     else {
       this->rootElement->handleEvent(event);

@@ -3,7 +3,10 @@
 LoadingBar::LoadingBar(struct DisplayGlobal displayGlobal,
                        const SDL_Rect boundaryRectangle,
                        const int& borderThickness,
-                       const std::string& logFile) {
+                       const float& totalTimeSeconds,
+                       const float& updatePeriodMs,
+                       const std::string& logFile)
+    : totalTimeSeconds(totalTimeSeconds), updatePeriodMs(updatePeriodMs) {
   this->logger          = std::make_unique<Logger>(logFile);
   this->displayGlobal   = displayGlobal;
   this->borderThickness = borderThickness;
@@ -15,9 +18,6 @@ LoadingBar::LoadingBar(struct DisplayGlobal displayGlobal,
 
   this->previousUpdate = std::chrono::steady_clock::now();
   addBorder(this->borderThickness);
-
-  this->totalTimeSeconds = 20;
-  this->updatePeriodMs   = 500;
 }
 
 void LoadingBar::update() {
@@ -35,11 +35,8 @@ void LoadingBar::update() {
   // Get time since last update
   this->currentUpdate = std::chrono::steady_clock::now();
   std::chrono::milliseconds updateDifference;
-
   updateDifference = std::chrono::duration_cast<std::chrono::milliseconds>(
       this->currentUpdate - this->previousUpdate);
-
-  //  std::cout << updateDifference.count() << std::endl;
 
   if (this->barRectangle.w >= this->boundaryRectangle.w) {
     return;

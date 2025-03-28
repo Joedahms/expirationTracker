@@ -43,11 +43,13 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger(LogFiles::SCANNI
   cancelScanButton->setCenteredHorizontal();
   rootElement->addElement(std::move(cancelScanButton));
 
-  SDL_Rect loadingBarRectangle  = {0, 200, 200, 30};
-  int loadingBarBorderThickness = 3;
-  std::unique_ptr<LoadingBar> loadingBar =
-      std::make_unique<LoadingBar>(this->displayGlobal, loadingBarRectangle,
-                                   loadingBarBorderThickness, LogFiles::SCANNING);
+  SDL_Rect loadingBarRectangle           = {0, 200, 200, 30};
+  int loadingBarBorderThickness          = 3;
+  float totalTimeSeconds                 = 20;
+  float updatePeriodMs                   = 100;
+  std::unique_ptr<LoadingBar> loadingBar = std::make_unique<LoadingBar>(
+      this->displayGlobal, loadingBarRectangle, loadingBarBorderThickness,
+      totalTimeSeconds, updatePeriodMs, LogFiles::SCANNING);
   loadingBar->setCenteredHorizontal();
   rootElement->addElement(std::move(loadingBar));
 
