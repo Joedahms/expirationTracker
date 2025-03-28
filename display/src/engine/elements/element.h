@@ -53,6 +53,9 @@ protected:
   std::unique_ptr<Logger> logger;
   std::string logFile;
 
+  std::chrono::steady_clock::time_point previousUpdate;
+  std::chrono::steady_clock::time_point currentUpdate;
+
   struct DisplayGlobal displayGlobal;
   int id                             = -1;
   SDL_Rect boundaryRectangle         = {0, 0, 0, 0};
