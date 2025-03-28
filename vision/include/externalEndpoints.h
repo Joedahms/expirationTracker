@@ -8,6 +8,8 @@ struct VisionExternalEndpoints {
       "ipc:///tmp/text_classifier_endpoint";
   inline static const std::string pythonServerEndpoint =
       "ipc:///tmp/python_server_endpoint";
+  inline static const std::string listenerEndpoint   = "ipc:///tmp/listener_endpoint";
+  inline static const std::string visionMainEndpoint = "ipc:///tmp/visionMain_endpoint";
 };
 
 #endif

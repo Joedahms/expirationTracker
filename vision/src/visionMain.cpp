@@ -14,29 +14,44 @@ void visionEntry(zmqpp::context& context) {
   logger.log("Within vision process");
 
   zmqpp::socket replySocket(context, zmqpp::socket_type::reply);
-  replySocket.bind(ExternalEndpoints::visionEndpoint);
+  replySocket.bind(VisionExternalEndpoints::visionMainEndpoint);
 
-  zmqpp::poller poller;
-  poller.add(replySocket);
-
-  zmqpp::socket cancelSocket(context, zmqpp::socket_type::pull);
-  cancelSocket.bind("tcp://*:6001");
+  zmqpp::socket listenerSocket(context, zmqpp::socket_type::reply);
+  listenerSocket.bind(ExternalEndpoints::visionEndpoint);
+  zmqpp::socket messengerSocket(context, zmqpp::socket_type::request);
+  messengerSocket.connect(VisionExternalEndpoints::visionMainEndpoint);
 
   ImageProcessor processor(context);
 
   // Listener thread
-  std::thread cancelThread([&]() {
+  std::thread listenerThread([&]() {
     while (true) {
       zmqpp::message msg;
-      cancelSocket.receive(msg);
+      listenerSocket.receive(msg);
       std::string command;
       msg >> command;
       if (command == Messages::SCAN_CANCELLED) {
+        logger.log("Cancel command received.");
         processor.requestCancel();
+        listenerSocket.send(Messages::AFFIRMATIVE);
+      }
+      else if (command == Messages::START_SCAN) {
+        logger.log("Start command received.");
+        listenerSocket.send(Messages::AFFIRMATIVE); // Tell hardware to send food item
+        zmqpp::message foodItemString;
+        listenerSocket.receive(foodItemString);     // Grab food item
+        listenerSocket.send(Messages::AFFIRMATIVE); // Tell hardware received food itme
+
+        messengerSocket.send(foodItemString); // Send fooditem to main
+        zmqpp::message response;
+        messengerSocket.receive(response); // Receive back affirmative
       }
     }
   });
-  cancelThread.detach();
+  listenerThread.detach();
+
+  zmqpp::poller poller;
+  poller.add(replySocket);
 
   while (1) {
     FoodItem foodItem;
