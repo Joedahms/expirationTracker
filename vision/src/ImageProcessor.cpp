@@ -59,6 +59,7 @@ bool ImageProcessor::analyze() {
   this->logger.log("Beginning image processing.");
   for (int i = 0; i < 7; i++) {
     if (isCancelRequested()) {
+      logger.log("Cancel requested — exiting early.");
       return false;
     }
     processImagePair(i, classifyObjectReturn);
