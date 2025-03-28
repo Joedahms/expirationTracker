@@ -15,6 +15,9 @@ LoadingBar::LoadingBar(struct DisplayGlobal displayGlobal,
 
   this->previousUpdate = std::chrono::steady_clock::now();
   addBorder(this->borderThickness);
+
+  this->totalTimeSeconds = 20;
+  this->updatePeriodMs   = 500;
 }
 
 void LoadingBar::update() {
@@ -22,18 +25,28 @@ void LoadingBar::update() {
     hasParentUpdate();
   }
 
+  float pixelsPerMs =
+      static_cast<float>(this->boundaryRectangle.w) / (this->totalTimeSeconds * 1000);
+  this->pixelsPerUpdate = pixelsPerMs * this->updatePeriodMs;
+
   this->barRectangle.x = this->boundaryRectangle.x + 1;
   this->barRectangle.y = this->boundaryRectangle.y + 1;
 
   // Get time since last update
   this->currentUpdate = std::chrono::steady_clock::now();
-  std::chrono::seconds updateDifference;
-  updateDifference = std::chrono::duration_cast<std::chrono::seconds>(
+  std::chrono::milliseconds updateDifference;
+
+  updateDifference = std::chrono::duration_cast<std::chrono::milliseconds>(
       this->currentUpdate - this->previousUpdate);
 
-  // 1 or more seconds since last update
-  if (updateDifference.count() > 0.5) {
-    this->barRectangle.w++;
+  //  std::cout << updateDifference.count() << std::endl;
+
+  if (this->barRectangle.w >= this->boundaryRectangle.w) {
+    return;
+  }
+  // Time to update?
+  if (updateDifference.count() > this->updatePeriodMs) {
+    this->barRectangle.w += this->pixelsPerUpdate;
     this->previousUpdate = this->currentUpdate;
   }
 }

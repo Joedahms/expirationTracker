@@ -19,6 +19,9 @@ public:
 private:
   SDL_Rect barRectangle;
   SDL_Color barColor;
+  float totalTimeSeconds;
+  float updatePeriodMs;
+  int pixelsPerUpdate;
 };
 
 #endif
