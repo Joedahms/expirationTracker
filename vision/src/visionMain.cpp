@@ -16,10 +16,10 @@ void visionEntry(zmqpp::context& context) {
   zmqpp::socket replySocket(context, zmqpp::socket_type::reply);
   replySocket.bind(ExternalEndpoints::visionEndpoint);
 
-  ImageProcessor processor(context);
-
   zmqpp::poller poller;
   poller.add(replySocket);
+
+  ImageProcessor processor(context, poller);
 
   while (1) {
     FoodItem foodItem;
