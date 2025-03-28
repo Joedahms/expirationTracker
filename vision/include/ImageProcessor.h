@@ -16,11 +16,14 @@ public:
   void process();
   struct FoodItem& getFoodItem();
   void setFoodItem(struct FoodItem&);
+  void requestCancel();
+  void resetCancel();
+  bool isCancelRequested();
 
 private:
   Logger logger;
 
-  bool cancelRequested;
+  std::atomic_bool cancelRequested = false;
 
   zmqpp::socket requestHardwareSocket;
   zmqpp::socket requestDisplaySocket;
@@ -35,8 +38,6 @@ private:
   void detectionFailed();
   bool analyze();
   void processImagePair(int, ClassifyObjectReturn&);
-
-  bool isCancelRequested();
 
   void foodItemToDisplay();
   void stopHardware();

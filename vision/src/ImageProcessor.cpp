@@ -177,27 +177,8 @@ void ImageProcessor::stopHardware() {
   }
 }
 
-bool ImageProcessor::isCancelRequested() {
-  logger.log("Entering isCancelRequested.");
-  zmqpp::poller poller;
-  poller.add(replySocket);
+void ImageProcessor::requestCancel() { cancelRequested = true; }
 
-  if (poller.poll(1000)) {
-    if (poller.has_input(replySocket)) {
-      logger.log("reply socket has input.");
-      zmqpp::message msg;
-      this->replySocket.receive(msg);
-      std::string command;
-      msg >> command;
+void ImageProcessor::resetCancel() { cancelRequested = false; }
 
-      if (command == Messages::SCAN_CANCELLED) {
-        logger.log("Cancel scan command received.");
-        logger.log("Telling display message received.");
-        this->replySocket.send(Messages::AFFIRMATIVE);
-        logger.log("Canceling scan...");
-        return true;
-      }
-    }
-  }
-  return false;
-}
+bool ImageProcessor::isCancelRequested() { return cancelRequested.load(); }
