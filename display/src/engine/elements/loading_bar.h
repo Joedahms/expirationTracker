@@ -28,7 +28,10 @@ private:
   bool held = false;
 
   SDL_Point previousMotion = {0, 0};
-  SDL_Point velocity       = {0, 0};
+  float xVelocity          = 0;
+  float yVelocity          = 0;
+  float xAcceleration      = 0;
+  float yAcceleration      = 0;
 };
 
 #endif
