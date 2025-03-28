@@ -19,17 +19,39 @@ void visionEntry(zmqpp::context& context) {
   zmqpp::poller poller;
   poller.add(replySocket);
 
+  zmqpp::socket cancelSocket(context, zmqpp::socket_type::pull);
+  cancelSocket.bind("tcp://*:6001");
+
   ImageProcessor processor(context);
+
+  // Listener thread
+  std::thread cancelThread([&]() {
+    while (true) {
+      zmqpp::message msg;
+      cancelSocket.receive(msg);
+      std::string command;
+      msg >> command;
+      if (command == Messages::SCAN_CANCELLED) {
+        processor.requestCancel();
+      }
+    }
+  });
+  cancelThread.detach();
 
   while (1) {
     FoodItem foodItem;
     logger.log("Waiting for start signal from Hardware");
 
-    while (startSignalCheck(replySocket, logger, foodItem, poller) == false) {
+    while (!startSignalCheck(replySocket, logger, foodItem, poller)) {
       ;
     }
     processor.setFoodItem(foodItem);
     processor.process();
+
+    if (processor.isCancelRequested()) {
+      logger.log("Process was canceled by user.");
+    }
+    processor.resetCancel();
   }
 }
 
