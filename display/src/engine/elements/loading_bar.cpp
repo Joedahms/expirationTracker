@@ -44,6 +44,9 @@ void LoadingBar::update() {
       this->previousUpdate = this->currentUpdate;
     }
   }
+  else {
+    this->barRectangle.w = 0;
+  }
 
   if (this->held) {
     this->positionRelativeToParent.x += this->velocity.x;
@@ -58,11 +61,11 @@ void LoadingBar::update() {
   }
 
   if (this->positionRelativeToParent.x + this->borderThickness < 0) {
-    this->velocity.x                 = 0;
+    this->velocity.x                 = this->velocity.x * -1;
     this->positionRelativeToParent.x = this->borderThickness;
   }
   if (this->positionRelativeToParent.y + this->borderThickness < 0) {
-    this->velocity.y                 = 0;
+    this->velocity.y                 = this->velocity.y * -1;
     this->positionRelativeToParent.y = this->borderThickness;
   }
 
@@ -71,7 +74,7 @@ void LoadingBar::update() {
   int rightEdge = this->positionRelativeToParent.x + this->boundaryRectangle.w +
                   this->borderThickness;
   if (rightEdge > parentRectangle.x + parentRectangle.w) {
-    this->velocity.x                 = 0;
+    this->velocity.x                 = this->velocity.x * -1;
     this->positionRelativeToParent.x = parentRectangle.x + parentRectangle.w -
                                        this->boundaryRectangle.w - this->borderThickness;
   }
@@ -79,7 +82,7 @@ void LoadingBar::update() {
   int bottomEdge = this->positionRelativeToParent.y + this->boundaryRectangle.h +
                    this->borderThickness;
   if (bottomEdge > parentRectangle.y + parentRectangle.h) {
-    this->velocity.y                 = 0;
+    this->velocity.y                 = this->velocity.y * -1;
     this->positionRelativeToParent.y = parentRectangle.y + parentRectangle.h -
                                        this->boundaryRectangle.h - this->borderThickness;
   }
