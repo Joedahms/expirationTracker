@@ -43,7 +43,7 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger(LogFiles::SCANNI
   cancelScanButton->setCenteredHorizontal();
   rootElement->addElement(std::move(cancelScanButton));
 
-  SDL_Rect loadingBarRectangle  = {0, 200, 100, 50};
+  SDL_Rect loadingBarRectangle  = {0, 200, 200, 30};
   int loadingBarBorderThickness = 3;
   std::unique_ptr<LoadingBar> loadingBar =
       std::make_unique<LoadingBar>(this->displayGlobal, loadingBarRectangle,

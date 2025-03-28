@@ -10,7 +10,7 @@ LoadingBar::LoadingBar(struct DisplayGlobal displayGlobal,
   setupPosition(boundaryRectangle);
 
   this->barRectangle = {this->boundaryRectangle.x + 1, this->boundaryRectangle.y, 0,
-                        this->boundaryRectangle.h};
+                        this->boundaryRectangle.h - 1};
   this->barColor     = {0, 255, 0, 255};
 
   this->previousUpdate = std::chrono::steady_clock::now();
