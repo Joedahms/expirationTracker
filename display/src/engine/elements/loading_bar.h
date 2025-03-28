@@ -24,6 +24,9 @@ private:
   float totalTimeSeconds;
   float updatePeriodMs;
   int pixelsPerUpdate;
+
+  SDL_Point offset;
+  bool held = false;
 };
 
 #endif

@@ -48,7 +48,30 @@ void LoadingBar::update() {
   }
 }
 
-void LoadingBar::handleEvent(const SDL_Event& event) {}
+void LoadingBar::handleEvent(const SDL_Event& event) {
+  if (event.type == SDL_MOUSEBUTTONDOWN) {
+    if (checkHovered()) {
+      this->held = true;
+
+      this->offset.x = event.button.x - this->positionRelativeToParent.x;
+      this->offset.y = event.button.y - this->positionRelativeToParent.y;
+
+      this->centerWithinParent           = false;
+      this->centerVerticalWithinParent   = false;
+      this->centerHorizontalWithinParent = false;
+    }
+  }
+  else if (event.type == SDL_MOUSEMOTION) {
+    if (this->held) {
+      this->positionRelativeToParent.x = event.motion.x - this->offset.x;
+      this->positionRelativeToParent.y = event.motion.y - this->offset.y;
+      updatePosition();
+    }
+  }
+  else if (event.type == SDL_MOUSEBUTTONUP) {
+    this->held = false;
+  }
+}
 
 void LoadingBar::render() const {
   // Border
