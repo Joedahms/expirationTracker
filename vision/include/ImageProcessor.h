@@ -27,7 +27,6 @@ private:
 
   zmqpp::socket requestHardwareSocket;
   zmqpp::socket requestDisplaySocket;
-  zmqpp::socket replySocket;
 
   ModelHandler modelHandler;
   FoodItem foodItem;

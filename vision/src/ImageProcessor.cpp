@@ -8,12 +8,10 @@
 ImageProcessor::ImageProcessor(zmqpp::context& context)
     : logger("image_processor.txt"), cancelRequested(false),
       requestHardwareSocket(context, zmqpp::socket_type::request),
-      requestDisplaySocket(context, zmqpp::socket_type::request),
-      replySocket(context, zmqpp::socket_type::reply), modelHandler(context) {
+      requestDisplaySocket(context, zmqpp::socket_type::request), modelHandler(context) {
   try {
     this->requestHardwareSocket.connect(ExternalEndpoints::hardwareEndpoint);
     this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
-    this->replySocket.bind(ExternalEndpoints::visionEndpoint);
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
   }
