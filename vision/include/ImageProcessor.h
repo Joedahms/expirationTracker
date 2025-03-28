@@ -22,6 +22,11 @@ public:
 private:
   Logger logger;
 
+  std::atomic_bool cancelRequested;
+  void requestCancel() { cancelRequested = true; }
+  void resetCancel() { cancelRequested = false; }
+  bool isCancelRequested() const { return cancelRequested.load(); }
+
   zmqpp::socket requestHardwareSocket;
   zmqpp::socket requestDisplaySocket;
   zmqpp::socket replySocket;
