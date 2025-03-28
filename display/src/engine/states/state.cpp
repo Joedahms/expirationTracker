@@ -11,8 +11,11 @@ void State::handleEvents(bool* displayIsRunning) {
       *displayIsRunning = false;
       break;
     }
-    if (event.type == SDL_FINGERDOWN) {
-      std::cout << "finger down" << std::endl;
+    if (event.type == SDL_MOUSEBUTTONDOWN) {
+      std::cout << "down" << std::endl;
+    }
+    if (event.type == SDL_MOUSEBUTTONUP) {
+      std::cout << "up" << std::endl;
     }
     else {
       this->rootElement->handleEvent(event);
