@@ -58,9 +58,9 @@ bool ImageProcessor::analyze() {
   ClassifyObjectReturn classifyObjectReturn{false, false};
   this->logger.log("Beginning image processing.");
   for (int i = 0; i < 7; i++) {
-    // if (isCancelRequested()) {
-    //   return false;
-    // }
+    if (isCancelRequested()) {
+      return false;
+    }
     processImagePair(i, classifyObjectReturn);
     if (classifyObjectReturn.foodItem && classifyObjectReturn.expirationDate) {
       this->logger.log(
