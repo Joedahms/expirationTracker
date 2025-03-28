@@ -12,7 +12,7 @@
 
 class ImageProcessor {
 public:
-  explicit ImageProcessor(zmqpp::context& context);
+  explicit ImageProcessor(zmqpp::context&, zmqpp::poller&);
   void process();
   struct FoodItem& getFoodItem();
   void setFoodItem(struct FoodItem&);
@@ -21,6 +21,7 @@ private:
   Logger logger;
 
   bool cancelRequested;
+  zmqpp::poller& sharedPoller;
 
   zmqpp::socket requestHardwareSocket;
   zmqpp::socket requestDisplaySocket;
