@@ -38,23 +38,62 @@ void LoadingBar::update() {
   updateDifference = std::chrono::duration_cast<std::chrono::milliseconds>(
       this->currentUpdate - this->previousUpdate);
 
-  if (this->barRectangle.w >= this->boundaryRectangle.w) {
-    return;
+  if (this->barRectangle.w <= this->boundaryRectangle.w) {
+    if (updateDifference.count() > this->updatePeriodMs) {
+      this->barRectangle.w += this->pixelsPerUpdate;
+      this->previousUpdate = this->currentUpdate;
+    }
   }
-  // Time to update?
-  if (updateDifference.count() > this->updatePeriodMs) {
-    this->barRectangle.w += this->pixelsPerUpdate;
-    this->previousUpdate = this->currentUpdate;
+
+  if (this->held) {
+    this->positionRelativeToParent.x += this->velocity.x;
+    this->positionRelativeToParent.y += this->velocity.y;
+    updatePosition();
+    this->velocity = {0, 0};
+  }
+  else {
+    this->positionRelativeToParent.x += this->velocity.x;
+    this->positionRelativeToParent.y += this->velocity.y;
+    updatePosition();
+  }
+
+  if (this->positionRelativeToParent.x + this->borderThickness < 0) {
+    this->velocity.x                 = 0;
+    this->positionRelativeToParent.x = this->borderThickness;
+  }
+  if (this->positionRelativeToParent.y + this->borderThickness < 0) {
+    this->velocity.y                 = 0;
+    this->positionRelativeToParent.y = this->borderThickness;
+  }
+
+  SDL_Rect parentRectangle = this->parent->getBoundaryRectangle();
+
+  int rightEdge = this->positionRelativeToParent.x + this->boundaryRectangle.w +
+                  this->borderThickness;
+  if (rightEdge > parentRectangle.x + parentRectangle.w) {
+    this->velocity.x                 = 0;
+    this->positionRelativeToParent.x = parentRectangle.x + parentRectangle.w -
+                                       this->boundaryRectangle.w - this->borderThickness;
+  }
+
+  int bottomEdge = this->positionRelativeToParent.y + this->boundaryRectangle.h +
+                   this->borderThickness;
+  if (bottomEdge > parentRectangle.y + parentRectangle.h) {
+    this->velocity.y                 = 0;
+    this->positionRelativeToParent.y = parentRectangle.y + parentRectangle.h -
+                                       this->boundaryRectangle.h - this->borderThickness;
   }
 }
 
 void LoadingBar::handleEvent(const SDL_Event& event) {
+  if (event.type == SDL_KEYDOWN) {
+    if (event.key.keysym.sym == SDLK_ESCAPE) {
+      SDL_Quit();
+    }
+  }
   if (event.type == SDL_MOUSEBUTTONDOWN) {
     if (checkHovered()) {
       this->held = true;
-
-      this->offset.x = event.button.x - this->positionRelativeToParent.x;
-      this->offset.y = event.button.y - this->positionRelativeToParent.y;
 
       this->centerWithinParent           = false;
       this->centerVerticalWithinParent   = false;
@@ -63,14 +102,18 @@ void LoadingBar::handleEvent(const SDL_Event& event) {
   }
   else if (event.type == SDL_MOUSEMOTION) {
     if (this->held) {
-      this->positionRelativeToParent.x = event.motion.x - this->offset.x;
-      this->positionRelativeToParent.y = event.motion.y - this->offset.y;
-      updatePosition();
+      this->velocity.x += event.motion.x - this->previousMotion.x;
+      this->velocity.y += event.motion.y - this->previousMotion.y;
+
+      this->previousMotion.x = event.motion.x;
+      this->previousMotion.y = event.motion.y;
     }
   }
   else if (event.type == SDL_MOUSEBUTTONUP) {
     this->held = false;
   }
+  this->previousMotion.x = event.motion.x;
+  this->previousMotion.y = event.motion.y;
 }
 
 void LoadingBar::render() const {

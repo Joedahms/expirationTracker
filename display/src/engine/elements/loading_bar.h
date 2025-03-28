@@ -25,8 +25,10 @@ private:
   float updatePeriodMs;
   int pixelsPerUpdate;
 
-  SDL_Point offset;
   bool held = false;
+
+  SDL_Point previousMotion = {0, 0};
+  SDL_Point velocity       = {0, 0};
 };
 
 #endif
