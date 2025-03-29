@@ -18,9 +18,6 @@
  * @param externalEndpoints Endpoints to the main components of the system (vision,
  * hardware, and display)
  * @return None
- *
- * TODO Add an infinite loop so that more than one food item can be scanned per
- * execution.
  */
 void hardwareEntry(zmqpp::context& context) {
   Logger logger("hardware_entry.txt");
@@ -45,6 +42,7 @@ void hardwareEntry(zmqpp::context& context) {
     logger.log("Received start signal from display");
     bool scanSuccessful = hardware.startScan();
 
+    // TODO - Add logic to tare weight sensor
     if (scanSuccessful) {
       logger.log("Scan successful");
     }

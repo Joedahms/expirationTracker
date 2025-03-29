@@ -82,6 +82,18 @@ bool Hardware::checkStartSignal(int timeoutMs) {
   bool receivedRequest = false;
   this->logger.log("Checking for start signal from display");
 
+  /*
+  this->logger.log("Checking weight");
+  if (checkWeight() == false) {
+    // TODO handle no weight on platform
+    // Send error to display
+    // Possible pattern HW error msg -> Display message with 3 options:
+    // 1. Retry 2. Skip/Override 3. Cancel
+    // Response from Display will then decide action
+    this->logger.log("No weight detected on platform");
+    return false;
+  }
+*/
   try {
     zmqpp::poller poller;
     poller.add(this->replySocket);
@@ -179,20 +191,6 @@ void Hardware::sendStartToVision() {
  */
 bool Hardware::startScan() {
   this->logger.log("Starting scan");
-
-  /*
-  this->logger.log("Checking weight");
-  if (checkWeight() == false) {
-    // TODO handle no weight on platform
-    // Send error to display
-    // Possible pattern HW error msg -> Display message with 3 options:
-    // 1. Retry 2. Skip/Override 3. Cancel
-    // Response from Display will then decide action
-    this->logger.log("No weight detected on platform");
-    return false;
-  }
-*/
-
   rotateAndCapture();
   this->logger.log("Scan complete");
   return true;
@@ -252,7 +250,12 @@ void Hardware::rotateAndCapture() {
     // Swap comment lines below if you don't want to wait on realistic motor rotation time
     // usleep(500);
     sleep(3);
-
+    
+    // Last iteration doensn't need to check signal
+    if (angle == 7) {
+      return;
+    }
+    
     this->logger.log("Checking for stop signal from vision");
     bool receivedStopSignal = false;
     bool receivedRequest    = false;
