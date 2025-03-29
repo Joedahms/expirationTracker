@@ -122,31 +122,14 @@ void Element::centerHorizontal() {
  * @param None
  * @return Whether or not the mouse is over the button
  */
-bool Element::checkHovered() {
-  int mouseXPosition, mouseYPosition;
-  SDL_GetMouseState(&mouseXPosition, &mouseYPosition);
+bool Element::checkMouseHovered() {
+  SDL_Point mousePosition;
+  SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
 
-  // Outside left edge
-  if (mouseXPosition < this->boundaryRectangle.x) {
-    return false;
+  if (SDL_PointInRect(&mousePosition, &this->boundaryRectangle)) {
+    return true;
   }
-
-  // Outside right edge
-  if (mouseXPosition > this->boundaryRectangle.x + this->boundaryRectangle.w) {
-    return false;
-  }
-
-  // Outside top edge
-  if (mouseYPosition < this->boundaryRectangle.y) {
-    return false;
-  }
-
-  // Outside bottom edge
-  if (mouseYPosition > this->boundaryRectangle.y + this->boundaryRectangle.h) {
-    return false;
-  }
-
-  return true;
+  return false;
 }
 
 /**

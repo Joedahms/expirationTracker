@@ -66,7 +66,7 @@ void ScrollBox::updateSelf() {
  * @return None
  */
 void ScrollBox::handleEventSelf(const SDL_Event& event) {
-  if (checkHovered() == false) {
+  if (checkMouseHovered() == false) {
     return;
   }
 

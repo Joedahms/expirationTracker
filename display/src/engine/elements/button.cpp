@@ -121,14 +121,7 @@ void Button::updateSelf() {
     hasParentUpdate();
   }
 
-  // Change color if hovered
-  if (checkHovered()) {
-    this->logger->log(this->textContent + " button hovered");
-    this->backgroundColor = this->hoveredColor;
-  }
-  else {
-    this->backgroundColor = this->defaultColor;
-  }
+  updateColor();
 }
 
 /**
@@ -153,10 +146,26 @@ void Button::renderSelf() const {
  */
 void Button::handleEventSelf(const SDL_Event& event) {
   if (event.type == SDL_MOUSEBUTTONDOWN) {
-    if (checkHovered() == true) {
+    if (checkMouseHovered()) {
       this->logger->log(this->textContent + " button clicked");
       onClick();
       this->logger->log(this->textContent + " button click callback successful");
     }
+  }
+}
+
+/**
+ * Choose background color based on mouse position.
+ *
+ * @param None
+ * @return None
+ */
+void Button::updateColor() {
+  if (checkMouseHovered()) {
+    this->logger->log(this->textContent + " button hovered");
+    this->backgroundColor = this->hoveredColor;
+  }
+  else {
+    this->backgroundColor = this->defaultColor;
   }
 }

@@ -40,7 +40,7 @@ public:
   void setCenteredHorizontal();
   bool checkCenterHorizontal();
 
-  bool checkHovered();
+  bool checkMouseHovered();
 
   void addBorder(const int& borderThickness);
   void renderBorder() const;

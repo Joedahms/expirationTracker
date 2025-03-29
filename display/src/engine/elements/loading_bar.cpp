@@ -102,7 +102,7 @@ void LoadingBar::handleEvent(const SDL_Event& event) {
     }
   }
   if (event.type == SDL_MOUSEBUTTONDOWN) {
-    if (checkHovered()) {
+    if (checkMouseHovered()) {
       this->held = true;
 
       this->centerWithinParent           = false;
