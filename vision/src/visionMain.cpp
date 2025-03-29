@@ -104,6 +104,7 @@ std::thread createListenerThread(zmqpp::context& context,
         logger.log("Cancel command received.");
         processor.requestCancel();
         listenerSocket.send(Messages::AFFIRMATIVE);
+        logger.log("Cancel received.");
       }
       else if (command == Messages::START_SCAN) {
         logger.log("Start command received. Notifying hardware of successful receive");
@@ -125,6 +126,7 @@ std::thread createListenerThread(zmqpp::context& context,
         if (resp != Messages::AFFIRMATIVE) {
           LOG(FATAL) << "Error in sending food item to visionmain.";
         }
+        logger.log("Response received.");
       }
     }
   });
