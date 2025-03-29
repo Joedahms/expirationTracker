@@ -56,30 +56,40 @@ void LoadingBar::handleEvent(const SDL_Event& event) {
     }
   }
   if (event.type == SDL_MOUSEBUTTONDOWN) {
-    if (checkMouseHovered()) {
-      this->held = true;
-
-      this->centerWithinParent           = false;
-      this->centerVerticalWithinParent   = false;
-      this->centerHorizontalWithinParent = false;
-    }
+    handleMouseDown();
   }
   else if (event.type == SDL_MOUSEMOTION) {
-    if (this->held) {
-      this->fixed = false;
-
-      this->velocity.x += event.motion.x - this->previousMotion.x;
-      this->velocity.y += event.motion.y - this->previousMotion.y;
-      this->previousMotion.x = event.motion.x;
-      this->previousMotion.y = event.motion.y;
-    }
+    handleMouseMotion(event);
   }
   else if (event.type == SDL_MOUSEBUTTONUP) {
-    this->held = false;
+    handleMouseUp();
+  }
+}
+
+void LoadingBar::handleMouseDown() {
+  if (checkMouseHovered()) {
+    this->held = true;
+
+    this->centerWithinParent           = false;
+    this->centerVerticalWithinParent   = false;
+    this->centerHorizontalWithinParent = false;
+  }
+}
+
+void LoadingBar::handleMouseMotion(const SDL_Event& event) {
+  if (this->held) {
+    this->fixed = false;
+
+    this->velocity.x += event.motion.x - this->previousMotion.x;
+    this->velocity.y += event.motion.y - this->previousMotion.y;
+    this->previousMotion.x = event.motion.x;
+    this->previousMotion.y = event.motion.y;
   }
   this->previousMotion.x = event.motion.x;
   this->previousMotion.y = event.motion.y;
 }
+
+void LoadingBar::handleMouseUp() { this->held = false; }
 
 void LoadingBar::render() const {
   // Border

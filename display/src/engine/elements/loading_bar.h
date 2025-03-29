@@ -26,6 +26,10 @@ private:
   int pixelsPerUpdate;
 
   SDL_Point previousMotion = {0, 0};
+
+  void handleMouseDown();
+  void handleMouseMotion(const SDL_Event& event);
+  void handleMouseUp();
 };
 
 #endif
