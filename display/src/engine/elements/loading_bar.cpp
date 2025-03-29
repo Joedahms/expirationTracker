@@ -20,6 +20,12 @@ LoadingBar::LoadingBar(struct DisplayGlobal displayGlobal,
   addBorder(this->borderThickness);
 }
 
+/**
+ * Loading bar slowly fills the border.
+ *
+ * @param None
+ * @return None
+ */
 void LoadingBar::update() {
   if (parent) {
     hasParentUpdate();
@@ -66,6 +72,13 @@ void LoadingBar::handleEvent(const SDL_Event& event) {
   }
 }
 
+/**
+ * If the mouse is clicked over the loading bar, it is held and no longer centered in any
+ * way.
+ *
+ * @param None
+ * @return None
+ */
 void LoadingBar::handleMouseDown() {
   if (checkMouseHovered()) {
     this->held = true;
@@ -74,8 +87,18 @@ void LoadingBar::handleMouseDown() {
     this->centerVerticalWithinParent   = false;
     this->centerHorizontalWithinParent = false;
   }
+  else {
+    this->velocity.y = -5;
+  }
 }
 
+/**
+ * If the mouse is moved while the loading bar is held, the loading bar should follow the
+ * mouse. The loading bar is drug by the mouse.
+ *
+ * @param event The SDL_MOUSEMOTION event to handle
+ * @return None
+ */
 void LoadingBar::handleMouseMotion(const SDL_Event& event) {
   if (this->held) {
     this->fixed = false;
