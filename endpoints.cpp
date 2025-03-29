@@ -14,3 +14,5 @@ const std::string Messages::ZERO_WEIGHT              = "zero weight";
 const std::string Messages::RETRY    = "retry";
 const std::string Messages::OVERRIDE = "override";
 const std::string Messages::CANCEL   = "cancel";
+
+const std::string Messages::SCAN_CANCELLED = "scan cancelled";

@@ -7,3 +7,4 @@ vision/Models/__pycache__/
 *.swp
 /*/*.swp
 /*/*/*.swp
+vision/Models/yolov8x-oiv7.pt

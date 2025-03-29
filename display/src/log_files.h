@@ -4,8 +4,10 @@
 #include <string>
 
 struct LogFiles {
-  static const std::string itemList;
-  static const std::string zeroWeight;
+  static const std::string ITEM_LIST;
+  static const std::string SCANNING;
+  static const std::string ZERO_WEIGHT;
+  static const std::string CANCEL_SCAN_CONFIRMATION;
 };
 
 #endif

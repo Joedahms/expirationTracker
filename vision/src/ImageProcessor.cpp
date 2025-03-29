@@ -6,14 +6,12 @@
  * hardware, and display)
  */
 ImageProcessor::ImageProcessor(zmqpp::context& context)
-    : logger("image_processor.txt"),
+    : logger("image_processor.txt"), cancelRequested(false),
       requestHardwareSocket(context, zmqpp::socket_type::request),
-      requestDisplaySocket(context, zmqpp::socket_type::request),
-      replySocket(context, zmqpp::socket_type::reply), modelHandler(context) {
+      requestDisplaySocket(context, zmqpp::socket_type::request), modelHandler(context) {
   try {
     this->requestHardwareSocket.connect(ExternalEndpoints::hardwareEndpoint);
     this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
-    this->replySocket.bind(ExternalEndpoints::visionEndpoint);
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
   }
@@ -35,15 +33,21 @@ void ImageProcessor::process() {
     return;
   }
 
-  bool detectedFoodItem = analyze();
+  AnalyzeObjectReturn detectedFoodItem = analyze();
   this->logger.log("Successfully analyzed all images");
 
-  // Move this into analyze
-  if (detectedFoodItem) {
+  switch (detectedFoodItem) {
+  case AnalyzeObjectReturn::Success:
     detectionSucceeded();
-  }
-  else {
+    break;
+  case AnalyzeObjectReturn::Failure:
     detectionFailed();
+    break;
+  case AnalyzeObjectReturn::Cancel:
+    stopHardware();
+    break;
+  default:
+    break;
   }
 }
 
@@ -53,22 +57,28 @@ void ImageProcessor::process() {
  * @param None
  * @return Whether FoodItem is successfully identified
  */
-bool ImageProcessor::analyze() {
+AnalyzeObjectReturn ImageProcessor::analyze() {
   this->logger.log("Entering analyze");
   ClassifyObjectReturn classifyObjectReturn{false, false};
   this->logger.log("Beginning image processing.");
   for (int i = 0; i < 7; i++) {
+    if (isCancelRequested()) {
+      logger.log("Cancel requested — exiting early.");
+      return AnalyzeObjectReturn::Cancel;
+    }
+
     processImagePair(i, classifyObjectReturn);
+
     if (classifyObjectReturn.foodItem && classifyObjectReturn.expirationDate) {
       this->logger.log(
           "Both food item and expiration date detected. Returning to processor.");
       std::filesystem::path imagePath =
           foodItem.getImagePath() / (std::to_string(i) + ".jpg");
       this->foodItem.setImagePath(std::filesystem::absolute(imagePath));
-      return true;
+      return AnalyzeObjectReturn::Success;
     }
   }
-  return false;
+  return AnalyzeObjectReturn::Failure;
 }
 
 void ImageProcessor::processImagePair(int currentImageNumber,
@@ -173,3 +183,9 @@ void ImageProcessor::stopHardware() {
     }
   }
 }
+
+void ImageProcessor::requestCancel() { cancelRequested = true; }
+
+void ImageProcessor::resetCancel() { cancelRequested = false; }
+
+bool ImageProcessor::isCancelRequested() { return cancelRequested.load(); }

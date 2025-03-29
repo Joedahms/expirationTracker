@@ -53,6 +53,8 @@ DisplayEngine::DisplayEngine(const char* windowTitle,
   this->scanning   = std::make_unique<Scanning>(this->displayGlobal);
   this->itemList   = std::make_unique<ItemList>(this->displayGlobal);
   this->zeroWeight = std::make_unique<ZeroWeight>(this->displayGlobal);
+  this->cancelScanConfirmation =
+      std::make_unique<CancelScanConfirmation>(this->displayGlobal);
 
   displayIsRunning = true;
   this->logger.log("Engine is constructed and now running");
@@ -146,37 +148,19 @@ void DisplayEngine::initializeEngine(SDL_Window* window) {
 void DisplayEngine::checkState() {
   switch (this->engineState) {
   case EngineState::SCANNING:
-    this->engineState = this->scanning->getCurrentState();
-    this->scanning->setCurrentState(EngineState::SCANNING);
+    checkScanning();
     break;
 
   case EngineState::ITEM_LIST:
-    this->engineState = this->itemList->getCurrentState();
-
-    if (this->engineState == EngineState::SCANNING) {
-      startSignalToDisplay();
-    }
-
-    this->itemList->setCurrentState(EngineState::ITEM_LIST);
+    checkItemList();
     break;
 
   case EngineState::ZERO_WEIGHT:
-    this->engineState = this->zeroWeight->getCurrentState();
-    // override
-    if (this->engineState == EngineState::SCANNING) {
-      sendZeroWeightResponse(Messages::OVERRIDE);
-    }
-    // cancel
-    else if (this->engineState == EngineState::ITEM_LIST) {
-      sendZeroWeightResponse(Messages::CANCEL);
-    }
-    else if (this->zeroWeight->getRetryScan()) {
-      sendZeroWeightResponse(Messages::RETRY);
-      this->zeroWeight->setRetryScan(false);
-      startSignalToDisplay();
-    }
+    checkZeroWeight();
+    break;
 
-    this->zeroWeight->setCurrentState(EngineState::ZERO_WEIGHT);
+  case EngineState::CANCEL_SCAN_CONFIRMATION:
+    checkCancelScanConfirmation();
     break;
 
   default:
@@ -184,6 +168,81 @@ void DisplayEngine::checkState() {
     LOG(FATAL) << "Invalid state";
     break;
   }
+}
+
+/**
+ * Check if the scanning state has requested a state switch
+ *
+ * @param None
+ * @return None
+ */
+void DisplayEngine::checkScanning() {
+  this->engineState = this->scanning->getCurrentState();
+
+  if (this->engineState == EngineState::CANCEL_SCAN_CONFIRMATION) {
+    scanCancelledToDisplayHandler();
+    // stopSignalToVision();
+  }
+
+  this->scanning->setCurrentState(EngineState::SCANNING);
+}
+
+/**
+ * Check if the scanning state has requested a state switch
+ *
+ * @param None
+ * @return None
+ */
+void DisplayEngine::checkItemList() {
+  this->engineState = this->itemList->getCurrentState();
+
+  if (this->engineState == EngineState::SCANNING) {
+    startSignalToDisplay();
+  }
+
+  this->itemList->setCurrentState(EngineState::ITEM_LIST);
+}
+
+/**
+ * Check if the scanning state has requested a state switch
+ *
+ * @param None
+ * @return None
+ */
+void DisplayEngine::checkZeroWeight() {
+  this->engineState = this->zeroWeight->getCurrentState();
+  // override
+  if (this->engineState == EngineState::SCANNING) {
+    sendZeroWeightResponse(Messages::OVERRIDE);
+  }
+  // cancel
+  else if (this->engineState == EngineState::ITEM_LIST) {
+    sendZeroWeightResponse(Messages::CANCEL);
+  }
+  else if (this->zeroWeight->getRetryScan()) {
+    sendZeroWeightResponse(Messages::RETRY);
+    this->zeroWeight->setRetryScan(false);
+    startSignalToDisplay();
+  }
+
+  this->zeroWeight->setCurrentState(EngineState::ZERO_WEIGHT);
+}
+
+/**
+ * Check if the scanning state has requested a state switch
+ *
+ * @param None
+ * @return None
+ */
+void DisplayEngine::checkCancelScanConfirmation() {
+  this->engineState = this->cancelScanConfirmation->getCurrentState();
+
+  if (this->engineState == EngineState::ITEM_LIST) { // Scan was cancelled
+  }
+  else if (this->engineState == EngineState::SCANNING) { // Scan was not cancelled
+  }
+
+  this->cancelScanConfirmation->setCurrentState(EngineState::CANCEL_SCAN_CONFIRMATION);
 }
 
 /**
@@ -224,6 +283,10 @@ void DisplayEngine::handleEvents() {
     this->zeroWeight->handleEvents(&this->displayIsRunning);
     break;
 
+  case EngineState::CANCEL_SCAN_CONFIRMATION:
+    this->cancelScanConfirmation->handleEvents(&this->displayIsRunning);
+    break;
+
   default:
     LOG(FATAL) << "Invalid state";
     break;
@@ -248,6 +311,9 @@ void DisplayEngine::checkKeystates() {
     break;
 
   case EngineState::ZERO_WEIGHT:
+    break;
+
+  case EngineState::CANCEL_SCAN_CONFIRMATION:
     break;
 
   default:
@@ -278,6 +344,10 @@ void DisplayEngine::update() {
     this->zeroWeight->update();
     break;
 
+  case EngineState::CANCEL_SCAN_CONFIRMATION:
+    this->cancelScanConfirmation->update();
+    break;
+
   default:
     LOG(FATAL) << "Invalid state";
     break;
@@ -304,6 +374,10 @@ void DisplayEngine::renderState() {
     this->zeroWeight->render();
     break;
 
+  case EngineState::CANCEL_SCAN_CONFIRMATION:
+    this->cancelScanConfirmation->render();
+    break;
+
   default:
     LOG(FATAL) << "Invalid state";
     break;
@@ -321,6 +395,24 @@ void DisplayEngine::clean() {
   SDL_DestroyRenderer(this->displayGlobal.renderer);
   SDL_Quit();
   LOG(INFO) << "DisplayEngine cleaned";
+}
+
+void DisplayEngine::scanCancelledToDisplayHandler() {
+  this->logger.log("Scan cancelled, sending cancel scan signal to display handler");
+  try {
+    this->requestSocket.send(Messages::SCAN_CANCELLED);
+    std::string response;
+    this->requestSocket.receive(response);
+    if (response == Messages::AFFIRMATIVE) {
+      this->logger.log("Cancel scan signal successfully sent to display handler, in "
+                       "cancel scan confirmation state");
+    }
+    else {
+      LOG(FATAL) << "Invalid response received from display handler";
+    }
+  } catch (const zmqpp::exception& e) {
+    LOG(FATAL) << e.what();
+  }
 }
 
 void DisplayEngine::startSignalToDisplay() {

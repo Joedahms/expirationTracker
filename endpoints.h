@@ -28,9 +28,17 @@ struct Messages {
   // Indicate that there is nothing on the platform
   static const std::string ZERO_WEIGHT;
 
+  // There was no weight detected, check again
   static const std::string RETRY;
+
+  // There was no weight detected, override and start a scan anyway
   static const std::string OVERRIDE;
+
+  // There was no weight detected, cancel
   static const std::string CANCEL;
+
+  // Scan was started but cancelled
+  static const std::string SCAN_CANCELLED;
 };
 
 #endif

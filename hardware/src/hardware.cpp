@@ -112,7 +112,6 @@ bool Hardware::checkStartSignal(int timeoutMs) {
  * @return None
  */
 void Hardware::sendStartToVision() {
-  this->logger.log("Sending start signal to vision");
   const std::chrono::time_point<std::chrono::system_clock> now{
       std::chrono::system_clock::now()};
 
@@ -121,6 +120,15 @@ void Hardware::sendStartToVision() {
   FoodItem foodItem(this->imageDirectory, scanDate, this->itemWeight);
 
   std::string response;
+  this->logger.log("Sending start signal to vision: ");
+  foodItem.logToFile(this->logger);
+  this->requestVisionSocket.send(Messages::START_SCAN);
+  this->logger.log("Awaiting ack from vision.");
+  this->requestVisionSocket.receive(response);
+  if (response != Messages::AFFIRMATIVE) {
+    LOG(FATAL) << "ERROR sending start scan to vision";
+  }
+  this->logger.log("Received ack, sending food item.");
   response = sendFoodItem(this->requestVisionSocket, foodItem);
   if (response == Messages::AFFIRMATIVE) {
     this->logger.log("Successfully sent start signal to vision");

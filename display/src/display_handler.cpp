@@ -44,31 +44,29 @@ void DisplayHandler::handle() {
 
     // Engine wants to start a new scan, decide what to send back to it
     if (receivedMessage == Messages::START_SCAN) {
-      //      bool scanStartedOrCancelled = false;
-      //     while (scanStartedOrCancelled == false) {
       std::string startResponse = startSignalToHardware();
-      if (startResponse == Messages::AFFIRMATIVE) {
-        // Success, weight on platform
-        receiveFromVision();
+
+      if (startResponse == Messages::AFFIRMATIVE) { // Success, weight on platform
+        handleScanStarted();
+        // receiveFromVision();
+        //  handle scanning
       }
       else if (startResponse == Messages::ZERO_WEIGHT) {
         // Tell engine no weight on platform and wait for next step
         this->logger.log("Indicating to engine that no weight on platform");
         this->replySocket.send(Messages::ZERO_WEIGHT);
         this->logger.log("Indicated to engine that no weight on platform");
+
         std::string zeroWeightResponse;
         this->replySocket.receive(zeroWeightResponse);
 
         if (zeroWeightResponse == Messages::RETRY) {
           zeroWeightRetry();
-          // Loop again
         }
         else if (zeroWeightResponse == Messages::OVERRIDE) {
-          //          scanStartedOrCancelled = true;
           zeroWeightOverride();
         }
         else if (zeroWeightResponse == Messages::CANCEL) {
-          //         scanStartedOrCancelled = true;
           zeroWeightCancel();
         }
         else {
@@ -121,8 +119,8 @@ std::string DisplayHandler::startSignalToHardware() {
  * @param None
  * @return None
  */
-void DisplayHandler::receiveFromVision() {
-  this->logger.log("Waiting for message from vision");
+void DisplayHandler::handleScanStarted() {
+  this->logger.log("Listening for incoming messages while scanning");
   std::string request;
   this->replySocket.receive(request);
   this->logger.log("Message received: " + request);
@@ -131,6 +129,9 @@ void DisplayHandler::receiveFromVision() {
   }
   else if (request == Messages::ITEM_DETECTION_SUCCEEDED) {
     detectionSuccess();
+  }
+  else if (request == Messages::SCAN_CANCELLED) {
+    scanCancelled();
   }
   else {
     LOG(FATAL) << "Unexpected message received";
@@ -191,6 +192,24 @@ void DisplayHandler::detectionSuccess() {
   }
 }
 
+void DisplayHandler::scanCancelled() {
+  this->replySocket.send(Messages::AFFIRMATIVE);
+
+  this->logger.log("Scan cancelled, sending scan cancelled message to vision");
+  this->requestVisionSocket.send(Messages::SCAN_CANCELLED);
+  this->logger.log("Scan cancelled message sent to vision");
+  std::string visionResponse;
+  this->logger.log("Receiving response from vision");
+  this->requestVisionSocket.receive(visionResponse);
+  this->logger.log("Received response from vision");
+  if (visionResponse == Messages::AFFIRMATIVE) {
+    this->logger.log("Vision received scan cancelled message");
+  }
+  else {
+    LOG(FATAL) << "Unexpected message received";
+  }
+}
+
 void DisplayHandler::zeroWeightRetry() {
   this->logger.log("Received retry from engine, sending affirmative back");
   // TODO figure out how to retry
@@ -213,7 +232,7 @@ void DisplayHandler::zeroWeightOverride() {
   this->requestHardwareSocket.receive(overrideResponse);
   // TODO check overrideResponse
   this->logger.log("Hardware received override request, waiting for request from vision");
-  receiveFromVision();
+  handleScanStarted();
 }
 
 void DisplayHandler::zeroWeightCancel() {
