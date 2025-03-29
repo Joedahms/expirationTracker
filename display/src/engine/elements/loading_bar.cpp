@@ -45,52 +45,6 @@ void LoadingBar::update() {
     this->barRectangle.w = 0;
   }
 
-  if (this->held) {
-    this->positionRelativeToParent.x += this->xVelocity;
-    this->positionRelativeToParent.y += this->yVelocity;
-    updatePosition();
-    this->xVelocity = 0;
-    this->yVelocity = 0;
-  }
-  else {
-    this->positionRelativeToParent.x += this->xVelocity;
-    this->positionRelativeToParent.y += this->yVelocity;
-    updatePosition();
-    this->xVelocity += this->xAcceleration;
-    this->yVelocity += this->yAcceleration;
-  }
-
-  if (this->positionRelativeToParent.x + this->borderThickness < 0) {
-    //    this->velocity.x                 = this->velocity.x - 1;
-    this->xVelocity                  = 0;
-    this->positionRelativeToParent.x = this->borderThickness;
-  }
-  if (this->positionRelativeToParent.y + this->borderThickness < 0) {
-    //    this->velocity.y                 = this->velocity.y * -1;
-    this->yVelocity                  = 0;
-    this->positionRelativeToParent.y = this->borderThickness;
-  }
-
-  SDL_Rect parentRectangle = this->parent->getBoundaryRectangle();
-
-  int rightEdge = this->positionRelativeToParent.x + this->boundaryRectangle.w +
-                  this->borderThickness;
-  if (rightEdge > parentRectangle.x + parentRectangle.w) {
-    //    this->velocity.x                 = this->velocity.x * -1;
-    this->xVelocity                  = 0;
-    this->positionRelativeToParent.x = parentRectangle.x + parentRectangle.w -
-                                       this->boundaryRectangle.w - this->borderThickness;
-  }
-
-  int bottomEdge = this->positionRelativeToParent.y + this->boundaryRectangle.h +
-                   this->borderThickness;
-  if (bottomEdge > parentRectangle.y + parentRectangle.h) {
-    //    this->velocity.y                 = this->velocity.y * -1;
-    this->yVelocity                  = 0;
-    this->positionRelativeToParent.y = parentRectangle.y + parentRectangle.h -
-                                       this->boundaryRectangle.h - this->borderThickness;
-  }
-
   this->barRectangle.x = this->boundaryRectangle.x + 1;
   this->barRectangle.y = this->boundaryRectangle.y + 1;
 }
@@ -112,10 +66,10 @@ void LoadingBar::handleEvent(const SDL_Event& event) {
   }
   else if (event.type == SDL_MOUSEMOTION) {
     if (this->held) {
-      this->yAcceleration = 0.1;
-      this->xVelocity += event.motion.x - this->previousMotion.x;
-      this->yVelocity += event.motion.y - this->previousMotion.y;
+      this->fixed = false;
 
+      this->velocity.x += event.motion.x - this->previousMotion.x;
+      this->velocity.y += event.motion.y - this->previousMotion.y;
       this->previousMotion.x = event.motion.x;
       this->previousMotion.y = event.motion.y;
     }
