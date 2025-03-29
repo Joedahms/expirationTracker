@@ -10,7 +10,7 @@
 #include "ModelHandler.h"
 #include "helperFunctions.h"
 
-enum AnalyzeObjectReturn { unknown, Success, Failure, Cancel };
+enum AnalyzeObjectReturn { Success, Failure, Cancel };
 
 class ImageProcessor {
 public:

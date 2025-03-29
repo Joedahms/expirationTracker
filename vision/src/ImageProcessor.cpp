@@ -46,7 +46,6 @@ void ImageProcessor::process() {
   case AnalyzeObjectReturn::Cancel:
     stopHardware();
     break;
-  case AnalyzeObjectReturn::unknown:
   default:
   };
 }
