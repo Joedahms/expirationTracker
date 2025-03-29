@@ -259,12 +259,12 @@ void Hardware::rotateAndCapture() {
     // Swap comment lines below if you don't want to wait on realistic motor rotation time
     // usleep(500);
     sleep(3);
-    
+
     // Last iteration doensn't need to check signal
     if (angle == 7) {
       return;
     }
-    
+
     this->logger.log("Checking for stop signal from vision");
     bool receivedStopSignal = false;
     bool receivedRequest    = false;
