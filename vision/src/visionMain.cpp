@@ -16,38 +16,10 @@ void visionEntry(zmqpp::context& context) {
   zmqpp::socket replySocket(context, zmqpp::socket_type::reply);
   replySocket.bind(VisionExternalEndpoints::visionMainEndpoint);
 
-  zmqpp::socket listenerSocket(context, zmqpp::socket_type::reply);
-  listenerSocket.bind(ExternalEndpoints::visionEndpoint);
-  zmqpp::socket messengerSocket(context, zmqpp::socket_type::request);
-  messengerSocket.connect(VisionExternalEndpoints::visionMainEndpoint);
-
   ImageProcessor processor(context);
 
-  // Listener thread
-  std::thread listenerThread([&]() {
-    while (true) {
-      zmqpp::message msg;
-      listenerSocket.receive(msg);
-      std::string command;
-      msg >> command;
-      if (command == Messages::SCAN_CANCELLED) {
-        logger.log("Cancel command received.");
-        processor.requestCancel();
-        listenerSocket.send(Messages::AFFIRMATIVE);
-      }
-      else if (command == Messages::START_SCAN) {
-        logger.log("Start command received.");
-        listenerSocket.send(Messages::AFFIRMATIVE); // Tell hardware to send food item
-        zmqpp::message foodItemString;
-        listenerSocket.receive(foodItemString);     // Grab food item
-        listenerSocket.send(Messages::AFFIRMATIVE); // Tell hardware received food itme
+  std::thread listenerThread = createListenerThread(context, logger, processor);
 
-        messengerSocket.send(foodItemString); // Send fooditem to main
-        zmqpp::message response;
-        messengerSocket.receive(response); // Receive back affirmative
-      }
-    }
-  });
   listenerThread.detach();
 
   zmqpp::poller poller;
@@ -55,7 +27,7 @@ void visionEntry(zmqpp::context& context) {
 
   while (1) {
     FoodItem foodItem;
-    logger.log("Waiting for start signal from Hardware");
+    logger.log("Waiting for Food Item");
 
     while (!startSignalCheck(replySocket, logger, foodItem, poller)) {
       ;
@@ -86,20 +58,74 @@ bool startSignalCheck(zmqpp::socket& replySocket,
   try {
     if (poller.poll(1000)) {
       if (poller.has_input(replySocket)) {
-        logger.log("Start signal check has input.");
         receiveFoodItem(replySocket, Messages::AFFIRMATIVE, foodItem);
-        logger.log("Received start signal from hardware: ");
+        logger.log("Received start signal: ");
         foodItem.logToFile(logger);
         return true;
       }
       return false;
     }
     else {
-      logger.log("Did not receive start signal from hardware");
+      logger.log("Did not receive start signal");
       return false;
     }
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
     return false;
   }
+}
+
+/**
+ * creates and returns thread to listen to vision endpoint and handle it
+ *
+ * @param context context
+ * @param logger Logger being used to log visionMain
+ * @param processor processor item
+ * @return Created listener thread
+ */
+std::thread createListenerThread(zmqpp::context& context,
+                                 const Logger& logger,
+                                 ImageProcessor& processor) {
+  return std::thread([&context, &logger, &processor]() {
+    zmqpp::socket listenerSocket(context, zmqpp::socket_type::reply);
+    listenerSocket.bind(ExternalEndpoints::visionEndpoint);
+
+    zmqpp::socket messengerSocket(context, zmqpp::socket_type::request);
+    messengerSocket.connect(VisionExternalEndpoints::visionMainEndpoint);
+
+    while (true) {
+      zmqpp::message msg;
+      listenerSocket.receive(msg);
+
+      std::string command;
+      msg >> command;
+
+      if (command == Messages::SCAN_CANCELLED) {
+        logger.log("Cancel command received.");
+        processor.requestCancel();
+        listenerSocket.send(Messages::AFFIRMATIVE);
+      }
+      else if (command == Messages::START_SCAN) {
+        logger.log("Start command received. Notifying hardware of successful receive");
+        listenerSocket.send(Messages::AFFIRMATIVE); // Tell hardware to send food item
+
+        zmqpp::message foodItemString;
+        logger.log("Waiting to retrieve food item from hardware");
+        listenerSocket.receive(foodItemString); // Grab food item
+        logger.log("Food item received. Notifying hardware.");
+        listenerSocket.send(Messages::AFFIRMATIVE); // Confirm receipt
+
+        logger.log("Forwarding food item to visionMain.");
+        messengerSocket.send(foodItemString); // Forward to main
+        zmqpp::message response;
+        logger.log("Waiting for response back from visionMain.");
+        messengerSocket.receive(response); // Wait for ack
+        std::string resp;
+        response >> resp;
+        if (resp != Messages::AFFIRMATIVE) {
+          LOG(FATAL) << "Error in sending food item to visionmain.";
+        }
+      }
+    }
+  });
 }
