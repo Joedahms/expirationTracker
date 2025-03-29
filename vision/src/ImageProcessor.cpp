@@ -47,7 +47,8 @@ void ImageProcessor::process() {
     stopHardware();
     break;
   default:
-  };
+    break;
+  }
 }
 
 /**
