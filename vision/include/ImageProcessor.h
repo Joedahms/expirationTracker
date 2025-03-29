@@ -10,6 +10,8 @@
 #include "ModelHandler.h"
 #include "helperFunctions.h"
 
+enum AnalyzeObjectReturn { unknown, Success, Failure, Cancel };
+
 class ImageProcessor {
 public:
   explicit ImageProcessor(zmqpp::context&);
@@ -35,7 +37,7 @@ private:
 
   void detectionSucceeded();
   void detectionFailed();
-  bool analyze();
+  AnalyzeObjectReturn analyze();
   void processImagePair(int, ClassifyObjectReturn&);
 
   void foodItemToDisplay();
