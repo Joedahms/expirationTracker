@@ -24,9 +24,11 @@ private:
   zmqpp::socket replySocket;
 
   std::string startSignalToHardware();
-  void receiveFromVision();
+
+  void handleScanStarted();
   void detectionFailure();
   void detectionSuccess();
+  void scanCancelled();
 
   void zeroWeightRetry();
   void zeroWeightOverride();

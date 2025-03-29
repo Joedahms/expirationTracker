@@ -16,13 +16,13 @@
 /**
  * @param displayGlobal Global display variables.
  */
-ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger(LogFiles::itemList) {
+ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger(LogFiles::ITEM_LIST) {
   this->logger.log("Constructing item list state");
   this->currentState = EngineState::ITEM_LIST;
 
   this->displayGlobal = displayGlobal;
 
-  this->mediator = std::make_shared<Mediator>(LogFiles::itemList);
+  this->mediator = std::make_shared<Mediator>(LogFiles::ITEM_LIST);
 
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
   previousUpdate             = std::chrono::steady_clock::now();
@@ -36,7 +36,7 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger(LogFiles::itemLi
   SDL_Rect newScanButtonRectangle       = {200, 150, 200, 50};
   std::unique_ptr<Button> newScanButton = std::make_unique<Button>(
       this->displayGlobal, newScanButtonRectangle, "Scan New Item", SDL_Point{10, 10},
-      [this]() { this->currentState = EngineState::SCANNING; }, LogFiles::itemList);
+      [this]() { this->currentState = EngineState::SCANNING; }, LogFiles::ITEM_LIST);
   newScanButton->setCenteredHorizontal();
   rootElement->addElement(std::move(newScanButton));
 
@@ -44,9 +44,9 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger(LogFiles::itemLi
   SDL_Rect scrollBoxRect = {0, 0, 400, 100};
   int windowWidth, windowHeight;
   SDL_GetWindowSize(this->displayGlobal.window, &windowWidth, &windowHeight);
-  scrollBoxRect.h = windowHeight - 1;
-  std::shared_ptr<ScrollBox> scrollBox =
-      std::make_shared<ScrollBox>(this->displayGlobal, scrollBoxRect, LogFiles::itemList);
+  scrollBoxRect.h                      = windowHeight - 1;
+  std::shared_ptr<ScrollBox> scrollBox = std::make_shared<ScrollBox>(
+      this->displayGlobal, scrollBoxRect, LogFiles::ITEM_LIST);
 
   scrollBox->setPanelHeight(30);
   scrollBox->addBorder(1);
@@ -60,13 +60,13 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger(LogFiles::itemLi
 
   std::shared_ptr<Button> sortByExpirationLowToHigh = std::make_shared<Button>(
       this->displayGlobal, SDL_Rect{0, 0, 0, 0}, "Expiration Date - Lowest to Highest",
-      SDL_Point{0, 0}, "low to high", LogFiles::itemList);
+      SDL_Point{0, 0}, "low to high", LogFiles::ITEM_LIST);
   sortByExpirationLowToHigh->initialize();
   this->mediator->addButton(sortByExpirationLowToHigh);
 
   std::shared_ptr<Button> sortByExpirationHighToLow = std::make_shared<Button>(
       this->displayGlobal, SDL_Rect{0, 0, 0, 0}, "Expiration Date - Highest to Lowest",
-      SDL_Point{0, 0}, "high to low", LogFiles::itemList);
+      SDL_Point{0, 0}, "high to low", LogFiles::ITEM_LIST);
   sortByExpirationHighToLow->initialize();
   this->mediator->addButton(sortByExpirationHighToLow);
 

@@ -1,8 +1,10 @@
-#include "zero_weight.h"
+#include <iostream>
+
 #include "../../log_files.h"
+#include "zero_weight.h"
 
 ZeroWeight::ZeroWeight(struct DisplayGlobal displayGlobal)
-    : logger(LogFiles::zeroWeight) {
+    : logger(LogFiles::ZERO_WEIGHT) {
   this->logger.log("Constructing zero weight state");
   this->currentState = EngineState::ZERO_WEIGHT;
 
@@ -16,17 +18,17 @@ ZeroWeight::ZeroWeight(struct DisplayGlobal displayGlobal)
 
   std::shared_ptr<Button> retryButton = std::make_shared<Button>(
       this->displayGlobal, SDL_Rect{0, 50, 0, 0}, "Retry", SDL_Point{0, 0},
-      [this]() { retry(); }, LogFiles::zeroWeight);
+      [this]() { retry(); }, LogFiles::ZERO_WEIGHT);
   retryButton->setCenteredHorizontal();
 
   std::shared_ptr<Button> overrideButton = std::make_shared<Button>(
       this->displayGlobal, SDL_Rect{0, 150, 0, 0}, "Override", SDL_Point{0, 0},
-      [this]() { override(); }, LogFiles::zeroWeight);
+      [this]() { override(); }, LogFiles::ZERO_WEIGHT);
   overrideButton->setCenteredHorizontal();
 
   std::shared_ptr<Button> cancelButton = std::make_shared<Button>(
       this->displayGlobal, SDL_Rect{0, 250, 0, 0}, "Cancel", SDL_Point{0, 0},
-      [this]() { cancel(); }, LogFiles::zeroWeight);
+      [this]() { cancel(); }, LogFiles::ZERO_WEIGHT);
   cancelButton->setCenteredHorizontal();
 
   this->rootElement->addElement(retryButton);

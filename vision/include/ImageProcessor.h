@@ -10,22 +10,25 @@
 #include "ModelHandler.h"
 #include "helperFunctions.h"
 
+enum AnalyzeObjectReturn { Success, Failure, Cancel };
+
 class ImageProcessor {
 public:
-  explicit ImageProcessor(zmqpp::context& context);
+  explicit ImageProcessor(zmqpp::context&);
   void process();
-  bool analyze();
   struct FoodItem& getFoodItem();
   void setFoodItem(struct FoodItem&);
-  void tellHardwareToStop();
-  void tellDisplayWeFailed();
+  void requestCancel();
+  void resetCancel();
+  bool isCancelRequested();
 
 private:
   Logger logger;
 
+  std::atomic_bool cancelRequested = false;
+
   zmqpp::socket requestHardwareSocket;
   zmqpp::socket requestDisplaySocket;
-  zmqpp::socket replySocket;
 
   ModelHandler modelHandler;
   FoodItem foodItem;
@@ -34,6 +37,8 @@ private:
 
   void detectionSucceeded();
   void detectionFailed();
+  AnalyzeObjectReturn analyze();
+  void processImagePair(int, ClassifyObjectReturn&);
 
   void foodItemToDisplay();
   void stopHardware();

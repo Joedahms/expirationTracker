@@ -10,6 +10,7 @@
 
 #include "../../../logger.h"
 
+#include "states/cancel_scan_confirmation.h"
 #include "states/item_list.h"
 #include "states/scanning.h"
 #include "states/zero_weight.h"
@@ -66,11 +67,18 @@ private:
   std::unique_ptr<Scanning> scanning;
   std::unique_ptr<ItemList> itemList;
   std::unique_ptr<ZeroWeight> zeroWeight;
+  std::unique_ptr<CancelScanConfirmation> cancelScanConfirmation;
+
+  void checkScanning();
+  void checkItemList();
+  void checkZeroWeight();
+  void checkCancelScanConfirmation();
 
   bool displayIsRunning = false;
 
   void startSignalToDisplay();
   void sendZeroWeightResponse(const std::string& zeroWeightResponse);
+  void scanCancelledToDisplayHandler();
 };
 
 #endif

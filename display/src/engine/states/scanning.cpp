@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 
+#include "../../log_files.h"
 #include "../display_global.h"
 #include "../elements/text.h"
 #include "scanning.h"
@@ -11,7 +12,7 @@
 /**
  * @param displayGlobal Global variables
  */
-Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger("scanning_state.txt") {
+Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger(LogFiles::SCANNING) {
   this->logger.log("Constructing scanning state");
 
   this->currentState         = EngineState::SCANNING;
@@ -23,16 +24,23 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger("scanning_state.
   rootRectangle.h        = windowSurface->h;
   this->rootElement      = std::make_unique<Container>(rootRectangle);
 
-  const char* fontPath               = "../display/fonts/16020_FUTURAM.ttf";
-  const char* progressMessageContent = "Scanning In Progress";
-  SDL_Color progressMessageColor     = {0, 255, 0, 255}; // Green
-  SDL_Rect progressMessageRectangle  = {0, 100, 0, 0};
-  std::unique_ptr<Text> progressMessage =
-      std::make_unique<Text>(this->displayGlobal, progressMessageRectangle, fontPath,
-                             progressMessageContent, 24, progressMessageColor);
+  const char* progressMessageContent    = "Scanning In Progress";
+  SDL_Color progressMessageColor        = {0, 255, 0, 255}; // Green
+  SDL_Rect progressMessageRectangle     = {0, 100, 0, 0};
+  std::unique_ptr<Text> progressMessage = std::make_unique<Text>(
+      this->displayGlobal, progressMessageRectangle, DisplayGlobal::futuramFontPath,
+      progressMessageContent, 24, progressMessageColor);
 
   progressMessage->setCenteredHorizontal();
   this->rootElement->addElement(std::move(progressMessage));
+
+  SDL_Rect cancelScanButtonRectangle       = {0, 150, 0, 0};
+  std::unique_ptr<Button> cancelScanButton = std::make_unique<Button>(
+      this->displayGlobal, cancelScanButtonRectangle, "Cancel Scan", SDL_Point{10, 10},
+      [this]() { this->currentState = EngineState::CANCEL_SCAN_CONFIRMATION; },
+      LogFiles::SCANNING);
+  cancelScanButton->setCenteredHorizontal();
+  rootElement->addElement(std::move(cancelScanButton));
 
   this->logger.log("Constructed scanning state");
 }
@@ -45,14 +53,6 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger("scanning_state.
  */
 EngineState Scanning::checkKeystates() {
   const Uint8* keystates = SDL_GetKeyboardState(NULL);
-
-  /*
-  if (keystates[SDL_SCANCODE_ESCAPE]) {
-    this->logger.log("Escape key pressed in scanning state");
-    return EngineState::PAUSE_MENU;
-  }
-  */
-
   return EngineState::SCANNING;
 }
 
