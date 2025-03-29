@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "../../log_files.h"
 #include "cancel_scan_confirmation.h"
 
