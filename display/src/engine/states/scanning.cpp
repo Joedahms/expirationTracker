@@ -6,6 +6,7 @@
 
 #include "../../log_files.h"
 #include "../display_global.h"
+#include "../elements/loading_bar.h"
 #include "../elements/text.h"
 #include "scanning.h"
 
@@ -41,6 +42,16 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger(LogFiles::SCANNI
       LogFiles::SCANNING);
   cancelScanButton->setCenteredHorizontal();
   rootElement->addElement(std::move(cancelScanButton));
+
+  SDL_Rect loadingBarRectangle           = {0, 200, 200, 30};
+  int loadingBarBorderThickness          = 3;
+  float totalTimeSeconds                 = 20;
+  float updatePeriodMs                   = 100;
+  std::unique_ptr<LoadingBar> loadingBar = std::make_unique<LoadingBar>(
+      this->displayGlobal, loadingBarRectangle, loadingBarBorderThickness,
+      totalTimeSeconds, updatePeriodMs, LogFiles::SCANNING);
+  loadingBar->setCenteredHorizontal();
+  rootElement->addElement(std::move(loadingBar));
 
   this->logger.log("Constructed scanning state");
 }

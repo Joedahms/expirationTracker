@@ -8,6 +8,16 @@
 #include "../display_global.h"
 #include "element_mediator.h"
 
+struct Velocity {
+  float x;
+  float y;
+};
+
+struct Acceleration {
+  float x;
+  float y;
+};
+
 /**
  * Defines the interface for an SDL element. This is any basic shape or texture to be
  * rendered to the screen.
@@ -40,10 +50,18 @@ public:
   void setCenteredHorizontal();
   bool checkCenterHorizontal();
 
-  bool checkHovered();
+  bool checkMouseHovered();
 
   void addBorder(const int& borderThickness);
   void renderBorder() const;
+
+  Velocity getVelocity();
+  void setVelocity(Velocity velocity);
+  Acceleration getAcceleration();
+  void setAcceleration(Acceleration acceleration);
+
+  int getBorderThickness();
+  bool getFixed();
 
 private:
   void centerVertical();
@@ -52,6 +70,9 @@ private:
 protected:
   std::unique_ptr<Logger> logger;
   std::string logFile;
+
+  std::chrono::steady_clock::time_point previousUpdate;
+  std::chrono::steady_clock::time_point currentUpdate;
 
   struct DisplayGlobal displayGlobal;
   int id                             = -1;
@@ -63,6 +84,12 @@ protected:
   bool centerWithinParent            = false;
   bool centerVerticalWithinParent    = false;
   bool centerHorizontalWithinParent  = false;
+
+  bool fixed = true;
+  bool held  = false;
+
+  Velocity velocity         = {0, 0};
+  Acceleration acceleration = {0, 0};
 
   std::weak_ptr<Mediator> mediator;
 

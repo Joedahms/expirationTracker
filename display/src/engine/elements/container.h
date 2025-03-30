@@ -11,6 +11,8 @@ class Container : public CompositeElement {
 public:
   Container();
   Container(const SDL_Rect& boundaryRectangle);
+  void update() override;
+  void checkElementPosition(std::shared_ptr<Element> element);
   void handleEventSelf(const SDL_Event& event) override;
 };
 

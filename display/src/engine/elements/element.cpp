@@ -50,7 +50,28 @@ void Element::hasParentUpdate() {
       centerHorizontal();
     }
   }
-  updatePosition();
+
+  if (this->held) {
+    this->positionRelativeToParent.x += this->velocity.x;
+    this->positionRelativeToParent.y += this->velocity.y;
+    updatePosition();
+
+    this->velocity.x = 0;
+    this->velocity.y = 0;
+  }
+  else {
+    if (!this->fixed) {
+      this->acceleration.x = 0;
+      this->acceleration.y = 0.1;
+    }
+
+    this->velocity.x += this->acceleration.x;
+    this->velocity.y += this->acceleration.y;
+
+    this->positionRelativeToParent.x += this->velocity.x;
+    this->positionRelativeToParent.y += this->velocity.y;
+    updatePosition();
+  }
 }
 
 void Element::updatePosition() {
@@ -122,31 +143,14 @@ void Element::centerHorizontal() {
  * @param None
  * @return Whether or not the mouse is over the button
  */
-bool Element::checkHovered() {
-  int mouseXPosition, mouseYPosition;
-  SDL_GetMouseState(&mouseXPosition, &mouseYPosition);
+bool Element::checkMouseHovered() {
+  SDL_Point mousePosition;
+  SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
 
-  // Outside left edge
-  if (mouseXPosition < this->boundaryRectangle.x) {
-    return false;
+  if (SDL_PointInRect(&mousePosition, &this->boundaryRectangle)) {
+    return true;
   }
-
-  // Outside right edge
-  if (mouseXPosition > this->boundaryRectangle.x + this->boundaryRectangle.w) {
-    return false;
-  }
-
-  // Outside top edge
-  if (mouseYPosition < this->boundaryRectangle.y) {
-    return false;
-  }
-
-  // Outside bottom edge
-  if (mouseYPosition > this->boundaryRectangle.y + this->boundaryRectangle.h) {
-    return false;
-  }
-
-  return true;
+  return false;
 }
 
 /**
@@ -221,3 +225,14 @@ void Element::setupPosition(const SDL_Rect& boundaryRectangle) {
     this->boundaryRectangle.y = parentRectangle.y + this->positionRelativeToParent.y;
   }
 }
+
+Velocity Element::getVelocity() { return this->velocity; }
+void Element::setVelocity(Velocity velocity) { this->velocity = velocity; }
+Acceleration Element::getAcceleration() { return this->acceleration; }
+void Element::setAcceleration(Acceleration acceleration) {
+  this->acceleration = acceleration;
+}
+
+int Element::getBorderThickness() { return this->borderThickness; }
+
+bool Element::getFixed() { return this->fixed; }

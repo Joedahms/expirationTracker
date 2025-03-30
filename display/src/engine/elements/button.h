@@ -44,6 +44,8 @@ private:
   SDL_Color hoveredColor;
   SDL_Point textPadding = {0, 0};
   std::string notifyMessage;
+
+  void updateColor();
 };
 
 #endif
