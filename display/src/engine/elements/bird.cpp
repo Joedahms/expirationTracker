@@ -21,7 +21,11 @@ Bird::Bird(struct DisplayGlobal displayGlobal, const SDL_Rect& boundaryRectangle
   this->fixed = false;
 }
 
-void Bird::handleEvent(const SDL_Event& event) {}
+void Bird::handleEvent(const SDL_Event& event) {
+  if (event.type == SDL_MOUSEBUTTONDOWN) {
+    this->velocity.y = -5;
+  }
+}
 
 void Bird::render() const {
   SDL_RenderCopy(this->displayGlobal.renderer, this->texture, NULL,
