@@ -8,6 +8,7 @@
 #include "../display_global.h"
 #include "../elements/bird.h"
 #include "../elements/loading_bar.h"
+#include "../elements/obstacle.h"
 #include "../elements/text.h"
 #include "scanning.h"
 
@@ -57,6 +58,11 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger(LogFiles::SCANNI
   SDL_Rect birdRectangle     = {0, 0, 32, 32};
   std::unique_ptr<Bird> bird = std::make_unique<Bird>(this->displayGlobal, birdRectangle);
   rootElement->addElement(std::move(bird));
+
+  SDL_Rect obstacleRect = {0, 0, 40, 70};
+  std::unique_ptr<Obstacle> obstacle =
+      std::make_unique<Obstacle>(this->displayGlobal, obstacleRect);
+  rootElement->addElement(std::move(obstacle));
 
   this->logger.log("Constructed scanning state");
 }
