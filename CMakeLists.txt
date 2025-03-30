@@ -77,6 +77,10 @@ add_executable(expirationTracker
   display/src/engine/elements/dropdown.cpp
   display/src/engine/elements/loading_bar.cpp
 
+  # Game elements
+  display/src/engine/elements/bird.cpp
+  display/src/engine/elements/obstacle.cpp
+
   # GUI States
   display/src/engine/states/state.cpp
   display/src/engine/states/scanning.cpp

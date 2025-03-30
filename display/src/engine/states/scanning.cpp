@@ -6,6 +6,7 @@
 
 #include "../../log_files.h"
 #include "../display_global.h"
+#include "../elements/bird.h"
 #include "../elements/loading_bar.h"
 #include "../elements/text.h"
 #include "scanning.h"
@@ -52,6 +53,10 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger(LogFiles::SCANNI
       totalTimeSeconds, updatePeriodMs, LogFiles::SCANNING);
   loadingBar->setCenteredHorizontal();
   rootElement->addElement(std::move(loadingBar));
+
+  SDL_Rect birdRectangle     = {0, 0, 32, 32};
+  std::unique_ptr<Bird> bird = std::make_unique<Bird>(this->displayGlobal, birdRectangle);
+  rootElement->addElement(std::move(bird));
 
   this->logger.log("Constructed scanning state");
 }

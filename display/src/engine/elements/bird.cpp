@@ -1,0 +1,29 @@
+#include <SDL2/SDL_image.h>
+#include <glog/logging.h>
+
+#include "bird.h"
+
+Bird::Bird(struct DisplayGlobal displayGlobal, const SDL_Rect& boundaryRectangle) {
+  this->displayGlobal     = displayGlobal;
+  this->boundaryRectangle = boundaryRectangle;
+
+  SDL_Surface* birdSurface = IMG_Load("../display/sprites/bird.png");
+  if (birdSurface == NULL) {
+    LOG(FATAL) << "error creating surface";
+  }
+
+  this->texture = SDL_CreateTextureFromSurface(this->displayGlobal.renderer, birdSurface);
+  if (this->texture == 0) {
+    LOG(FATAL) << "error creating texture from surface";
+  }
+  SDL_FreeSurface(birdSurface);
+
+  this->fixed = false;
+}
+
+void Bird::handleEvent(const SDL_Event& event) {}
+
+void Bird::render() const {
+  SDL_RenderCopy(this->displayGlobal.renderer, this->texture, NULL,
+                 &this->boundaryRectangle);
+}

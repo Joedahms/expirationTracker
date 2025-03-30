@@ -88,7 +88,9 @@ void LoadingBar::handleMouseDown() {
     this->centerHorizontalWithinParent = false;
   }
   else {
-    this->velocity.y = -5;
+    if (!fixed) {
+      this->velocity.y = -5;
+    }
   }
 }
 
