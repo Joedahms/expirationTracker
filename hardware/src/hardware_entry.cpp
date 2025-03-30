@@ -22,7 +22,7 @@
 void hardwareEntry(zmqpp::context& context) {
   Logger logger("hardware_entry.txt");
   logger.log("Within hardware process");
-  hardware.initializeSensors();
+  hardware.initDC();
   // TODO - Setup communication with Arduino for weight.
 
   Hardware hardware(context);

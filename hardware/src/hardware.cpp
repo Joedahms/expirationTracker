@@ -39,7 +39,7 @@ Hardware::Hardware(zmqpp::context& context)
  *
  * @return None
  */
-void initializeSensors() {
+void Hardware::initDC() {
   // Uses BCM numbering of the GPIOs and directly accesses the GPIO registers.
   wiringPiSetupPinType(WPI_PIN_BCM);
 
@@ -330,7 +330,7 @@ bool Hardware::takePhotos(int angle) {
  * @return None
  */
 // likely needs to be updated after testing to confirm direction
-void rotateMotor(bool clockwise) {
+void Hardware::rotateMotor(bool clockwise) {
   if (clockwise) {
     this->logger.log("Rotating clockwise.");
     digitalWrite(MOTOR_IN1, HIGH);
