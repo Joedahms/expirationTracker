@@ -20,6 +20,17 @@ public:
 
 private:
   Logger logger;
+
+  int windowWidth;
+  int windowHeight;
+
+  const int obstacleWidth         = 40;
+  const int obstacleHeight        = 70;
+  const int verticalObstacleGap   = 50;
+  const int horizontalObstacleGap = 70;
+
+  void initializeObstacles();
+  void initializeObstaclePair(int xPosition, int respawnOffset);
 };
 
 #endif

@@ -1,7 +1,9 @@
 #include "obstacle.h"
 
 Obstacle::Obstacle(struct DisplayGlobal displayGlobal,
-                   const SDL_Rect& boundaryRectangle) {
+                   const SDL_Rect& boundaryRectangle,
+                   const int& respawnOffset)
+    : respawnOffset(respawnOffset) {
   this->displayGlobal = displayGlobal;
   setupPosition(boundaryRectangle);
   this->velocity.x = -3;
@@ -16,7 +18,7 @@ void Obstacle::update() {
   SDL_GetWindowSize(this->displayGlobal.window, &windowWidth, NULL);
 
   if (this->boundaryRectangle.x <= -(this->boundaryRectangle.w)) {
-    this->positionRelativeToParent.x = windowWidth;
+    this->positionRelativeToParent.x = windowWidth + this->respawnOffset;
     updatePosition();
   }
 }

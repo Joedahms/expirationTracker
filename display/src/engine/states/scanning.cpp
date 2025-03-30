@@ -21,10 +21,12 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger(LogFiles::SCANNI
   this->currentState         = EngineState::SCANNING;
   this->displayGlobal        = displayGlobal;
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
+  this->windowWidth          = windowSurface->w;
+  this->windowHeight         = windowSurface->h;
 
   SDL_Rect rootRectangle = {0, 0, 0, 0};
-  rootRectangle.w        = windowSurface->w;
-  rootRectangle.h        = windowSurface->h;
+  rootRectangle.w        = this->windowWidth;
+  rootRectangle.h        = this->windowHeight;
   this->rootElement      = std::make_unique<Container>(rootRectangle);
 
   const char* progressMessageContent    = "Scanning In Progress";
@@ -59,16 +61,7 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger(LogFiles::SCANNI
   std::unique_ptr<Bird> bird = std::make_unique<Bird>(this->displayGlobal, birdRectangle);
   rootElement->addElement(std::move(bird));
 
-  int windowHeight;
-  int windowWidth;
-  SDL_GetWindowSize(this->displayGlobal.window, &windowWidth, &windowHeight);
-  int height = windowHeight - 70;
-  std::cout << "height: " << height << std::endl;
-
-  SDL_Rect obstacleRect = {windowWidth - 40, height, 40, 70};
-  std::unique_ptr<Obstacle> obstacle =
-      std::make_unique<Obstacle>(this->displayGlobal, obstacleRect);
-  rootElement->addElement(std::move(obstacle));
+  initializeObstacles();
 
   this->logger.log("Constructed scanning state");
 }
@@ -95,4 +88,37 @@ void Scanning::render() const {
   SDL_RenderClear(this->displayGlobal.renderer);
   this->rootElement->render();
   SDL_RenderPresent(this->displayGlobal.renderer);
+}
+
+void Scanning::initializeObstacles() {
+  int totalObstaclePairs =
+      this->windowWidth / (this->obstacleWidth + this->horizontalObstacleGap);
+
+  totalObstaclePairs++;
+  int respawnOffset =
+      this->windowWidth % (this->obstacleWidth + this->horizontalObstacleGap);
+
+  int xPosition = this->windowWidth;
+  for (int i = 0; i < totalObstaclePairs; i++) {
+    initializeObstaclePair(xPosition, respawnOffset);
+    xPosition += this->obstacleWidth + this->horizontalObstacleGap;
+  }
+}
+
+void Scanning::initializeObstaclePair(int xPosition, int respawnOffset) {
+  int yPosition = this->windowHeight - this->obstacleHeight;
+
+  SDL_Rect topObstacleRect = {xPosition, yPosition, this->obstacleWidth,
+                              this->obstacleHeight};
+  std::unique_ptr<Obstacle> topObstacle =
+      std::make_unique<Obstacle>(this->displayGlobal, topObstacleRect, respawnOffset);
+  rootElement->addElement(std::move(topObstacle));
+
+  yPosition = yPosition - this->verticalObstacleGap - this->obstacleHeight;
+
+  SDL_Rect bottomObstacleRect = {xPosition, yPosition, this->obstacleWidth,
+                                 this->obstacleHeight};
+  std::unique_ptr<Obstacle> bottomObstacle =
+      std::make_unique<Obstacle>(this->displayGlobal, bottomObstacleRect, respawnOffset);
+  rootElement->addElement(std::move(bottomObstacle));
 }
