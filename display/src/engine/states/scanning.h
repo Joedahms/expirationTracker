@@ -25,7 +25,9 @@ private:
   int windowHeight;
 
   const int obstacleWidth         = 40;
-  const int obstacleHeight        = 70;
+  const int obstacleMinHeight     = 40;
+  const int obstacleMaxHeight     = 100;
+  const int obstaclePairHeight    = 200;
   const int verticalObstacleGap   = 50;
   const int horizontalObstacleGap = 70;
 

@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <glog/logging.h>
 #include <iostream>
+#include <random>
 #include <string>
 
 #include "../../log_files.h"
@@ -106,19 +107,26 @@ void Scanning::initializeObstacles() {
 }
 
 void Scanning::initializeObstaclePair(int xPosition, int respawnOffset) {
-  int yPosition = this->windowHeight - this->obstacleHeight;
+  std::random_device r;
 
-  SDL_Rect topObstacleRect = {xPosition, yPosition, this->obstacleWidth,
-                              this->obstacleHeight};
-  std::unique_ptr<Obstacle> topObstacle =
-      std::make_unique<Obstacle>(this->displayGlobal, topObstacleRect, respawnOffset);
-  rootElement->addElement(std::move(topObstacle));
+  std::default_random_engine e1(r());
+  std::uniform_int_distribution<int> uniform_dist(this->obstacleMinHeight,
+                                                  this->obstacleMaxHeight);
+  int obstacleHeight = uniform_dist(e1);
 
-  yPosition = yPosition - this->verticalObstacleGap - this->obstacleHeight;
+  int yPosition = this->windowHeight - obstacleHeight;
 
   SDL_Rect bottomObstacleRect = {xPosition, yPosition, this->obstacleWidth,
-                                 this->obstacleHeight};
+                                 obstacleHeight};
   std::unique_ptr<Obstacle> bottomObstacle =
       std::make_unique<Obstacle>(this->displayGlobal, bottomObstacleRect, respawnOffset);
   rootElement->addElement(std::move(bottomObstacle));
+
+  obstacleHeight = obstaclePairHeight - obstacleHeight - verticalObstacleGap;
+  yPosition      = yPosition - this->verticalObstacleGap - obstacleHeight;
+
+  SDL_Rect topObstacleRect = {xPosition, yPosition, this->obstacleWidth, obstacleHeight};
+  std::unique_ptr<Obstacle> topObstacle =
+      std::make_unique<Obstacle>(this->displayGlobal, topObstacleRect, respawnOffset);
+  rootElement->addElement(std::move(topObstacle));
 }
