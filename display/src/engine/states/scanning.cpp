@@ -59,7 +59,13 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger(LogFiles::SCANNI
   std::unique_ptr<Bird> bird = std::make_unique<Bird>(this->displayGlobal, birdRectangle);
   rootElement->addElement(std::move(bird));
 
-  SDL_Rect obstacleRect = {0, 0, 40, 70};
+  int windowHeight;
+  int windowWidth;
+  SDL_GetWindowSize(this->displayGlobal.window, &windowWidth, &windowHeight);
+  int height = windowHeight - 70;
+  std::cout << "height: " << height << std::endl;
+
+  SDL_Rect obstacleRect = {windowWidth - 40, height, 40, 70};
   std::unique_ptr<Obstacle> obstacle =
       std::make_unique<Obstacle>(this->displayGlobal, obstacleRect);
   rootElement->addElement(std::move(obstacle));

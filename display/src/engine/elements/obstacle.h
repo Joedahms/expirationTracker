@@ -6,6 +6,7 @@
 class Obstacle : public Element {
 public:
   Obstacle(struct DisplayGlobal displayGlobal, const SDL_Rect& boundaryRectangle);
+  void update() override;
   void handleEvent(const SDL_Event& event) override;
   void render() const override;
 };
