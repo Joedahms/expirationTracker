@@ -24,7 +24,6 @@ private:
   SDL_Surface* windowSurface;
 
   void initializeObstacles();
-  void initializeObstaclePair(int xPosition, int respawnOffset);
 };
 
 #endif

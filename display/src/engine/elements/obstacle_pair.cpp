@@ -10,34 +10,12 @@ ObstaclePair::ObstaclePair(DisplayGlobal displayGlobal,
                            std::string logFile)
     : windowWidth(windowWidth), respawnOffset(respawnOffset) {
   this->displayGlobal = displayGlobal;
-  this->logger        = std::make_unique<Logger>(logFile);
-  this->logger->log("Constructing obstacle pair");
   setupPosition(boundaryRectangle);
+  this->logger = std::make_unique<Logger>(logFile);
+  this->logger->log("Constructing obstacle pair");
   this->velocity.x   = -3;
   this->fixed        = false;
   this->screenBoundX = false;
-
-  /*
-  // Random top obstacle height
-  std::random_device r;
-  std::default_random_engine e1(r());
-  std::uniform_int_distribution<int> uniform_dist(this->obstacleMinHeight,
-                                                  this->obstacleMaxHeight);
-  int obstacleHeight = uniform_dist(e1);
-
-  SDL_Rect topObstacleRect = {0, 0, this->boundaryRectangle.w, obstacleHeight};
-  std::unique_ptr<Obstacle> topObstacle =
-      std::make_unique<Obstacle>(this->displayGlobal, topObstacleRect);
-  addElement(std::move(topObstacle));
-
-  int yPosition  = this->verticalObstacleGap + obstacleHeight;
-  obstacleHeight = obstaclePairHeight - obstacleHeight - verticalObstacleGap;
-
-  SDL_Rect bottomObstacleRect = {0, yPosition, this->boundaryRectangle.w, obstacleHeight};
-  std::unique_ptr<Obstacle> bottomObstacle =
-      std::make_unique<Obstacle>(this->displayGlobal, bottomObstacleRect);
-  addElement(std::move(bottomObstacle));
-  */
 
   std::unique_ptr<Obstacle> topObstacle = std::make_unique<Obstacle>(
       this->displayGlobal, SDL_Rect{0, 0, this->boundaryRectangle.w, 0});
@@ -52,6 +30,12 @@ ObstaclePair::ObstaclePair(DisplayGlobal displayGlobal,
   this->logger->log("Obstacle pair constructed");
 }
 
+/**
+ * Randomize how long the top and bottom pipes are.
+ *
+ * @param None
+ * @return None
+ */
 void ObstaclePair::randomizeGapPosition() {
   SDL_Rect boundaryRectangle = this->children[0]->getBoundaryRectangle();
 
@@ -74,6 +58,12 @@ void ObstaclePair::randomizeGapPosition() {
   this->children[1]->setPositionRelativeToParent(positionRelativeToParent);
 }
 
+/**
+ * Perform child update. Check if off screen and loop back around if so.
+ *
+ * @param None
+ * @return None
+ */
 void ObstaclePair::updateSelf() {
   if (parent) {
     hasParentUpdate();

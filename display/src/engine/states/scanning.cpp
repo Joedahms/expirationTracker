@@ -91,11 +91,12 @@ void Scanning::render() const {
 }
 
 void Scanning::initializeObstacles() {
+  const int windowWidth  = this->windowSurface->w;
+  const int windowHeight = this->windowSurface->h;
+
   const int obstacleWidth         = 40;
   const int obstaclePairHeight    = 200;
   const int horizontalObstacleGap = 70;
-  const int windowWidth           = this->windowSurface->w;
-  const int windowHeight          = this->windowSurface->h;
 
   int totalObstaclePairs = windowWidth / (obstacleWidth + horizontalObstacleGap);
 

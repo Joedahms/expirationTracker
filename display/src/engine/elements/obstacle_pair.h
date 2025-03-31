@@ -12,9 +12,8 @@ public:
                std::string logFile);
 
 private:
-  const int respawnOffset;
-
   const int windowWidth;
+  const int respawnOffset;
 
   const int obstacleMinHeight   = 40;
   const int obstacleMaxHeight   = 100;
