@@ -41,17 +41,17 @@ Hardware::Hardware(zmqpp::context& context)
  */
 void Hardware::initDC() {
   // Uses BCM numbering of the GPIOs and directly accesses the GPIO registers.
-  wiringPiSetupPinType(WPI_PIN_BCM);
+  wiringPiSetupGpio();
 
   this->logger.log("Motor System Initialization");
   // Setup DC Motor Driver Pins
-  pinMode(MOTOR_IN1, OUTPUT);
-  pinMode(MOTOR_IN2, OUTPUT);
+  pinMode(23, OUTPUT);
+  pinMode(24, OUTPUT);
   // Frequency and pulse break ratio can be configured
   // pinMode(MOTOR_ENA, PWM_OUTPUT);
 
-  digitalWrite(MOTOR_IN1, LOW);
-  digitalWrite(MOTOR_IN2, LOW);
+  digitalWrite(23, LOW);
+  digitalWrite(24, LOW);
   // pwmWrite(MOTOR_ENA, ###);
 
   this->logger.log("Motor System Initialized.");
