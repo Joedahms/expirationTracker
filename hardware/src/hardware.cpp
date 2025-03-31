@@ -1,8 +1,8 @@
 #include <filesystem>
 #include <glog/logging.h>
 #include <unistd.h>
+#include <wiringPi.h>
 
-#include "../../../WiringPi/wiringPi/wiringPi.h"
 #include "../../endpoints.h"
 #include "../../food_item.h"
 #include "hardware.h"
@@ -41,14 +41,14 @@ Hardware::Hardware(zmqpp::context& context)
  */
 void Hardware::initDC() {
   // Uses BCM numbering of the GPIOs and directly accesses the GPIO registers.
-  wiringPiSetupGpio();
+  wiriingPiSetupPinType(WPI_PIN_BCM);
 
   this->logger.log("Motor System Initialization");
   // Setup DC Motor Driver Pins
   pinMode(23, OUTPUT);
   pinMode(24, OUTPUT);
   // Frequency and pulse break ratio can be configured
-  // pinMode(MOTOR_ENA, PWM_OUTPUT);
+  // pinMode(MOTOR_ENA, PWM_MS_OUTPUT);
 
   digitalWrite(23, LOW);
   digitalWrite(24, LOW);

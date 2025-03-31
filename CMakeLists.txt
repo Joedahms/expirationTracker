@@ -32,7 +32,7 @@ include_directories(
   ${ZMQ_INCLUDE_DIRS}
   ${ZMQPP_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
-   ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}
   ${PROTOBUF_INCLUDE_DIRS}
 )
 
@@ -96,7 +96,7 @@ add_executable(expirationTracker
   hardware/src/hardware_entry.cpp
   hardware/src/hardware.cpp
 
-    ${PROTO_SRCS}
+  ${PROTO_SRCS}
   ${PROTO_HDRS}
 )
 
@@ -111,6 +111,7 @@ target_link_libraries(expirationTracker
   ${ZMQ_LIBRARIES}
   ${ZMQPP_LIBRARIES}
   ${PROTOBUF_LIBRARIES}
+  wiringPi
 )
 
 # Add library search directories if needed
