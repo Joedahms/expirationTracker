@@ -20,7 +20,7 @@ class Hardware {
 public:
   Hardware(zmqpp::context& context);
 
-  void initializeSensors();
+  void initDC();
   bool checkStartSignal(int timeoutMs);
   void sendStartToVision();
   bool startScan();

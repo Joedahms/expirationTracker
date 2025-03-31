@@ -39,7 +39,7 @@ Hardware::Hardware(zmqpp::context& context)
  *
  * @return None
  */
-void initializeSensors() {
+void Hardware::initDC() {
   // Uses BCM numbering of the GPIOs and directly accesses the GPIO registers.
   wiringPiSetupPinType(WPI_PIN_BCM);
 
