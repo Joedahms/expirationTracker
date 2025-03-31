@@ -41,7 +41,7 @@ Hardware::Hardware(zmqpp::context& context)
  */
 void Hardware::initDC() {
   // Uses BCM numbering of the GPIOs and directly accesses the GPIO registers.
-  wiriingPiSetupPinType(WPI_PIN_BCM);
+  wiringPiSetupPinType(WPI_PIN_BCM);
 
   this->logger.log("Motor System Initialization");
   // Setup DC Motor Driver Pins
