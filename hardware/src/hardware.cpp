@@ -1,8 +1,8 @@
 #include <filesystem>
 #include <glog/logging.h>
 #include <unistd.h>
-#include <wiringPi.h>
 
+#include "../../../WiringPi/wiringPi/wiringPi.h"
 #include "../../endpoints.h"
 #include "../../food_item.h"
 #include "hardware.h"
