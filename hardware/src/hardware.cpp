@@ -254,7 +254,7 @@ void Hardware::rotateAndCapture() {
     }
 
     this->logger.log("Rotating platform");
-    hardware.rotateMotor();
+    rotateMotor(true);
 
     // Swap comment lines below if you don't want to wait on realistic motor rotation time
     // usleep(500);
