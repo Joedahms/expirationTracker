@@ -23,12 +23,6 @@ private:
 
   SDL_Surface* windowSurface;
 
-  //  int windowWidth;
-  // int windowHeight;
-
-  const int obstacleWidth         = 40;
-  const int horizontalObstacleGap = 70;
-
   void initializeObstacles();
   void initializeObstaclePair(int xPosition, int respawnOffset);
 };

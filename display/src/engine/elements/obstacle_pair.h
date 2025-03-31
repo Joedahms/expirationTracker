@@ -12,19 +12,18 @@ public:
                std::string logFile);
 
 private:
-  void updateSelf() override;
-  void handleEventSelf(const SDL_Event& event);
-
   const int respawnOffset;
 
   const int windowWidth;
 
-  const int obstacleWidth         = 40;
-  const int obstacleMinHeight     = 40;
-  const int obstacleMaxHeight     = 100;
-  const int obstaclePairHeight    = 200;
-  const int verticalObstacleGap   = 50;
-  const int horizontalObstacleGap = 70;
+  const int obstacleMinHeight   = 40;
+  const int obstacleMaxHeight   = 100;
+  const int obstaclePairHeight  = 200;
+  const int verticalObstacleGap = 50;
+
+  void randomizeGapPosition();
+  void updateSelf() override;
+  void handleEventSelf(const SDL_Event& event);
 };
 
 #endif
