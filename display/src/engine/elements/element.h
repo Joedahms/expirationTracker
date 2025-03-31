@@ -62,6 +62,8 @@ public:
 
   int getBorderThickness();
   bool getFixed();
+  bool getScreenBoundX();
+  bool getScreenBoundY();
 
 private:
   void centerVertical();
@@ -85,8 +87,10 @@ protected:
   bool centerVerticalWithinParent    = false;
   bool centerHorizontalWithinParent  = false;
 
-  bool fixed = true;
-  bool held  = false;
+  bool fixed        = true;
+  bool held         = false;
+  bool screenBoundX = true;
+  bool screenBoundY = true;
 
   Velocity velocity         = {0, 0};
   Acceleration acceleration = {0, 0};

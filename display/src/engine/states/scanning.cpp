@@ -2,7 +2,6 @@
 #include <assert.h>
 #include <glog/logging.h>
 #include <iostream>
-#include <random>
 #include <string>
 
 #include "../../log_files.h"
@@ -10,6 +9,7 @@
 #include "../elements/bird.h"
 #include "../elements/loading_bar.h"
 #include "../elements/obstacle.h"
+#include "../elements/obstacle_pair.h"
 #include "../elements/text.h"
 #include "scanning.h"
 
@@ -19,16 +19,19 @@
 Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger(LogFiles::SCANNING) {
   this->logger.log("Constructing scanning state");
 
-  this->currentState         = EngineState::SCANNING;
-  this->displayGlobal        = displayGlobal;
+  this->currentState  = EngineState::SCANNING;
+  this->displayGlobal = displayGlobal;
+  this->windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
+  /*
   SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
   this->windowWidth          = windowSurface->w;
   this->windowHeight         = windowSurface->h;
+  */
 
-  SDL_Rect rootRectangle = {0, 0, 0, 0};
-  rootRectangle.w        = this->windowWidth;
-  rootRectangle.h        = this->windowHeight;
-  this->rootElement      = std::make_unique<Container>(rootRectangle);
+  SDL_Rect rootRectangle = {0, 0, this->windowSurface->w, this->windowSurface->h};
+  //  rootRectangle.w        = this->windowWidth;
+  // rootRectangle.h        = this->windowHeight;
+  this->rootElement = std::make_unique<Container>(rootRectangle);
 
   const char* progressMessageContent    = "Scanning In Progress";
   SDL_Color progressMessageColor        = {0, 255, 0, 255}; // Green
@@ -92,20 +95,36 @@ void Scanning::render() const {
 }
 
 void Scanning::initializeObstacles() {
+  const int obstacleWidth         = 40;
+  const int obstaclePairHeight    = 200;
+  const int horizontalObstacleGap = 70;
+
+  int windowWidth  = this->windowSurface->w;
+  int windowHeight = this->windowSurface->h;
+
   int totalObstaclePairs =
-      this->windowWidth / (this->obstacleWidth + this->horizontalObstacleGap);
+      windowWidth / (this->obstacleWidth + this->horizontalObstacleGap);
 
   totalObstaclePairs++;
-  int respawnOffset =
-      this->windowWidth % (this->obstacleWidth + this->horizontalObstacleGap);
+  int respawnOffset = windowWidth % (this->obstacleWidth + this->horizontalObstacleGap);
 
-  int xPosition = this->windowWidth;
+  int xPosition = windowWidth;
+  int yPosition = windowHeight - obstaclePairHeight;
+  int width     = obstacleWidth;
+  int height    = obstaclePairHeight;
+
   for (int i = 0; i < totalObstaclePairs; i++) {
-    initializeObstaclePair(xPosition, respawnOffset);
+    SDL_Rect boundaryRectangle = {xPosition, yPosition, width, height};
+
+    std::unique_ptr<ObstaclePair> obstaclePair =
+        std::make_unique<ObstaclePair>(this->displayGlobal, boundaryRectangle,
+                                       windowWidth, respawnOffset, LogFiles::SCANNING);
+    this->rootElement->addElement(std::move(obstaclePair));
     xPosition += this->obstacleWidth + this->horizontalObstacleGap;
   }
 }
 
+/*
 void Scanning::initializeObstaclePair(int xPosition, int respawnOffset) {
   std::random_device r;
 
@@ -130,3 +149,4 @@ void Scanning::initializeObstaclePair(int xPosition, int respawnOffset) {
       std::make_unique<Obstacle>(this->displayGlobal, topObstacleRect, respawnOffset);
   rootElement->addElement(std::move(topObstacle));
 }
+*/

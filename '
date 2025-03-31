@@ -1,0 +1,26 @@
+#include "obstacle_pair.h"
+
+ObstaclePair::ObstaclePair(int windowHeight) {
+  std::random_device r;
+
+  std::default_random_engine e1(r());
+  std::uniform_int_distribution<int> uniform_dist(this->obstacleMinHeight,
+                                                  this->obstacleMaxHeight);
+  int obstacleHeight = uniform_dist(e1);
+
+  int yPosition = this->windowHeight - obstacleHeight;
+
+  SDL_Rect bottomObstacleRect = {xPosition, yPosition, this->obstacleWidth,
+                                 obstacleHeight};
+  std::unique_ptr<Obstacle> bottomObstacle =
+      std::make_unique<Obstacle>(this->displayGlobal, bottomObstacleRect, respawnOffset);
+  rootElement->addElement(std::move(bottomObstacle));
+
+  obstacleHeight = obstaclePairHeight - obstacleHeight - verticalObstacleGap;
+  yPosition      = yPosition - this->verticalObstacleGap - obstacleHeight;
+
+  SDL_Rect topObstacleRect = {xPosition, yPosition, this->obstacleWidth, obstacleHeight};
+  std::unique_ptr<Obstacle> topObstacle =
+      std::make_unique<Obstacle>(this->displayGlobal, topObstacleRect, respawnOffset);
+  rootElement->addElement(std::move(topObstacle));
+}

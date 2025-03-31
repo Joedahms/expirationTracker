@@ -234,5 +234,6 @@ void Element::setAcceleration(Acceleration acceleration) {
 }
 
 int Element::getBorderThickness() { return this->borderThickness; }
-
 bool Element::getFixed() { return this->fixed; }
+bool Element::getScreenBoundX() { return this->screenBoundX; }
+bool Element::getScreenBoundY() { return this->screenBoundY; }

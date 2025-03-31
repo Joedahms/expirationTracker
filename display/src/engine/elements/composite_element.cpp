@@ -15,6 +15,19 @@ void CompositeElement::update() {
 }
 
 /**
+ * Default updateSelf for a composite element. If a child of another composite element,
+ * perform updates relating to being a child.
+ *
+ * @param None
+ * @return None
+ */
+void CompositeElement::updateSelf() {
+  if (parent) {
+    hasParentUpdate();
+  }
+}
+
+/**
  * Add an element to the composite and ensure that the new element's parent is set to
  * this.
  *
@@ -46,6 +59,12 @@ void CompositeElement::render() const {
   }
 }
 
+void CompositeElement::renderSelf() const {
+  if (this->hasBorder) {
+    renderBorder();
+  }
+}
+
 /**
  * Handle the event then ask all children to handle the event.
  *
@@ -56,24 +75,5 @@ void CompositeElement::handleEvent(const SDL_Event& event) {
   handleEventSelf(event);
   for (const auto& element : this->children) {
     element->handleEvent(event);
-  }
-}
-
-void CompositeElement::renderSelf() const {
-  if (this->hasBorder) {
-    renderBorder();
-  }
-}
-
-/**
- * Default updateSelf for a composite element. If a child of another composite element,
- * perform updates relating to being a child.
- *
- * @param None
- * @return None
- */
-void CompositeElement::updateSelf() {
-  if (parent) {
-    hasParentUpdate();
   }
 }

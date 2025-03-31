@@ -21,14 +21,12 @@ public:
 private:
   Logger logger;
 
-  int windowWidth;
-  int windowHeight;
+  SDL_Surface* windowSurface;
+
+  //  int windowWidth;
+  // int windowHeight;
 
   const int obstacleWidth         = 40;
-  const int obstacleMinHeight     = 40;
-  const int obstacleMaxHeight     = 100;
-  const int obstaclePairHeight    = 200;
-  const int verticalObstacleGap   = 50;
   const int horizontalObstacleGap = 70;
 
   void initializeObstacles();
