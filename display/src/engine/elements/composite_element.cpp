@@ -109,12 +109,24 @@ void CompositeElement::checkCollisionSelf(std::vector<SDL_Rect>& boundaryRectang
         continue;
       }
 
+      // Right side
+      if (this->boundaryRectangle
+              .x<boundaryRectangle.x&& this->boundaryRectangle.x +
+                 this->boundaryRectangle.w> boundaryRectangle.x &&
+          this->boundaryRectangle.y + this->boundaryRectangle.h > boundaryRectangle.y) {
+        this->positionRelativeToParent.x =
+            boundaryRectangle.x - this->boundaryRectangle.w;
+        updatePosition();
+      }
+
+      /*
       if (SDL_HasIntersection(&this->boundaryRectangle, &boundaryRectangle)) {
         this->positionRelativeToParent.x -= this->velocity.x;
         this->positionRelativeToParent.y -= this->velocity.y;
         updatePosition();
         this->velocity = {0, 0};
       }
+      */
 
       /*
       if (boundaryRectangle.x == this->boundaryRectangle.x &&
