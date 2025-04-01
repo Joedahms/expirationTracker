@@ -15,12 +15,14 @@ public:
   void render() const override;
   void handleEvent(const SDL_Event& event) override;
   void addBoundaryRectangle(std::vector<SDL_Rect>& boundaryRectangles) const override;
+  void checkCollision(std::vector<SDL_Rect>& boundaryRectangles) override;
 
 protected:
   virtual void updateSelf();
   virtual void renderSelf() const;
   virtual void handleEventSelf(const SDL_Event& event) = 0;
   void addBoundaryRectangleSelf(std::vector<SDL_Rect>& boundaryRectangles) const;
+  void checkCollisionSelf(std::vector<SDL_Rect>& boundaryRectangles);
 
   std::vector<std::shared_ptr<Element>> children;
 };

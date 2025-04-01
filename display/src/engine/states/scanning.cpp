@@ -94,7 +94,7 @@ void Scanning::update() {
   this->rootElement->update();
 
   std::vector<SDL_Rect> boundaryRectangles = getBoundaryRectangles();
-  // this->rootElement.checkCollision(boundaryRectangles);
+  this->rootElement->checkCollision(boundaryRectangles);
 }
 
 void Scanning::initializeObstacles() {

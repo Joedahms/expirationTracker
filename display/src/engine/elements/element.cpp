@@ -241,3 +241,28 @@ bool Element::getScreenBoundY() { return this->screenBoundY; }
 void Element::addBoundaryRectangle(std::vector<SDL_Rect>& boundaryRectangles) const {
   boundaryRectangles.push_back(this->boundaryRectangle);
 }
+
+void Element::checkCollision(std::vector<SDL_Rect>& boundaryRectangles) {
+  for (auto boundaryRectangle : boundaryRectangles) {
+    for (auto boundaryRectangle : boundaryRectangles) {
+      if (SDL_RectEquals(&this->boundaryRectangle, &boundaryRectangle)) {
+        continue;
+      }
+
+      if (SDL_HasIntersection(&this->boundaryRectangle, &boundaryRectangle)) {
+        this->positionRelativeToParent.x -= this->velocity.x;
+        this->positionRelativeToParent.y -= this->velocity.y;
+        updatePosition();
+      }
+
+      /*
+      if (boundaryRectangle.x == this->boundaryRectangle.x &&
+          boundaryRectangle.y == this->boundaryRectangle.y &&
+          boundaryRectangle.w == this->boundaryRectangle.w &&
+          boundaryRectangle.h == this->boundaryRectangle.h) {
+        continue;
+      }
+      */
+    }
+  }
+}

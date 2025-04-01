@@ -5,6 +5,7 @@ Obstacle::Obstacle(struct DisplayGlobal displayGlobal,
   this->displayGlobal = displayGlobal;
   setupPosition(boundaryRectangle);
   this->screenBoundX = false;
+  this->canCollide   = true;
 }
 
 void Obstacle::handleEvent(const SDL_Event& event) {}
