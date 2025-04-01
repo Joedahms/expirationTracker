@@ -90,6 +90,13 @@ void Scanning::render() const {
   SDL_RenderPresent(this->displayGlobal.renderer);
 }
 
+void Scanning::update() {
+  this->rootElement->update();
+
+  std::vector<SDL_Rect> boundaryRectangles = getBoundaryRectangles();
+  // this->rootElement.checkCollision(boundaryRectangles);
+}
+
 void Scanning::initializeObstacles() {
   const int windowWidth  = this->windowSurface->w;
   const int windowHeight = this->windowSurface->h;
@@ -117,4 +124,12 @@ void Scanning::initializeObstacles() {
     this->rootElement->addElement(std::move(obstaclePair));
     xPosition += obstacleWidth + horizontalObstacleGap;
   }
+}
+
+std::vector<SDL_Rect> Scanning::getBoundaryRectangles() {
+  std::vector<SDL_Rect> boundaryRectangles;
+
+  this->rootElement->addBoundaryRectangle(boundaryRectangles);
+
+  return boundaryRectangles;
 }

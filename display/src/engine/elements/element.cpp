@@ -237,3 +237,7 @@ int Element::getBorderThickness() { return this->borderThickness; }
 bool Element::getFixed() { return this->fixed; }
 bool Element::getScreenBoundX() { return this->screenBoundX; }
 bool Element::getScreenBoundY() { return this->screenBoundY; }
+
+void Element::addBoundaryRectangle(std::vector<SDL_Rect>& boundaryRectangles) const {
+  boundaryRectangles.push_back(this->boundaryRectangle);
+}

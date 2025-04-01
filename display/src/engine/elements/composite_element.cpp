@@ -77,3 +77,16 @@ void CompositeElement::handleEvent(const SDL_Event& event) {
     element->handleEvent(event);
   }
 }
+
+void CompositeElement::addBoundaryRectangle(
+    std::vector<SDL_Rect>& boundaryRectangles) const {
+  addBoundaryRectangleSelf(boundaryRectangles);
+  for (const auto& element : this->children) {
+    element->addBoundaryRectangle(boundaryRectangles);
+  }
+}
+
+void CompositeElement::addBoundaryRectangleSelf(
+    std::vector<SDL_Rect>& boundaryRectangles) const {
+  boundaryRectangles.push_back(this->boundaryRectangle);
+}

@@ -29,6 +29,7 @@ public:
   virtual void update();
   virtual void render() const;
   virtual void handleEvent(const SDL_Event& event) = 0;
+  virtual void addBoundaryRectangle(std::vector<SDL_Rect>& boundaryRectangles) const;
 
   virtual std::string getContent() const;
   virtual void setContent(const std::string& content) {}
@@ -65,6 +66,8 @@ public:
   bool getScreenBoundX();
   bool getScreenBoundY();
 
+  //  void checkCollision(std::vector<SDL_Rect>& boundaryRectangles);
+
 private:
   void centerVertical();
   void centerHorizontal();
@@ -91,6 +94,7 @@ protected:
   bool held         = false;
   bool screenBoundX = true;
   bool screenBoundY = true;
+  bool canCollide   = false;
 
   Velocity velocity         = {0, 0};
   Acceleration acceleration = {0, 0};
