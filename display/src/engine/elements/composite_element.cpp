@@ -95,47 +95,9 @@ void CompositeElement::addBoundaryRectangleSelf(
 
 void CompositeElement::checkCollision(std::vector<SDL_Rect>& boundaryRectangles) {
   if (this->canCollide) {
-    checkCollisionSelf(boundaryRectangles);
+    checkCollisionImpl(boundaryRectangles);
   }
   for (auto& element : this->children) {
     element->checkCollision(boundaryRectangles);
-  }
-}
-
-void CompositeElement::checkCollisionSelf(std::vector<SDL_Rect>& boundaryRectangles) {
-  for (auto boundaryRectangle : boundaryRectangles) {
-    for (auto boundaryRectangle : boundaryRectangles) {
-      if (SDL_RectEquals(&this->boundaryRectangle, &boundaryRectangle)) {
-        continue;
-      }
-
-      // Right side
-      if (this->boundaryRectangle
-              .x<boundaryRectangle.x&& this->boundaryRectangle.x +
-                 this->boundaryRectangle.w> boundaryRectangle.x &&
-          this->boundaryRectangle.y + this->boundaryRectangle.h > boundaryRectangle.y) {
-        this->positionRelativeToParent.x =
-            boundaryRectangle.x - this->boundaryRectangle.w;
-        updatePosition();
-      }
-
-      /*
-      if (SDL_HasIntersection(&this->boundaryRectangle, &boundaryRectangle)) {
-        this->positionRelativeToParent.x -= this->velocity.x;
-        this->positionRelativeToParent.y -= this->velocity.y;
-        updatePosition();
-        this->velocity = {0, 0};
-      }
-      */
-
-      /*
-      if (boundaryRectangle.x == this->boundaryRectangle.x &&
-          boundaryRectangle.y == this->boundaryRectangle.y &&
-          boundaryRectangle.w == this->boundaryRectangle.w &&
-          boundaryRectangle.h == this->boundaryRectangle.h) {
-        continue;
-      }
-      */
-    }
   }
 }

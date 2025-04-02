@@ -89,11 +89,12 @@ protected:
   bool centerVerticalWithinParent    = false;
   bool centerHorizontalWithinParent  = false;
 
-  bool fixed        = true;
-  bool held         = false;
-  bool screenBoundX = true;
-  bool screenBoundY = true;
-  bool canCollide   = false;
+  bool fixed          = true;
+  bool held           = false;
+  bool screenBoundX   = true;
+  bool screenBoundY   = true;
+  bool canCollide     = false;
+  bool collisionFixed = true;
 
   Velocity velocity         = {0, 0};
   Acceleration acceleration = {0, 0};
@@ -103,6 +104,7 @@ protected:
   void setupPosition(const SDL_Rect& boundaryRectangle);
   void hasParentUpdate();
   void updatePosition();
+  void checkCollisionImpl(std::vector<SDL_Rect>& boundaryRectangles);
 };
 
 #endif

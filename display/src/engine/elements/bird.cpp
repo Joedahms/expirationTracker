@@ -19,8 +19,9 @@ Bird::Bird(struct DisplayGlobal displayGlobal, const SDL_Rect& boundaryRectangle
   }
   SDL_FreeSurface(birdSurface);
 
-  this->fixed      = false;
-  this->canCollide = true;
+  this->fixed          = false;
+  this->canCollide     = true;
+  this->collisionFixed = false;
 }
 
 void Bird::handleEvent(const SDL_Event& event) {

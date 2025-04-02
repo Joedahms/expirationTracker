@@ -245,43 +245,70 @@ void Element::addBoundaryRectangle(std::vector<SDL_Rect>& boundaryRectangles) co
 }
 
 void Element::checkCollision(std::vector<SDL_Rect>& boundaryRectangles) {
-  if (!this->canCollide) {
+  if (!this->canCollide || this->collisionFixed) {
     return;
   }
 
-  for (auto boundaryRectangle : boundaryRectangles) {
-    for (auto boundaryRectangle : boundaryRectangles) {
-      if (SDL_RectEquals(&this->boundaryRectangle, &boundaryRectangle)) {
-        continue;
+  checkCollisionImpl(boundaryRectangles);
+}
+
+void Element::checkCollisionImpl(std::vector<SDL_Rect>& boundaryRectangles) {
+  for (auto& boundaryRectangle : boundaryRectangles) {
+    if (SDL_RectEquals(&this->boundaryRectangle, &boundaryRectangle)) {
+      continue;
+    }
+
+    if (SDL_HasIntersection(&this->boundaryRectangle, &boundaryRectangle)) {
+      int overlapX, overlapY;
+
+      // X-axis overlap
+      if (this->boundaryRectangle.x < boundaryRectangle.x) {
+        // Right edge
+        overlapX =
+            (this->boundaryRectangle.x + this->boundaryRectangle.w) - boundaryRectangle.x;
+      }
+      else {
+        // Left edge
+        overlapX =
+            this->boundaryRectangle.x - (boundaryRectangle.x + boundaryRectangle.w);
+        overlapX = -overlapX;
       }
 
-      // Right side
-      if (this->boundaryRectangle
-              .x<boundaryRectangle.x&& this->boundaryRectangle.x +
-                 this->boundaryRectangle.w> boundaryRectangle.x &&
-          this->boundaryRectangle.y + this->boundaryRectangle.h > boundaryRectangle.y) {
-        this->positionRelativeToParent.x =
-            boundaryRectangle.x - this->boundaryRectangle.w;
+      // Bottom edge
+      if (this->boundaryRectangle.y < boundaryRectangle.y) {
+        overlapY =
+            (this->boundaryRectangle.y + this->boundaryRectangle.h) - boundaryRectangle.y;
+      }
+      // Top edge
+      else {
+        overlapY =
+            this->boundaryRectangle.y - (boundaryRectangle.y + boundaryRectangle.h);
+        overlapY = -overlapY;
+      }
+
+      if (overlapX > 0 && overlapY > 0) {
+        if (overlapX < overlapY) {
+          // Right
+          if (this->boundaryRectangle.x < boundaryRectangle.x) {
+            this->positionRelativeToParent.x -= overlapX;
+          }
+          // Left
+          else {
+            this->positionRelativeToParent.x += overlapX;
+          }
+        }
+        else {
+          // Bottom
+          if (this->boundaryRectangle.y < boundaryRectangle.y) {
+            this->positionRelativeToParent.y -= overlapY;
+          }
+          // Top
+          else {
+            this->positionRelativeToParent.y += overlapY;
+          }
+        }
         updatePosition();
       }
-
-      /*
-      if (SDL_HasIntersection(&this->boundaryRectangle, &boundaryRectangle)) {
-        this->positionRelativeToParent.x -= this->velocity.x;
-        this->positionRelativeToParent.y -= this->velocity.y;
-        updatePosition();
-        this->velocity = {0, 0};
-      }
-      */
-
-      /*
-      if (boundaryRectangle.x == this->boundaryRectangle.x &&
-          boundaryRectangle.y == this->boundaryRectangle.y &&
-          boundaryRectangle.w == this->boundaryRectangle.w &&
-          boundaryRectangle.h == this->boundaryRectangle.h) {
-        continue;
-      }
-      */
     }
   }
 }
