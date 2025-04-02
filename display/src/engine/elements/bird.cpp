@@ -24,6 +24,12 @@ Bird::Bird(struct DisplayGlobal displayGlobal, const SDL_Rect& boundaryRectangle
   this->collisionFixed = false;
 }
 
+/**
+ * If the mouse button is pressed down, make the bird jump upwards.
+ *
+ * @param event SDL event that occured
+ * @return None
+ */
 void Bird::handleEvent(const SDL_Event& event) {
   if (event.type == SDL_MOUSEBUTTONDOWN) {
     this->velocity.y = -5;

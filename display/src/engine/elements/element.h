@@ -105,6 +105,8 @@ protected:
   void hasParentUpdate();
   void updatePosition();
   void checkCollisionImpl(std::vector<SDL_Rect>& boundaryRectangles);
+  SDL_Point calculateOverlap(const SDL_Rect boundaryRectangle) const;
+  void fixCollision(const SDL_Point overlap, const SDL_Rect boundaryRectangle);
 };
 
 #endif
