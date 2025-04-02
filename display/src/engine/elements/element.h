@@ -95,6 +95,7 @@ protected:
   bool screenBoundY   = true;
   bool canCollide     = false;
   bool collisionFixed = true;
+  bool hasCollided    = false;
 
   Velocity velocity         = {0, 0};
   Acceleration acceleration = {0, 0};

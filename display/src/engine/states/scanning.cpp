@@ -59,6 +59,7 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger(LogFiles::SCANNI
 
   SDL_Rect birdRectangle     = {0, 0, 32, 32};
   std::unique_ptr<Bird> bird = std::make_unique<Bird>(this->displayGlobal, birdRectangle);
+  birdPtr                    = bird.get();
   rootElement->addElement(std::move(bird));
 
   initializeObstacles();
@@ -95,6 +96,19 @@ void Scanning::update() {
 
   std::vector<SDL_Rect> boundaryRectangles = getBoundaryRectangles();
   this->rootElement->checkCollision(boundaryRectangles);
+
+  SDL_Rect birdRect = this->birdPtr->getBoundaryRectangle();
+  for (const auto& obstaclePair : this->obstaclePairs) {
+    if (obstaclePair->scored) {
+      continue;
+    }
+    SDL_Rect obstaclePairRect = obstaclePair->getBoundaryRectangle();
+    if (birdRect.x >= obstaclePairRect.x) {
+      this->score++;
+      obstaclePair->scored = true;
+      std::cout << "score: " << this->score << std::endl;
+    }
+  }
 }
 
 void Scanning::initializeObstacles() {
@@ -120,6 +134,8 @@ void Scanning::initializeObstacles() {
     std::unique_ptr<ObstaclePair> obstaclePair =
         std::make_unique<ObstaclePair>(this->displayGlobal, boundaryRectangle,
                                        windowWidth, respawnOffset, LogFiles::SCANNING);
+
+    obstaclePairs.push_back(obstaclePair.get());
 
     this->rootElement->addElement(std::move(obstaclePair));
     xPosition += obstacleWidth + horizontalObstacleGap;

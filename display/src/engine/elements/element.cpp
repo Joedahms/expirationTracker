@@ -276,6 +276,7 @@ void Element::checkCollisionImpl(std::vector<SDL_Rect>& boundaryRectangles) {
     if (!SDL_HasIntersection(&this->boundaryRectangle, &boundaryRectangle)) {
       continue;
     }
+    this->hasCollided = true;
 
     SDL_Point overlap = calculateOverlap(boundaryRectangle);
     fixCollision(overlap, boundaryRectangle);

@@ -11,6 +11,8 @@ public:
                int respawnOffset,
                std::string logFile);
 
+  bool scored = false;
+
 private:
   const int windowWidth;
   const int respawnOffset;

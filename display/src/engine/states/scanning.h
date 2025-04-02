@@ -6,6 +6,8 @@
 #include <string>
 
 #include "../display_global.h"
+#include "../elements/bird.h"
+#include "../elements/obstacle_pair.h"
 #include "../engine_state.h"
 #include "state.h"
 
@@ -23,6 +25,9 @@ private:
   Logger logger;
 
   SDL_Surface* windowSurface;
+  Bird* birdPtr = nullptr;
+  std::vector<ObstaclePair*> obstaclePairs;
+  int score = 0;
 
   void initializeObstacles();
   std::vector<SDL_Rect> getBoundaryRectangles();

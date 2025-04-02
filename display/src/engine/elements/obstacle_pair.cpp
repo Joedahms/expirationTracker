@@ -71,6 +71,7 @@ void ObstaclePair::updateSelf() {
 
   if (this->boundaryRectangle.x <= -(this->boundaryRectangle.w)) {
     this->positionRelativeToParent.x = this->windowWidth + this->respawnOffset;
+    this->scored                     = false;
     randomizeGapPosition();
     updatePosition();
   }
