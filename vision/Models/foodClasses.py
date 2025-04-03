@@ -1,14 +1,39 @@
 
-textClasses = {
-    "milk", "cheese", "bread", "eggs", "yogurt", "butter", "juice", "meat", "chicken",
-    "fish", "cereal", "pasta", "rice", "flour", "sugar", "salt", "pepper", "coffee",
-    "tea", "honey", "jam", "peanut butter", "chocolate", "candy", "cookies", "crackers",
-    "granola", "oats", "popcorn", "chips", "pancake mix", "syrup", "beans", "corn",
-    "tomatoes", "tuna", "soup", "fruit", "vegetables", "meals", "pizza", "fries",
-    "ice cream", "energy bars", "protein powder", "noodles", "ketchup", "mayonnaise",
-    "mustard", "soy sauce", "hot sauce", "dressing", "oil", "vinegar", "pudding",
-    "whipped cream", "sour cream", "tofu", "bacon"
-}
+textClasses = [
+    "Sprite",
+    "Milk",
+    "Tortilla Chips",
+    "Oats",
+    "Cheese",
+    "Water",
+    "Chocolate",
+    "Cakes",
+    "Pepperoni",
+    "Bacon",
+    "Ham",
+    "Bar",
+    "Skittles",
+    "Coffee",
+    "Yogurt",
+    "Hot Dogs",
+    "Peanut Butter",
+    "Mayonnaise",
+    "Cool Whip",
+    "Ice Cream",
+    "Sausage",
+    "Macaroni",
+    "Waffles",
+    "Rice",
+    "Chicken Breast",
+    "Mixed Vegetables",
+    "Tuna",
+    "Preserves",
+    "Applesauce",
+    "Honey",
+    "Flour",
+    "Barbecue Sauce"
+]
+
 
 pluMapping = {
     # Apples
