@@ -234,5 +234,118 @@ void Element::setAcceleration(Acceleration acceleration) {
 }
 
 int Element::getBorderThickness() { return this->borderThickness; }
-
 bool Element::getFixed() { return this->fixed; }
+bool Element::getScreenBoundX() { return this->screenBoundX; }
+bool Element::getScreenBoundY() { return this->screenBoundY; }
+
+void Element::addBoundaryRectangle(std::vector<SDL_Rect>& boundaryRectangles) const {
+  if (this->canCollide) {
+    boundaryRectangles.push_back(this->boundaryRectangle);
+  }
+}
+
+/**
+ * If the element's position is not fixed in the event of a collision, check if it
+ * has collided with any other element that can be collided with.
+ *
+ * @param boundaryRectangles Boundary rectangles for all objects that can be collided
+ * with.
+ * @return None
+ */
+void Element::checkCollision(std::vector<SDL_Rect>& boundaryRectangles) {
+  if (!this->canCollide || this->collisionFixed) {
+    return;
+  }
+  checkCollisionImpl(boundaryRectangles);
+}
+
+/**
+ * Implementation of collision checking. Check against all other objects that can be
+ * collided with. If there is a collision, adjust position so that there is no collision.
+ *
+ * @param boundaryRectangles Boundary rectangles for all objects that can be collided
+ * with.
+ * @return None
+ */
+void Element::checkCollisionImpl(std::vector<SDL_Rect>& boundaryRectangles) {
+  for (auto& boundaryRectangle : boundaryRectangles) {
+    if (SDL_RectEquals(&this->boundaryRectangle, &boundaryRectangle)) {
+      continue;
+    }
+
+    if (!SDL_HasIntersection(&this->boundaryRectangle, &boundaryRectangle)) {
+      continue;
+    }
+
+    SDL_Point overlap = calculateOverlap(boundaryRectangle);
+    fixCollision(overlap, boundaryRectangle);
+  }
+}
+
+/**
+ * Calculate the overlap resulting from a collision between two elements.
+ *
+ * @param boundaryRectangle The boundary rectangle of the element that this element is
+ * colliding with
+ * @return An SDL_Point containing the x and y dimensions of the overlap
+ */
+SDL_Point Element::calculateOverlap(const SDL_Rect boundaryRectangle) const {
+  SDL_Point overlap = {0, 0};
+
+  // Right edge
+  if (this->boundaryRectangle.x < boundaryRectangle.x) {
+    overlap.x =
+        (this->boundaryRectangle.x + this->boundaryRectangle.w) - boundaryRectangle.x;
+  }
+  // Left edge
+  else {
+    overlap.x = this->boundaryRectangle.x - (boundaryRectangle.x + boundaryRectangle.w);
+    overlap.x = -overlap.x;
+  }
+  // Bottom edge
+  if (this->boundaryRectangle.y < boundaryRectangle.y) {
+    overlap.y =
+        (this->boundaryRectangle.y + this->boundaryRectangle.h) - boundaryRectangle.y;
+  }
+  // Top edge
+  else {
+    overlap.y = this->boundaryRectangle.y - (boundaryRectangle.y + boundaryRectangle.h);
+    overlap.y = -overlap.y;
+  }
+
+  return overlap;
+}
+
+/**
+ * Undo a collision between two elements by moving this element outside of the other
+ * element.
+ *
+ * @param overlap An SDL_Point containing the x and y dimensions of the overlap
+ * @param boundaryRectangle The boundary rectangle of the element that this element is
+ * colliding with
+ */
+void Element::fixCollision(const SDL_Point overlap, const SDL_Rect boundaryRectangle) {
+  if (overlap.x > 0 && overlap.y > 0) {
+    if (overlap.x < overlap.y) {
+      // Right
+      if (this->boundaryRectangle.x < boundaryRectangle.x) {
+        this->positionRelativeToParent.x -= overlap.x;
+      }
+      // Left
+      else {
+        this->positionRelativeToParent.x += overlap.x;
+      }
+    }
+    else {
+      // Bottom
+      if (this->boundaryRectangle.y < boundaryRectangle.y) {
+        this->positionRelativeToParent.y -= overlap.y;
+      }
+      // Top
+      else {
+        this->positionRelativeToParent.y += overlap.y;
+      }
+    }
+    updatePosition();
+  }
+}
