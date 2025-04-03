@@ -80,6 +80,7 @@ add_executable(expirationTracker
   # Game elements
   display/src/engine/elements/bird.cpp
   display/src/engine/elements/obstacle.cpp
+  display/src/engine/elements/obstacle_pair.cpp
 
   # GUI States
   display/src/engine/states/state.cpp
