@@ -73,7 +73,6 @@ void DisplayHandler::handle() {
           LOG(FATAL) << "Unexpected message received: " << receivedMessage;
         }
       }
-      //}
     }
     else {
       LOG(FATAL) << "Unexpected message received: " << receivedMessage;

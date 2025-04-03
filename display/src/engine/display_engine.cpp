@@ -180,7 +180,7 @@ void DisplayEngine::checkScanning() {
   this->engineState = this->scanning->getCurrentState();
 
   if (this->engineState == EngineState::CANCEL_SCAN_CONFIRMATION) {
-    scanCancelledToDisplayHandler();
+    //  scanCancelledToDisplayHandler();
     // stopSignalToVision();
   }
 
@@ -238,8 +238,10 @@ void DisplayEngine::checkCancelScanConfirmation() {
   this->engineState = this->cancelScanConfirmation->getCurrentState();
 
   if (this->engineState == EngineState::ITEM_LIST) { // Scan was cancelled
+    scanCancelledToDisplayHandler();
   }
   else if (this->engineState == EngineState::SCANNING) { // Scan was not cancelled
+                                                         //    startSignalToDisplay();
   }
 
   this->cancelScanConfirmation->setCurrentState(EngineState::CANCEL_SCAN_CONFIRMATION);
