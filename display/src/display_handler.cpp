@@ -146,7 +146,19 @@ void DisplayHandler::handleScanStarted() {
 void DisplayHandler::detectionFailure() {
   this->replySocket.send(Messages::AFFIRMATIVE);
   this->logger.log("Item detection failed");
-  // TODO Display failure message
+
+  this->requestEngineSocket.send(Messages::ITEM_DETECTION_FAILED);
+  this->logger.log("Failure message send to engine");
+  std::string engineResponse;
+  this->logger.log("Receiving response from engine");
+  this->requestEngineSocket.receive(engineResponse);
+  this->logger.log("Received response from engine");
+  if (engineResponse == Messages::AFFIRMATIVE) {
+    this->logger.log("Engine notified of failure");
+  }
+  else {
+    LOG(FATAL) << "Unexpected message received";
+  }
 }
 
 /**

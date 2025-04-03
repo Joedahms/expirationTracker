@@ -241,7 +241,6 @@ void DisplayEngine::checkCancelScanConfirmation() {
     scanCancelledToDisplayHandler();
   }
   else if (this->engineState == EngineState::SCANNING) { // Scan was not cancelled
-                                                         //    startSignalToDisplay();
   }
 
   this->cancelScanConfirmation->setCurrentState(EngineState::CANCEL_SCAN_CONFIRMATION);
@@ -268,6 +267,11 @@ void DisplayEngine::handleEvents() {
       }
       if (messageFromDisplay == Messages::ITEM_DETECTION_SUCCEEDED) {
         this->logger.log("New food item received, switching to item list state");
+        this->engineState = EngineState::ITEM_LIST;
+        this->replySocket.send(Messages::AFFIRMATIVE);
+      }
+      else if (messageFromDisplay == Messages::ITEM_DETECTION_FAILED) {
+        this->logger.log("Item detection failed, switching to item list state");
         this->engineState = EngineState::ITEM_LIST;
         this->replySocket.send(Messages::AFFIRMATIVE);
       }
