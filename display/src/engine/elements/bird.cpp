@@ -6,6 +6,7 @@
 Bird::Bird(struct DisplayGlobal displayGlobal, const SDL_Rect& boundaryRectangle) {
   this->displayGlobal     = displayGlobal;
   this->boundaryRectangle = boundaryRectangle;
+  this->debugName         = "bird";
 
   SDL_Surface* birdSurface = IMG_Load("../display/sprites/bird.png");
   if (birdSurface == NULL) {
@@ -18,9 +19,17 @@ Bird::Bird(struct DisplayGlobal displayGlobal, const SDL_Rect& boundaryRectangle
   }
   SDL_FreeSurface(birdSurface);
 
-  this->fixed = false;
+  this->fixed          = false;
+  this->canCollide     = true;
+  this->collisionFixed = false;
 }
 
+/**
+ * If the mouse button is pressed down, make the bird jump upwards.
+ *
+ * @param event SDL event that occured
+ * @return None
+ */
 void Bird::handleEvent(const SDL_Event& event) {
   if (event.type == SDL_MOUSEBUTTONDOWN) {
     this->velocity.y = -5;

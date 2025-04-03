@@ -9,6 +9,7 @@
 #include "../elements/bird.h"
 #include "../elements/loading_bar.h"
 #include "../elements/obstacle.h"
+#include "../elements/obstacle_pair.h"
 #include "../elements/text.h"
 #include "scanning.h"
 
@@ -18,25 +19,25 @@
 Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger(LogFiles::SCANNING) {
   this->logger.log("Constructing scanning state");
 
-  this->currentState         = EngineState::SCANNING;
-  this->displayGlobal        = displayGlobal;
-  SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
+  this->currentState  = EngineState::SCANNING;
+  this->displayGlobal = displayGlobal;
+  this->windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
 
-  SDL_Rect rootRectangle = {0, 0, 0, 0};
-  rootRectangle.w        = windowSurface->w;
-  rootRectangle.h        = windowSurface->h;
+  // Root element
+  SDL_Rect rootRectangle = {0, 0, this->windowSurface->w, this->windowSurface->h};
   this->rootElement      = std::make_unique<Container>(rootRectangle);
 
+  // Scan message
   const char* progressMessageContent    = "Scanning In Progress";
   SDL_Color progressMessageColor        = {0, 255, 0, 255}; // Green
   SDL_Rect progressMessageRectangle     = {0, 100, 0, 0};
   std::unique_ptr<Text> progressMessage = std::make_unique<Text>(
       this->displayGlobal, progressMessageRectangle, DisplayGlobal::futuramFontPath,
       progressMessageContent, 24, progressMessageColor);
-
   progressMessage->setCenteredHorizontal();
   this->rootElement->addElement(std::move(progressMessage));
 
+  // Cancel scan
   SDL_Rect cancelScanButtonRectangle       = {0, 150, 0, 0};
   std::unique_ptr<Button> cancelScanButton = std::make_unique<Button>(
       this->displayGlobal, cancelScanButtonRectangle, "Cancel Scan", SDL_Point{10, 10},
@@ -45,6 +46,7 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger(LogFiles::SCANNI
   cancelScanButton->setCenteredHorizontal();
   rootElement->addElement(std::move(cancelScanButton));
 
+  // Loading bar
   SDL_Rect loadingBarRectangle           = {0, 200, 200, 30};
   int loadingBarBorderThickness          = 3;
   float totalTimeSeconds                 = 20;
@@ -59,10 +61,7 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger(LogFiles::SCANNI
   std::unique_ptr<Bird> bird = std::make_unique<Bird>(this->displayGlobal, birdRectangle);
   rootElement->addElement(std::move(bird));
 
-  SDL_Rect obstacleRect = {0, 0, 40, 70};
-  std::unique_ptr<Obstacle> obstacle =
-      std::make_unique<Obstacle>(this->displayGlobal, obstacleRect);
-  rootElement->addElement(std::move(obstacle));
+  initializeObstacles();
 
   this->logger.log("Constructed scanning state");
 }
@@ -89,4 +88,48 @@ void Scanning::render() const {
   SDL_RenderClear(this->displayGlobal.renderer);
   this->rootElement->render();
   SDL_RenderPresent(this->displayGlobal.renderer);
+}
+
+void Scanning::update() {
+  this->rootElement->update();
+
+  std::vector<SDL_Rect> boundaryRectangles = getBoundaryRectangles();
+  this->rootElement->checkCollision(boundaryRectangles);
+}
+
+void Scanning::initializeObstacles() {
+  const int windowWidth  = this->windowSurface->w;
+  const int windowHeight = this->windowSurface->h;
+
+  const int obstacleWidth         = 40;
+  const int obstaclePairHeight    = 200;
+  const int horizontalObstacleGap = 70;
+
+  int totalObstaclePairs = windowWidth / (obstacleWidth + horizontalObstacleGap);
+
+  totalObstaclePairs++;
+  const int respawnOffset = windowWidth % (obstacleWidth + horizontalObstacleGap);
+
+  int xPosition       = windowWidth;
+  const int yPosition = windowHeight - obstaclePairHeight;
+
+  for (int i = 0; i < totalObstaclePairs; i++) {
+    SDL_Rect boundaryRectangle = {xPosition, yPosition, obstacleWidth,
+                                  obstaclePairHeight};
+
+    std::unique_ptr<ObstaclePair> obstaclePair =
+        std::make_unique<ObstaclePair>(this->displayGlobal, boundaryRectangle,
+                                       windowWidth, respawnOffset, LogFiles::SCANNING);
+
+    this->rootElement->addElement(std::move(obstaclePair));
+    xPosition += obstacleWidth + horizontalObstacleGap;
+  }
+}
+
+std::vector<SDL_Rect> Scanning::getBoundaryRectangles() {
+  std::vector<SDL_Rect> boundaryRectangles;
+
+  this->rootElement->addBoundaryRectangle(boundaryRectangles);
+
+  return boundaryRectangles;
 }
