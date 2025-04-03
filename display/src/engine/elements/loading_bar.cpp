@@ -18,8 +18,6 @@ LoadingBar::LoadingBar(struct DisplayGlobal displayGlobal,
 
   this->previousUpdate = std::chrono::steady_clock::now();
   addBorder(this->borderThickness);
-
-  this->canCollide = true;
 }
 
 /**

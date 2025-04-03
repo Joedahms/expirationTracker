@@ -12,19 +12,13 @@ void Container::update() {
 
   for (const auto& element : this->children) {
     element->update();
-    if (element->getFixed()) {
-      continue;
-    }
-    if (element->getScreenBoundX()) {
-      checkElementPositionX(element);
-    }
-    if (element->getScreenBoundY()) {
-      checkElementPositionY(element);
+    if (element->getFixed() == false) {
+      checkElementPosition(element);
     }
   }
 }
 
-void Container::checkElementPositionX(std::shared_ptr<Element> element) {
+void Container::checkElementPosition(std::shared_ptr<Element> element) {
   Velocity elementVelocity                  = element->getVelocity();
   int elementBorderThickness                = element->getBorderThickness();
   SDL_Point elementPositionRelativeToParent = element->getPositionRelativeToParent();
@@ -36,6 +30,15 @@ void Container::checkElementPositionX(std::shared_ptr<Element> element) {
     element->setVelocity(elementVelocity);
 
     elementPositionRelativeToParent.x = elementBorderThickness;
+    element->setPositionRelativeToParent(elementPositionRelativeToParent);
+  }
+
+  // Top
+  if (elementPositionRelativeToParent.y - elementBorderThickness < 0) {
+    elementVelocity.y = 0;
+    element->setVelocity(elementVelocity);
+
+    elementPositionRelativeToParent.y = elementBorderThickness;
     element->setPositionRelativeToParent(elementPositionRelativeToParent);
   }
 
@@ -51,24 +54,8 @@ void Container::checkElementPositionX(std::shared_ptr<Element> element) {
         elementBoundaryRectangle.w - elementBorderThickness;
     element->setPositionRelativeToParent(elementPositionRelativeToParent);
   }
-}
 
-void Container::checkElementPositionY(std::shared_ptr<Element> element) {
-  Velocity elementVelocity                  = element->getVelocity();
-  int elementBorderThickness                = element->getBorderThickness();
-  SDL_Point elementPositionRelativeToParent = element->getPositionRelativeToParent();
-  SDL_Rect elementBoundaryRectangle         = element->getBoundaryRectangle();
-
-  // Top
-  if (elementPositionRelativeToParent.y - elementBorderThickness < 0) {
-    elementVelocity.y = 0;
-    element->setVelocity(elementVelocity);
-
-    elementPositionRelativeToParent.y = elementBorderThickness;
-    element->setPositionRelativeToParent(elementPositionRelativeToParent);
-  }
-
-  // Bottom
+  // Left
   int elementBottomEdge = elementPositionRelativeToParent.y + elementBoundaryRectangle.h +
                           elementBorderThickness;
   if (elementBottomEdge > this->boundaryRectangle.y + this->boundaryRectangle.h) {

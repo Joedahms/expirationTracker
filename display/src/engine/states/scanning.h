@@ -16,16 +16,10 @@ class Scanning : public State {
 public:
   Scanning(struct DisplayGlobal displayGlobal);
   EngineState checkKeystates();
-  void update() override;
   void render() const override;
 
 private:
   Logger logger;
-
-  SDL_Surface* windowSurface;
-
-  void initializeObstacles();
-  std::vector<SDL_Rect> getBoundaryRectangles();
 };
 
 #endif
