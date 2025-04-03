@@ -1,5 +1,5 @@
 
-textClasses = [
+textClasses = {
     "Sprite",
     "Milk",
     "Tortilla Chips",
@@ -32,7 +32,7 @@ textClasses = [
     "Honey",
     "Flour",
     "Barbecue Sauce"
-]
+}
 
 
 pluMapping = {
