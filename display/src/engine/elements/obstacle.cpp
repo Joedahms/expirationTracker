@@ -2,12 +2,9 @@
 
 Obstacle::Obstacle(struct DisplayGlobal displayGlobal,
                    const SDL_Rect& boundaryRectangle) {
-  this->displayGlobal = displayGlobal;
-  setupPosition(boundaryRectangle);
-  this->screenBoundX = false;
-  this->canCollide   = true;
+  this->displayGlobal     = displayGlobal;
+  this->boundaryRectangle = boundaryRectangle;
 }
-
 void Obstacle::handleEvent(const SDL_Event& event) {}
 
 void Obstacle::render() const {
