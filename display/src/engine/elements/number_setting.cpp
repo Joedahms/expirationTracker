@@ -21,7 +21,7 @@ NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal,
                              const std::string& logFile)
     : settingId(settingId) {
   setupPosition(boundaryRectangle);
-  // this->logger  = std::make_unique<Logger>(logFile);
+  this->logger  = std::make_unique<Logger>(logFile);
   this->logFile = logFile;
 
   std::shared_ptr<Button> decreaseButton = std::make_shared<Button>(
@@ -55,6 +55,7 @@ NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal,
  * @return None
  */
 void NumberSetting::updateSelf() {
+  /*
   if (parent) {
     hasParentUpdate();
   }
@@ -85,6 +86,7 @@ void NumberSetting::updateSelf() {
   else {
     this->children[1]->setContent(std::to_string(this->settingValue));
   }
+  */
 }
 
 void NumberSetting::handleEventSelf(const SDL_Event& event) {}
