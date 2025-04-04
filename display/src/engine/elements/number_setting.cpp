@@ -55,11 +55,11 @@ NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal,
  * @return None
  */
 void NumberSetting::updateSelf() {
-  /*
   if (parent) {
     hasParentUpdate();
   }
 
+  /*
   for (int i = 0; i < this->children.size(); i++) {
     SDL_Point childRelativePosition = this->children[i]->getPositionRelativeToParent();
     childRelativePosition.y         = this->positionRelativeToParent.y;
