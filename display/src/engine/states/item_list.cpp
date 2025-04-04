@@ -40,7 +40,6 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger(LogFiles::ITEM_L
   newScanButton->setCenteredHorizontal();
   rootElement->addElement(std::move(newScanButton));
 
-  /*
   // Scrollbox
   SDL_Rect scrollBoxRect = {0, 0, 400, 100};
   int windowWidth, windowHeight;
@@ -54,7 +53,6 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger(LogFiles::ITEM_L
   this->mediator->addScrollBox(scrollBox);
   this->rootElement->addElement(std::move(scrollBox));
   this->rootElement->update();
-  */
 
   // Dropdown
   std::shared_ptr<Dropdown> sortBy =
