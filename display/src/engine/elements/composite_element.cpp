@@ -43,7 +43,6 @@ void CompositeElement::addElement(std::shared_ptr<Element> element) {
 
   Element* childPointer = element.get();
   childPointer->setParent(this);
-  free(childPointer);
 
   this->children.push_back(std::move(element));
 }

@@ -100,7 +100,7 @@ void ScrollBox::refreshPanels() {
         this->displayGlobal, boundaryRectangle, foodItem.getId(), this->logFile);
     boundaryRectangle.y += panelHeight;
 
-    newPanel->addFoodItem(foodItem, SDL_Point{0, 0});
+    // newPanel->addFoodItem(foodItem, SDL_Point{0, 0});
     int borderThickness = 1;
     newPanel->addBorder(borderThickness);
     addElement(std::move(newPanel));
