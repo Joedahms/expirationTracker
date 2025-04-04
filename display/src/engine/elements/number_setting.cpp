@@ -59,7 +59,6 @@ void NumberSetting::updateSelf() {
     hasParentUpdate();
   }
 
-  /*
   for (int i = 0; i < this->children.size(); i++) {
     SDL_Point childRelativePosition = this->children[i]->getPositionRelativeToParent();
     childRelativePosition.y         = this->positionRelativeToParent.y;
@@ -75,6 +74,7 @@ void NumberSetting::updateSelf() {
     this->children[i]->setPositionRelativeToParent(childRelativePosition);
   }
 
+  /*
   FoodItem foodItem    = readFoodItemById(this->settingId);
   int foodItemQuantity = foodItem.getQuantity();
   if (foodItemQuantity == 0) {
