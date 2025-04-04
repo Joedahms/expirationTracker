@@ -58,8 +58,8 @@ void Panel::addText(const std::string& fontPath,
  * @return None
  */
 void Panel::addFoodItem(const FoodItem& foodItem, const SDL_Point& relativePosition) {
-  addFoodItemName(foodItem, relativePosition);
-  addFoodItemExpirationDate(foodItem, relativePosition);
+  // addFoodItemName(foodItem, relativePosition);
+  // addFoodItemExpirationDate(foodItem, relativePosition);
 
   std::shared_ptr<NumberSetting> itemQuantity = std::make_shared<NumberSetting>(
       this->displayGlobal, SDL_Rect{0, 0, 0, 0}, this->id, this->logFile);
