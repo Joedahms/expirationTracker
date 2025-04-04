@@ -74,8 +74,8 @@ void NumberSetting::updateSelf() {
     this->children[i]->setPositionRelativeToParent(childRelativePosition);
   }
 
+  FoodItem foodItem = readFoodItemById(this->settingId);
   /*
-  FoodItem foodItem    = readFoodItemById(this->settingId);
   int foodItemQuantity = foodItem.getQuantity();
   if (foodItemQuantity == 0) {
     deleteById(this->settingId);
