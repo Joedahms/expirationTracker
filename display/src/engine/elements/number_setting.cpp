@@ -21,7 +21,7 @@ NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal,
                              const std::string& logFile)
     : settingId(settingId) {
   setupPosition(boundaryRectangle);
-  this->logger  = std::make_unique<Logger>(logFile);
+  // this->logger  = std::make_unique<Logger>(logFile);
   this->logFile = logFile;
 
   std::shared_ptr<Button> decreaseButton = std::make_shared<Button>(
