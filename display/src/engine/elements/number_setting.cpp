@@ -82,11 +82,9 @@ void NumberSetting::updateSelf() {
   else if (foodItemQuantity != this->settingValue) {
     updateFoodItemQuantity(this->settingId, this->settingValue);
   }
-  /*
   else {
     this->children[1]->setContent(std::to_string(this->settingValue));
   }
-  */
 }
 
 void NumberSetting::handleEventSelf(const SDL_Event& event) {}
