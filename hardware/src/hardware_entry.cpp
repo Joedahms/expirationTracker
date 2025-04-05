@@ -22,7 +22,7 @@
 void hardwareEntry(zmqpp::context& context) {
   Logger logger("hardware_entry.txt");
   logger.log("Within hardware process");
-  
+
   Hardware hardware(context);
   bool startSignalReceived = false;
   int startSignalTimeoutMs = 1000;
