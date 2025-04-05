@@ -37,8 +37,6 @@ private:
   void scrollUp();
   void scrollDown();
 
-  std::chrono::steady_clock::time_point previousUpdate;
-  std::chrono::steady_clock::time_point currentUpdate;
   int panelHeight;
   int topPanelPosition = 0;
   int scrollAmount     = 4;
