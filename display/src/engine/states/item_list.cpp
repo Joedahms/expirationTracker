@@ -34,7 +34,7 @@ ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger(LogFiles::ITEM_L
 
   // Start Scan
   SDL_Rect newScanButtonRectangle       = {200, 150, 200, 50};
-  std::unique_ptr<Button> newScanButton = std::make_unique<Button>(
+  std::shared_ptr<Button> newScanButton = std::make_shared<Button>(
       this->displayGlobal, newScanButtonRectangle, "Scan New Item", SDL_Point{10, 10},
       [this]() { this->currentState = EngineState::SCANNING; }, LogFiles::ITEM_LIST);
   newScanButton->setCenteredHorizontal();
