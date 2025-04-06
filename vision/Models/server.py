@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 import socket
 import json
+import time
 from easyOCR import performOCR
 
 PORT = "5555" #zeroMQ port
@@ -47,16 +48,23 @@ def wait_for_pi_discovery():
 def run_server():
     wait_for_pi_discovery()  # Wait for Raspberry Pi discovery
     ADDRESS = f"tcp://0.0.0.0:{PORT}"  # Bind ZeroMQ to communicate with Pi
+    HEARTBEAT_ADDRESS = f"tcp://0.0.0.0:{HEARTBEAT_PORT}"
 
     # Create ZeroMQ context and socket
     context = zmq.Context()
     socket = context.socket(zmq.REP)
     socket.bind(ADDRESS)
+
+    hearbeatsocket = context.socket(zmq.REP)
+    hearbeatsocket.bind(HEARTBEAT_ADDRESS)
+    hearbeatsocket.RCVTIMEO = 0  # non-blocking receive
     
     print(f"Server started on {ADDRESS}")
     
     poller = zmq.Poller()
     poller.register(socket, zmq.POLLIN)
+
+    last_heartbeat_time = time.time()
 
     try:
         while True:
@@ -67,39 +75,60 @@ def run_server():
             if socket in socks and socks[socket] == zmq.POLLIN:
                 # Receive image data (blocking receive)
                 msg_parts = socket.recv_multipart()  
-                print(f"Request received!")
+                try:
+                    print(f"Request received!")
+                    img_size = struct.unpack("Q", msg_parts[0])[0]
+                    img_data = msg_parts[1]
 
-                img_size = struct.unpack("Q", msg_parts[0])[0]
-                img_data = msg_parts[1]
+                    print(f"Image is {img_size} bytes!")
 
-                print(f"Image is {img_size} bytes!")
+                    print(f"Decoding image.")
+                    # Decode image
+                    image = cv2.imdecode(np.frombuffer(img_data, dtype=np.uint8), cv2.IMREAD_COLOR)
+                    if image is None:
+                        print("Error: Failed to decode image.")
+                        socket.send_string("ERROR: Image decoding failed")
+                        continue
+                    
+                    print(f"Image decoded. Now beginning AI processing.")
 
-                print(f"Decoding image.")
-                # Decode image
-                image = cv2.imdecode(np.frombuffer(img_data, dtype=np.uint8), cv2.IMREAD_COLOR)
-                if image is None:
-                    print("Error: Failed to decode image.")
-                    socket.send_string("ERROR: Image decoding failed")
-                    continue
-                
-                print(f"Image decoded. Now beginning AI processing.")
+                    # Perform OCR
+                    result = json.dumps(performOCR(image))
 
-                # Perform OCR
-                result = json.dumps(performOCR(image))
+                    print(f"Processing complete. Sending result back.")
+                    # Send response
+                    socket.send_string(result)
+                    print(f"Sent response: {result}")
 
-                print(f"Processing complete. Sending result back.")
-                # Send response
-                socket.send_string(result)
-                print(f"Sent response: {result}")
+                    # Reset heartbeat timer after processing completes
+                    last_heartbeat_time = time.time()
+                except Exception as e:
+                    print(f"Processing error: {e}")
+                    socket.send_string("ERROR: Exception during processing")
             else:
-                pass
+                try:
+                    msg = hearbeatsocket.recv_string(flags=zmq.NOBLOCK)
+                    if msg == "heartbeat":
+                        print("Received heartbeat")
+                        hearbeatsocket.send_string("alive")
+                        last_heartbeat_time = time.time()
+                except zmq.Again:
+                    pass  # No heartbeat received
+
+                if time.time() - last_heartbeat_time > 30:
+                    print("No heartbeat received for 30 seconds while idle. Restarting server...")
+                    break
     except KeyboardInterrupt:
         print("Server interrupted")
     finally:
         # Clean up
         socket.close()
+        hearbeatsocket.close()
         context.term()
         print("Server terminated")
 
 if __name__ == "__main__":
-    run_server()
+    while True:
+        run_server()
+        print("restarting server...")
+        time.sleep(2)
