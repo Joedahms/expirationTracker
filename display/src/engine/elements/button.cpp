@@ -36,7 +36,7 @@ Button::Button(struct DisplayGlobal displayGlobal,
   // Button Text
   SDL_Color textColor        = {255, 255, 0, 255}; // Yellow
   SDL_Rect textRect          = {textPadding.x, textPadding.y, 0, 0};
-  std::unique_ptr<Text> text = std::make_unique<Text>(
+  std::shared_ptr<Text> text = std::make_shared<Text>(
       this->displayGlobal, textRect, "../display/fonts/16020_FUTURAM.ttf",
       this->textContent.c_str(), 24, textColor);
   text->setCentered();
@@ -73,7 +73,7 @@ Button::Button(struct DisplayGlobal displayGlobal,
   // Button Text
   SDL_Color textColor        = {255, 255, 0, 255}; // Yellow
   SDL_Rect textRect          = {textPadding.x, textPadding.y, 0, 0};
-  std::unique_ptr<Text> text = std::make_unique<Text>(
+  std::shared_ptr<Text> text = std::make_shared<Text>(
       this->displayGlobal, textRect, "../display/fonts/16020_FUTURAM.ttf",
       this->textContent.c_str(), 24, textColor);
   text->setCentered();
