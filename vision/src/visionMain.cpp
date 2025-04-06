@@ -156,7 +156,7 @@ void createHeartBeatThread(zmqpp::context& context,
                            std::atomic_bool& isProcessing,
                            std::string& heartbeatAddress) {
   std::thread thread([&context, &isProcessing, heartbeatAddress]() {
-    Logger logger("vision_hearbeat.txt");
+    Logger logger("vision_heartbeat.txt");
     logger.log("Within vision hearbeat thread");
     zmqpp::socket heartbeatSocket(context, zmqpp::socket_type::request);
     heartbeatSocket.connect(heartbeatAddress);
@@ -169,11 +169,10 @@ void createHeartBeatThread(zmqpp::context& context,
           heartbeatSocket.send(heartbeat);
 
           zmqpp::message response;
-          if (heartbeatSocket.receive(response, true)) {
-            std::string reply;
-            response >> reply;
-            logger.log("Heartbeat acknowledged: " + reply);
-          }
+          heartbeatSocket.receive(response);
+          std::string reply;
+          response >> reply;
+          logger.log("Heartbeat acknowledged: " + reply);
         } catch (const zmqpp::exception& e) {
           logger.log("Heartbeat error: " + std::string(e.what()));
         }
