@@ -5,10 +5,11 @@
  * @param externalEndpoints Endpoints to the main components of the system (vision,
  * hardware, and display)
  */
-ImageProcessor::ImageProcessor(zmqpp::context& context)
+ImageProcessor::ImageProcessor(zmqpp::context& context, std::string& serverAddress)
     : logger("image_processor.txt"), cancelRequested(false),
       requestHardwareSocket(context, zmqpp::socket_type::request),
-      requestDisplaySocket(context, zmqpp::socket_type::request), modelHandler(context) {
+      requestDisplaySocket(context, zmqpp::socket_type::request),
+      modelHandler(context, serverAddress) {
   try {
     this->requestHardwareSocket.connect(ExternalEndpoints::hardwareEndpoint);
     this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);

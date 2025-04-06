@@ -16,13 +16,23 @@ void visionEntry(zmqpp::context& context) {
   zmqpp::socket replySocket(context, zmqpp::socket_type::reply);
   replySocket.bind(VisionExternalEndpoints::visionMainEndpoint);
 
-  ImageProcessor processor(context);
+  std::string serverIP         = discoverServerViaUDP();
+  std::string serverAddress    = "";
+  std::string heartbeatAddress = "";
+  if (!serverIP.empty()) {
+    std::cout << "Discovered Server IP: " << serverIP << std::endl;
+    serverAddress    = "tcp://" + serverIP + ":" + std::to_string(zeroMQPort);
+    heartbeatAddress = "tcp://" + serverIP + ":" + std::to_string(zeroMQHeartbeatPort);
+  }
+  else {
+    LOG(FATAL) << "Failed to find server address.";
+  }
+
+  ImageProcessor processor(context, serverAddress);
   std::atomic_bool isProcessing{false};
 
-  std::thread listenerThread = createListenerThread(context, processor);
-  listenerThread.detach();
-  std::thread heartbeatThread = createHeartBeatThread(context, isProcessing);
-  heartbeatThread.detach();
+  createListenerThread(context, processor);
+  createHeartBeatThread(context, isProcessing, heartbeatAddress);
 
   zmqpp::poller poller;
   poller.add(replySocket);
@@ -83,12 +93,10 @@ bool startSignalCheck(zmqpp::socket& replySocket,
  * creates and returns thread to listen to vision endpoint and handle it
  *
  * @param context context
- * @param logger Logger being used to log visionMain
  * @param processor processor item
- * @return Created listener thread
  */
-std::thread createListenerThread(zmqpp::context& context, ImageProcessor& processor) {
-  return std::thread([&context, &processor]() {
+void createListenerThread(zmqpp::context& context, ImageProcessor& processor) {
+  std::thread thread([&context, &processor]() {
     Logger logger("vision_listener.txt");
     logger.log("Within vision listener thread");
     zmqpp::socket listenerSocket(context, zmqpp::socket_type::reply);
@@ -134,59 +142,45 @@ std::thread createListenerThread(zmqpp::context& context, ImageProcessor& proces
       }
     }
   });
+  thread.detach();
 }
 
 /**
- * creates and returns thread to listen to vision endpoint and handle it
+ * creates and returns thread to send heartbeat to server
  *
  * @param context context
- * @param logger Logger being used to log visionMain
- * @param processor processor item
- * @return Created listener thread
+ * @param isProcessing bool to track if processing is occuring
+ * @param heartbeatAddress string endpoint to connect to
  */
-std::thread createHeartBeatThread(zmqpp::context& context,
-                                  std::atomic_bool& isProcessing) {
-  return std::thread([&context, &isProcessing]() {
-    Logger logger("vision_heartbeat.txt");
-    logger.log("Within vision heartbeat thread");
-    zmqpp::socket listenerSocket(context, zmqpp::socket_type::reply);
-    listenerSocket.bind(ExternalEndpoints::visionEndpoint);
+void createHeartBeatThread(zmqpp::context& context,
+                           std::atomic_bool& isProcessing,
+                           std::string& heartbeatAddress) {
+  std::thread thread([&context, &isProcessing, heartbeatAddress]() {
+    Logger logger("vision_hearbeat.txt");
+    logger.log("Within vision hearbeat thread");
+    zmqpp::socket heartbeatSocket(context, zmqpp::socket_type::request);
+    heartbeatSocket.connect(heartbeatAddress);
 
     while (true) {
-      zmqpp::message msg;
-      listenerSocket.receive(msg);
+      if (!isProcessing.load()) {
+        try {
+          zmqpp::message heartbeat;
+          heartbeat << "heartbeat";
+          heartbeatSocket.send(heartbeat);
 
-      std::string command;
-      msg >> command;
-
-      if (command == Messages::SCAN_CANCELLED) {
-        logger.log("Cancel command received.");
-        processor.requestCancel();
-        listenerSocket.send(Messages::AFFIRMATIVE);
-        logger.log("Cancel received.");
-      }
-      else if (command == Messages::START_SCAN) {
-        logger.log("Start command received. Notifying hardware of successful receive");
-        listenerSocket.send(Messages::AFFIRMATIVE); // Tell hardware to send food item
-
-        zmqpp::message foodItemString;
-        logger.log("Waiting to retrieve food item from hardware");
-        listenerSocket.receive(foodItemString); // Grab food item
-        logger.log("Food item received. Notifying hardware.");
-        listenerSocket.send(Messages::AFFIRMATIVE); // Confirm receipt
-
-        logger.log("Forwarding food item to visionMain.");
-        messengerSocket.send(foodItemString); // Forward to main
-        zmqpp::message response;
-        logger.log("Waiting for response back from visionMain.");
-        messengerSocket.receive(response); // Wait for ack
-        std::string resp;
-        response >> resp;
-        if (resp != Messages::AFFIRMATIVE) {
-          LOG(FATAL) << "Error in sending food item to visionmain.";
+          zmqpp::message response;
+          if (heartbeatSocket.receive(response, true)) {
+            std::string reply;
+            response >> reply;
+            logger.log("Heartbeat acknowledged: " + reply);
+          }
+        } catch (const zmqpp::exception& e) {
+          logger.log("Heartbeat error: " + std::string(e.what()));
         }
-        logger.log("Response received.");
       }
+
+      std::this_thread::sleep_for(std::chrono::seconds(30));
     }
   });
+  thread.detach();
 }

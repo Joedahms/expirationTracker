@@ -115,3 +115,40 @@ std::string joinVector(const std::vector<std::string>& vec,
   }
   return oss.str();
 }
+
+std::string discoverServerViaUDP() {
+  int sockfd;
+  struct sockaddr_in serverAddr;
+  socklen_t addrLen = sizeof(serverAddr);
+  char buffer[1024] = {0};
+
+  // Create UDP socket
+  sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+  if (sockfd < 0) {
+    LOG(FATAL) << ("UDP socket creation failed");
+    return "";
+  }
+
+  // Enable broadcast mode
+  int broadcastEnable = 1;
+  setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &broadcastEnable, sizeof(broadcastEnable));
+
+  // Set destination address
+  memset(&serverAddr, 0, sizeof(serverAddr));
+  serverAddr.sin_family      = AF_INET;
+  serverAddr.sin_addr.s_addr = inet_addr(BROADCAST_IP);
+  serverAddr.sin_port        = htons(DISCOVERY_PORT);
+
+  // Send discovery request
+  std::string message = "DISCOVER_SERVER";
+  sendto(sockfd, message.c_str(), message.size(), 0, (struct sockaddr*)&serverAddr,
+         addrLen);
+
+  std::cout << "Discovery request sent, waiting for response..." << std::endl;
+
+  // Wait for response
+  recvfrom(sockfd, buffer, sizeof(buffer), 0, (struct sockaddr*)&serverAddr, &addrLen);
+  close(sockfd);
+
+  return std::string(buffer);
+}

@@ -8,6 +8,7 @@ import json
 from easyOCR import performOCR
 
 PORT = "5555" #zeroMQ port
+HEARTBEAT_PORT = "5556"
 DISCOVERY_PORT = 5005 # UDP discovery port
 
 def get_local_ip():

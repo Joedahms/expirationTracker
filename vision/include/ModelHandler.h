@@ -18,10 +18,9 @@ struct ClassifyObjectReturn {
 
 class ModelHandler {
 public:
-  ModelHandler(zmqpp::context&);
+  ModelHandler(zmqpp::context&, std::string&);
   ClassifyObjectReturn classifyObject(const std::filesystem::path&, FoodItem&);
   std::chrono::year_month_day extractExpirationDate(const std::string&);
-  std::string discoverServerViaUDP();
 
 private:
   Logger logger;
