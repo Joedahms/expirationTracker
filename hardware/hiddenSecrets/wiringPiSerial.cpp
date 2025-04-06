@@ -1,28 +1,30 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <wiringPi.h>
 #include <wiringSerial.h>
 
 int arduino_fd = -1; // File descriptor for the serial port
 
 // Initialize the serial connection to the Arduino
 void initSerialConnection(const char* device, int baudRate) {
-  arduino_fd = serialOpen(device, baudRate);
-  if (arduino_fd < 0) {
-    fprintf(stderr, "Error: Unable to open serial device %s\n", device);
-    exit(1);
+  if (arduino_fd = serialOpen(device, baudRate) < 0) {
+    fprintf(stderr, "Error: Unable to open serial device %s\n", strerror(errno));
+    return 1;
+  }
+  if (wiringPiSetup() == -1) {
+    fprintf(stderr, "Error: Unable to initialize wiringPi %s\n");
+    return 1;
   }
   serialFlush(arduino_fd);
-  printf("Serial connection established on %s at %d baud.\n", device, baudRate);
+  printf("Serial connection established on %s at %d baud.\n", strerror(errno));
 }
 
 // Send a single command byte to the Arduino and read its response.
 // 'command' is a value: 0=nothing, 1=get weight, 2=tare, 3=auto-calibrate.
 // 'responseBuffer' should be a preallocated array to store the response.
 // Returns the number of bytes received.
-int sendCommand(unsigned char command,
-                unsigned char* responseBuffer,
-                int maxResponseLength) {
+int sendCommand(int command, int* responseBuffer, int maxResponseLength) {
   // Send the command byte to the Arduino.
   serialPutchar(arduino_fd, command);
   // Optionally, wait a short time to allow the Arduino to process the command.
@@ -47,8 +49,8 @@ int main(void) {
   initSerialConnection(serialDevice, baud);
 
   // Send a command to get weight (command = 1)
-  unsigned char response[256] = {0};
-  int responseLength          = sendCommand(1, response, sizeof(response));
+  int response[256]  = {0};
+  int responseLength = sendCommand(1, response, sizeof(response));
 
   printf("Received %d bytes: ", responseLength);
   for (int i = 0; i < responseLength; i++) {
