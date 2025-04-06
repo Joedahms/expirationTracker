@@ -80,7 +80,11 @@ void ScrollBox::handleEventSelf(const SDL_Event& event) {
   }
 }
 
-void ScrollBox::renderSelf() const {}
+void ScrollBox::renderSelf() const {
+  if (this->hasBorder) {
+    renderBorder();
+  }
+}
 
 /**
  * Ensure that all panels have data consistent with what is in the database. Destroys all
