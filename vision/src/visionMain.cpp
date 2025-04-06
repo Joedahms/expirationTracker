@@ -179,7 +179,7 @@ void createHeartBeatThread(zmqpp::context& context,
         }
       }
 
-      std::this_thread::sleep_for(std::chrono::seconds(30));
+      std::this_thread::sleep_for(std::chrono::seconds(15));
     }
   });
   thread.detach();
