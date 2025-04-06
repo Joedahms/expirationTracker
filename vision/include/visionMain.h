@@ -16,5 +16,6 @@ constexpr int MAX_SERVER_RETRIES = 5;
 void visionEntry(zmqpp::context&, const ExternalEndpoints&);
 bool startPythonServer(const Logger&);
 bool startSignalCheck(zmqpp::socket&, const Logger&, FoodItem&, zmqpp::poller&);
-std::thread createListenerThread(zmqpp::context&, const Logger&, ImageProcessor&);
+std::thread createListenerThread(zmqpp::context&, ImageProcessor&);
+std::thread createHeartBeatThread(zmqpp::context&, std::atomic_bool&);
 #endif
