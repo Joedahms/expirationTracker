@@ -18,19 +18,16 @@
  * @param externalEndpoints Endpoints to the main components of the system (vision,
  * hardware, and display)
  * @return None
- *
- * TODO Add an infinite loop so that more than one food item can be scanned per
- * execution.
  */
 void hardwareEntry(zmqpp::context& context) {
   Logger logger("hardware_entry.txt");
   logger.log("Within hardware process");
-  // TODO - Add a function to initialize motor and weight sensor.
-  // TODO - Setup communication with Arduino for weight.
 
   Hardware hardware(context);
   bool startSignalReceived = false;
   int startSignalTimeoutMs = 1000;
+  hardware.initDC();
+  // TODO - Setup communication with Arduino for weight.
 
   while (1) {
     startSignalReceived = false;
@@ -45,6 +42,7 @@ void hardwareEntry(zmqpp::context& context) {
     logger.log("Received start signal from display");
     bool scanSuccessful = hardware.startScan();
 
+    // TODO - Add logic to tare weight sensor
     if (scanSuccessful) {
       logger.log("Scan successful");
     }
