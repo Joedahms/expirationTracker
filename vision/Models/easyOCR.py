@@ -185,7 +185,7 @@ def performOCR(image):
             for text in textResults:
                 classification = isPLUClass(text)
                 if classification:
-                    print(f"Detected PLU: {classification["value"]}.")
+                    print(f"Detected PLU: {classification['value']}.")
                     foodLabels.append(classification["value"])
                     result["Food Labels"] = foodLabels
                     return result
@@ -194,7 +194,7 @@ def performOCR(image):
         for text in textResults:
             classification = isFoodClass(text)
             if classification:
-                print(f"Detected food item: {classification["value"]}.")
+                print(f"Detected food item: {classification['value']}.")
                 foodLabels.append(classification["value"])
 
         # Extract expiration date

@@ -45,13 +45,13 @@ void Hardware::initDC() {
 
   this->logger.log("Motor System Initialization");
   // Setup DC Motor Driver Pins
-  pinMode(MOTOR_IN1, OUTPUT);
-  pinMode(MOTOR_IN2, OUTPUT);
+  pinMode(23, OUTPUT);
+  pinMode(24, OUTPUT);
   // Frequency and pulse break ratio can be configured
-  // pinMode(MOTOR_ENA, PWM_OUTPUT);
+  // pinMode(MOTOR_ENA, PWM_MS_OUTPUT);
 
-  digitalWrite(MOTOR_IN1, LOW);
-  digitalWrite(MOTOR_IN2, LOW);
+  digitalWrite(23, LOW);
+  digitalWrite(24, LOW);
   // pwmWrite(MOTOR_ENA, ###);
 
   this->logger.log("Motor System Initialized.");
@@ -254,7 +254,7 @@ void Hardware::rotateAndCapture() {
     }
 
     this->logger.log("Rotating platform");
-    rotateMotor();
+    rotateMotor(true);
 
     // Swap comment lines below if you don't want to wait on realistic motor rotation time
     // usleep(500);
