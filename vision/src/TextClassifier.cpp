@@ -3,7 +3,6 @@
 /**
  * @param context The zeroMQ context with which to creates with
  * @param textClassifierEndpoint Endpoint of the text classifier
- * @param pythonServerEndpoint Endpont of the python server
  */
 TextClassifier::TextClassifier(zmqpp::context& context,
                                const std::string& textClassifierEndpoint)
