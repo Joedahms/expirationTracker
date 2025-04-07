@@ -39,7 +39,7 @@ HX711 scale;
 
 // 400150.00 worked for the small setup I created.
 // Will need to be redone for the final "scale" created
-float calibrationFactor = 3300.00;
+float calibrationFactor = 420.00;
 float weight            = 0.0f;
 float prevWeight        = 0.0f;
 float epsilon           = 0.1f;
@@ -56,11 +56,12 @@ void setup() {
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
   scale.set_scale();
   scale.tare(); // Reset the scale to 0
-  scale.set_gain(64);
+  // scale.set_gain(64);
 
   // This can be used to remove the need to tare the scale.
   // Useful in permanent scale projects.
   zeroFactor = scale.read_average(); // Get a baseline reading
+  
 
   setupDone = true;
   Serial.println(setupDone);
@@ -77,10 +78,13 @@ void setup() {
  * @return item weight || -1 for no weight
  */
 void loop() {
+  measure();
+  Serial.println(weight);
+  delay(2000);
   if (Serial.available()) {
-    int command = Serial.read();
+    char command = Serial.read();
 
-    if (command == 1) {
+    if (command == '1') {
       bool itemRemoved = measure();
       if (count == 0) {
         weightThreshold = weight * epsilon;
@@ -100,7 +104,7 @@ void loop() {
       count++;
     }
 
-    else if (command == 2) {
+    else if (command == '2') {
       scale.set_offset(zeroFactor); // Auto-tare
 
       // Reset variables for new process
@@ -112,7 +116,7 @@ void loop() {
       Serial.println(confirm); // Notify Pi 5 of tare completion
     }
 
-    else if (command == 4) {
+    else if (command == '4') {
       bool noWeight = measure();
       Serial.println(noWeight); // Send weight to Pi 5
     }
@@ -126,10 +130,9 @@ void loop() {
  */
 bool measure() {
   if (setupDone && scale.is_ready()) {
-    scale.set_offset(zeroFactor);       // Auto-tare
     scale.set_scale(calibrationFactor); // Adjust to this calibration factor
 
-    weight = scale.get_value(20);
+    weight = scale.get_units(20);
 
     // Check if weight on scale was removed. Return true if less than 0.1lb (1.6oz)
     if (abs(weight) < 0.1f) {
