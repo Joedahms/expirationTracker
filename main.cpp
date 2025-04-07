@@ -13,6 +13,15 @@ int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
   zmqpp::context context;
 
+  bool usingMotor = true;
+  if (argc == 2) {
+    std::string arg1(argv[1]);
+    if (arg1 == "-nomo") {
+      usingMotor = false;
+      std::cout << "here" << std::endl;
+    }
+  }
+
   // Display
   LOG(INFO) << "Starting display process..";
   int displayPid;
@@ -41,7 +50,7 @@ int main(int argc, char* argv[]) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("hardware");
 
-    hardwareEntry(context);
+    hardwareEntry(context, usingMotor);
     LOG(INFO) << "Hardware process";
     return 0;
   }
