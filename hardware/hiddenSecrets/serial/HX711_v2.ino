@@ -32,25 +32,21 @@
 
 #include "HX711.h"
 
-#define LOADCELL_DOUT_PIN 3  // 6
-#define LOADCELL_SCK_PIN  2  // 7
-#define MOV_AVG_SAMPLES   30 // Number of samples read by the moving average algorithm
+#define LOADCELL_DOUT_PIN 3 // 6
+#define LOADCELL_SCK_PIN  2 // 7
 
 HX711 scale;
 
 // 400150.00 worked for the small setup I created.
 // Will need to be redone for the final "scale" created
 float calibrationFactor = 3300.00;
-float movingAverage     = 0.0f;
-float prevValue         = 0.0f;
-float epsilon           = 0.01f;
-float sum, prevSample, filteredWeight;
-long zero_factor, weight_threshold;
-bool setupDone = false;
-int count      = 0;
-
-float movingAverageSamples[MOV_AVG_SAMPLES];
-float exponentialSumming(float data, bool reset);
+float weight            = 0.0f;
+float prevWeight        = 0.0f;
+float epsilon           = 0.1f;
+bool setupDone          = false;
+int count               = 0;
+int errCount            = 0;
+long zeroFactor, weightThreshold;
 
 void setup() {
   Serial.begin(9600);
@@ -64,89 +60,82 @@ void setup() {
 
   // This can be used to remove the need to tare the scale.
   // Useful in permanent scale projects.
-  zero_factor = scale.read_average(); // Get a baseline reading
+  zeroFactor = scale.read_average(); // Get a baseline reading
 
-  for (int i = 0; i < MOV_AVG_SAMPLES; i++) {
-    movingAverageSamples[i] = 0; // initializing the array
-  }
-
-  Serial.write((byte*) &zero_factor, sizeof(zero_factor));
   setupDone = true;
+  Serial.println(setupDone);
 }
 
+/**
+ * Main function that acts as a switch for bidirectional commmunication.
+ * When the process initiates, the first reading is used for a +-10% threshold.
+ *
+ * Pi 5 sends a:
+ * @param 1 -> request for weight
+ * @param 2 -> request for tare, notify of end of process
+ * @param 4 -> request for process start
+ * @return item weight || -1 for no weight
+ */
 void loop() {
   if (Serial.available()) {
-    int command - Serial.read();
-    if (command == 2) {
+    int command = Serial.read();
+
+    if (command == 1) {
       bool itemRemoved = measure();
       if (count == 0) {
-        weight_threshold =
-            (abs(exponentialSumming(movingAverage, 0)) - zero_factor) * .10;
+        weightThreshold = weight * epsilon;
       }
-      count++;
+
       if (!itemRemoved) {
-        filteredWeight = exponentialSumming(&movingAverage, 0);
-        Serial.write((byte*)&filteredWeight, sizeof(filteredWeight));
+        Serial.println(weight); // Send weight to Pi 5
       }
       else {
-        Serial.write(-1, sizeof(-1)); // Send -1 to indicate item removed
+        errcount++;
+        if (errCount = 2) {
+          int removed = -1;
+          Serial.println(removed); // signal; no weight on scale
+        }
       }
+      prevWeight = weight; // Could be used to check for weight drift
+      count++;
     }
+
+    else if (command == 2) {
+      scale.set_offset(zeroFactor); // Auto-tare
+
+      // Reset variables for new process
+      count        = 0;
+      errCount     = 0;
+      weight       = 0.0f;
+      prevWeight   = 0.0f;
+      bool confirm = true;
+      Serial.println(confirm); // Notify Pi 5 of tare completion
+    }
+
     else if (command == 4) {
-      scale.tare();
-      long item_factor = scale.read_average();
-      if (abs(item_factor - zero_factor) > weight_threshold) {
-        scale.set_scale(calibrationFactor);
-      }
-    }
-    else if (command == 1) {
-      setup();
+      bool noWeight = measure();
+      Serial.println(noWeight); // Send weight to Pi 5
     }
   }
 }
 
-// This function is used to measure the weight on the scale
+/**
+ * This function is used to measure the weight on the scale.
+ * Reads 20 values in and takes their average.
+ * get_value() returns: average - OFFSET (zeroFactor)
+ */
 bool measure() {
   if (setupDone && scale.is_ready()) {
+    scale.set_offset(zeroFactor);       // Auto-tare
     scale.set_scale(calibrationFactor); // Adjust to this calibration factor
 
-    // Shifting samples the moving average is looking at
-    for (int i = 0; i < MOV_AVG_SAMPLES - 1; i++) {
-      movingAverageSamples[i] = movingAverageSamples[i + 1];
-    }
-    // Gaining next sample
-    movingAverageSamples[MOV_AVG_SAMPLES - 1] = scale.get_units();
-    sum                                       = 0;
-    // Determining the average value
-    for (int i = 0; i < MOV_AVG_SAMPLES; i++) {
-      sum += movingAverageSamples[i];
-      movingAverage = sum / MOV_AVG_SAMPLES;
-    }
+    weight = scale.get_value(20);
 
-    // weight on scale was removed
-    if (abs(exponentialSumming(movingAverage, 0)) >=
-        (abs(exponentialSumming(movingAverage, 0)) - prevSample) * epsilon) {
+    // Check if weight on scale was removed. Return true if less than 0.1lb (1.6oz)
+    if (abs(weight) < 0.1f) {
       return true;
     }
-    else {
-      prevSample = abs(exponentialSumming(movingAverage, 0));
-    }
+
     return false;
   }
-}
-
-// implementing a moving exponential average filter
-float exponentialSumming(float data, bool reset) {
-  float smoothingFactor, currentValue;
-  smoothingFactor = 0.4;
-
-  if (reset) {
-    prevValue = 0;
-    return 0;
-  }
-
-  currentValue = prevValue + smoothingFactor * (data - prevValue);
-  prevValue    = currentValue;
-
-  return currentValue;
 }
