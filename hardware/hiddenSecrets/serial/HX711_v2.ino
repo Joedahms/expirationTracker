@@ -61,7 +61,7 @@ void setup() {
   // This can be used to remove the need to tare the scale.
   // Useful in permanent scale projects.
   zeroFactor = scale.read_average(); // Get a baseline reading
-  setupDone = true;
+  setupDone  = true;
   Serial.println(setupDone);
 }
 
@@ -118,8 +118,8 @@ void loop() {
     }
 
     else if (command == '4') {
-      bool noWeight = measure();
-      Serial.println(noWeight); // signal 1 = no weight 0 = weight
+      bool isWeight = measure();
+      Serial.println(isWeight); // signal 1 = weight present 0 = no weight
     }
   }
 }

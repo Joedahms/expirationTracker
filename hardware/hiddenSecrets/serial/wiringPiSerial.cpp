@@ -25,45 +25,75 @@ int initSerialConnection(const char* device, int baudRate) {
   return 0;
 }
 
-// Send a single integer command (1 byte) and read the response
-float sendCommandForFloat(int command) {
-  serialFlush(arduino_fd);
-  serialPutchar(arduino_fd, (unsigned char)command); // Send raw byte
-  usleep(100000); // Wait 100ms for response
-
-  unsigned char raw[4];
-  int i = 0;
-
-  int timeout = 100; // 100 x 1ms = 100ms max wait
-  while (i < 4 && timeout--) {
+int readLineFromArduino(char* buffer, int maxLen) {
+  int i       = 0;
+  int timeout = 1000; // 1000 ms timeout
+  while (i < maxLen - 1 && timeout--) {
     if (serialDataAvail(arduino_fd)) {
-      raw[i++] = serialGetchar(arduino_fd);
-    } else {
-      usleep(1000); // Wait 1ms
+      char c = serialGetchar(arduino_fd);
+      if (c == '\n')
+        break;
+      buffer[i++] = c;
+    }
+    else {
+      usleep(1000); // 1 ms wait
     }
   }
-
-  float result;
-  memcpy(&result, raw, sizeof(float));
-  return result;
+  buffer[i] = '\0';
+  return i;
 }
 
 int main(void) {
   const char* serialDevice = "/dev/ttyUSB0";
-  int baud = 9600;
+  int baud                 = 9600;
 
   if (initSerialConnection(serialDevice, baud) != 0)
     return 1;
 
-  printf("Sending integer 1 to initialize Arduino...\n");
-  serialPutchar(arduino_fd, 1); // Send setup command
-  usleep(100000); // Optional wait
+  char input[10];
+  char response[64];
 
-  sleep(1); // Delay before measurement
+  printf("Command Menu:\n");
+  printf(" 1 = get weight\n 2 = tare/end\n 4 = confirm presence\n q = quit\n");
 
-  printf("Sending integer 2 to request weight...\n");
-  float weight = sendCommandForFloat(2);
-  printf("Weight: %.2f\n", weight);
+  while (1) {
+    printf("Enter command: ");
+    fflush(stdout);
+    if (!fgets(input, sizeof(input), stdin)) {
+      break;
+    }
+    input[strcspn(input, "\n")] = 0;
+
+    if (strcmp(input, "q") == 0 || strcmp(input, "Q") == 0) {
+      printf("Exiting...\n");
+      break;
+    }
+
+    if (strcmp(input, "1") == 0) {
+      printf("Sending command '1' (get weight)...\n");
+      serialPutchar(arduino_fd, '1');
+      readLineFromArduino(response, sizeof(response));
+      float weight = atof(response);
+      printf("Received weight: %.2f\n", weight);
+    }
+    else if (strcmp(input, "2") == 0) {
+      printf("Sending command '2' (tare/end)...\n");
+      serialPutchar(arduino_fd, '2');
+      readLineFromArduino(response, sizeof(response));
+      bool success = atoi(response);
+      printf("Tare result: %s\n", success ? "OK" : "Failed");
+    }
+    else if (strcmp(input, "4") == 0) {
+      printf("Sending command '4' (confirm presence)...\n");
+      serialPutchar(arduino_fd, '4');
+      readLineFromArduino(response, sizeof(response));
+      bool present = atoi(response);
+      printf("Weight detected: %s\n", present ? "YES" : "NO");
+    }
+    else {
+      printf("Unknown command. Try 1, 2, 4, or q.\n");
+    }
+  }
 
   serialClose(arduino_fd);
   return 0;
