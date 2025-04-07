@@ -34,10 +34,18 @@ Text::Text(struct DisplayGlobal displayGlobal,
                    &this->boundaryRectangle.h);
 }
 
-Text::~Text() { TTF_CloseFont(this->font); }
+Text::~Text() {
+  SDL_DestroyTexture(this->texture);
+  TTF_CloseFont(this->font);
+}
 
 void Text::setContent(const std::string& content) {
   this->content = content;
+
+  if (this->texture) {
+    SDL_DestroyTexture(this->texture);
+    this->texture = nullptr;
+  }
 
   SDL_Surface* textSurface =
       TTF_RenderText_Solid(this->font, this->content.c_str(), this->color);

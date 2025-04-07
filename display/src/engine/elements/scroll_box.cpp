@@ -58,6 +58,12 @@ void ScrollBox::updateSelf() {
   }
 }
 
+void ScrollBox::renderSelf() const {
+  if (this->hasBorder) {
+    renderBorder();
+  }
+}
+
 /**
  * Check if the scrollbox is hovered. If it is hovered and the event is a mousewheel
  * event, scroll the panels up or down accordingly.
@@ -66,75 +72,21 @@ void ScrollBox::updateSelf() {
  * @return None
  */
 void ScrollBox::handleEventSelf(const SDL_Event& event) {
-  if (checkMouseHovered() == false) {
-    return;
-  }
+  switch (event.type) {
+  case SDL_MOUSEBUTTONDOWN:
+    handleMouseDown();
+    break;
 
-  if (event.type == SDL_MOUSEWHEEL) {
-    if (event.wheel.y > 0) {
-      scrollUp();
-    }
-    else if (event.wheel.y < 0) {
-      scrollDown();
-    }
-  }
-}
+  case SDL_MOUSEMOTION:
+    handleMouseMotion(event);
+    break;
 
-void ScrollBox::renderSelf() const {}
+  case SDL_MOUSEBUTTONUP:
+    handleMouseUp();
+    break;
 
-/**
- * Ensure that all panels have data consistent with what is in the database. Destroys all
- * panels and makes new ones.
- *
- * @param None
- * @return None
- */
-void ScrollBox::refreshPanels() {
-  // std::vector<FoodItem> allFoodItems = readAllFoodItems();
-  std::vector<FoodItem> allFoodItems = readAllFoodItemsSorted(this->sortMethod);
-
-  this->children.clear();
-  SDL_Rect boundaryRectangle = {0, topPanelPosition, 0, this->panelHeight};
-
-  for (auto& foodItem : allFoodItems) {
-    std::unique_ptr<Panel> newPanel = std::make_unique<Panel>(
-        this->displayGlobal, boundaryRectangle, foodItem.getId(), this->logFile);
-    boundaryRectangle.y += panelHeight;
-
-    newPanel->addFoodItem(foodItem, SDL_Point{0, 0});
-    int borderThickness = 1;
-    newPanel->addBorder(borderThickness);
-    addElement(std::move(newPanel));
-  }
-}
-
-/**
- * Move all panels within the scroll box up. Scroll amount is hardcoded.
- *
- * @param None
- * @return None
- */
-void ScrollBox::scrollUp() {
-  topPanelPosition -= this->scrollAmount;
-  for (auto& currPanel : this->children) {
-    SDL_Point currPanelRelativePosition = currPanel->getPositionRelativeToParent();
-    currPanelRelativePosition.y -= this->scrollAmount;
-    currPanel->setPositionRelativeToParent(currPanelRelativePosition);
-  }
-}
-
-/**
- * Move all panels within the scroll box down. Scroll amount is hardcoded.
- *
- * @param None
- * @return None
- */
-void ScrollBox::scrollDown() {
-  topPanelPosition += this->scrollAmount;
-  for (auto& currPanel : this->children) {
-    SDL_Point currPanelRelativePosition = currPanel->getPositionRelativeToParent();
-    currPanelRelativePosition.y += this->scrollAmount;
-    currPanel->setPositionRelativeToParent(currPanelRelativePosition);
+  default:
+    break;
   }
 }
 
@@ -154,3 +106,82 @@ void ScrollBox::setSortMethod(SortMethod sortMethod) {
 
   refreshPanels();
 }
+
+/**
+ * Ensure that all panels have data consistent with what is in the database. Destroys all
+ * panels and makes new ones.
+ *
+ * @param None
+ * @return None
+ */
+void ScrollBox::refreshPanels() {
+  std::vector<FoodItem> allFoodItems = readAllFoodItemsSorted(this->sortMethod);
+
+  this->children.clear();
+  SDL_Rect boundaryRectangle = {0, topPanelPosition, 0, this->panelHeight};
+
+  for (auto& foodItem : allFoodItems) {
+    std::shared_ptr<Panel> newPanel = std::make_shared<Panel>(
+        this->displayGlobal, boundaryRectangle, foodItem.getId(), this->logFile);
+    boundaryRectangle.y += panelHeight;
+
+    newPanel->addFoodItem(foodItem, SDL_Point{0, 0});
+    int borderThickness = 1;
+    newPanel->addBorder(borderThickness);
+    addElement(std::move(newPanel));
+  }
+}
+
+/**
+ * Move all panels up or down by the scroll amount. Zero out scroll amount so that it does
+ * not grow unbounded.
+ *
+ * @param None
+ * @return None
+ */
+void ScrollBox::scroll() {
+  topPanelPosition += this->scrollAmount;
+  for (auto& currPanel : this->children) {
+    SDL_Point currPanelRelativePosition = currPanel->getPositionRelativeToParent();
+    currPanelRelativePosition.y += this->scrollAmount;
+    currPanel->setPositionRelativeToParent(currPanelRelativePosition);
+  }
+  this->scrollAmount = 0;
+}
+
+/**
+ * SDL_MOUSEBUTTONDOWN
+ *
+ * @param None
+ * @return None
+ */
+void ScrollBox::handleMouseDown() {
+  if (checkMouseHovered() == false) {
+    return;
+  }
+  this->held = true;
+}
+
+/**
+ * SDL_MOUSEMOTION
+ *
+ * @param The SDL_MOUSEMOTION event to handle
+ * @return None
+ */
+void ScrollBox::handleMouseMotion(const SDL_Event& event) {
+  if (this->held) {
+    this->scrollAmount += event.motion.y - this->previousMotion.y;
+    scroll();
+    this->previousMotion.y = event.motion.y;
+  }
+
+  this->previousMotion.y = event.motion.y;
+}
+
+/**
+ * SDL_MOUSEBUTTONUP
+ *
+ * @param None
+ * @return None
+ */
+void ScrollBox::handleMouseUp() { this->held = false; }

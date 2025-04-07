@@ -6,6 +6,10 @@
 #include "../../endpoints.h"
 #include "../../logger.h"
 
+#define MOTOR_IN1 23 // GPIO Pin for L298N IN1
+#define MOTOR_IN2 24 // GPIO Pin for L298N IN2
+#define MOTOR_ENA 18 // GPIO Pin forL298N enable (PWM Speed Control)
+
 // TODO Figure out a better way to represent the photo path
 //
 // There is the constant below IMAGE_DIRECTORY but ../images/temp is also
@@ -16,6 +20,7 @@ class Hardware {
 public:
   Hardware(zmqpp::context& context);
 
+  void initDC();
   bool checkStartSignal(int timeoutMs);
   void sendStartToVision();
   bool startScan();
@@ -34,6 +39,7 @@ private:
   bool checkWeight();
   void rotateAndCapture();
   bool takePhotos(int angle);
+  void rotateMotor(bool clockwise);
   bool capturePhoto(int angle);
 };
 

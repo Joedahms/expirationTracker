@@ -1,5 +1,7 @@
 #include <filesystem>
 #include <glog/logging.h>
+#include <unistd.h>
+#include <wiringPi.h>
 
 #include "../../endpoints.h"
 #include "../../food_item.h"
@@ -32,7 +34,30 @@ Hardware::Hardware(zmqpp::context& context)
   }
 }
 
-/*
+/**
+ * Initializes GPIO and sensors.
+ *
+ * @return None
+ */
+void Hardware::initDC() {
+  // Uses BCM numbering of the GPIOs and directly accesses the GPIO registers.
+  wiringPiSetupPinType(WPI_PIN_BCM);
+
+  this->logger.log("Motor System Initialization");
+  // Setup DC Motor Driver Pins
+  pinMode(23, OUTPUT);
+  pinMode(24, OUTPUT);
+  // Frequency and pulse break ratio can be configured
+  // pinMode(MOTOR_ENA, PWM_MS_OUTPUT);
+
+  digitalWrite(23, LOW);
+  digitalWrite(24, LOW);
+  // pwmWrite(MOTOR_ENA, ###);
+
+  this->logger.log("Motor System Initialized.");
+}
+
+/**
  * Checks for a start signal from the display. Return if have not received a message by
  * the timeout.
  *
@@ -43,6 +68,18 @@ bool Hardware::checkStartSignal(int timeoutMs) {
   bool receivedRequest = false;
   this->logger.log("Checking for start signal from display");
 
+  /*
+  this->logger.log("Checking weight");
+  if (checkWeight() == false) {
+    // TODO handle no weight on platform
+    // Send error to display
+    // Possible pattern HW error msg -> Display message with 3 options:
+    // 1. Retry 2. Skip/Override 3. Cancel
+    // Response from Display will then decide action
+    this->logger.log("No weight detected on platform");
+    return false;
+  }
+*/
   try {
     zmqpp::poller poller;
     poller.add(this->replySocket);
@@ -105,7 +142,7 @@ bool Hardware::checkStartSignal(int timeoutMs) {
   }
 }
 
-/*
+/**
  * Sends the photo directory and weight data to the AI Vision system.
  *
  * @param weight The weight of the object on the platform.
@@ -146,14 +183,6 @@ void Hardware::sendStartToVision() {
  *
  * TODO Handle no weight on platform
  */
-/*
- * Function call to controls routine:
- * Checks weight
- * weight = ~0 -> error to Display
- * weight = +int -> start scan
- *
- * @return bool
- * */
 bool Hardware::startScan() {
   this->logger.log("Starting scan");
 
@@ -194,7 +223,7 @@ bool Hardware::checkWeight() {
   return true;
 }
 
-/*
+/**
  * Rotates platform in 45-degree increments, captures images, and sends the
  * data to the AI Vision system until a full 360-degree rotation is complete.
  * The process can be stopped early if AI Vision sends a "STOP" signal
@@ -219,17 +248,22 @@ void Hardware::rotateAndCapture() {
     //   this->logger.log("Error taking a photo");
     // }
 
-    // Initiate scan
+    // Initiate image scanning on server
     if (angle == 0) {
       sendStartToVision();
     }
 
     this->logger.log("Rotating platform");
-    // TODO rotateMotor();
+    rotateMotor(true);
 
     // Swap comment lines below if you don't want to wait on realistic motor rotation time
     // usleep(500);
     sleep(3);
+
+    // Last iteration doensn't need to check signal
+    if (angle == 7) {
+      return;
+    }
 
     this->logger.log("Checking for stop signal from vision");
     bool receivedStopSignal = false;
@@ -243,8 +277,6 @@ void Hardware::rotateAndCapture() {
         receivedStopSignal = true;
       }
       else {
-        // Could skip receivedStopSignal and this else statement and just break if "item
-        // identified"
         this->logger.log("Received other from vision");
         this->replySocket.send(Messages::RETRANSMIT);
       }
@@ -257,7 +289,7 @@ void Hardware::rotateAndCapture() {
   }
 }
 
-/*
+/**
  * Takes two photos, one top & side, saves them to the image directory, and logs
  * Note: current "top camera" is ribbon port closer to USB
  *
@@ -288,7 +320,39 @@ bool Hardware::takePhotos(int angle) {
   return true;
 }
 
-/*
+/**
+ * Controls platform rotation with L298N motor driver.
+ * Rotates for a fixed duration.
+ * Timing will need to be adjusted.
+ * HIGH,LOW == forward LOW,HIGH == backwards
+ * @param clockwise Boolean; true for clockwise, false for counterclockwise
+ *
+ * @return None
+ */
+// likely needs to be updated after testing to confirm direction
+void Hardware::rotateMotor(bool clockwise) {
+  if (clockwise) {
+    this->logger.log("Rotating clockwise.");
+    digitalWrite(MOTOR_IN1, HIGH);
+    digitalWrite(MOTOR_IN2, LOW);
+    // pwmWrite(MOTOR_ENA, 255); // Adjust speed
+    usleep(1875000); // Rotate duration
+    digitalWrite(MOTOR_IN1, LOW);
+    digitalWrite(MOTOR_IN2, LOW); // HIGH,HIGH || LOW,LOW == off
+  }
+  else {
+    this->logger.log("Rotating counter-clockwise.");
+    digitalWrite(MOTOR_IN1, LOW);
+    digitalWrite(MOTOR_IN2, HIGH);
+    // pwmWrite(MOTOR_ENA, 255);
+    usleep(1875000);
+    digitalWrite(MOTOR_IN1, LOW);
+    digitalWrite(MOTOR_IN2, LOW);
+  }
+  LOG(INFO) << "Rotation complete.";
+}
+
+/**
  * Test Function
  * Captures a photo at the given angle and saves it to the image directory
  *
