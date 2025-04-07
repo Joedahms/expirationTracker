@@ -66,35 +66,31 @@ void ScrollBox::updateSelf() {
  * @return None
  */
 void ScrollBox::handleEventSelf(const SDL_Event& event) {
-  if (event.type == SDL_MOUSEBUTTONDOWN) {
+  switch (event.type) {
+  case SDL_MOUSEBUTTONDOWN:
     if (checkMouseHovered() == false) {
       return;
     }
-
     this->held = true;
-  }
-  else if (event.type == SDL_MOUSEMOTION) {
+    break;
+
+  case SDL_MOUSEMOTION:
     if (this->held) {
       this->scrollAmount += event.motion.y - this->previousMotion.y;
       scroll();
       this->previousMotion.y = event.motion.y;
     }
-    this->previousMotion.y = event.motion.y;
-  }
-  else if (event.type == SDL_MOUSEBUTTONUP) {
-    this->held = false;
-  }
 
-  /*
-  if (event.type == SDL_MOUSEWHEEL) {
-    if (event.wheel.y > 0) {
-      scrollUp();
-    }
-    else if (event.wheel.y < 0) {
-      scrollDown();
-    }
+    this->previousMotion.y = event.motion.y;
+    break;
+
+  case SDL_MOUSEBUTTONUP:
+    this->held = false;
+    break;
+
+  default:
+    break;
   }
-  */
 }
 
 void ScrollBox::renderSelf() const {
