@@ -66,10 +66,23 @@ void ScrollBox::updateSelf() {
  * @return None
  */
 void ScrollBox::handleEventSelf(const SDL_Event& event) {
-  if (checkMouseHovered() == false) {
-    return;
+  if (event.type == SDL_MOUSEBUTTONDOWN) {
+    if (checkMouseHovered() == false) {
+      return;
+    }
+
+    this->held = true;
+  }
+  else if (event.type == SDL_MOUSEMOTION) {
+    if (this->held) {
+      scroll(event.motion.y);
+    }
+  }
+  else if (event.type == SDL_MOUSEBUTTONUP) {
+    this->held = false;
   }
 
+  /*
   if (event.type == SDL_MOUSEWHEEL) {
     if (event.wheel.y > 0) {
       scrollUp();
@@ -78,6 +91,7 @@ void ScrollBox::handleEventSelf(const SDL_Event& event) {
       scrollDown();
     }
   }
+  */
 }
 
 void ScrollBox::renderSelf() const {
@@ -108,6 +122,15 @@ void ScrollBox::refreshPanels() {
     int borderThickness = 1;
     newPanel->addBorder(borderThickness);
     addElement(std::move(newPanel));
+  }
+}
+
+void ScrollBox::scroll(int yMotion) {
+  topPanelPosition += yMotion;
+  for (auto& currPanel : this->children) {
+    SDL_Point currPanelRelativePosition = currPanel->getPositionRelativeToParent();
+    currPanelRelativePosition.y += yMotion;
+    currPanel->setPositionRelativeToParent(currPanelRelativePosition);
   }
 }
 

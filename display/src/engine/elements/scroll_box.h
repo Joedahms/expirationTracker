@@ -36,12 +36,15 @@ private:
   void refreshPanels();
   void scrollUp();
   void scrollDown();
+  void scroll(int yMotion);
 
   int panelHeight;
   int topPanelPosition = 0;
   int scrollAmount     = 4;
 
   SortMethod sortMethod = SortMethod::LOW_TO_HIGH;
+
+  //  SDL_Point previousMotion = {0, 0};
 };
 
 #endif
