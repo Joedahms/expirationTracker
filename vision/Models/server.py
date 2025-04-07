@@ -12,7 +12,7 @@ PORT = "5555" #zeroMQ port
 HEARTBEAT_PORT = "5556"
 DISCOVERY_PORT = 5005 # UDP discovery port
 
-def get_local_ip():
+def getlocalip():
     """Get the actual network IP of this machine (not 127.0.0.1)."""
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -24,9 +24,9 @@ def get_local_ip():
         print(f"Failed to get local IP: {e}")
         return "127.0.0.1"
 
-def wait_for_pi_discovery():
+def waitforpidiscovery():
     """Wait for a Raspberry Pi discovery request, then send the IP."""
-    server_ip = get_local_ip()
+    server_ip = getlocalip()
     print(f"Waiting for Raspberry Pi discovery on UDP {DISCOVERY_PORT}...")
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -45,8 +45,8 @@ def wait_for_pi_discovery():
         except Exception as e:
             print(f"UDP error: {e}")
 
-def run_server():
-    wait_for_pi_discovery()  # Wait for Raspberry Pi discovery
+def runserver():
+    waitforpidiscovery()  # Wait for Raspberry Pi discovery
     ADDRESS = f"tcp://0.0.0.0:{PORT}"  # Bind ZeroMQ to communicate with Pi
     HEARTBEAT_ADDRESS = f"tcp://0.0.0.0:{HEARTBEAT_PORT}"
 
@@ -64,7 +64,7 @@ def run_server():
     poller = zmq.Poller()
     poller.register(socket, zmq.POLLIN)
 
-    last_heartbeat_time = time.time()
+    lastheartbeattime = time.time()
 
     try:
         while True:
@@ -74,17 +74,17 @@ def run_server():
 
             if socket in socks and socks[socket] == zmq.POLLIN:
                 # Receive image data (blocking receive)
-                msg_parts = socket.recv_multipart()  
+                messageparts = socket.recv_multipart()  
                 try:
                     print(f"Request received!")
-                    img_size = struct.unpack("Q", msg_parts[0])[0]
-                    img_data = msg_parts[1]
+                    imagesize = struct.unpack("Q", messageparts[0])[0]
+                    imagedata = messageparts[1]
 
-                    print(f"Image is {img_size} bytes!")
+                    print(f"Image is {imagesize} bytes!")
 
                     print(f"Decoding image.")
                     # Decode image
-                    image = cv2.imdecode(np.frombuffer(img_data, dtype=np.uint8), cv2.IMREAD_COLOR)
+                    image = cv2.imdecode(np.frombuffer(imagedata, dtype=np.uint8), cv2.IMREAD_COLOR)
                     if image is None:
                         print("Error: Failed to decode image.")
                         socket.send_string("ERROR: Image decoding failed")
@@ -101,21 +101,21 @@ def run_server():
                     print(f"Sent response: {result}")
 
                     # Reset heartbeat timer after processing completes
-                    last_heartbeat_time = time.time()
+                    lastheartbeattime = time.time()
                 except Exception as e:
                     print(f"Processing error: {e}")
                     socket.send_string("ERROR: Exception during processing")
             else:
                 try:
-                    msg = hearbeatsocket.recv_string(flags=zmq.NOBLOCK)
-                    if msg == "heartbeat":
+                    heartbeatmessage = hearbeatsocket.recv_string(flags=zmq.NOBLOCK)
+                    if heartbeatmessage == "heartbeat":
                         print("Received heartbeat")
                         hearbeatsocket.send_string("alive")
-                        last_heartbeat_time = time.time()
+                        lastheartbeattime = time.time()
                 except zmq.Again:
                     pass  # No heartbeat received
 
-                if time.time() - last_heartbeat_time > 20:
+                if time.time() - lastheartbeattime > 20:
                     print("No heartbeat received for 20 seconds while idle. Restarting server...")
                     break
     except KeyboardInterrupt:
@@ -129,6 +129,6 @@ def run_server():
 
 if __name__ == "__main__":
     while True:
-        run_server()
+        runserver()
         print("restarting server...")
         time.sleep(2)
