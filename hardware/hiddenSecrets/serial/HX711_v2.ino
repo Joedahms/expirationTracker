@@ -90,7 +90,7 @@ void loop() {
         Serial.println(weight); // Send weight to Pi 5
       }
       else {
-        errcount++;
+        errCount++;
         if (errCount = 2) {
           int removed = -1;
           Serial.println(removed); // signal; no weight on scale
