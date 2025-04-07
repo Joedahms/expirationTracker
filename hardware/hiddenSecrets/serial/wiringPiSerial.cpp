@@ -34,9 +34,12 @@ float sendCommandForFloat(int command) {
   unsigned char raw[4];
   int i = 0;
 
-  while (i < 4) {
+  int timeout = 100; // 100 x 1ms = 100ms max wait
+  while (i < 4 && timeout--) {
     if (serialDataAvail(arduino_fd)) {
       raw[i++] = serialGetchar(arduino_fd);
+    } else {
+      usleep(1000); // Wait 1ms
     }
   }
 
