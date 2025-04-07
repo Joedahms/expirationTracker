@@ -44,7 +44,7 @@ int readLineFromArduino(char* buffer, int maxLen) {
 }
 
 int main(void) {
-  const char* serialDevice = "/dev/ttyUSB0";
+  const char* serialDevice = "/dev/ttyACM0";
   int baud                 = 9600;
 
   if (initSerialConnection(serialDevice, baud) != 0)
