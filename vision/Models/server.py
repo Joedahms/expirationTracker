@@ -116,7 +116,7 @@ def run_server():
                     pass  # No heartbeat received
 
                 if time.time() - last_heartbeat_time > 20:
-                    print("No heartbeat received for 30 seconds while idle. Restarting server...")
+                    print("No heartbeat received for 20 seconds while idle. Restarting server...")
                     break
     except KeyboardInterrupt:
         print("Server interrupted")
