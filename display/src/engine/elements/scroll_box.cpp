@@ -75,8 +75,11 @@ void ScrollBox::handleEventSelf(const SDL_Event& event) {
   }
   else if (event.type == SDL_MOUSEMOTION) {
     if (this->held) {
-      scroll(event.motion.y);
+      this->scrollAmount += event.motion.y - this->previousMotion.y;
+      scroll();
+      this->previousMotion.y = event.motion.y;
     }
+    this->previousMotion.y = event.motion.y;
   }
   else if (event.type == SDL_MOUSEBUTTONUP) {
     this->held = false;
@@ -125,13 +128,14 @@ void ScrollBox::refreshPanels() {
   }
 }
 
-void ScrollBox::scroll(int yMotion) {
-  topPanelPosition += yMotion;
+void ScrollBox::scroll() {
+  topPanelPosition += this->scrollAmount;
   for (auto& currPanel : this->children) {
     SDL_Point currPanelRelativePosition = currPanel->getPositionRelativeToParent();
-    currPanelRelativePosition.y += yMotion;
+    currPanelRelativePosition.y += this->scrollAmount;
     currPanel->setPositionRelativeToParent(currPanelRelativePosition);
   }
+  this->scrollAmount = 0;
 }
 
 /**
