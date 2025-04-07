@@ -78,18 +78,17 @@ void setup() {
 void loop() {
   if (Serial.available()) {
     int command - Serial.read();
-    if (command == 1) {
-      setup();
-    }
-    else if (command == 2) {
+    if (command == 2) {
       bool itemRemoved = measure();
       if (count == 0) {
-        weight_threshold = (abs(exponentialSumming(movingAverage, 0)) - zero_factor) * .10;
+        weight_threshold =
+            (abs(exponentialSumming(movingAverage, 0)) - zero_factor) * .10;
       }
       count++;
       if (!itemRemoved) {
         Serial.print(exponentialSumming(movingAverage, 0), 4);
-      } else {
+      }
+      else {
         Serial.print(-1);
       }
     }
@@ -99,6 +98,9 @@ void loop() {
       if (abs(item_factor - zero_factor) > weight_threshold) {
         scale.set_scale(calibrationFactor);
       }
+    }
+    else if (command == 1) {
+      setup();
     }
   }
 }
