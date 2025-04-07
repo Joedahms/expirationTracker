@@ -61,8 +61,6 @@ void setup() {
   // This can be used to remove the need to tare the scale.
   // Useful in permanent scale projects.
   zeroFactor = scale.read_average(); // Get a baseline reading
-  
-
   setupDone = true;
   Serial.println(setupDone);
 }
@@ -74,13 +72,16 @@ void setup() {
  * Pi 5 sends a:
  * @param 1 -> request for weight
  * @param 2 -> request for tare, notify of end of process
- * @param 4 -> request for process start
- * @return item weight || -1 for no weight
+ * @param 4 -> request for process start confimation
+ * @return 1 -> item weight || -1 for no weight
+ * @return 2 -> 1 for confimation of tare
+ * @return 4 -> 1 for no weight || 0 for weight
  */
 void loop() {
-  measure();
-  Serial.println(weight);
-  delay(2000);
+  // // For easier calibration
+  // measure();
+  // Serial.println(weight);
+  // delay(2000);
   if (Serial.available()) {
     char command = Serial.read();
 
@@ -118,7 +119,7 @@ void loop() {
 
     else if (command == '4') {
       bool noWeight = measure();
-      Serial.println(noWeight); // Send weight to Pi 5
+      Serial.println(noWeight); // signal 1 = no weight 0 = weight
     }
   }
 }
@@ -130,6 +131,8 @@ void loop() {
  */
 bool measure() {
   if (setupDone && scale.is_ready()) {
+    scale.set_offset(zeroFactor); // Auto-tare
+    delay(2);
     scale.set_scale(calibrationFactor); // Adjust to this calibration factor
 
     weight = scale.get_units(20);
