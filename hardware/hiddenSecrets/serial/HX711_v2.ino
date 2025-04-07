@@ -137,8 +137,8 @@ bool measure() {
 
     weight = scale.get_units(20);
 
-    // Check if weight on scale was removed. Return true if less than 0.1lb (1.6oz)
-    if (abs(weight) < 0.1f) {
+    // Check if weight on scale was removed. Return true if less than 0.15lb (2.4oz)
+    if (abs(weight) < 0.15f) {
       return true;
     }
 
