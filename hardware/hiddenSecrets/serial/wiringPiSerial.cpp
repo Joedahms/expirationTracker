@@ -1,62 +1,67 @@
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <wiringPi.h>
 #include <wiringSerial.h>
 
-int arduino_fd = -1; // File descriptor for the serial port
+int arduino_fd = -1;
 
-// Initialize the serial connection to the Arduino
-void initSerialConnection(const char* device, int baudRate) {
-  if (arduino_fd = serialOpen(device, baudRate) < 0) {
-    fprintf(stderr, "Error: Unable to open serial device %s\n", strerror(errno));
+int initSerialConnection(const char* device, int baudRate) {
+  arduino_fd = serialOpen(device, baudRate);
+  if (arduino_fd < 0) {
+    fprintf(stderr, "Error: Unable to open serial device: %s\n", strerror(errno));
     return 1;
   }
+
   if (wiringPiSetup() == -1) {
-    fprintf(stderr, "Error: Unable to initialize wiringPi %s\n");
+    fprintf(stderr, "Error: Unable to initialize wiringPi\n");
     return 1;
   }
+
   serialFlush(arduino_fd);
-  printf("Serial connection established on %s at %d baud.\n", strerror(errno));
+  printf("Serial connection established on %s at %d baud.\n", device, baudRate);
+  return 0;
 }
 
-// Send a single command byte to the Arduino and read its response.
-// 'command' is a value: 0=nothing, 1=get weight, 2=tare, 3=auto-calibrate.
-// 'responseBuffer' should be a preallocated array to store the response.
-// Returns the number of bytes received.
-int sendCommand(int command, int* responseBuffer, int maxResponseLength) {
-  // Send the command byte to the Arduino.
-  serialPutchar(arduino_fd, command);
-  // Optionally, wait a short time to allow the Arduino to process the command.
-  usleep(10000); // 10 ms delay
+// Send a single integer command (1 byte) and read the response
+float sendCommandForFloat(int command) {
+  serialFlush(arduino_fd);
+  serialPutchar(arduino_fd, (unsigned char)command); // Send raw byte
+  usleep(100000); // Wait 100ms for response
 
-  int bytesRead = 0;
-  // Read available bytes (the response could be more than one byte)
-  while (serialDataAvail(arduino_fd) > 0 && bytesRead < maxResponseLength) {
-    int c = serialGetchar(arduino_fd);
-    if (c < 0)
-      break;
-    responseBuffer[bytesRead++] = (unsigned char)c;
+  unsigned char raw[4];
+  int i = 0;
+
+  while (i < 4) {
+    if (serialDataAvail(arduino_fd)) {
+      raw[i++] = serialGetchar(arduino_fd);
+    }
   }
-  return bytesRead;
+
+  float result;
+  memcpy(&result, raw, sizeof(float));
+  return result;
 }
 
-// Example usage
 int main(void) {
   const char* serialDevice = "/dev/ttyUSB0";
-  // Adjust as needed for your setup.
-  int baud = 9600; // Use the baud rate set on your Arduino.
-  initSerialConnection(serialDevice, baud);
+  int baud = 9600;
 
-  // Send a command to get weight (command = 1)
-  int response[256]  = {0};
-  int responseLength = sendCommand(1, response, sizeof(response));
+  if (initSerialConnection(serialDevice, baud) != 0)
+    return 1;
 
-  printf("Received %d bytes: ", responseLength);
-  for (int i = 0; i < responseLength; i++) {
-    printf("%02X ", response[i]);
-  }
-  printf("\n");
+  printf("Sending integer 1 to initialize Arduino...\n");
+  serialPutchar(arduino_fd, 1); // Send setup command
+  usleep(100000); // Optional wait
+
+  sleep(1); // Delay before measurement
+
+  printf("Sending integer 2 to request weight...\n");
+  float weight = sendCommandForFloat(2);
+  printf("Weight: %.2f\n", weight);
+
   serialClose(arduino_fd);
   return 0;
 }

@@ -1,4 +1,3 @@
-
 /*
  Example using the SparkFun HX711 breakout board with a scale
  By: Nathan Seidle
@@ -45,7 +44,7 @@ float calibrationFactor = 3300.00;
 float movingAverage     = 0.0f;
 float prevValue         = 0.0f;
 float epsilon           = 0.01f;
-float sum, prevSample;
+float sum, prevSample, filteredWeight;
 long zero_factor, weight_threshold;
 bool setupDone = false;
 int count      = 0;
@@ -71,7 +70,7 @@ void setup() {
     movingAverageSamples[i] = 0; // initializing the array
   }
 
-  Serial.println(zero_factor);
+  Serial.write((byte*) &zero_factor, sizeof(zero_factor));
   setupDone = true;
 }
 
@@ -86,10 +85,11 @@ void loop() {
       }
       count++;
       if (!itemRemoved) {
-        Serial.print(exponentialSumming(movingAverage, 0), 4);
+        filteredWeight = exponentialSumming(&movingAverage, 0);
+        Serial.write((byte*)&filteredWeight, sizeof(filteredWeight));
       }
       else {
-        Serial.print(-1);
+        Serial.write(-1, sizeof(-1)); // Send -1 to indicate item removed
       }
     }
     else if (command == 4) {
