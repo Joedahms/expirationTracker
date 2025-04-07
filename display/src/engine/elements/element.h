@@ -66,6 +66,10 @@ public:
   bool getFixed();
   bool getScreenBoundX();
   bool getScreenBoundY();
+  bool getHasCollided();
+  void setFixed(bool fixed);
+  void setCanCollide(bool canCollide);
+  void setCollisionFixed(bool collisionFixed);
 
 private:
   void centerVertical();

@@ -98,25 +98,36 @@ void Scanning::update() {
   std::vector<SDL_Rect> boundaryRectangles = getBoundaryRectangles();
   this->rootElement->checkCollision(boundaryRectangles);
 
+  if (this->birdPtr->getHasCollided()) {
+    this->birdPtr->setVelocity(Velocity{0, 0});
+    for (const auto& obstaclePair : this->obstaclePairs) {
+      obstaclePair->setVelocity(Velocity{0, 0});
+    }
+  }
+
   SDL_Rect birdRect = this->birdPtr->getBoundaryRectangle();
   for (const auto& obstaclePair : this->obstaclePairs) {
     if (obstaclePair->scored) {
       continue;
     }
-    // get gap top and bottom
-    SDL_Rect topRect    = obstaclePair->getTopObstacleRect();
-    SDL_Rect bottomRect = obstaclePair->getBottomObstacleRect();
-
     SDL_Rect obstaclePairRect = obstaclePair->getBoundaryRectangle();
+    SDL_Rect topRect          = obstaclePair->getTopObstacleRect();
+    SDL_Rect bottomRect       = obstaclePair->getBottomObstacleRect();
+
+    /*
     if (birdRect.x >= obstaclePairRect.x) {
-      if (birdRect.y < topRect.y) {
-        if (birdRect.y + birdRect.h > bottomRect.y) {
+      std::cout << "x good" << std::endl;
+      if (birdRect.y > topRect.y + topRect.h) {
+        std::cout << "below top" << std::endl;
+        if (birdRect.y + birdRect.h < bottomRect.y) {
+          std::cout << "above bottom" << std::endl;
           this->score++;
           obstaclePair->scored = true;
           std::cout << "score: " << this->score << std::endl;
         }
       }
     }
+    */
   }
 }
 

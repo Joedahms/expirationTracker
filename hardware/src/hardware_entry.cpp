@@ -26,6 +26,7 @@ void hardwareEntry(zmqpp::context& context, bool usingMotor) {
   Hardware hardware(context);
   bool startSignalReceived = false;
   int startSignalTimeoutMs = 1000;
+
   if (usingMotor) {
     hardware.initDC();
   }

@@ -350,3 +350,13 @@ void Element::fixCollision(const SDL_Point overlap, const SDL_Rect boundaryRecta
     updatePosition();
   }
 }
+
+bool Element::getHasCollided() { return this->hasCollided; }
+
+void Element::setFixed(bool fixed) { this->fixed = fixed; }
+
+void Element::setCanCollide(bool canCollide) { this->canCollide = canCollide; }
+
+void Element::setCollisionFixed(bool collisionFixed) {
+  this->collisionFixed = collisionFixed;
+}
