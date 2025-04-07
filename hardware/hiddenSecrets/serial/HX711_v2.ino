@@ -7,14 +7,14 @@
  License: This code is public domain but you buy me a beer if you use this and we meet
  someday (Beerware license).
 
- This is the calibration sketch. Use it to determine the calibration_factor that the main
+ This is the calibration sketch. Use it to determine the calibrationFactor that the main
  example uses. It also outputs the zero_factor useful for projects that have a permanent
  mass on the scale in between power cycles.
 
  Setup your scale and start the sketch WITHOUT a weight on the scale
  Once readings are displayed place the weight on the scale
- Press +/- or a/z to adjust the calibration_factor until the output readings match the
- known weight Use this calibration_factor on the example sketch
+ Press +/- or a/z to adjust the calibrationFactor until the output readings match the
+ known weight Use this calibrationFactor on the example sketch
 
  This example assumes pounds (lbs). If you prefer kilograms, change the Serial.print("
  lbs"); line to kg. The calibration factor will be significantly different but it will be
@@ -39,106 +39,102 @@
 
 HX711 scale;
 
-float calibration_factor =
-    3300.00; // 400150.00 worked for the small setup I created. Will need to be redone for
-             // the final "scale" created
-float movingAverageSamples[MOV_AVG_SAMPLES];
-float sum, movingAverage = 0, prevValue = 0.0f, prevSample;
-float epsilon = 0.01;
-int count     = 0;
+// 400150.00 worked for the small setup I created.
+// Will need to be redone for the final "scale" created
+float calibrationFactor = 3300.00;
+float movingAverage     = 0.0f;
+float prevValue         = 0.0f;
+float epsilon           = 0.01f;
+float sum, prevSample;
+long zero_factor, weight_threshold;
+bool setupDone = false;
+int count      = 0;
 
+float movingAverageSamples[MOV_AVG_SAMPLES];
 float exponentialSumming(float data, bool reset);
 
 void setup() {
   Serial.begin(9600);
-  Serial.println("HX711 calibration sketch");
-  Serial.println("Remove all weight from scale");
-  Serial.println("After readings begin, place known weight on scale");
-  Serial.println("Press + or a to increase calibration factor");
-  Serial.println("Press - or z to decrease calibration factor");
-
+  // wait for serial port to connect. Needed for native USB port only
+  while (!Serial) {
+  };
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
   scale.set_scale();
   scale.tare(); // Reset the scale to 0
   scale.set_gain(64);
 
-  long zero_factor = scale.read_average(); // Get a baseline reading
-  Serial.print("Zero factor: "); // This can be used to remove the need to tare the scale.
-                                 // Useful in permanent scale projects.
-  Serial.println(zero_factor);
+  // This can be used to remove the need to tare the scale.
+  // Useful in permanent scale projects.
+  zero_factor = scale.read_average(); // Get a baseline reading
 
-  for (int i = 0; i < MOV_AVG_SAMPLES; i++)
+  for (int i = 0; i < MOV_AVG_SAMPLES; i++) {
     movingAverageSamples[i] = 0; // initializing the array
+  }
+
+  Serial.println(zero_factor);
+  setupDone = true;
 }
 
 void loop() {
-  scale.set_scale(calibration_factor); // Adjust to this calibration factor
-
-  for (int i = 0; i < MOV_AVG_SAMPLES - 1;
-       i++) // Shifting samples the moving average is looking at
-    movingAverageSamples[i] = movingAverageSamples[i + 1];
-
-  movingAverageSamples[MOV_AVG_SAMPLES - 1] = scale.get_units(); // Gaining next sample
-  sum                                       = 0;
-
-  for (int i = 0; i < MOV_AVG_SAMPLES; i++) { // Determining the average value
-    sum += movingAverageSamples[i];
-    movingAverage = sum / MOV_AVG_SAMPLES;
-  }
-
-  // if (count % 5 == 0)
-  // prevSample = abs(scale.get_units());
-
-  if (count == 3) { // will check if weight is on scale every 20 iterations
-    if (abs(exponentialSumming(movingAverage, 0)) >=
-        abs(exponentialSumming(movingAverage, 0)) -
-            (prevSample * epsilon)) { // weight on scale was removed
-      // if (abs(exponentialSumming(movingAverage, 0)) - prevSample >=  epsilon) {
-      Serial.print("\nTaring scale...\n");
-      scale.tare();
-    }
-    else if (exponentialSumming(movingAverage, 0) <= 0) {
-      Serial.print("\nTaring scale...\n");
-      scale.tare();
-    }
-    else
-      count = 0;
-  }
-  else
-    prevSample = abs(exponentialSumming(movingAverage, 0));
-
-  count++;
-
-  Serial.print("Reading: ");
-  Serial.print(exponentialSumming(movingAverage, 0), 4);
-  Serial.print(
-      " kg (moving exp average)"); // Change this to kg and re-adjust the calibration
-                                   // factor if you follow SI units like a sane person
-  // Serial.print(" calibration_factor: ");
-  // Serial.print(calibration_factor);
-  // Serial.print(", ");
-  // Serial.print(movingAverage, 4);
-  // Serial.print(" kg (moving average)");
-  Serial.println();
-
   if (Serial.available()) {
-    char temp = Serial.read();
-    if (temp == '+' || temp == 'a')
-      calibration_factor += 10;
-    else if (temp == '-' || temp == 'z')
-      calibration_factor -= 100;
-    else if (temp == 'r') {
+    int command - Serial.read();
+    if (command == 1) {
+      setup();
+    }
+    else if (command == 2) {
+      bool itemRemoved = measure();
+      if (count == 0) {
+        weight_threshold = (abs(exponentialSumming(movingAverage, 0)) - zero_factor) * .10;
+      }
+      count++;
+      if (!itemRemoved) {
+        Serial.print(exponentialSumming(movingAverage, 0), 4);
+      } else {
+        Serial.print(-1);
+      }
+    }
+    else if (command == 4) {
       scale.tare();
-      exponentialSumming(0, 1);
+      long item_factor = scale.read_average();
+      if (abs(item_factor - zero_factor) > weight_threshold) {
+        scale.set_scale(calibrationFactor);
+      }
     }
   }
-
-  // delay(1000);
 }
 
-float exponentialSumming(float data,
-                         bool reset) { // implementing a moving exponential average filter
+// This function is used to measure the weight on the scale
+bool measure() {
+  if (setupDone && scale.is_ready()) {
+    scale.set_scale(calibrationFactor); // Adjust to this calibration factor
 
+    // Shifting samples the moving average is looking at
+    for (int i = 0; i < MOV_AVG_SAMPLES - 1; i++) {
+      movingAverageSamples[i] = movingAverageSamples[i + 1];
+    }
+    // Gaining next sample
+    movingAverageSamples[MOV_AVG_SAMPLES - 1] = scale.get_units();
+    sum                                       = 0;
+    // Determining the average value
+    for (int i = 0; i < MOV_AVG_SAMPLES; i++) {
+      sum += movingAverageSamples[i];
+      movingAverage = sum / MOV_AVG_SAMPLES;
+    }
+
+    // weight on scale was removed
+    if (abs(exponentialSumming(movingAverage, 0)) >=
+        (abs(exponentialSumming(movingAverage, 0)) - prevSample) * epsilon) {
+      return true;
+    }
+    else {
+      prevSample = abs(exponentialSumming(movingAverage, 0));
+    }
+    return false;
+  }
+}
+
+// implementing a moving exponential average filter
+float exponentialSumming(float data, bool reset) {
   float smoothingFactor, currentValue;
   smoothingFactor = 0.4;
 
