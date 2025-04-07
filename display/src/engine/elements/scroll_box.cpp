@@ -58,6 +58,12 @@ void ScrollBox::updateSelf() {
   }
 }
 
+void ScrollBox::renderSelf() const {
+  if (this->hasBorder) {
+    renderBorder();
+  }
+}
+
 /**
  * Check if the scrollbox is hovered. If it is hovered and the event is a mousewheel
  * event, scroll the panels up or down accordingly.
@@ -68,24 +74,15 @@ void ScrollBox::updateSelf() {
 void ScrollBox::handleEventSelf(const SDL_Event& event) {
   switch (event.type) {
   case SDL_MOUSEBUTTONDOWN:
-    if (checkMouseHovered() == false) {
-      return;
-    }
-    this->held = true;
+    handleMouseDown();
     break;
 
   case SDL_MOUSEMOTION:
-    if (this->held) {
-      this->scrollAmount += event.motion.y - this->previousMotion.y;
-      scroll();
-      this->previousMotion.y = event.motion.y;
-    }
-
-    this->previousMotion.y = event.motion.y;
+    handleMouseMotion(event);
     break;
 
   case SDL_MOUSEBUTTONUP:
-    this->held = false;
+    handleMouseUp();
     break;
 
   default:
@@ -93,10 +90,21 @@ void ScrollBox::handleEventSelf(const SDL_Event& event) {
   }
 }
 
-void ScrollBox::renderSelf() const {
-  if (this->hasBorder) {
-    renderBorder();
+void ScrollBox::setSortMethod(SortMethod sortMethod) {
+  switch (sortMethod) {
+  case SortMethod::LOW_TO_HIGH:
+    this->sortMethod = SortMethod::LOW_TO_HIGH;
+    this->logger->log("Scrollbox sort method changed to low to high");
+    break;
+  case SortMethod::HIGH_TO_LOW:
+    this->sortMethod = SortMethod::HIGH_TO_LOW;
+    this->logger->log("Scrollbox sort method changed to high to low");
+    break;
+  default:
+    LOG(FATAL) << "Attempt to set sort method to invalid method";
   }
+
+  refreshPanels();
 }
 
 /**
@@ -124,6 +132,13 @@ void ScrollBox::refreshPanels() {
   }
 }
 
+/**
+ * Move all panels up or down by the scroll amount. Zero out scroll amount so that it does
+ * not grow unbounded.
+ *
+ * @param None
+ * @return None
+ */
 void ScrollBox::scroll() {
   topPanelPosition += this->scrollAmount;
   for (auto& currPanel : this->children) {
@@ -135,48 +150,38 @@ void ScrollBox::scroll() {
 }
 
 /**
- * Move all panels within the scroll box up. Scroll amount is hardcoded.
+ * SDL_MOUSEBUTTONDOWN
  *
  * @param None
  * @return None
  */
-void ScrollBox::scrollUp() {
-  topPanelPosition -= this->scrollAmount;
-  for (auto& currPanel : this->children) {
-    SDL_Point currPanelRelativePosition = currPanel->getPositionRelativeToParent();
-    currPanelRelativePosition.y -= this->scrollAmount;
-    currPanel->setPositionRelativeToParent(currPanelRelativePosition);
+void ScrollBox::handleMouseDown() {
+  if (checkMouseHovered() == false) {
+    return;
   }
+  this->held = true;
 }
 
 /**
- * Move all panels within the scroll box down. Scroll amount is hardcoded.
+ * SDL_MOUSEMOTION
+ *
+ * @param The SDL_MOUSEMOTION event to handle
+ * @return None
+ */
+void ScrollBox::handleMouseMotion(const SDL_Event& event) {
+  if (this->held) {
+    this->scrollAmount += event.motion.y - this->previousMotion.y;
+    scroll();
+    this->previousMotion.y = event.motion.y;
+  }
+
+  this->previousMotion.y = event.motion.y;
+}
+
+/**
+ * SDL_MOUSEBUTTONUP
  *
  * @param None
  * @return None
  */
-void ScrollBox::scrollDown() {
-  topPanelPosition += this->scrollAmount;
-  for (auto& currPanel : this->children) {
-    SDL_Point currPanelRelativePosition = currPanel->getPositionRelativeToParent();
-    currPanelRelativePosition.y += this->scrollAmount;
-    currPanel->setPositionRelativeToParent(currPanelRelativePosition);
-  }
-}
-
-void ScrollBox::setSortMethod(SortMethod sortMethod) {
-  switch (sortMethod) {
-  case SortMethod::LOW_TO_HIGH:
-    this->sortMethod = SortMethod::LOW_TO_HIGH;
-    this->logger->log("Scrollbox sort method changed to low to high");
-    break;
-  case SortMethod::HIGH_TO_LOW:
-    this->sortMethod = SortMethod::HIGH_TO_LOW;
-    this->logger->log("Scrollbox sort method changed to high to low");
-    break;
-  default:
-    LOG(FATAL) << "Attempt to set sort method to invalid method";
-  }
-
-  refreshPanels();
-}
+void ScrollBox::handleMouseUp() { this->held = false; }
