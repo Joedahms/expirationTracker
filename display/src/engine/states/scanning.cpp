@@ -103,11 +103,19 @@ void Scanning::update() {
     if (obstaclePair->scored) {
       continue;
     }
+    // get gap top and bottom
+    SDL_Rect topRect    = obstaclePair->getTopObstacleRect();
+    SDL_Rect bottomRect = obstaclePair->getBottomObstacleRect();
+
     SDL_Rect obstaclePairRect = obstaclePair->getBoundaryRectangle();
     if (birdRect.x >= obstaclePairRect.x) {
-      this->score++;
-      obstaclePair->scored = true;
-      std::cout << "score: " << this->score << std::endl;
+      if (birdRect.y < topRect.y) {
+        if (birdRect.y + birdRect.h > bottomRect.y) {
+          this->score++;
+          obstaclePair->scored = true;
+          std::cout << "score: " << this->score << std::endl;
+        }
+      }
     }
   }
 }

@@ -5,13 +5,16 @@
 
 class ObstaclePair : public CompositeElement {
 public:
+  bool scored = false;
+
   ObstaclePair(struct DisplayGlobal displayGlobal,
                const SDL_Rect& boundaryRectangle,
                int windowWidth,
                int respawnOffset,
                std::string logFile);
 
-  bool scored = false;
+  SDL_Rect getTopObstacleRect();
+  SDL_Rect getBottomObstacleRect();
 
 private:
   const int windowWidth;

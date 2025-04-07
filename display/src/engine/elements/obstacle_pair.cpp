@@ -30,6 +30,16 @@ ObstaclePair::ObstaclePair(DisplayGlobal displayGlobal,
   this->logger->log("Obstacle pair constructed");
 }
 
+SDL_Rect ObstaclePair::getTopObstacleRect() {
+  SDL_Rect rect = this->children[0]->getBoundaryRectangle();
+  return rect;
+}
+
+SDL_Rect ObstaclePair::getBottomObstacleRect() {
+  SDL_Rect rect = this->children[1]->getBoundaryRectangle();
+  return rect;
+}
+
 /**
  * Randomize how long the top and bottom pipes are.
  *
