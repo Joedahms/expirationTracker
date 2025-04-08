@@ -16,23 +16,13 @@ void visionEntry(zmqpp::context& context) {
   zmqpp::socket replySocket(context, zmqpp::socket_type::reply);
   replySocket.bind(VisionExternalEndpoints::visionMainEndpoint);
 
-  std::string serverIP         = discoverServerViaUDP(logger);
-  std::string serverAddress    = "";
-  std::string heartbeatAddress = "";
-  if (!serverIP.empty()) {
-    std::cout << "Discovered Server IP: " << serverIP << std::endl;
-    serverAddress    = "tcp://" + serverIP + ":" + std::to_string(ZEROMQPORT);
-    heartbeatAddress = "tcp://" + serverIP + ":" + std::to_string(ZEROMQHEARTBEATPORT);
-  }
-  else {
-    LOG(FATAL) << "Failed to find server address.";
-  }
+  ServerAddress addresses = connectToServer(logger);
 
-  ImageProcessor processor(context, serverAddress);
+  ImageProcessor processor(context, addresses.serverAddress);
   std::atomic_bool isProcessing{false};
 
   createListenerThread(context, processor);
-  createHeartBeatThread(context, isProcessing, heartbeatAddress);
+  createHeartBeatThread(context, isProcessing, addresses.heartbeatAddress);
 
   zmqpp::poller poller;
   poller.add(replySocket);
@@ -186,4 +176,28 @@ void createHeartBeatThread(zmqpp::context& context,
   thread.detach();
 }
 
-bool connectToServer(const Logger&) {}
+ServerAddress connectToServer(const Logger& logger) {
+  logger.log("in connectToServer");
+  std::filesystem::path path = "../vision/Config.h";
+  Config cfg                 = loadConfig(path);
+  ServerAddress addresses{"", ""};
+  std::string serverIP = "";
+
+  if (cfg.useEthernet) {
+    logger.log("Loading ethernet IP");
+    serverIP = getEthernetIP(logger);
+  }
+  else {
+    logger.log("Attempting server broadcast");
+    serverIP = discoverServerViaUDP(logger);
+  }
+  if (!serverIP.empty()) {
+    logger.log("Discovered Server IP: " + serverIP);
+    addresses.serverAddress = "tcp://" + serverIP + ":" + std::to_string(cfg.serverPort);
+    addresses.heartbeatAddress =
+        "tcp://" + serverIP + ":" + std::to_string(cfg.heartbeatPort);
+  }
+  else {
+    LOG(FATAL) << "Failed to find server address.";
+  }
+}
