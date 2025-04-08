@@ -1,6 +1,7 @@
 #ifndef HELPER_FUNCTIONS_H
 #define HELPER_FUNCTIONS_H
 
+#include "../../logger.h"
 #include <algorithm>
 #include <arpa/inet.h>
 #include <filesystem>
@@ -26,7 +27,7 @@ std::string cleanText(const std::string&);
 std::string removePrefix(const std::string&, const std::string&);
 std::string joinVector(const std::vector<std::string>&, const std::string&);
 std::string discoverServerViaUDP(const Logger&);
-std::string getEthernetIP(const Logger&);
+std::string getEthernetIP(const std::string&, const Logger&);
 Config loadConfig(const std::filesystem::path&);
 
 #endif
