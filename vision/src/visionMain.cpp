@@ -178,7 +178,7 @@ void createHeartBeatThread(zmqpp::context& context,
 
 ServerAddress connectToServer(const Logger& logger) {
   logger.log("in connectToServer");
-  std::filesystem::path path = "../vision/Config.h";
+  std::filesystem::path path = "../vision/config.json";
   Config cfg                 = loadConfig(path);
   ServerAddress addresses{"", ""};
   std::string serverIP = "";
