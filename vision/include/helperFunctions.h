@@ -15,10 +15,8 @@
 #include "../../endpoints.h"
 #include "config.h"
 
-#define BROADCAST_IP        "255.255.255.255"
-#define ZEROMQPORT          5555
-#define ZEROMQHEARTBEATPORT 5556
-#define DISCOVERY_PORT      5005
+#define BROADCAST_IP   "255.255.255.255"
+#define DISCOVERY_PORT 5005
 
 bool isValidDirectory(const std::filesystem::path&);
 bool hasFiles(const std::filesystem::path&);
