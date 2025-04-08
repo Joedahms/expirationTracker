@@ -1,3 +1,9 @@
+/**
+ * Author: Geromy Cunningham
+ * Date: 07 APR 2025
+ * Raspberry Pi 5 HX711 Custom Scale for bilateral communication with Arduino
+ */
+
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
