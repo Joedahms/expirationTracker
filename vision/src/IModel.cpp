@@ -41,5 +41,6 @@ std::string IModel::taskTypeToString(const TaskType& taskType) const {
 }
 
 void IModel::connectToServer(std::string& serverAddress) {
+  logger.log("Binding to: " + serverAddress);
   this->requestSocket.connect(serverAddress);
 }

@@ -21,13 +21,13 @@ void visionEntry(zmqpp::context& context) {
   ImageProcessor processor(context, addresses.serverAddress);
   std::atomic_bool isProcessing{false};
 
+  processor.notifyServer(NotifyServerConstants::connected);
+
   createListenerThread(context, processor);
   createHeartBeatThread(context, isProcessing, addresses.heartbeatAddress);
 
   zmqpp::poller poller;
   poller.add(replySocket);
-
-  processor.notifyServer(NotifyServerConstants::connected);
 
   while (1) {
     FoodItem foodItem;
