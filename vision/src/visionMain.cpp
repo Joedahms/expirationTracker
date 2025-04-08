@@ -193,7 +193,7 @@ ServerAddress connectToServer(const Logger& logger) {
   }
   if (!serverIP.empty()) {
     logger.log("Discovered Server IP: " + serverIP);
-    std::cout << "Discovered Server IP: " + serverIP;
+    std::cout << "Discovered Server IP: " + serverIP << std::endl;
     addresses.serverAddress = "tcp://" + serverIP + ":" + std::to_string(cfg.serverPort);
     addresses.heartbeatAddress =
         "tcp://" + serverIP + ":" + std::to_string(cfg.heartbeatPort);
