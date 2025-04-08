@@ -173,3 +173,14 @@ std::string getEthernetIP(const std::string& interfaceName) {
   freeifaddrs(ifaddr);
   return ip;
 }
+
+Config loadConfig(const std::filesystem::path& path) {
+  std::ifstream f(path);
+  nlohmann::json data = nlohmann::json::parse(f);
+
+  Config cfg;
+  cfg.serverPort  = data["network"]["serverPort"];
+  cfg.serverPort  = data["network"]["serverPort"];
+  cfg.useEthernet = data["network"]["useEthernet"];
+  return cfg;
+}

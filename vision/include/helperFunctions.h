@@ -4,13 +4,16 @@
 #include <algorithm>
 #include <arpa/inet.h>
 #include <filesystem>
+#include <fstream>
 #include <glog/logging.h>
 #include <ifaddrs.h>
 #include <iostream>
+#include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
 
 #include "../../endpoints.h"
+#include "config.h"
 
 #define BROADCAST_IP        "255.255.255.255"
 #define ZEROMQPORT          5555
@@ -26,5 +29,6 @@ std::string removePrefix(const std::string&, const std::string&);
 std::string joinVector(const std::vector<std::string>&, const std::string&);
 std::string discoverServerViaUDP(const Logger&);
 std::string getEthernetIP(const Logger&);
+Config loadConfig(const std::filesystem::path&);
 
 #endif
