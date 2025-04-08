@@ -2,6 +2,6 @@
     "network": {
         "serverPort": 5555,
         "heartbeatPort": 5556,
-        "useEthernet": false
+        "useEthernet": true
     }
 }
