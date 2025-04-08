@@ -21,8 +21,8 @@ void visionEntry(zmqpp::context& context) {
   std::string heartbeatAddress = "";
   if (!serverIP.empty()) {
     std::cout << "Discovered Server IP: " << serverIP << std::endl;
-    serverAddress    = "tcp://" + serverIP + ":" + std::to_string(zeroMQPort);
-    heartbeatAddress = "tcp://" + serverIP + ":" + std::to_string(zeroMQHeartbeatPort);
+    serverAddress    = "tcp://" + serverIP + ":" + std::to_string(ZEROMQPORT);
+    heartbeatAddress = "tcp://" + serverIP + ":" + std::to_string(ZEROMQHEARTBEATPORT);
   }
   else {
     LOG(FATAL) << "Failed to find server address.";
