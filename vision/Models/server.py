@@ -115,8 +115,8 @@ def runserver():
                 except zmq.Again:
                     pass  # No heartbeat received
 
-                if time.time() - lastHeartbeatTime > 2:
-                    print("No heartbeat received for 1 seconds while idle. Restarting server...")
+                if time.time() - lastHeartbeatTime > 3:
+                    print("No heartbeat received for 3 seconds while idle. Restarting server...")
                     break
     except KeyboardInterrupt:
         print("Server interrupted")
