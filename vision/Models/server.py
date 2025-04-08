@@ -11,7 +11,7 @@ from easyOCR import performOCR
 DISCOVERY_PORT = 5005 # UDP discovery port
 
 def loadConfig():
-    config_path = os.path.join(os.path.dirname(__file__), "../vision/config.json")
+    config_path = os.path.join(os.path.dirname(__file__), "../config.json")
     with open(config_path, "r") as f:
         return json.load(f)
 
