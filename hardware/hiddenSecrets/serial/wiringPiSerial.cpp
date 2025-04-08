@@ -43,6 +43,15 @@ int readLineFromArduino(char* buffer, int maxLen) {
   return i;
 }
 
+/**
+ * Pi 5 sends a:
+ * @param 1 -> request for weight
+ * @param 2 -> request for tare, notify of end of process
+ * @param 4 -> request for process start confimation
+ * @return 1 -> item weight || -1 for no weight
+ * @return 2 -> 1 for confimation of tare
+ * @return 4 -> 1 for no weight || 0 for weight
+ */
 int main(void) {
   const char* serialDevice = "/dev/ttyACM0";
   int baud                 = 9600;

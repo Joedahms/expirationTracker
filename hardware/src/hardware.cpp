@@ -1,10 +1,3 @@
-#include <filesystem>
-#include <glog/logging.h>
-#include <unistd.h>
-#include <wiringPi.h>
-
-#include "../../endpoints.h"
-#include "../../food_item.h"
 #include "hardware.h"
 
 /**
@@ -58,6 +51,31 @@ void Hardware::initDC() {
 }
 
 /**
+ * Initializes the serial connection to the Arduino.
+ *
+ * @param device The serial device to connect to (e.g., "/dev/ttyACM0").
+ * @param baudRate The baud rate for the serial connection (e.g., 9600).
+ * @return 0 on success, 1 on failure.
+ */
+int Hardware::initSerialConnection(const char* device, int baudRate) {
+  arduino_fd = serialOpen(device, baudRate);
+  this->logger.log("Attempting to open serial device: " + std::string(device));
+  if (arduino_fd < 0) {
+    this->logger.log("Error: Unable to open serial device " + std::string(device));
+    return 1;
+  }
+
+  if (wiringPiSetup() == -1) {
+    this->logger.log("Error: Unable to initialize wiringPi");
+    return 1;
+  }
+
+  serialFlush(arduino_fd);
+  this->logger.log("Serial device opened successfully: " + std::string(device));
+  return 0;
+}
+
+/**
  * Checks for a start signal from the display. Return if have not received a message by
  * the timeout.
  *
@@ -68,18 +86,6 @@ bool Hardware::checkStartSignal(int timeoutMs) {
   bool receivedRequest = false;
   this->logger.log("Checking for start signal from display");
 
-  /*
-  this->logger.log("Checking weight");
-  if (checkWeight() == false) {
-    // TODO handle no weight on platform
-    // Send error to display
-    // Possible pattern HW error msg -> Display message with 3 options:
-    // 1. Retry 2. Skip/Override 3. Cancel
-    // Response from Display will then decide action
-    this->logger.log("No weight detected on platform");
-    return false;
-  }
-*/
   try {
     zmqpp::poller poller;
     poller.add(this->replySocket);
@@ -94,7 +100,7 @@ bool Hardware::checkStartSignal(int timeoutMs) {
 
           this->logger.log("Received start signal from display, checking weight");
 
-          nonzeroWeight = checkWeight();
+          nonzeroWeight = (bool)hardware.sendCommand('4');
           if (nonzeroWeight == false) {
             this->logger.log("Informing display that no weight detected on plaform");
             this->replySocket.send(Messages::ZERO_WEIGHT);
@@ -206,21 +212,80 @@ bool Hardware::startScan() {
 }
 
 /**
- * Read from the weight sensor to get the weight of an object on the platform.
+ * Reads a line from the Arduino serial port.
  *
- * @param None
- * @return True if non zero weight. False if zero weight.
- *
- * TODO 1. setup zmqpp with Arduino
- *      2. integrate code to check weight from Arduino Read from weight sensor
+ * @param buffer The buffer to store the read line.
+ * @param maxLen The maximum length of the buffer.
+ * @return The number of characters read.
  */
-bool Hardware::checkWeight() {
-  this->itemWeight = 0; // set to 0 for testing
-  if (this->itemWeight <= 0) {
-    // May need to adjust up because the scale is likely sensitive to vibrations
-    return false;
+int Hardware::readLineFromArduino(char* buffer, int maxLen) {
+  int i       = 0;
+  int timeout = 1000; // 1000 ms timeout
+  this->logger.log("Reading line from Arduino");
+  while (i < maxLen - 1 && timeout--) {
+    if (serialDataAvail(arduino_fd)) {
+      char c = serialGetchar(arduino_fd);
+      if (c == '\n')
+        break;
+      buffer[i++] = c;
+    }
+    else {
+      usleep(1000); // 1 ms wait
+    }
   }
-  return true;
+  buffer[i] = '\0';
+  this->logger.log("Read line from Arduino: " + std::string(buffer));
+  return i;
+}
+
+/**
+ * Sends a command to the Arduino and reads the response.
+ *
+ * @param commandChar The command character to send.
+ *  Pi 5 sends a:
+ *  @param 1 -> request for weight
+ *  @param 2 -> request for tare, notify of end of process
+ *  @param 4 -> request for process start confimation
+ * Arduino responds with:
+ *  @return 1 -> item weight || -1 for no weight
+ *  @return 2 -> 1 for confimation of tare
+ *  @return 4 -> 1 for no weight || 0 for weight
+ *  @return The response from the Arduino.
+ */
+float sendCommand(char commandChar) {
+  this->logger.log("Sending command to Arduino: " + std::string(1, commandChar));
+  serialFlush(arduino_fd);
+  serialPutchar(arduino_fd, commandChar);
+
+  char response[64];
+  readLineFromArduino(response, sizeof(response));
+
+  switch (commandChar) {
+  case '1':
+    {
+      // Expect float (weight or -1.0)
+      this->logger.log("Received weight from Arduino: " + std::string(response));
+      float value = atof(response);
+      return value;
+    }
+  case '2':
+    {
+      // Expect 0 or 1 (really just a 1 to confirm)
+      this->logger.log("Received tare confirmation from Arduino: " +
+                       std::string(response));
+      return (float)atoi(response);
+    }
+  case '4':
+    {
+      // Expect 0 or 1 (bool)
+      this->logger.log("Received start weight confirmation from Arduino: " +
+                       std::string(response));
+      return (float)atoi(response);
+    }
+  default:
+    fprintf(stderr, "Unknown command: %c\n", commandChar);
+    return -999.0f; // invalid fallback
+  }
 }
 
 /**
@@ -255,10 +320,8 @@ void Hardware::rotateAndCapture() {
 
     this->logger.log("Rotating platform");
     rotateMotor(true);
-
-    // Swap comment lines below if you don't want to wait on realistic motor rotation time
-    // usleep(500);
-    sleep(3);
+    // float weight = sendCommand('1');
+    // OPTION: use weight to deteremine if item is still present
 
     // Last iteration doensn't need to check signal
     if (angle == 7) {
