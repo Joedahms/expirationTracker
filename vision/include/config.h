@@ -5,6 +5,7 @@ struct Config {
   std::string ethernetIP;
   int serverPort;
   int heartbeatPort;
+  int discoveryPort;
   bool useEthernet;
 };
 

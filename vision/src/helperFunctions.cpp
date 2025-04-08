@@ -116,7 +116,7 @@ std::string joinVector(const std::vector<std::string>& vec,
   return oss.str();
 }
 
-std::string discoverServerViaUDP(const Logger& logger) {
+std::string discoverServerViaUDP(const Logger& logger, const int& discoveryPort) {
   logger.log("in discoverServerViaUDP");
   int sockfd;
   struct sockaddr_in serverAddr;
@@ -138,7 +138,7 @@ std::string discoverServerViaUDP(const Logger& logger) {
   memset(&serverAddr, 0, sizeof(serverAddr));
   serverAddr.sin_family      = AF_INET;
   serverAddr.sin_addr.s_addr = inet_addr(BROADCAST_IP);
-  serverAddr.sin_port        = htons(DISCOVERY_PORT);
+  serverAddr.sin_port        = htons(discoveryPort);
 
   // Send discovery request
   std::string message = "DISCOVER_SERVER";
@@ -166,6 +166,7 @@ Config loadConfig(const std::filesystem::path& path) {
   cfg.ethernetIP    = data["network"]["ethernetIP"];
   cfg.serverPort    = data["network"]["serverPort"];
   cfg.heartbeatPort = data["network"]["heartbeatPort"];
+  cfg.discoveryPort = data["network"]["discoveryPort"];
   cfg.useEthernet   = data["network"]["useEthernet"];
   return cfg;
 }

@@ -189,7 +189,7 @@ ServerAddress connectToServer(const Logger& logger) {
   }
   else {
     logger.log("Attempting server broadcast");
-    serverIP = discoverServerViaUDP(logger);
+    serverIP = discoverServerViaUDP(logger, cfg.discoveryPort);
   }
   if (!serverIP.empty()) {
     logger.log("Discovered Server IP: " + serverIP);

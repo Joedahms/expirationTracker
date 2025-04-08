@@ -3,6 +3,7 @@
         "ethernetIP": "192.168.137.1",
         "serverPort": 5555,
         "heartbeatPort": 5556,
+        "discoveryPort": 5005,
         "useEthernet": true
     }
 }
