@@ -200,4 +200,6 @@ ServerAddress connectToServer(const Logger& logger) {
   else {
     LOG(FATAL) << "Failed to find server address.";
   }
+
+  return addresses;
 }
