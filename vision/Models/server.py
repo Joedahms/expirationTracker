@@ -45,7 +45,7 @@ def waitForPiDiscovery():
         except Exception as e:
             print(f"UDP error: {e}")
 
-def runserver():
+def runServer():
     waitForPiDiscovery()  # Wait for Raspberry Pi discovery
     ADDRESS = f"tcp://0.0.0.0:{PORT}"  # Bind ZeroMQ to communicate with Pi
     HEARTBEAT_ADDRESS = f"tcp://0.0.0.0:{HEARTBEAT_PORT}"
@@ -129,6 +129,6 @@ def runserver():
 
 if __name__ == "__main__":
     while True:
-        runserver()
+        runServer()
         print("restarting server...")
         time.sleep(2)
