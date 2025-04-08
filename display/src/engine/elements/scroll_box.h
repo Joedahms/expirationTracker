@@ -24,7 +24,6 @@ public:
             const std::string& logFile);
 
   void setPanelHeight(int panelHeight);
-  void addPanel(std::unique_ptr<Panel> panel, SDL_Rect containingRectangle);
 
   void updateSelf() override;
   void renderSelf() const override;
@@ -34,14 +33,19 @@ public:
 
 private:
   void refreshPanels();
-  void scrollUp();
-  void scrollDown();
+  void scroll();
+
+  void handleMouseDown();
+  void handleMouseMotion(const SDL_Event& event);
+  void handleMouseUp();
 
   int panelHeight;
   int topPanelPosition = 0;
-  int scrollAmount     = 4;
+  int scrollAmount     = 0;
 
   SortMethod sortMethod = SortMethod::LOW_TO_HIGH;
+
+  SDL_Point previousMotion = {0, 0};
 };
 
 #endif
