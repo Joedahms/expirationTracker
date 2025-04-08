@@ -25,6 +25,7 @@ def isFoodClass(text):
     """ Check if extracted text belongs to a known classification. """
     words = cleanText(text).split()
     for word in words:
+        print(f"Text found: {word}")
         if len(word) > 2 and word in textClasses:
             return {"type": "classification", "value": word}  # Return food category
 
