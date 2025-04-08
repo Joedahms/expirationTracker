@@ -2,6 +2,7 @@
 #define CONFIG_H
 
 struct Config {
+  std::string ethernetIP;
   int serverPort;
   int heartbeatPort;
   bool useEthernet;
