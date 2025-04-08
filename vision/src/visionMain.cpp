@@ -185,7 +185,7 @@ ServerAddress connectToServer(const Logger& logger) {
 
   if (cfg.useEthernet) {
     logger.log("Loading ethernet IP");
-    serverIP = getEthernetIP(logger);
+    serverIP = getEthernetIP("eth0", logger);
   }
   else {
     logger.log("Attempting server broadcast");
