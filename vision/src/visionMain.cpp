@@ -199,6 +199,8 @@ ServerAddress connectToServer(const Logger& logger) {
     addresses.serverAddress = "tcp://" + serverIP + ":" + std::to_string(cfg.serverPort);
     addresses.heartbeatAddress =
         "tcp://" + serverIP + ":" + std::to_string(cfg.heartbeatPort);
+    logger.log("server address: " + addresses.serverAddress);
+    logger.log("server address: " + addresses.heartbeatAddress);
   }
   else {
     LOG(FATAL) << "Failed to find server address.";
