@@ -65,7 +65,7 @@ def runServer():
     poller.register(socket, zmq.POLLIN)
 
     lastHeartbeatTime = time.time()
-
+    activeProcessing = False
     try:
         while True:
             print("Waiting for image from Raspberry Pi...")
@@ -76,6 +76,20 @@ def runServer():
                 # Receive image data (blocking receive)
                 messageParts = socket.recv_multipart()  
                 try:
+                    command = messageParts[0].decode()
+
+                    if command == "start":
+                        activeProcessing = True
+                        print("Session started.")
+                        socket.send_string("yes")
+                        continue
+
+                    elif command == "stop":
+                        activeProcessing = False
+                        print("Session stopped.")
+                        socket.send_string("yes")
+                        continue
+
                     print(f"Request received!")
                     imageSize = struct.unpack("Q", messageParts[0])[0]
                     imageData = messageParts[1]
@@ -105,7 +119,7 @@ def runServer():
                 except Exception as e:
                     print(f"Processing error: {e}")
                     socket.send_string("ERROR: Exception during processing")
-            else:
+            elif not activeProcessing:
                 try:
                     heartbeatmessage = heartbeatSocket.recv_string(flags=zmq.NOBLOCK)
                     if heartbeatmessage == "heartbeat":
@@ -115,7 +129,7 @@ def runServer():
                 except zmq.Again:
                     pass  # No heartbeat received
 
-                if time.time() - lastHeartbeatTime > 6:
+                if time.time() - lastHeartbeatTime > 1:
                     print("Pi disconnect detected. Restarting server...")
                     break
     except KeyboardInterrupt:
