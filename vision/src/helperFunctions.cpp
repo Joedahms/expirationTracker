@@ -178,12 +178,16 @@ std::string getEthernetIP(const std::string& interfaceName, const Logger& logger
 }
 
 Config loadConfig(const std::filesystem::path& path) {
+  if (!std::filesystem::exists(path)) {
+    LOG(FATAL) << "Error: Given config path does not exist.";
+  }
+
   std::ifstream f(path);
   nlohmann::json data = nlohmann::json::parse(f);
 
   Config cfg;
-  cfg.serverPort  = data["network"]["serverPort"];
-  cfg.serverPort  = data["network"]["serverPort"];
-  cfg.useEthernet = data["network"]["useEthernet"];
+  cfg.serverPort    = data["network"]["serverPort"];
+  cfg.heartbeatPort = data["network"]["heartbeatPort"];
+  cfg.useEthernet   = data["network"]["useEthernet"];
   return cfg;
 }
