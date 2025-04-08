@@ -76,19 +76,20 @@ def runServer():
                 # Receive image data (blocking receive)
                 messageParts = socket.recv_multipart()  
                 try:
-                    command = messageParts[0].decode()
-
-                    if command == "start":
-                        activeProcessing = True
-                        print("Session started.")
-                        socket.send_string("yes")
-                        continue
-
-                    elif command == "stop":
-                        activeProcessing = False
-                        print("Session stopped.")
-                        socket.send_string("yes")
-                        continue
+                    if len(messageParts) == 1:
+                        # Handle control message
+                        command = messageParts[0].decode()
+                        if command == "start":
+                            activeProcessing = True
+                            print("Processing started.")
+                            socket.send_string("yes")
+                        elif command == "stop":
+                            activeProcessing = False
+                            print("Processing stopped.")
+                            socket.send_string("yes")
+                        else:
+                            print(f"Unknown command: {command}")
+                            socket.send_string("ERROR: Unknown command")
 
                     print(f"Request received!")
                     imageSize = struct.unpack("Q", messageParts[0])[0]
