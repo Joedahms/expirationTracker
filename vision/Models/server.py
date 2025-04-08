@@ -12,21 +12,21 @@ PORT = "5555" #zeroMQ port
 HEARTBEAT_PORT = "5556"
 DISCOVERY_PORT = 5005 # UDP discovery port
 
-def getlocalip():
+def getLocalIP():
     """Get the actual network IP of this machine (not 127.0.0.1)."""
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))  # Connect to an external server
-        ip = s.getsockname()[0]
-        s.close()
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.connect(("8.8.8.8", 80))  # Connect to an external server
+        ip = sock.getsockname()[0]
+        sock.close()
         return ip
     except Exception as e:
         print(f"Failed to get local IP: {e}")
         return "127.0.0.1"
 
-def waitforpidiscovery():
+def waitForPiDiscovery():
     """Wait for a Raspberry Pi discovery request, then send the IP."""
-    server_ip = getlocalip()
+    serverIP = getLocalIP()
     print(f"Waiting for Raspberry Pi discovery on UDP {DISCOVERY_PORT}...")
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -34,19 +34,19 @@ def waitforpidiscovery():
 
     while True:
         try:
-            data, client_addr = sock.recvfrom(1024)  # Receive broadcast
+            data, clientAddress = sock.recvfrom(1024)  # Receive broadcast
             message = data.decode("utf-8").strip()
 
             if message == "DISCOVER_SERVER":
-                print(f"Received discovery request from {client_addr[0]}")
-                sock.sendto(server_ip.encode(), client_addr)  # Send server IP back
+                print(f"Received discovery request from {clientAddress[0]}")
+                sock.sendto(serverIP.encode(), clientAddress)  # Send server IP back
                 sock.close()
                 return
         except Exception as e:
             print(f"UDP error: {e}")
 
 def runserver():
-    waitforpidiscovery()  # Wait for Raspberry Pi discovery
+    waitForPiDiscovery()  # Wait for Raspberry Pi discovery
     ADDRESS = f"tcp://0.0.0.0:{PORT}"  # Bind ZeroMQ to communicate with Pi
     HEARTBEAT_ADDRESS = f"tcp://0.0.0.0:{HEARTBEAT_PORT}"
 
@@ -55,16 +55,16 @@ def runserver():
     socket = context.socket(zmq.REP)
     socket.bind(ADDRESS)
 
-    hearbeatsocket = context.socket(zmq.REP)
-    hearbeatsocket.bind(HEARTBEAT_ADDRESS)
-    hearbeatsocket.RCVTIMEO = 0  # non-blocking receive
+    heartbeatSocket = context.socket(zmq.REP)
+    heartbeatSocket.bind(HEARTBEAT_ADDRESS)
+    heartbeatSocket.RCVTIMEO = 0  # non-blocking receive
     
     print(f"Server started on {ADDRESS}")
     
     poller = zmq.Poller()
     poller.register(socket, zmq.POLLIN)
 
-    lastheartbeattime = time.time()
+    lastHeartbeatTime = time.time()
 
     try:
         while True:
@@ -74,17 +74,17 @@ def runserver():
 
             if socket in socks and socks[socket] == zmq.POLLIN:
                 # Receive image data (blocking receive)
-                messageparts = socket.recv_multipart()  
+                messageParts = socket.recv_multipart()  
                 try:
                     print(f"Request received!")
-                    imagesize = struct.unpack("Q", messageparts[0])[0]
-                    imagedata = messageparts[1]
+                    imageSize = struct.unpack("Q", messageParts[0])[0]
+                    imageData = messageParts[1]
 
-                    print(f"Image is {imagesize} bytes!")
+                    print(f"Image is {imageSize} bytes!")
 
                     print(f"Decoding image.")
                     # Decode image
-                    image = cv2.imdecode(np.frombuffer(imagedata, dtype=np.uint8), cv2.IMREAD_COLOR)
+                    image = cv2.imdecode(np.frombuffer(imageData, dtype=np.uint8), cv2.IMREAD_COLOR)
                     if image is None:
                         print("Error: Failed to decode image.")
                         socket.send_string("ERROR: Image decoding failed")
@@ -101,21 +101,21 @@ def runserver():
                     print(f"Sent response: {result}")
 
                     # Reset heartbeat timer after processing completes
-                    lastheartbeattime = time.time()
+                    lastHeartbeatTime = time.time()
                 except Exception as e:
                     print(f"Processing error: {e}")
                     socket.send_string("ERROR: Exception during processing")
             else:
                 try:
-                    heartbeatmessage = hearbeatsocket.recv_string(flags=zmq.NOBLOCK)
+                    heartbeatmessage = heartbeatSocket.recv_string(flags=zmq.NOBLOCK)
                     if heartbeatmessage == "heartbeat":
                         print("Received heartbeat")
-                        hearbeatsocket.send_string("alive")
-                        lastheartbeattime = time.time()
+                        heartbeatSocket.send_string("alive")
+                        lastHeartbeatTime = time.time()
                 except zmq.Again:
                     pass  # No heartbeat received
 
-                if time.time() - lastheartbeattime > 20:
+                if time.time() - lastHeartbeatTime > 20:
                     print("No heartbeat received for 20 seconds while idle. Restarting server...")
                     break
     except KeyboardInterrupt:
@@ -123,7 +123,7 @@ def runserver():
     finally:
         # Clean up
         socket.close()
-        hearbeatsocket.close()
+        heartbeatSocket.close()
         context.term()
         print("Server terminated")
 
