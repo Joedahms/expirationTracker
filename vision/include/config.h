@@ -7,4 +7,9 @@ struct Config {
   bool useEthernet;
 };
 
+struct ServerAddress {
+  std::string serverAddress;
+  std::string heartbeatAddress;
+};
+
 #endif
