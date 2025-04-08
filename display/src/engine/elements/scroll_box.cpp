@@ -58,6 +58,12 @@ void ScrollBox::updateSelf() {
   }
 }
 
+void ScrollBox::renderSelf() const {
+  if (this->hasBorder) {
+    renderBorder();
+  }
+}
+
 /**
  * Check if the scrollbox is hovered. If it is hovered and the event is a mousewheel
  * event, scroll the panels up or down accordingly.
@@ -66,21 +72,40 @@ void ScrollBox::updateSelf() {
  * @return None
  */
 void ScrollBox::handleEventSelf(const SDL_Event& event) {
-  if (checkMouseHovered() == false) {
-    return;
-  }
+  switch (event.type) {
+  case SDL_MOUSEBUTTONDOWN:
+    handleMouseDown();
+    break;
 
-  if (event.type == SDL_MOUSEWHEEL) {
-    if (event.wheel.y > 0) {
-      scrollUp();
-    }
-    else if (event.wheel.y < 0) {
-      scrollDown();
-    }
+  case SDL_MOUSEMOTION:
+    handleMouseMotion(event);
+    break;
+
+  case SDL_MOUSEBUTTONUP:
+    handleMouseUp();
+    break;
+
+  default:
+    break;
   }
 }
 
-void ScrollBox::renderSelf() const {}
+void ScrollBox::setSortMethod(SortMethod sortMethod) {
+  switch (sortMethod) {
+  case SortMethod::LOW_TO_HIGH:
+    this->sortMethod = SortMethod::LOW_TO_HIGH;
+    this->logger->log("Scrollbox sort method changed to low to high");
+    break;
+  case SortMethod::HIGH_TO_LOW:
+    this->sortMethod = SortMethod::HIGH_TO_LOW;
+    this->logger->log("Scrollbox sort method changed to high to low");
+    break;
+  default:
+    LOG(FATAL) << "Attempt to set sort method to invalid method";
+  }
+
+  refreshPanels();
+}
 
 /**
  * Ensure that all panels have data consistent with what is in the database. Destroys all
@@ -108,48 +133,55 @@ void ScrollBox::refreshPanels() {
 }
 
 /**
- * Move all panels within the scroll box up. Scroll amount is hardcoded.
+ * Move all panels up or down by the scroll amount. Zero out scroll amount so that it does
+ * not grow unbounded.
  *
  * @param None
  * @return None
  */
-void ScrollBox::scrollUp() {
-  topPanelPosition -= this->scrollAmount;
-  for (auto& currPanel : this->children) {
-    SDL_Point currPanelRelativePosition = currPanel->getPositionRelativeToParent();
-    currPanelRelativePosition.y -= this->scrollAmount;
-    currPanel->setPositionRelativeToParent(currPanelRelativePosition);
-  }
-}
-
-/**
- * Move all panels within the scroll box down. Scroll amount is hardcoded.
- *
- * @param None
- * @return None
- */
-void ScrollBox::scrollDown() {
+void ScrollBox::scroll() {
   topPanelPosition += this->scrollAmount;
   for (auto& currPanel : this->children) {
     SDL_Point currPanelRelativePosition = currPanel->getPositionRelativeToParent();
     currPanelRelativePosition.y += this->scrollAmount;
     currPanel->setPositionRelativeToParent(currPanelRelativePosition);
   }
+  this->scrollAmount = 0;
 }
 
-void ScrollBox::setSortMethod(SortMethod sortMethod) {
-  switch (sortMethod) {
-  case SortMethod::LOW_TO_HIGH:
-    this->sortMethod = SortMethod::LOW_TO_HIGH;
-    this->logger->log("Scrollbox sort method changed to low to high");
-    break;
-  case SortMethod::HIGH_TO_LOW:
-    this->sortMethod = SortMethod::HIGH_TO_LOW;
-    this->logger->log("Scrollbox sort method changed to high to low");
-    break;
-  default:
-    LOG(FATAL) << "Attempt to set sort method to invalid method";
+/**
+ * SDL_MOUSEBUTTONDOWN
+ *
+ * @param None
+ * @return None
+ */
+void ScrollBox::handleMouseDown() {
+  if (checkMouseHovered() == false) {
+    return;
+  }
+  this->held = true;
+}
+
+/**
+ * SDL_MOUSEMOTION
+ *
+ * @param The SDL_MOUSEMOTION event to handle
+ * @return None
+ */
+void ScrollBox::handleMouseMotion(const SDL_Event& event) {
+  if (this->held) {
+    this->scrollAmount += event.motion.y - this->previousMotion.y;
+    scroll();
+    this->previousMotion.y = event.motion.y;
   }
 
-  refreshPanels();
+  this->previousMotion.y = event.motion.y;
 }
+
+/**
+ * SDL_MOUSEBUTTONUP
+ *
+ * @param None
+ * @return None
+ */
+void ScrollBox::handleMouseUp() { this->held = false; }
