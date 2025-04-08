@@ -23,10 +23,11 @@ def cleanText(text):
 
 def isFoodClass(text):
     """ Check if extracted text belongs to a known classification. """
+    lowercaseTextClasses = set(cls.lower() for cls in textClasses)
     words = cleanText(text).split()
     for word in words:
         print(f"Text found: {word}")
-        if len(word) > 2 and word in textClasses:
+        if len(word) > 2 and word.lower() in lowercaseTextClasses:
             return {"type": "classification", "value": word}  # Return food category
 
     return None
