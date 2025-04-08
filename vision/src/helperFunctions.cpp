@@ -154,29 +154,6 @@ std::string discoverServerViaUDP(const Logger& logger) {
   return std::string(buffer);
 }
 
-std::string getEthernetIP(const std::string& interfaceName, const Logger& logger) {
-  logger.log("in getEthernetIP");
-  struct ifaddrs *ifaddr, *ifa;
-  std::string ip = "";
-
-  if (getifaddrs(&ifaddr) == -1) {
-    return ip;
-  }
-
-  for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next) {
-    if (ifa->ifa_addr == nullptr || ifa->ifa_addr->sa_family != AF_INET)
-      continue;
-
-    if (interfaceName == ifa->ifa_name) {
-      ip = inet_ntoa(((struct sockaddr_in*)ifa->ifa_addr)->sin_addr);
-      break;
-    }
-  }
-
-  freeifaddrs(ifaddr);
-  return ip;
-}
-
 Config loadConfig(const std::filesystem::path& path) {
   if (!std::filesystem::exists(path)) {
     LOG(FATAL) << "Error: Given config path does not exist.";
@@ -186,6 +163,7 @@ Config loadConfig(const std::filesystem::path& path) {
   nlohmann::json data = nlohmann::json::parse(f);
 
   Config cfg;
+  cfg.ethernetIP    = data["network"]["ethernetIP"];
   cfg.serverPort    = data["network"]["serverPort"];
   cfg.heartbeatPort = data["network"]["heartbeatPort"];
   cfg.useEthernet   = data["network"]["useEthernet"];
