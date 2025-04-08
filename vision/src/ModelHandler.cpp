@@ -68,3 +68,7 @@ std::chrono::year_month_day ModelHandler::extractExpirationDate(
   iss >> year >> delim1 >> month >> delim1 >> day;
   return {std::chrono::year{year}, std::chrono::month{month}, std::chrono::day{day}};
 }
+
+void ModelHandler::notifyServer(const bool& isProcessing) {
+  this->textClassifier.notifyServer(isProcessing);
+}

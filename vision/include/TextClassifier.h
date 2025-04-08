@@ -6,6 +6,7 @@
 class TextClassifier : public IModel {
 public:
   TextClassifier(zmqpp::context&, const std::string&);
+  void notifyServer(const bool&);
 
   OCRResult runModel(const std::filesystem::path&) override;
   OCRResult handleClassification(const std::filesystem::path&) override;

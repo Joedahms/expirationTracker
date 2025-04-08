@@ -126,3 +126,26 @@ OCRResult TextClassifier::runModel(const std::filesystem::path& imagePath) {
     return classifications;
   }
 }
+
+void TextClassifier::notifyServer(const bool& isProcessing) {
+  if (isProcessing) {
+    this->requestSocket.send("start");
+    zmqpp::message message;
+    this->requestSocket.receive(message);
+    std::string response;
+    message >> response;
+    if (response != "yes") {
+      LOG(FATAL) << "server did not acknowledge processing start.";
+    }
+  }
+  else {
+    this->requestSocket.send("stop");
+    zmqpp::message message;
+    this->requestSocket.receive(message);
+    std::string response;
+    message >> response;
+    if (response != "yes") {
+      LOG(FATAL) << "server did not acknowledge processing stop.";
+    }
+  }
+}

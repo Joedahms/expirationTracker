@@ -45,8 +45,10 @@ void visionEntry(zmqpp::context& context) {
       ;
     }
     isProcessing = true;
+    processor.notifyServer(true);
     processor.setFoodItem(foodItem);
     processor.process();
+    processor.notifyServer(false);
     isProcessing = false;
 
     if (processor.isCancelRequested()) {
