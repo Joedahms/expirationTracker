@@ -60,7 +60,7 @@ def runServer():
         waitForPiDiscovery()
     else:
         print("Skipping discovery. Binding immediately.")
-        
+
     ADDRESS = f"tcp://0.0.0.0:{port}"  # Bind ZeroMQ to communicate with Pi
     HEARTBEAT_ADDRESS = f"tcp://0.0.0.0:{heartbeatPort}"
 
@@ -81,6 +81,10 @@ def runServer():
     lastHeartbeatTime = time.time()
     activeProcessing = False
     try:
+        startMessage = socket.recv_string() #wait for the pi to be connected
+        if startMessage == "connected":
+            print("Pi is connected")
+            socket.send_string("awake")
         while True:
             print("Waiting for image from Raspberry Pi...")
 

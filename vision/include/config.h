@@ -14,4 +14,10 @@ struct ServerAddress {
   std::string heartbeatAddress;
 };
 
+struct NotifyServerConstants {
+  inline static const std::string start     = "start";
+  inline static const std::string stop      = "stop";
+  inline static const std::string connected = "connected";
+};
+
 #endif

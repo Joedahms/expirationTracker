@@ -27,6 +27,8 @@ void visionEntry(zmqpp::context& context) {
   zmqpp::poller poller;
   poller.add(replySocket);
 
+  processor.notifyServer(NotifyServerConstants::connected);
+
   while (1) {
     FoodItem foodItem;
     logger.log("Waiting for Food Item");
@@ -35,10 +37,10 @@ void visionEntry(zmqpp::context& context) {
       ;
     }
     isProcessing = true;
-    processor.notifyServer(true);
+    processor.notifyServer(NotifyServerConstants::start);
     processor.setFoodItem(foodItem);
     processor.process();
-    processor.notifyServer(false);
+    processor.notifyServer(NotifyServerConstants::start);
     isProcessing = false;
 
     if (processor.isCancelRequested()) {

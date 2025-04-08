@@ -21,7 +21,7 @@ public:
   void requestCancel();
   void resetCancel();
   bool isCancelRequested();
-  void notifyServer(const bool&);
+  void notifyServer(const std::string&);
 
 private:
   Logger logger;
