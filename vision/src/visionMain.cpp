@@ -184,8 +184,8 @@ ServerAddress connectToServer(const Logger& logger) {
   std::string serverIP = "";
 
   if (cfg.useEthernet) {
-    logger.log("Loading ethernet IP");
-    serverIP = getEthernetIP("eth0", logger);
+    logger.log("Using static ethernet IP set in" + path.string());
+    serverIP = cfg.ethernetIP;
   }
   else {
     logger.log("Attempting server broadcast");
