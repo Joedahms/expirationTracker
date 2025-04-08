@@ -22,7 +22,7 @@ public:
   const char* serialDevice = "/dev/ttyACM0";
   int baud                 = 9600;
   int arduino_fd           = -1;
-  
+
   void initDC();
   int initSerialConnection(const char* device, int baudRate);
   bool checkStartSignal(int timeoutMs);
