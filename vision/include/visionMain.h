@@ -18,4 +18,5 @@ bool startPythonServer(const Logger&);
 bool startSignalCheck(zmqpp::socket&, const Logger&, FoodItem&, zmqpp::poller&);
 void createListenerThread(zmqpp::context&, ImageProcessor&);
 void createHeartBeatThread(zmqpp::context&, std::atomic_bool&, std::string&);
+bool connectToServer(const Logger&);
 #endif

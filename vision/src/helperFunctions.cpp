@@ -152,3 +152,24 @@ std::string discoverServerViaUDP() {
 
   return std::string(buffer);
 }
+
+std::string getEthernetIP(const std::string& interfaceName) {
+  struct ifaddrs *ifaddr, *ifa;
+  std::string ip = "";
+
+  if (getifaddrs(&ifaddr) == -1)
+    return ip;
+
+  for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next) {
+    if (ifa->ifa_addr == nullptr || ifa->ifa_addr->sa_family != AF_INET)
+      continue;
+
+    if (interfaceName == ifa->ifa_name) {
+      ip = inet_ntoa(((struct sockaddr_in*)ifa->ifa_addr)->sin_addr);
+      break;
+    }
+  }
+
+  freeifaddrs(ifaddr);
+  return ip;
+}

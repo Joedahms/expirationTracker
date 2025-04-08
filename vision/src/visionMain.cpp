@@ -16,7 +16,7 @@ void visionEntry(zmqpp::context& context) {
   zmqpp::socket replySocket(context, zmqpp::socket_type::reply);
   replySocket.bind(VisionExternalEndpoints::visionMainEndpoint);
 
-  std::string serverIP         = discoverServerViaUDP();
+  std::string serverIP         = discoverServerViaUDP(logger);
   std::string serverAddress    = "";
   std::string heartbeatAddress = "";
   if (!serverIP.empty()) {
@@ -185,3 +185,5 @@ void createHeartBeatThread(zmqpp::context& context,
   });
   thread.detach();
 }
+
+bool connectToServer(const Logger&) {}
