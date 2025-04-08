@@ -60,8 +60,7 @@ def runServer():
         waitForPiDiscovery()
     else:
         print("Skipping discovery. Binding immediately.")
-
-    waitForPiDiscovery()  # Wait for Raspberry Pi discovery
+        
     ADDRESS = f"tcp://0.0.0.0:{port}"  # Bind ZeroMQ to communicate with Pi
     HEARTBEAT_ADDRESS = f"tcp://0.0.0.0:{heartbeatPort}"
 
