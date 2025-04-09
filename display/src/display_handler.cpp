@@ -27,6 +27,62 @@ DisplayHandler::DisplayHandler(const zmqpp::context& context)
 }
 
 /**
+ * Send a message to a zeroMQ endpoint and get back its response.
+ *
+ * @param message The message to send to the endpoint
+ * @param endpoint The zeroMQ endpoint to send the message to
+ * @return The response from the endpoint after sending it the message
+ */
+std::string DisplayHandler::sendMessage(const std::string& message,
+                                        const std::string& endpoint) {
+  std::string response;
+  if (endpoint == ExternalEndpoints::hardwareEndpoint) {
+    this->requestHardwareSocket.send(message);
+    this->requestHardwareSocket.receive(response);
+    return response;
+  }
+  else if (endpoint == ExternalEndpoints::visionEndpoint) {
+    this->requestVisionSocket.send(message);
+    this->requestVisionSocket.receive(response);
+    return response;
+  }
+  else {
+    LOG(FATAL) << "Attempt to send message to invalid endpoint";
+  }
+}
+
+/**
+ * Receive a zeroMQ message with a specified timeout and send back response if a message
+ * is received.
+ *
+ * @param response What to send back to requesting socket upon receiving a message.
+ * @param timeoutMS Max amount of time to wait for a message. If set to 0, return right
+ * away if no message.
+ * @return The message received. Returns "null" if no message received.
+ */
+std::string DisplayHandler::receiveMessage(const std::string& response,
+                                           const int timeoutMS) {
+  std::string request = "null";
+  if (timeoutMS == 0) {
+    this->replySocket.receive(request);
+    this->replySocket.send(response);
+  }
+  else {
+    zmqpp::poller poller;
+    poller.add(this->replySocket);
+
+    if (poller.poll(timeoutMS)) {
+      if (poller.has_input(this->replySocket)) {
+        this->replySocket.receive(request);
+        this->replySocket.send(response);
+      }
+    }
+  }
+
+  return request;
+}
+
+/**
  * Handle all communiation into and out of the display. Check for start signal from
  * engine, send start signal to hardware, then wait for message from vision.
  *
@@ -79,8 +135,8 @@ void DisplayHandler::handle() {
 }
 
 /**
- * Indicate to hardware that the user has placed an item on the platform and would like to
- * scan it.
+ * Indicate to hardware that the user has placed an item on the platform and would like
+ * to scan it.
  *
  * @param None
  * @return True if hardware started scan. False if hardware not able to start scan.
@@ -249,8 +305,8 @@ void DisplayHandler::zeroWeightOverride() {
   std::string overrideResponse;
   this->requestHardwareSocket.receive(overrideResponse);
   // TODO check overrideResponse
-  this->logger.log("Hardware received override request, waiting for request from vision");
-  handleScanStarted();
+  this->logger.log("Hardware received override request, waiting for request from
+  vision"); handleScanStarted();
   */
 }
 

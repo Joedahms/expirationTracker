@@ -187,11 +187,6 @@ void DisplayEngine::checkState() {
 void DisplayEngine::checkScanning() {
   this->engineState = this->scanning->getCurrentState();
 
-  if (this->engineState == EngineState::CANCEL_SCAN_CONFIRMATION) {
-    //  scanCancelledToDisplayHandler();
-    // stopSignalToVision();
-  }
-
   this->scanning->setCurrentState(EngineState::SCANNING);
 }
 
@@ -434,10 +429,26 @@ void DisplayEngine::scanCancelledToDisplayHandler() {
 }
 
 void DisplayEngine::startSignalToDisplay() {
-  /*
-  this->logger.log("Scan initialized, sending start signal to display");
+  this->logger.log("Scan initialized, sending start signal to hardware");
   try {
-    this->requestSocket.send(Messages::START_SCAN);
+    std::string hardwareResponse = this->displayHandler.sendMessage(
+        Messages::START_SCAN, ExternalEndpoints::hardwareEndpoint);
+
+    if (hardwareResponse == Messages::AFFIRMATIVE) {
+      this->logger.log("Hardware starting scan");
+    }
+    else if (hardwareResponse == Messages::ZERO_WEIGHT) {
+      this->logger.log(
+          "Hardware indicated zero weight on platform, switching to zero weight state");
+      this->engineState = EngineState::ZERO_WEIGHT;
+    }
+    else {
+      this->logger.log("Received invalid response from hardware: " + hardwareResponse);
+      LOG(FATAL) << "Invalid response received from hardware: " << hardwareResponse;
+    }
+
+    /*
+     this->requestSocket.send(Messages::START_SCAN);
     this->logger.log("Start signal successfully sent to display, waiting for response");
     std::string response;
     this->requestSocket.receive(response);
@@ -449,17 +460,17 @@ void DisplayEngine::startSignalToDisplay() {
           "Received zero weight back from display, switching to zero weight state");
       this->engineState = EngineState::ZERO_WEIGHT;
       // At this point need to check if display sends back affirmative or zero weight
-      // Break out response checking (if else if) and call it on some interval if in zero
-      // weight state?
+      // Break out response checking (if else if) and call it on some interval if in
+      // zero weight state?
     }
     else {
       this->logger.log("Received invalid response from display: " + response);
       LOG(FATAL) << "Invalid response received from display " << response;
     }
+    */
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
   }
-  */
 }
 
 void DisplayEngine::sendZeroWeightResponse(const std::string& zeroWeightResponse) {
