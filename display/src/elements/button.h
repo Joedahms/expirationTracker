@@ -38,11 +38,11 @@ public:
 
 private:
   std::string textContent;
+  SDL_Point textPadding = {0, 0};
   std::function<void()> onClick;
   SDL_Color backgroundColor;
   SDL_Color defaultColor;
   SDL_Color hoveredColor;
-  SDL_Point textPadding = {0, 0};
   std::string notifyMessage;
 
   void updateColor();

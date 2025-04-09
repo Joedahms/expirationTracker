@@ -13,9 +13,10 @@ ObstaclePair::ObstaclePair(DisplayGlobal displayGlobal,
   setupPosition(boundaryRectangle);
   this->logger = std::make_unique<Logger>(logFile);
   this->logger->log("Constructing obstacle pair");
-  this->velocity.x   = -3;
-  this->fixed        = false;
-  this->screenBoundX = false;
+  this->velocity.x         = -3;
+  this->fixed              = false;
+  this->screenBoundX       = false;
+  this->obstaclePairHeight = boundaryRectangle.h;
 
   std::unique_ptr<Obstacle> topObstacle = std::make_unique<Obstacle>(
       this->displayGlobal, SDL_Rect{0, 0, this->boundaryRectangle.w, 0});
@@ -51,8 +52,9 @@ void ObstaclePair::randomizeGapPosition() {
 
   std::random_device r;
   std::default_random_engine e1(r());
-  std::uniform_int_distribution<int> uniform_dist(this->obstacleMinHeight,
-                                                  this->obstacleMaxHeight);
+  int minHeight = 10;
+  int maxHeight = this->obstaclePairHeight - this->verticalObstacleGap - minHeight;
+  std::uniform_int_distribution<int> uniform_dist(minHeight, maxHeight);
   int obstacleHeight  = uniform_dist(e1);
   boundaryRectangle.h = obstacleHeight;
   this->children[0]->setBoundaryRectangle(boundaryRectangle);

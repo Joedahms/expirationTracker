@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "../../log_files.h"
+#include "../log_files.h"
 #include "zero_weight.h"
 
 ZeroWeight::ZeroWeight(struct DisplayGlobal displayGlobal)

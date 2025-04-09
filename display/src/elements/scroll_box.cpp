@@ -6,10 +6,10 @@
 #include <memory>
 #include <vector>
 
-#include "../../../../food_item.h"
-#include "../../sql_food.h"
+#include "../../../food_item.h"
 #include "../display_global.h"
 #include "../sdl_debug.h"
+#include "../sql_food.h"
 #include "panel.h"
 #include "scroll_box.h"
 

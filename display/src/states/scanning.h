@@ -31,6 +31,8 @@ private:
 
   void initializeObstacles();
   std::vector<SDL_Rect> getBoundaryRectangles();
+
+  void handleBirdCollision();
 };
 
 #endif

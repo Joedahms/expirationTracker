@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "../../log_files.h"
+#include "../log_files.h"
 #include "cancel_scan_confirmation.h"
 
 CancelScanConfirmation::CancelScanConfirmation(struct DisplayGlobal displayGlobal)

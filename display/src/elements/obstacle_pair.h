@@ -20,10 +20,10 @@ private:
   const int windowWidth;
   const int respawnOffset;
 
-  const int obstacleMinHeight   = 40;
-  const int obstacleMaxHeight   = 100;
-  const int obstaclePairHeight  = 200;
-  const int verticalObstacleGap = 50;
+  //  const int obstacleMinHeight   = 0;
+  // const int obstacleMaxHeight   = 20;
+  int obstaclePairHeight        = 0;
+  const int verticalObstacleGap = 400;
 
   void randomizeGapPosition();
   void updateSelf() override;

@@ -12,14 +12,12 @@
  * @param context The zeroMQ context with which to create sockets with
  * @param engineEndpoint zeroMQ endpoint to communicate with the display engine
  */
-DisplayHandler::DisplayHandler(zmqpp::context& context, const std::string& engineEndpoint)
-    : engineEndpoint(engineEndpoint),
-      requestEngineSocket(context, zmqpp::socket_type::request),
+DisplayHandler::DisplayHandler(const zmqpp::context& context)
+    : logger("display_handler.txt"),
       requestHardwareSocket(context, zmqpp::socket_type::request),
       requestVisionSocket(context, zmqpp::socket_type::request),
-      replySocket(context, zmqpp::socket_type::reply), logger("display_handler.txt") {
+      replySocket(context, zmqpp::socket_type::reply) {
   try {
-    this->requestEngineSocket.connect(engineEndpoint);
     this->requestHardwareSocket.connect(ExternalEndpoints::hardwareEndpoint);
     this->requestVisionSocket.connect(ExternalEndpoints::visionEndpoint);
     this->replySocket.bind(ExternalEndpoints::displayEndpoint);
@@ -144,6 +142,7 @@ void DisplayHandler::handleScanStarted() {
  * @return None
  */
 void DisplayHandler::detectionFailure() {
+  /*
   this->replySocket.send(Messages::AFFIRMATIVE);
   this->logger.log("Item detection failed");
 
@@ -159,6 +158,7 @@ void DisplayHandler::detectionFailure() {
   else {
     LOG(FATAL) << "Unexpected message received";
   }
+  */
 }
 
 /**
@@ -169,6 +169,7 @@ void DisplayHandler::detectionFailure() {
  * @return None
  */
 void DisplayHandler::detectionSuccess() {
+  /*
   this->replySocket.send(Messages::AFFIRMATIVE);
 
   this->logger.log("Item detection succeeded, receiving food item");
@@ -201,9 +202,11 @@ void DisplayHandler::detectionSuccess() {
   else {
     LOG(FATAL) << "Unexpected message received";
   }
+  */
 }
 
 void DisplayHandler::scanCancelled() {
+  /*
   this->replySocket.send(Messages::AFFIRMATIVE);
 
   this->logger.log("Scan cancelled, sending scan cancelled message to vision");
@@ -219,9 +222,11 @@ void DisplayHandler::scanCancelled() {
   else {
     LOG(FATAL) << "Unexpected message received";
   }
+  */
 }
 
 void DisplayHandler::zeroWeightRetry() {
+  /*
   this->logger.log("Received retry from engine, sending affirmative back");
   // TODO figure out how to retry
   this->replySocket.send(Messages::AFFIRMATIVE);
@@ -231,9 +236,11 @@ void DisplayHandler::zeroWeightRetry() {
   std::string retryResponse;
   this->requestHardwareSocket.receive(retryResponse);
   this->logger.log("Hardware received retry request");
+  */
 }
 
 void DisplayHandler::zeroWeightOverride() {
+  /*
   this->logger.log("Received override from engine, sending affirmative back");
   this->replySocket.send(Messages::AFFIRMATIVE);
   this->logger.log("Affirmative sent, sending override request to hardware");
@@ -244,9 +251,11 @@ void DisplayHandler::zeroWeightOverride() {
   // TODO check overrideResponse
   this->logger.log("Hardware received override request, waiting for request from vision");
   handleScanStarted();
+  */
 }
 
 void DisplayHandler::zeroWeightCancel() {
+  /*
   this->logger.log("Received cancel from engine, sending affirmative back");
   this->replySocket.send(Messages::AFFIRMATIVE);
   this->logger.log("Affirmative sent, sending cancel request to hardware");
@@ -256,4 +265,5 @@ void DisplayHandler::zeroWeightCancel() {
   this->requestHardwareSocket.receive(cancelResponse);
   // TODO check cancelResponse
   this->logger.log("Hardware received cancel request");
+  */
 }

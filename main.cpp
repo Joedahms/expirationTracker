@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <zmqpp/zmqpp.hpp>
 
-#include "display/src/display_entry.h"
+#include "display/src/display_engine.h"
 #include "endpoints.h"
 #include "hardware/src/hardware_entry.h"
 #include "vision/include/visionMain.h"
@@ -31,7 +31,15 @@ int main(int argc, char* argv[]) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("display");
 
-    displayEntry(context);
+    // Context
+    const int windowWidth  = 1024;
+    const int windowHeight = 600;
+    const bool fullscreen  = false;
+
+    DisplayEngine displayEngine("Display", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                                windowWidth, windowHeight, fullscreen, context);
+    displayEngine.start();
+
     LOG(INFO) << "Display process";
     return 0;
   }

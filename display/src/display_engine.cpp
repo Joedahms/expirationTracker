@@ -4,7 +4,7 @@
 #include <glog/logging.h>
 #include <iostream>
 
-#include "../../../endpoints.h"
+#include "../../endpoints.h"
 
 #include "display_engine.h"
 #include "display_global.h"
@@ -25,31 +25,16 @@ DisplayEngine::DisplayEngine(const char* windowTitle,
                              int screenWidth,
                              int screenHeight,
                              bool fullscreen,
-                             struct DisplayGlobal displayGlobal,
-                             const zmqpp::context& context,
-                             const std::string& displayEndpoint,
-                             const std::string& engineEndpoint)
-    : replySocket(context, zmqpp::socket_type::reply),
-      requestSocket(context, zmqpp::socket_type::request),
-      DISPLAY_ENDPOINT(displayEndpoint), ENGINE_ENDPOINT(engineEndpoint),
-      logger("display_engine.txt") {
+                             const zmqpp::context& context)
+    : logger("display_engine.txt"), displayHandler(context) {
   this->logger.log("Constructing display engine");
-  // Setup sockets
-  try {
-    this->requestSocket.connect(this->DISPLAY_ENDPOINT);
-    this->replySocket.bind(this->ENGINE_ENDPOINT);
-  } catch (const zmqpp::exception& e) {
-    LOG(FATAL) << e.what();
-  }
 
-  this->displayGlobal = displayGlobal;
-  this->displayGlobal.window =
-      setupWindow(windowTitle, windowXPosition, windowYPosition, screenWidth,
-                  screenHeight, fullscreen); // Setup the SDL display window
+  this->displayGlobal.window = setupWindow(windowTitle, windowXPosition, windowYPosition,
+                                           screenWidth, screenHeight, fullscreen);
 
   initializeEngine(this->displayGlobal.window);
 
-  // Initialize states
+  // States
   this->scanning   = std::make_unique<Scanning>(this->displayGlobal);
   this->itemList   = std::make_unique<ItemList>(this->displayGlobal);
   this->zeroWeight = std::make_unique<ZeroWeight>(this->displayGlobal);
@@ -137,6 +122,29 @@ void DisplayEngine::initializeEngine(SDL_Window* window) {
     exit(1);
   }
   this->logger.log("Engine initialized");
+}
+
+void DisplayEngine::start() {
+  LOG(INFO) << "SDL display process started successfully";
+
+  std::chrono::milliseconds msPerFrame = std::chrono::milliseconds(16);
+
+  while (this->displayIsRunning) {
+    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+    this->displayHandler.handle();
+    handleEvents();
+    checkState();
+    checkKeystates();
+    checkState();
+    update();
+    renderState();
+    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    std::chrono::milliseconds sleepDuration =
+        std::chrono::duration_cast<std::chrono::milliseconds>(start + msPerFrame - now);
+    std::this_thread::sleep_for(sleepDuration);
+  }
+
+  clean();
 }
 
 /**
@@ -254,6 +262,7 @@ void DisplayEngine::checkCancelScanConfirmation() {
  * @return None
  */
 void DisplayEngine::handleEvents() {
+  /*
   switch (this->engineState) {
   case EngineState::SCANNING:
     {
@@ -297,6 +306,7 @@ void DisplayEngine::handleEvents() {
     LOG(FATAL) << "Invalid state";
     break;
   }
+  */
 }
 
 /**
@@ -404,6 +414,7 @@ void DisplayEngine::clean() {
 }
 
 void DisplayEngine::scanCancelledToDisplayHandler() {
+  /*
   this->logger.log("Scan cancelled, sending cancel scan signal to display handler");
   try {
     this->requestSocket.send(Messages::SCAN_CANCELLED);
@@ -419,9 +430,11 @@ void DisplayEngine::scanCancelledToDisplayHandler() {
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
   }
+  */
 }
 
 void DisplayEngine::startSignalToDisplay() {
+  /*
   this->logger.log("Scan initialized, sending start signal to display");
   try {
     this->requestSocket.send(Messages::START_SCAN);
@@ -446,9 +459,11 @@ void DisplayEngine::startSignalToDisplay() {
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
   }
+  */
 }
 
 void DisplayEngine::sendZeroWeightResponse(const std::string& zeroWeightResponse) {
+  /*
   this->logger.log("Sending zero weight response: " + zeroWeightResponse + " to display");
   try {
     this->requestSocket.send(zeroWeightResponse);
@@ -463,4 +478,5 @@ void DisplayEngine::sendZeroWeightResponse(const std::string& zeroWeightResponse
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
   }
+  */
 }

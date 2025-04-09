@@ -4,13 +4,13 @@
 #include <iostream>
 #include <string>
 
-#include "../../log_files.h"
 #include "../display_global.h"
 #include "../elements/bird.h"
 #include "../elements/loading_bar.h"
 #include "../elements/obstacle.h"
 #include "../elements/obstacle_pair.h"
 #include "../elements/text.h"
+#include "../log_files.h"
 #include "scanning.h"
 
 /**
@@ -97,13 +97,7 @@ void Scanning::update() {
 
   std::vector<SDL_Rect> boundaryRectangles = getBoundaryRectangles();
   this->rootElement->checkCollision(boundaryRectangles);
-
-  if (this->birdPtr->getHasCollided()) {
-    this->birdPtr->setVelocity(Velocity{0, 0});
-    for (const auto& obstaclePair : this->obstaclePairs) {
-      obstaclePair->setVelocity(Velocity{0, 0});
-    }
-  }
+  handleBirdCollision();
 
   SDL_Rect birdRect = this->birdPtr->getBoundaryRectangle();
   for (const auto& obstaclePair : this->obstaclePairs) {
@@ -114,20 +108,11 @@ void Scanning::update() {
     SDL_Rect topRect          = obstaclePair->getTopObstacleRect();
     SDL_Rect bottomRect       = obstaclePair->getBottomObstacleRect();
 
-    /*
-    if (birdRect.x >= obstaclePairRect.x) {
-      std::cout << "x good" << std::endl;
-      if (birdRect.y > topRect.y + topRect.h) {
-        std::cout << "below top" << std::endl;
-        if (birdRect.y + birdRect.h < bottomRect.y) {
-          std::cout << "above bottom" << std::endl;
-          this->score++;
-          obstaclePair->scored = true;
-          std::cout << "score: " << this->score << std::endl;
-        }
-      }
+    if (birdRect.x > obstaclePairRect.x + obstaclePairRect.w) {
+      this->score++;
+      obstaclePair->scored = true;
+      std::cout << "score: " << this->score << std::endl;
     }
-    */
   }
 }
 
@@ -168,4 +153,13 @@ std::vector<SDL_Rect> Scanning::getBoundaryRectangles() {
   this->rootElement->addBoundaryRectangle(boundaryRectangles);
 
   return boundaryRectangles;
+}
+
+void Scanning::handleBirdCollision() {
+  if (this->birdPtr->getHasCollided()) {
+    this->birdPtr->setVelocity(Velocity{0, 0});
+    for (const auto& obstaclePair : this->obstaclePairs) {
+      obstaclePair->setVelocity(Velocity{0, 0});
+    }
+  }
 }

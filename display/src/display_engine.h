@@ -8,7 +8,7 @@
 #include <vector>
 #include <zmqpp/zmqpp.hpp>
 
-#include "../../../logger.h"
+#include "../../logger.h"
 
 #include "states/cancel_scan_confirmation.h"
 #include "states/item_list.h"
@@ -16,6 +16,7 @@
 #include "states/zero_weight.h"
 
 #include "display_global.h"
+#include "display_handler.h"
 #include "engine_state.h"
 
 /**
@@ -29,10 +30,7 @@ public:
                 int screenWidth,
                 int screenHeight,
                 bool fullscreen,
-                struct DisplayGlobal displayGlobal,
-                const zmqpp::context& context,
-                const std::string& displayEndpoint,
-                const std::string& engineEndpoint);
+                const zmqpp::context& context);
 
   SDL_Window* setupWindow(const char* windowTitle,
                           int windowXPosition,
@@ -42,6 +40,8 @@ public:
                           bool fullscreen);
   void initializeEngine(SDL_Window* window);
 
+  void start();
+
   void checkState();
   void handleEvents();
   void checkKeystates();
@@ -49,19 +49,13 @@ public:
 
   void renderState();
   void clean();
-  bool running() { return displayIsRunning; }
 
 private:
-  struct DisplayGlobal displayGlobal;
   Logger logger;
-
-  zmqpp::socket replySocket;
-  zmqpp::socket requestSocket;
-
-  const std::string& DISPLAY_ENDPOINT;
-  const std::string& ENGINE_ENDPOINT;
-
+  DisplayHandler displayHandler;
+  struct DisplayGlobal displayGlobal;
   EngineState engineState = EngineState::ITEM_LIST;
+  bool displayIsRunning   = false;
 
   // States
   std::unique_ptr<Scanning> scanning;
@@ -73,8 +67,6 @@ private:
   void checkItemList();
   void checkZeroWeight();
   void checkCancelScanConfirmation();
-
-  bool displayIsRunning = false;
 
   void startSignalToDisplay();
   void sendZeroWeightResponse(const std::string& zeroWeightResponse);

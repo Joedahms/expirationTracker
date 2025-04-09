@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 #include <memory>
 
-#include "../../../../logger.h"
+#include "../../../logger.h"
 #include "../display_global.h"
 #include "element_mediator.h"
 

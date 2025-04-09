@@ -2,9 +2,9 @@
 #include <iostream>
 #include <sqlite3.h>
 
-#include "../../../../food_item.h"
-#include "../../sql_food.h"
+#include "../../../food_item.h"
 #include "../sdl_debug.h"
+#include "../sql_food.h"
 #include "number_setting.h"
 
 /**
@@ -59,6 +59,7 @@ void NumberSetting::updateSelf() {
     hasParentUpdate();
   }
 
+  // TODO change to range based for loop
   for (int i = 0; i < this->children.size(); i++) {
     SDL_Point childRelativePosition = this->children[i]->getPositionRelativeToParent();
     childRelativePosition.y         = this->positionRelativeToParent.y;

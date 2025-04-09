@@ -10,14 +10,12 @@
 
 class DisplayHandler {
 public:
-  DisplayHandler(zmqpp::context& context, const std::string& engineEndpoint);
+  DisplayHandler(const zmqpp::context& context);
   void handle();
 
 private:
   Logger logger;
-  const std::string engineEndpoint;
 
-  zmqpp::socket requestEngineSocket;
   zmqpp::socket requestHardwareSocket;
   zmqpp::socket requestVisionSocket;
 

@@ -3,14 +3,14 @@
 #include <iostream>
 #include <memory>
 
-#include "../../../../food_item.h"
-#include "../../log_files.h"
-#include "../../sql_food.h"
+#include "../../../food_item.h"
 #include "../display_global.h"
 #include "../elements/dropdown.h"
 #include "../elements/panel.h"
 #include "../elements/scroll_box.h"
 #include "../elements/text.h"
+#include "../log_files.h"
+#include "../sql_food.h"
 #include "item_list.h"
 
 /**
