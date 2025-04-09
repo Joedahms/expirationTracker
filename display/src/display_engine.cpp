@@ -200,7 +200,7 @@ void DisplayEngine::checkItemList() {
   this->engineState = this->itemList->getCurrentState();
 
   if (this->engineState == EngineState::SCANNING) {
-    startSignalToDisplay();
+    startToHardware();
   }
 
   this->itemList->setCurrentState(EngineState::ITEM_LIST);
@@ -225,7 +225,7 @@ void DisplayEngine::checkZeroWeight() {
   else if (this->zeroWeight->getRetryScan()) {
     sendZeroWeightResponse(Messages::RETRY);
     this->zeroWeight->setRetryScan(false);
-    startSignalToDisplay();
+    startToHardware();
   }
 
   this->zeroWeight->setCurrentState(EngineState::ZERO_WEIGHT);
@@ -428,7 +428,7 @@ void DisplayEngine::scanCancelledToDisplayHandler() {
   */
 }
 
-void DisplayEngine::startSignalToDisplay() {
+void DisplayEngine::startToHardware() {
   this->logger.log("Scan initialized, sending start signal to hardware");
   try {
     std::string hardwareResponse = this->displayHandler.sendMessage(
