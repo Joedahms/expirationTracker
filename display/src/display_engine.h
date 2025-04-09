@@ -69,8 +69,8 @@ private:
   void checkCancelScanConfirmation();
 
   void startToHardware();
-  void sendZeroWeightResponse(const std::string& zeroWeightResponse);
-  void scanCancelledToDisplayHandler();
+  void zeroWeightChoiceToHardware(const std::string& zeroWeightChoice);
+  void scanCancelledToVision();
 };
 
 #endif

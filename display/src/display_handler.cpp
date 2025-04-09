@@ -35,19 +35,24 @@ DisplayHandler::DisplayHandler(const zmqpp::context& context)
  */
 std::string DisplayHandler::sendMessage(const std::string& message,
                                         const std::string& endpoint) {
-  std::string response;
-  if (endpoint == ExternalEndpoints::hardwareEndpoint) {
-    this->requestHardwareSocket.send(message);
-    this->requestHardwareSocket.receive(response);
-    return response;
-  }
-  else if (endpoint == ExternalEndpoints::visionEndpoint) {
-    this->requestVisionSocket.send(message);
-    this->requestVisionSocket.receive(response);
-    return response;
-  }
-  else {
-    LOG(FATAL) << "Attempt to send message to invalid endpoint";
+  try {
+    std::string response;
+
+    if (endpoint == ExternalEndpoints::hardwareEndpoint) {
+      this->requestHardwareSocket.send(message);
+      this->requestHardwareSocket.receive(response);
+      return response;
+    }
+    else if (endpoint == ExternalEndpoints::visionEndpoint) {
+      this->requestVisionSocket.send(message);
+      this->requestVisionSocket.receive(response);
+      return response;
+    }
+    else {
+      LOG(FATAL) << "Attempt to send message to invalid endpoint";
+    }
+  } catch (const zmqpp::exception& e) {
+    LOG(FATAL) << "zmqpp error when sending message: " << e.what();
   }
 }
 
@@ -62,24 +67,28 @@ std::string DisplayHandler::sendMessage(const std::string& message,
  */
 std::string DisplayHandler::receiveMessage(const std::string& response,
                                            const int timeoutMS) {
-  std::string request = "null";
-  if (timeoutMS == 0) {
-    this->replySocket.receive(request);
-    this->replySocket.send(response);
-  }
-  else {
-    zmqpp::poller poller;
-    poller.add(this->replySocket);
+  try {
+    std::string request = "null";
+    if (timeoutMS == 0) {
+      this->logger.log("Receiving message with no timeout");
+      this->replySocket.receive(request, true);
+    }
+    else {
+      zmqpp::poller poller;
+      poller.add(this->replySocket);
 
-    if (poller.poll(timeoutMS)) {
-      if (poller.has_input(this->replySocket)) {
-        this->replySocket.receive(request);
-        this->replySocket.send(response);
+      if (poller.poll(timeoutMS)) {
+        if (poller.has_input(this->replySocket)) {
+          this->replySocket.receive(request);
+          this->replySocket.send(response);
+        }
       }
     }
-  }
 
-  return request;
+    return request;
+  } catch (const zmqpp::exception& e) {
+    LOG(FATAL) << "zmqpp error when receiving message: " << e.what();
+  }
 }
 
 /**
@@ -89,6 +98,7 @@ std::string DisplayHandler::receiveMessage(const std::string& response,
  * @param None
  * @return None
  */
+/*
 void DisplayHandler::handle() {
   while (true) {
     std::string receivedMessage;
@@ -133,6 +143,7 @@ void DisplayHandler::handle() {
     }
   }
 }
+*/
 
 /**
  * Indicate to hardware that the user has placed an item on the platform and would like
@@ -141,6 +152,7 @@ void DisplayHandler::handle() {
  * @param None
  * @return True if hardware started scan. False if hardware not able to start scan.
  */
+/*
 std::string DisplayHandler::startSignalToHardware() {
   this->logger.log("Received start scan from engine");
 
@@ -165,6 +177,7 @@ std::string DisplayHandler::startSignalToHardware() {
     LOG(FATAL) << e.what();
   }
 }
+*/
 
 /**
  * Wait for a response from vision indicating success of scan.
@@ -172,6 +185,7 @@ std::string DisplayHandler::startSignalToHardware() {
  * @param None
  * @return None
  */
+/*
 void DisplayHandler::handleScanStarted() {
   this->logger.log("Listening for incoming messages while scanning");
   std::string request;
@@ -190,6 +204,7 @@ void DisplayHandler::handleScanStarted() {
     LOG(FATAL) << "Unexpected message received";
   }
 }
+*/
 
 /**
  * Handle the failure of a scan.
@@ -197,8 +212,8 @@ void DisplayHandler::handleScanStarted() {
  * @param None
  * @return None
  */
+/*
 void DisplayHandler::detectionFailure() {
-  /*
   this->replySocket.send(Messages::AFFIRMATIVE);
   this->logger.log("Item detection failed");
 
@@ -214,8 +229,8 @@ void DisplayHandler::detectionFailure() {
   else {
     LOG(FATAL) << "Unexpected message received";
   }
-  */
 }
+*/
 
 /**
  * Handle the success of a scan. Store the identified food item in the database and
@@ -224,102 +239,103 @@ void DisplayHandler::detectionFailure() {
  * @param None
  * @return None
  */
+/*
 void DisplayHandler::detectionSuccess() {
-  /*
-  this->replySocket.send(Messages::AFFIRMATIVE);
+this->replySocket.send(Messages::AFFIRMATIVE);
 
-  this->logger.log("Item detection succeeded, receiving food item");
-  FoodItem foodItem;
-  bool foodItemReceived = false;
-  while (foodItemReceived == false) {
-    foodItemReceived =
-        receiveFoodItem(this->replySocket, Messages::AFFIRMATIVE, foodItem);
-  }
-
-  this->logger.log("Food item received: ");
-  foodItem.logToFile(this->logger);
-  this->logger.log("Storing food item in database");
-  sqlite3* database = nullptr;
-  openDatabase(&database);
-  storeFoodItem(database, foodItem);
-  sqlite3_close(database);
-  this->logger.log("Food item stored in database");
-
-  this->logger.log("Sending success message to engine");
-  this->requestEngineSocket.send(Messages::ITEM_DETECTION_SUCCEEDED);
-  this->logger.log("Success message send to engine");
-  std::string engineResponse;
-  this->logger.log("Receiving response from engine");
-  this->requestEngineSocket.receive(engineResponse);
-  this->logger.log("Received response from engine");
-  if (engineResponse == Messages::AFFIRMATIVE) {
-    this->logger.log("Item stored in database and engine notified of success");
-  }
-  else {
-    LOG(FATAL) << "Unexpected message received";
-  }
-  */
+this->logger.log("Item detection succeeded, receiving food item");
+FoodItem foodItem;
+bool foodItemReceived = false;
+while (foodItemReceived == false) {
+  foodItemReceived =
+      receiveFoodItem(this->replySocket, Messages::AFFIRMATIVE, foodItem);
 }
 
+this->logger.log("Food item received: ");
+foodItem.logToFile(this->logger);
+this->logger.log("Storing food item in database");
+sqlite3* database = nullptr;
+openDatabase(&database);
+storeFoodItem(database, foodItem);
+sqlite3_close(database);
+this->logger.log("Food item stored in database");
+
+this->logger.log("Sending success message to engine");
+this->requestEngineSocket.send(Messages::ITEM_DETECTION_SUCCEEDED);
+this->logger.log("Success message send to engine");
+std::string engineResponse;
+this->logger.log("Receiving response from engine");
+this->requestEngineSocket.receive(engineResponse);
+this->logger.log("Received response from engine");
+if (engineResponse == Messages::AFFIRMATIVE) {
+  this->logger.log("Item stored in database and engine notified of success");
+}
+else {
+  LOG(FATAL) << "Unexpected message received";
+}
+}
+
+*/
+
+/*
 void DisplayHandler::scanCancelled() {
-  /*
-  this->replySocket.send(Messages::AFFIRMATIVE);
+this->replySocket.send(Messages::AFFIRMATIVE);
 
-  this->logger.log("Scan cancelled, sending scan cancelled message to vision");
-  this->requestVisionSocket.send(Messages::SCAN_CANCELLED);
-  this->logger.log("Scan cancelled message sent to vision");
-  std::string visionResponse;
-  this->logger.log("Receiving response from vision");
-  this->requestVisionSocket.receive(visionResponse);
-  this->logger.log("Received response from vision");
-  if (visionResponse == Messages::AFFIRMATIVE) {
-    this->logger.log("Vision received scan cancelled message");
-  }
-  else {
-    LOG(FATAL) << "Unexpected message received";
-  }
-  */
+this->logger.log("Scan cancelled, sending scan cancelled message to vision");
+this->requestVisionSocket.send(Messages::SCAN_CANCELLED);
+this->logger.log("Scan cancelled message sent to vision");
+std::string visionResponse;
+this->logger.log("Receiving response from vision");
+this->requestVisionSocket.receive(visionResponse);
+this->logger.log("Received response from vision");
+if (visionResponse == Messages::AFFIRMATIVE) {
+  this->logger.log("Vision received scan cancelled message");
 }
+else {
+  LOG(FATAL) << "Unexpected message received";
+}
+}
+*/
 
+/*
 void DisplayHandler::zeroWeightRetry() {
-  /*
-  this->logger.log("Received retry from engine, sending affirmative back");
-  // TODO figure out how to retry
-  this->replySocket.send(Messages::AFFIRMATIVE);
-  this->logger.log("Affirmative sent, sending retry request to hardware");
-  this->requestHardwareSocket.send(Messages::RETRY);
-  this->logger.log("Sent retry request to hardware");
-  std::string retryResponse;
-  this->requestHardwareSocket.receive(retryResponse);
-  this->logger.log("Hardware received retry request");
-  */
+this->logger.log("Received retry from engine, sending affirmative back");
+// TODO figure out how to retry
+this->replySocket.send(Messages::AFFIRMATIVE);
+this->logger.log("Affirmative sent, sending retry request to hardware");
+this->requestHardwareSocket.send(Messages::RETRY);
+this->logger.log("Sent retry request to hardware");
+std::string retryResponse;
+this->requestHardwareSocket.receive(retryResponse);
+this->logger.log("Hardware received retry request");
 }
+*/
 
+/*
 void DisplayHandler::zeroWeightOverride() {
-  /*
-  this->logger.log("Received override from engine, sending affirmative back");
-  this->replySocket.send(Messages::AFFIRMATIVE);
-  this->logger.log("Affirmative sent, sending override request to hardware");
-  this->requestHardwareSocket.send(Messages::OVERRIDE);
-  this->logger.log("Sent override request to hardware");
-  std::string overrideResponse;
-  this->requestHardwareSocket.receive(overrideResponse);
-  // TODO check overrideResponse
-  this->logger.log("Hardware received override request, waiting for request from
-  vision"); handleScanStarted();
-  */
+this->logger.log("Received override from engine, sending affirmative back");
+this->replySocket.send(Messages::AFFIRMATIVE);
+this->logger.log("Affirmative sent, sending override request to hardware");
+this->requestHardwareSocket.send(Messages::OVERRIDE);
+this->logger.log("Sent override request to hardware");
+std::string overrideResponse;
+this->requestHardwareSocket.receive(overrideResponse);
+// TODO check overrideResponse
+this->logger.log("Hardware received override request, waiting for request from
+vision"); handleScanStarted();
 }
+*/
 
+/*
 void DisplayHandler::zeroWeightCancel() {
-  /*
-  this->logger.log("Received cancel from engine, sending affirmative back");
-  this->replySocket.send(Messages::AFFIRMATIVE);
-  this->logger.log("Affirmative sent, sending cancel request to hardware");
-  this->requestHardwareSocket.send(Messages::CANCEL);
-  this->logger.log("Sent cancel request to hardware");
-  std::string cancelResponse;
-  this->requestHardwareSocket.receive(cancelResponse);
-  // TODO check cancelResponse
-  this->logger.log("Hardware received cancel request");
-  */
+this->logger.log("Received cancel from engine, sending affirmative back");
+this->replySocket.send(Messages::AFFIRMATIVE);
+this->logger.log("Affirmative sent, sending cancel request to hardware");
+this->requestHardwareSocket.send(Messages::CANCEL);
+this->logger.log("Sent cancel request to hardware");
+std::string cancelResponse;
+this->requestHardwareSocket.receive(cancelResponse);
+// TODO check cancelResponse
+this->logger.log("Hardware received cancel request");
 }
+*/

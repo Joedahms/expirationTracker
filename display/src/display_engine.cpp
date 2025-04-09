@@ -131,7 +131,6 @@ void DisplayEngine::start() {
 
   while (this->displayIsRunning) {
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-    this->displayHandler.handle();
     handleEvents();
     checkState();
     checkKeystates();
@@ -214,16 +213,18 @@ void DisplayEngine::checkItemList() {
  */
 void DisplayEngine::checkZeroWeight() {
   this->engineState = this->zeroWeight->getCurrentState();
-  // override
+
+  // Override
   if (this->engineState == EngineState::SCANNING) {
-    sendZeroWeightResponse(Messages::OVERRIDE);
+    zeroWeightChoiceToHardware(Messages::OVERRIDE);
   }
-  // cancel
+  // Cancel
   else if (this->engineState == EngineState::ITEM_LIST) {
-    sendZeroWeightResponse(Messages::CANCEL);
+    zeroWeightChoiceToHardware(Messages::CANCEL);
   }
+  // Retry
   else if (this->zeroWeight->getRetryScan()) {
-    sendZeroWeightResponse(Messages::RETRY);
+    zeroWeightChoiceToHardware(Messages::RETRY);
     this->zeroWeight->setRetryScan(false);
     startToHardware();
   }
@@ -241,7 +242,7 @@ void DisplayEngine::checkCancelScanConfirmation() {
   this->engineState = this->cancelScanConfirmation->getCurrentState();
 
   if (this->engineState == EngineState::ITEM_LIST) { // Scan was cancelled
-    scanCancelledToDisplayHandler();
+    scanCancelledToVision();
   }
   else if (this->engineState == EngineState::SCANNING) { // Scan was not cancelled
   }
@@ -257,30 +258,28 @@ void DisplayEngine::checkCancelScanConfirmation() {
  * @return None
  */
 void DisplayEngine::handleEvents() {
-  /*
   switch (this->engineState) {
   case EngineState::SCANNING:
     {
       this->scanning->handleEvents(&this->displayIsRunning);
 
-      bool gotMessageFromDisplay = false;
-      std::string messageFromDisplay;
-      gotMessageFromDisplay = this->replySocket.receive(messageFromDisplay, true);
-      if (gotMessageFromDisplay == false) {
+      std::string response      = Messages::AFFIRMATIVE;
+      std::string visionRequest = this->displayHandler.receiveMessage(response, 0);
+      if (visionRequest == "null") {
         break;
       }
-      if (messageFromDisplay == Messages::ITEM_DETECTION_SUCCEEDED) {
+
+      if (visionRequest == Messages::ITEM_DETECTION_SUCCEEDED) {
         this->logger.log("New food item received, switching to item list state");
         this->engineState = EngineState::ITEM_LIST;
-        this->replySocket.send(Messages::AFFIRMATIVE);
       }
-      else if (messageFromDisplay == Messages::ITEM_DETECTION_FAILED) {
+      else if (visionRequest == Messages::ITEM_DETECTION_FAILED) {
         this->logger.log("Item detection failed, switching to item list state");
         this->engineState = EngineState::ITEM_LIST;
-        this->replySocket.send(Messages::AFFIRMATIVE);
       }
       else {
-        LOG(FATAL) << "Invalid message received from display";
+        this->logger.log("Invalid request received from vision: " + visionRequest);
+        LOG(FATAL) << "Invalid request received from vision: " << visionRequest;
       }
       break;
     }
@@ -301,7 +300,6 @@ void DisplayEngine::handleEvents() {
     LOG(FATAL) << "Invalid state";
     break;
   }
-  */
 }
 
 /**
@@ -408,86 +406,54 @@ void DisplayEngine::clean() {
   LOG(INFO) << "DisplayEngine cleaned";
 }
 
-void DisplayEngine::scanCancelledToDisplayHandler() {
-  /*
-  this->logger.log("Scan cancelled, sending cancel scan signal to display handler");
-  try {
-    this->requestSocket.send(Messages::SCAN_CANCELLED);
-    std::string response;
-    this->requestSocket.receive(response);
-    if (response == Messages::AFFIRMATIVE) {
-      this->logger.log("Cancel scan signal successfully sent to display handler, in "
-                       "cancel scan confirmation state");
-    }
-    else {
-      LOG(FATAL) << "Invalid response received from display handler";
-    }
-  } catch (const zmqpp::exception& e) {
-    LOG(FATAL) << e.what();
+void DisplayEngine::scanCancelledToVision() {
+  this->logger.log("Scan cancelled, sending scan cancelled message to vision");
+
+  std::string visionResponse = this->displayHandler.sendMessage(
+      Messages::SCAN_CANCELLED, ExternalEndpoints::visionEndpoint);
+
+  this->logger.log("Received response from vision");
+  if (visionResponse == Messages::AFFIRMATIVE) {
+    this->logger.log("Vision received scan cancelled message");
   }
-  */
+  else {
+    this->logger.log("Invalid response received from vision: " + visionResponse);
+    LOG(FATAL) << "Invalid response received from vision: " << visionResponse;
+  }
 }
 
 void DisplayEngine::startToHardware() {
   this->logger.log("Scan initialized, sending start signal to hardware");
-  try {
-    std::string hardwareResponse = this->displayHandler.sendMessage(
-        Messages::START_SCAN, ExternalEndpoints::hardwareEndpoint);
 
-    if (hardwareResponse == Messages::AFFIRMATIVE) {
-      this->logger.log("Hardware starting scan");
-    }
-    else if (hardwareResponse == Messages::ZERO_WEIGHT) {
-      this->logger.log(
-          "Hardware indicated zero weight on platform, switching to zero weight state");
-      this->engineState = EngineState::ZERO_WEIGHT;
-    }
-    else {
-      this->logger.log("Received invalid response from hardware: " + hardwareResponse);
-      LOG(FATAL) << "Invalid response received from hardware: " << hardwareResponse;
-    }
+  std::string hardwareResponse = this->displayHandler.sendMessage(
+      Messages::START_SCAN, ExternalEndpoints::hardwareEndpoint);
 
-    /*
-     this->requestSocket.send(Messages::START_SCAN);
-    this->logger.log("Start signal successfully sent to display, waiting for response");
-    std::string response;
-    this->requestSocket.receive(response);
-    if (response == Messages::AFFIRMATIVE) {
-      this->logger.log("Received affirmative from display");
-    }
-    else if (response == Messages::ZERO_WEIGHT) {
-      this->logger.log(
-          "Received zero weight back from display, switching to zero weight state");
-      this->engineState = EngineState::ZERO_WEIGHT;
-      // At this point need to check if display sends back affirmative or zero weight
-      // Break out response checking (if else if) and call it on some interval if in
-      // zero weight state?
-    }
-    else {
-      this->logger.log("Received invalid response from display: " + response);
-      LOG(FATAL) << "Invalid response received from display " << response;
-    }
-    */
-  } catch (const zmqpp::exception& e) {
-    LOG(FATAL) << e.what();
+  if (hardwareResponse == Messages::AFFIRMATIVE) {
+    this->logger.log("Hardware starting scan");
+  }
+  else if (hardwareResponse == Messages::ZERO_WEIGHT) {
+    this->logger.log(
+        "Hardware indicated zero weight on platform, switching to zero weight state");
+    this->engineState = EngineState::ZERO_WEIGHT;
+  }
+  else {
+    this->logger.log("Invalid response received from hardware: " + hardwareResponse);
+    LOG(FATAL) << "Invalid response received from hardware: " << hardwareResponse;
   }
 }
 
-void DisplayEngine::sendZeroWeightResponse(const std::string& zeroWeightResponse) {
-  /*
-  this->logger.log("Sending zero weight response: " + zeroWeightResponse + " to display");
-  try {
-    this->requestSocket.send(zeroWeightResponse);
-    std::string response;
-    this->requestSocket.receive(response);
-    if (response == Messages::AFFIRMATIVE) {
-      this->logger.log("Zero weight response successfully sent to display");
-    }
-    else {
-      LOG(FATAL) << "Invalid response received from display";
-    }
-  } catch (const zmqpp::exception& e) {
-    LOG(FATAL) << e.what();
+void DisplayEngine::zeroWeightChoiceToHardware(const std::string& zeroWeightChoice) {
+  this->logger.log("Sending zero weight choice: " + zeroWeightChoice + " to hardware");
+
+  std::string hardwareResponse = this->displayHandler.sendMessage(
+      zeroWeightChoice, ExternalEndpoints::hardwareEndpoint);
+
+  if (hardwareResponse == Messages::AFFIRMATIVE) {
+    this->logger.log(
+        "Zero weight choice successfully sent to hardware, switching to scanning state");
   }
-  */
+  else {
+    this->logger.log("Invalid response received from hardware: " + hardwareResponse);
+    LOG(FATAL) << "Invalid response received from hardware: " << hardwareResponse;
+  }
 }
