@@ -3,7 +3,6 @@
 /**
  * @param context The zeroMQ context with which to creates with
  * @param textClassifierEndpoint Endpoint of the text classifier
- * @param pythonServerEndpoint Endpont of the python server
  */
 TextClassifier::TextClassifier(zmqpp::context& context,
                                const std::string& textClassifierEndpoint)
@@ -125,5 +124,28 @@ OCRResult TextClassifier::runModel(const std::filesystem::path& imagePath) {
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << "ZeroMQ error: " << e.what();
     return classifications;
+  }
+}
+
+void TextClassifier::notifyServer(const bool& isProcessing) {
+  if (isProcessing) {
+    this->requestSocket.send("start");
+    zmqpp::message message;
+    this->requestSocket.receive(message);
+    std::string response;
+    message >> response;
+    if (response != "yes") {
+      LOG(FATAL) << "server did not acknowledge processing start.";
+    }
+  }
+  else {
+    this->requestSocket.send("stop");
+    zmqpp::message message;
+    this->requestSocket.receive(message);
+    std::string response;
+    message >> response;
+    if (response != "yes") {
+      LOG(FATAL) << "server did not acknowledge processing stop.";
+    }
   }
 }
