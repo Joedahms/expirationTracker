@@ -34,16 +34,18 @@ void ImageProcessor::process() {
   }
 
   AnalyzeObjectReturn detectedFoodItem = analyze();
-  this->logger.log("Successfully analyzed all images");
 
   switch (detectedFoodItem) {
   case AnalyzeObjectReturn::Success:
+    this->logger.log("Successfully detected a food item");
     detectionSucceeded();
     break;
   case AnalyzeObjectReturn::Failure:
+    this->logger.log("Failure detecting a food item");
     detectionFailed();
     break;
   case AnalyzeObjectReturn::Cancel:
+    this->logger.log("Detection of food item cancelled");
     stopHardware();
     break;
   default:

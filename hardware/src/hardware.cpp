@@ -277,7 +277,7 @@ void Hardware::rotateAndCapture() {
         receivedStopSignal = true;
       }
       else {
-        this->logger.log("Received other from vision");
+        this->logger.log("Received other from vision: " + request);
         this->replySocket.send(Messages::RETRANSMIT);
       }
     }

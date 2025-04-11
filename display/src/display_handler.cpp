@@ -35,17 +35,24 @@ DisplayHandler::DisplayHandler(const zmqpp::context& context)
  */
 std::string DisplayHandler::sendMessage(const std::string& message,
                                         const std::string& endpoint) {
+  this->logger.log("Entering sendMessage");
   try {
     std::string response;
 
     if (endpoint == ExternalEndpoints::hardwareEndpoint) {
+      this->logger.log("Sending message to hardware: " + message);
       this->requestHardwareSocket.send(message);
+      this->logger.log("Message sent to hardware, awaiting response");
       this->requestHardwareSocket.receive(response);
+      this->logger.log("Response received: " + response);
       return response;
     }
     else if (endpoint == ExternalEndpoints::visionEndpoint) {
+      this->logger.log("Sending message to vision: " + message);
       this->requestVisionSocket.send(message);
+      this->logger.log("Message sent to vision, awaiting response");
       this->requestVisionSocket.receive(response);
+      this->logger.log("Response received: " + response);
       return response;
     }
     else {
