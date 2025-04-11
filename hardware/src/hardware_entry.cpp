@@ -19,13 +19,14 @@
  * hardware, and display)
  * @return None
  */
-void hardwareEntry(zmqpp::context& context, bool usingMotor) {
+void hardwareEntry(zmqpp::context& context, bool usingMotor, bool usingCamera) {
   Logger logger("hardware_entry.txt");
   logger.log("Within hardware process");
 
-  Hardware hardware(context);
-  bool startSignalReceived = false;
-  int startSignalTimeoutMs = 1000;
+  Hardware hardware(context, usingMotor, usingCamera);
+
+  bool startSignalReceived       = false;
+  const int startSignalTimeoutMs = 1000;
 
   if (usingMotor) {
     hardware.initDC();

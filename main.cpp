@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
     google::ShutdownGoogleLogging();
     google::InitGoogleLogging("hardware");
 
-    hardwareEntry(context, usingMotor);
+    hardwareEntry(context, usingMotor, usingCamera);
     LOG(INFO) << "Hardware process";
     return 0;
   }

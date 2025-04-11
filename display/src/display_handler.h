@@ -15,7 +15,8 @@ public:
   std::string sendMessage(const std::string& message, const std::string& endpoint);
   std::string receiveMessage(const std::string& response, const int timeout);
 
-  void handle();
+  // void handle();
+  void detectionSuccess();
 
 private:
   Logger logger;
@@ -28,7 +29,6 @@ private:
 
   void handleScanStarted();
   void detectionFailure();
-  void detectionSuccess();
   void scanCancelled();
 
   void zeroWeightRetry();

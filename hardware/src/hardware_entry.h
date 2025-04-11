@@ -5,6 +5,6 @@
 
 #include "../../endpoints.h"
 
-void hardwareEntry(zmqpp::context& context, bool usingMotor);
+void hardwareEntry(zmqpp::context& context, bool usingMotor, bool usingCamera);
 
 #endif

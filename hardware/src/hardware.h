@@ -18,7 +18,7 @@
 
 class Hardware {
 public:
-  Hardware(zmqpp::context& context);
+  Hardware(zmqpp::context& context, bool usingMotor, bool usingCamera);
 
   void initDC();
   bool checkStartSignal(int timeoutMs);
@@ -35,6 +35,9 @@ private:
   std::filesystem::path imageDirectory;
 
   float itemWeight = 0;
+
+  bool usingMotor;
+  bool usingCamera;
 
   bool checkWeight();
   void rotateAndCapture();

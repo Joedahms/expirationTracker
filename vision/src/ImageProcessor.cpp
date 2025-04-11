@@ -38,11 +38,9 @@ void ImageProcessor::process() {
 
   switch (detectedFoodItem) {
   case AnalyzeObjectReturn::Success:
-    this->logger.log("Successfully detected a food item");
     detectionSucceeded();
     break;
   case AnalyzeObjectReturn::Failure:
-    this->logger.log("Failure detecting a food item");
     detectionFailed();
     break;
   case AnalyzeObjectReturn::Cancel:
@@ -104,10 +102,12 @@ void ImageProcessor::processImagePair(int currentImageNumber,
     sideExists = std::filesystem::exists(sideImage);
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
+
   ClassifyObjectReturn sideImageReturn =
       this->modelHandler.classifyObject(sideImage, this->foodItem);
   ClassifyObjectReturn topImageReturn =
       this->modelHandler.classifyObject(topImage, this->foodItem);
+
   if (sideImageReturn.foodItem || topImageReturn.foodItem) {
     this->logger.log("Food item found.");
     classifyObjectReturn.foodItem = true;
@@ -116,7 +116,6 @@ void ImageProcessor::processImagePair(int currentImageNumber,
     this->logger.log("Expiration date found.");
     classifyObjectReturn.expirationDate = true;
   }
-  return;
 }
 
 struct FoodItem& ImageProcessor::getFoodItem() { return this->foodItem; }
@@ -147,11 +146,11 @@ void ImageProcessor::detectionFailed() {
 void ImageProcessor::foodItemToDisplay() {
   this->logger.log("Indicating detection success to display");
   this->requestDisplaySocket.send(Messages::ITEM_DETECTION_SUCCEEDED);
+  this->logger.log("Sent success message to display, awaiting response");
   std::string response;
   this->requestDisplaySocket.receive(response);
   if (response == Messages::AFFIRMATIVE) {
-    this->logger.log("Success indicated to display, sending detected food item");
-    this->logger.log("Sending detected food item to display: ");
+    this->logger.log("Display acknowledged success, sending detected food item: ");
     this->foodItem.logToFile(this->logger);
     response = sendFoodItem(this->requestDisplaySocket, this->foodItem);
     if (response == Messages::AFFIRMATIVE) {
@@ -160,6 +159,8 @@ void ImageProcessor::foodItemToDisplay() {
     else {
       LOG(FATAL) << "Detected food item transmission failure";
     }
+  }
+  else {
   }
 }
 

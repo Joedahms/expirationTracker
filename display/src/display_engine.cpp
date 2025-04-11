@@ -263,14 +263,17 @@ void DisplayEngine::handleEvents() {
     {
       this->scanning->handleEvents(&this->displayIsRunning);
 
-      std::string response      = Messages::AFFIRMATIVE;
-      std::string visionRequest = this->displayHandler.receiveMessage(response, 0);
+      std::string response       = Messages::AFFIRMATIVE;
+      const int receiveTimeoutMs = 1;
+      std::string visionRequest =
+          this->displayHandler.receiveMessage(response, receiveTimeoutMs);
       if (visionRequest == "null") {
         break;
       }
 
       if (visionRequest == Messages::ITEM_DETECTION_SUCCEEDED) {
         this->logger.log("New food item received, switching to item list state");
+        this->displayHandler.detectionSuccess();
         this->engineState = EngineState::ITEM_LIST;
       }
       else if (visionRequest == Messages::ITEM_DETECTION_FAILED) {
@@ -285,9 +288,19 @@ void DisplayEngine::handleEvents() {
     }
 
   case EngineState::ITEM_LIST:
-    this->itemList->handleEvents(&this->displayIsRunning);
-    break;
+    {
+      this->itemList->handleEvents(&this->displayIsRunning);
 
+      std::string response       = Messages::AFFIRMATIVE;
+      const int receiveTimeoutMs = 1;
+      std::string request =
+          this->displayHandler.receiveMessage(response, receiveTimeoutMs);
+      if (request == "null" || request == Messages::ITEM_DETECTION_SUCCEEDED ||
+          request == Messages::ITEM_DETECTION_FAILED) {
+        break;
+      }
+      break;
+    }
   case EngineState::ZERO_WEIGHT:
     this->zeroWeight->handleEvents(&this->displayIsRunning);
     break;

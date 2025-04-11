@@ -81,12 +81,15 @@ std::string DisplayHandler::receiveMessage(const std::string& response,
       this->replySocket.receive(request, true);
     }
     else {
+      this->logger.log("Receiving message with " + std::to_string(timeoutMS) +
+                       " ms timeout");
       zmqpp::poller poller;
       poller.add(this->replySocket);
 
       if (poller.poll(timeoutMS)) {
         if (poller.has_input(this->replySocket)) {
           this->replySocket.receive(request);
+          this->logger.log("Received message: " + request);
           this->replySocket.send(response);
         }
       }
@@ -246,43 +249,24 @@ void DisplayHandler::detectionFailure() {
  * @param None
  * @return None
  */
-/*
 void DisplayHandler::detectionSuccess() {
-this->replySocket.send(Messages::AFFIRMATIVE);
+  this->logger.log("Item detection succeeded, receiving food item");
+  FoodItem foodItem;
+  bool foodItemReceived = false;
+  while (foodItemReceived == false) {
+    foodItemReceived =
+        receiveFoodItem(this->replySocket, Messages::AFFIRMATIVE, foodItem);
+  }
 
-this->logger.log("Item detection succeeded, receiving food item");
-FoodItem foodItem;
-bool foodItemReceived = false;
-while (foodItemReceived == false) {
-  foodItemReceived =
-      receiveFoodItem(this->replySocket, Messages::AFFIRMATIVE, foodItem);
+  this->logger.log("Food item received: ");
+  foodItem.logToFile(this->logger);
+  this->logger.log("Storing food item in database");
+  sqlite3* database = nullptr;
+  openDatabase(&database);
+  storeFoodItem(database, foodItem);
+  sqlite3_close(database);
+  this->logger.log("Food item stored in database");
 }
-
-this->logger.log("Food item received: ");
-foodItem.logToFile(this->logger);
-this->logger.log("Storing food item in database");
-sqlite3* database = nullptr;
-openDatabase(&database);
-storeFoodItem(database, foodItem);
-sqlite3_close(database);
-this->logger.log("Food item stored in database");
-
-this->logger.log("Sending success message to engine");
-this->requestEngineSocket.send(Messages::ITEM_DETECTION_SUCCEEDED);
-this->logger.log("Success message send to engine");
-std::string engineResponse;
-this->logger.log("Receiving response from engine");
-this->requestEngineSocket.receive(engineResponse);
-this->logger.log("Received response from engine");
-if (engineResponse == Messages::AFFIRMATIVE) {
-  this->logger.log("Item stored in database and engine notified of success");
-}
-else {
-  LOG(FATAL) << "Unexpected message received";
-}
-}
-
-*/
 
 /*
 void DisplayHandler::scanCancelled() {

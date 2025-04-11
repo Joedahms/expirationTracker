@@ -12,19 +12,29 @@
  * @param externalEndpoints Endpoints to the main components of the system (vision,
  * hardware, and display)
  */
-Hardware::Hardware(zmqpp::context& context)
-    : requestVisionSocket(context, zmqpp::socket_type::request),
+Hardware::Hardware(zmqpp::context& context, bool usingMotor, bool usingCamera)
+    : logger("hardware_log.txt"),
+      requestVisionSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
-      replySocket(context, zmqpp::socket_type::reply), logger("hardware_log.txt"),
-      imageDirectory(std::filesystem::current_path() / "tmp/images/") {
-  if (!std::filesystem::exists(imageDirectory)) {
-    if (std::filesystem::create_directories(imageDirectory)) {
-      this->logger.log("Created directory: " + imageDirectory.string());
-    }
-    else {
-      this->logger.log("Failed to create directory: " + imageDirectory.string());
+      replySocket(context, zmqpp::socket_type::reply),
+      // imageDirectory(std::filesystem::current_path() / "tmp/images/"),
+      usingMotor(usingMotor), usingCamera(usingCamera) {
+  if (this->usingCamera) {
+    this->imageDirectory = std::filesystem::current_path() / "tmp/images/";
+
+    if (!std::filesystem::exists(imageDirectory)) {
+      if (std::filesystem::create_directories(imageDirectory)) {
+        this->logger.log("Created directory: " + imageDirectory.string());
+      }
+      else {
+        this->logger.log("Failed to create directory: " + imageDirectory.string());
+      }
     }
   }
+  else {
+    this->imageDirectory = std::filesystem::current_path() / "../images/Banana";
+  }
+
   try {
     this->requestVisionSocket.connect(ExternalEndpoints::visionEndpoint);
     this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
@@ -179,7 +189,8 @@ void Hardware::sendStartToVision() {
 /**
  * Start the scan of a new food item.
  *
- * @param None
+ * @param usingCamera True if a raspberry pi camera is connected and can be used to take
+ * pictures. False if no camera connected and pictures from images/Apple should be used.
  * @return True if the scan was successful. False if the scan was unsuccessful.
  *
  * TODO Handle no weight on platform
@@ -187,17 +198,17 @@ void Hardware::sendStartToVision() {
 bool Hardware::startScan() {
   this->logger.log("Starting scan");
 
-  if (!this->imageDirectory.empty()) {
-    this->logger.log("Clearing directory");
+  if (!this->imageDirectory.empty() && this->usingCamera) {
+    this->logger.log("Clearing image directory");
     try {
       for (const auto& entry : std::filesystem::directory_iterator(imageDirectory)) {
         if (entry.is_regular_file()) {
           std::filesystem::remove(entry.path());
-          this->logger.log("Deleted: " + entry.path().string());
+          this->logger.log("Deleted image: " + entry.path().string());
         }
       }
     } catch (const std::filesystem::filesystem_error& e) {
-      this->logger.log("Error deleting files: " + std::string(e.what()));
+      this->logger.log("Error deleting images: " + std::string(e.what()));
     }
   }
 
@@ -241,21 +252,20 @@ void Hardware::rotateAndCapture() {
     this->logger.log("At location " + std::to_string(angle) + " of 8");
 
     // Leaving in T/F logic in case we need to add error handling later
-    if (takePhotos(angle) == false) {
-      this->logger.log("Error taking photos");
-    };
-
-    // if (capturePhoto(angle) == false) {
-    //   this->logger.log("Error taking a photo");
-    // }
+    if (this->usingCamera) {
+      if (takePhotos(angle) == false) {
+        this->logger.log("Error taking photos");
+      }
+    }
 
     // Initiate image scanning on server
     if (angle == 0) {
       sendStartToVision();
     }
 
-    this->logger.log("Rotating platform");
-    rotateMotor(true);
+    if (this->usingMotor) {
+      rotateMotor(true);
+    }
 
     // Swap comment lines below if you don't want to wait on realistic motor rotation time
     // usleep(500);
@@ -299,24 +309,25 @@ void Hardware::rotateAndCapture() {
  */
 bool Hardware::takePhotos(int angle) {
   this->logger.log("Taking photos at position: " + std::to_string(angle));
-  std::string cmd0 = "rpicam-jpeg --camera 0";
-  std::string cmd1 = "rpicam-jpeg --camera 1";
-  std::string np   = " --nopreview";
-  std::string res  = " --width 4608 --height 2592";
-  std::string out  = " --output ";
-  std::string to   = " --timeout 50"; // DO NOT SET TO 0! Will cause infinite preview!
-  std::string topPhoto =
+  const std::string cmd0 = "rpicam-jpeg --camera 0";
+  const std::string cmd1 = "rpicam-jpeg --camera 1";
+  const std::string np   = " --nopreview";
+  const std::string res  = " --width 4608 --height 2592";
+  const std::string out  = " --output ";
+  const std::string to = " --timeout 50"; // DO NOT SET TO 0! Will cause infinite preview!
+  const std::string topPhoto =
       this->imageDirectory.string() + std::to_string(angle) + "_top.jpg";
-  std::string sidePhoto =
+  const std::string sidePhoto =
       this->imageDirectory.string() + std::to_string(angle) + "_side.jpg";
 
-  std::string command0 = cmd0 + np + res + out + topPhoto + to;
-  std::string command1 = cmd0 + np + res + out + sidePhoto + to;
+  const std::string command0 = cmd0 + np + res + out + topPhoto + to;
+  const std::string command1 = cmd0 + np + res + out + sidePhoto + to;
   system(command0.c_str());
   system(command1.c_str());
 
   this->logger.log("Photos successfully captured at position: " + std::to_string(angle));
   this->logger.log("Exiting takePhotos at angle: " + std::to_string(angle));
+
   // Always returns true
   return true;
 }
@@ -332,6 +343,7 @@ bool Hardware::takePhotos(int angle) {
  */
 // likely needs to be updated after testing to confirm direction
 void Hardware::rotateMotor(bool clockwise) {
+  this->logger.log("Rotating platform");
   if (clockwise) {
     this->logger.log("Rotating clockwise.");
     digitalWrite(MOTOR_IN1, HIGH);
@@ -350,7 +362,7 @@ void Hardware::rotateMotor(bool clockwise) {
     digitalWrite(MOTOR_IN1, LOW);
     digitalWrite(MOTOR_IN2, LOW);
   }
-  LOG(INFO) << "Rotation complete.";
+  this->logger.log("Platform successfully rotated");
 }
 
 /**
