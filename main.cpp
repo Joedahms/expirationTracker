@@ -9,17 +9,16 @@
 #include "hardware/src/hardware_entry.h"
 #include "vision/include/visionMain.h"
 
+void checkCommandLineArgs(int argc, char* argv[], bool& usingMotor, bool& usingCamera);
+
 int main(int argc, char* argv[]) {
   google::InitGoogleLogging(argv[0]);
   zmqpp::context context;
 
-  bool usingMotor = true;
-  if (argc == 2) {
-    std::string arg1(argv[1]);
-    if (arg1 == "-nomo") {
-      usingMotor = false;
-    }
-  }
+  bool usingMotor  = true;
+  bool usingCamera = true;
+
+  checkCommandLineArgs(argc, argv, usingMotor, usingCamera);
 
   // Display
   LOG(INFO) << "Starting display process..";
@@ -94,4 +93,23 @@ int main(int argc, char* argv[]) {
   LOG(INFO) << "Vision process terminated with status: " << status;
   google::ShutdownGoogleLogging();
   return 0;
+}
+
+void checkCommandLineArgs(int argc, char* argv[], bool& usingMotor, bool& usingCamera) {
+  const std::string noMotorFlag  = "-nomo";
+  const std::string noCameraFlag = "-nocam";
+
+  for (int i = 1; i < argc; i++) {
+    std::string arg(argv[i]);
+    if (arg == noMotorFlag) {
+      usingMotor = false;
+    }
+    else if (arg == noCameraFlag) {
+      usingCamera = false;
+    }
+  }
+
+  std::cout << "Starting expiration tracker..." << std::endl;
+  std::cout << "Using motor: " << usingMotor << std::endl;
+  std::cout << "Using camera: " << usingCamera << std::endl;
 }

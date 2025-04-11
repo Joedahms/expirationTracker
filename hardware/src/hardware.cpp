@@ -79,7 +79,8 @@ bool Hardware::checkStartSignal(int timeoutMs) {
     this->logger.log("No weight detected on platform");
     return false;
   }
-*/
+  */
+
   try {
     zmqpp::poller poller;
     poller.add(this->replySocket);
