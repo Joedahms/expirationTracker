@@ -19,9 +19,6 @@
 #include "display_handler.h"
 #include "engine_state.h"
 
-/**
- * Class containing all objects related to the engine.
- */
 class DisplayEngine {
 public:
   DisplayEngine(const char* windowTitle,

@@ -17,7 +17,7 @@
  * @param screenWidth Width of the display window in pixels
  * @param screenHeight Height of the display window in pixels
  * @param fullscreen Whether or not the display window should be fullscreen
- * @param displayGlobal Global display variables
+ * @param context The zeroMQ context with which to create sockets with
  */
 DisplayEngine::DisplayEngine(const char* windowTitle,
                              int windowXPosition,
@@ -131,12 +131,14 @@ void DisplayEngine::start() {
 
   while (this->displayIsRunning) {
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+
     handleEvents();
     checkState();
     checkKeystates();
     checkState();
     update();
     renderState();
+
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     std::chrono::milliseconds sleepDuration =
         std::chrono::duration_cast<std::chrono::milliseconds>(start + msPerFrame - now);
@@ -171,14 +173,14 @@ void DisplayEngine::checkState() {
     break;
 
   default:
-    std::cout << engineStateToString(this->engineState) << std::endl;
-    LOG(FATAL) << "Invalid state";
+    this->logger.log("Invalid state: " + engineStateToString(this->engineState));
+    LOG(FATAL) << "Invalid state: " << engineStateToString(this->engineState));
     break;
   }
 }
 
 /**
- * Check if the scanning state has requested a state switch
+ * Check if the scanning state has requested a state switch.
  *
  * @param None
  * @return None
@@ -190,7 +192,7 @@ void DisplayEngine::checkScanning() {
 }
 
 /**
- * Check if the scanning state has requested a state switch
+ * Check if the item list state has requested a state switch.
  *
  * @param None
  * @return None
@@ -206,7 +208,7 @@ void DisplayEngine::checkItemList() {
 }
 
 /**
- * Check if the scanning state has requested a state switch
+ * Check if the zero weight state has requested a state switch.
  *
  * @param None
  * @return None
@@ -233,7 +235,7 @@ void DisplayEngine::checkZeroWeight() {
 }
 
 /**
- * Check if the scanning state has requested a state switch
+ * Check if the cancel scan confirmation state has requested a state switch.
  *
  * @param None
  * @return None
@@ -243,8 +245,6 @@ void DisplayEngine::checkCancelScanConfirmation() {
 
   if (this->engineState == EngineState::ITEM_LIST) { // Scan was cancelled
     scanCancelledToVision();
-  }
-  else if (this->engineState == EngineState::SCANNING) { // Scan was not cancelled
   }
 
   this->cancelScanConfirmation->setCurrentState(EngineState::CANCEL_SCAN_CONFIRMATION);
@@ -263,7 +263,7 @@ void DisplayEngine::handleEvents() {
     {
       this->scanning->handleEvents(&this->displayIsRunning);
 
-      std::string response       = Messages::AFFIRMATIVE;
+      const std::string response = Messages::AFFIRMATIVE;
       const int receiveTimeoutMs = 1;
       std::string visionRequest =
           this->displayHandler.receiveMessage(response, receiveTimeoutMs);
@@ -291,7 +291,7 @@ void DisplayEngine::handleEvents() {
     {
       this->itemList->handleEvents(&this->displayIsRunning);
 
-      std::string response       = Messages::AFFIRMATIVE;
+      const std::string response = Messages::AFFIRMATIVE;
       const int receiveTimeoutMs = 1;
       std::string request =
           this->displayHandler.receiveMessage(response, receiveTimeoutMs);
@@ -317,7 +317,7 @@ void DisplayEngine::handleEvents() {
 
 /**
  * Check the current state of the display and call that state's method to check the
- * key states
+ * key states.
  *
  * @param None
  * @return None
@@ -419,6 +419,12 @@ void DisplayEngine::clean() {
   LOG(INFO) << "DisplayEngine cleaned";
 }
 
+/**
+ * Indicate to vision that the user requested that the scan be cancelled.
+ *
+ * @param None
+ * @return None
+ */
 void DisplayEngine::scanCancelledToVision() {
   this->logger.log("Scan cancelled, sending scan cancelled message to vision");
 
@@ -435,6 +441,12 @@ void DisplayEngine::scanCancelledToVision() {
   }
 }
 
+/**
+ * Indicate to hardware that the user would like to scan a new item.
+ *
+ * @param None
+ * @return None
+ */
 void DisplayEngine::startToHardware() {
   this->logger.log("Scan initialized, sending start signal to hardware");
 
@@ -455,6 +467,14 @@ void DisplayEngine::startToHardware() {
   }
 }
 
+/**
+ * If there is no weight on the platform, the user is given the chance to decide what they
+ * want to do. Once the user has decided what they want to do, this function sends their
+ * decision to hardware.
+ *
+ * @param zeroWeightChoice What the user wants to do about no weight detected.
+ * @return None
+ */
 void DisplayEngine::zeroWeightChoiceToHardware(const std::string& zeroWeightChoice) {
   this->logger.log("Sending zero weight choice: " + zeroWeightChoice + " to hardware");
 
