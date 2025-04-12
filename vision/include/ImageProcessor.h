@@ -14,13 +14,14 @@ enum AnalyzeObjectReturn { Success, Failure, Cancel };
 
 class ImageProcessor {
 public:
-  explicit ImageProcessor(zmqpp::context&);
+  explicit ImageProcessor(zmqpp::context&, std::string&);
   void process();
   struct FoodItem& getFoodItem();
   void setFoodItem(struct FoodItem&);
   void requestCancel();
   void resetCancel();
   bool isCancelRequested();
+  void notifyServer(const bool&);
 
 private:
   Logger logger;
