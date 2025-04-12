@@ -1,6 +1,6 @@
 #include "hardware_entry.h"
 
-/*
+/**
  * Entry into the hardware code.
  * Only called from main after hardware child process is forked.
  *
@@ -17,7 +17,7 @@ void hardwareEntry(zmqpp::context& context) {
   bool startSignalReceived = false;
   int startSignalTimeoutMs = 1000;
   hardware.initDC();
-  hardware.initSerialConnection(hardware.serialDevice, hardware.baud);
+  hardware.initSerialConnection(hardware.SerialDevice, hardware.baud);
 
   while (1) {
     startSignalReceived = false;

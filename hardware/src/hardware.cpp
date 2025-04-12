@@ -38,13 +38,13 @@ void Hardware::initDC() {
 
   this->logger.log("Motor System Initialization");
   // Setup DC Motor Driver Pins
-  pinMode(23, OUTPUT);
-  pinMode(24, OUTPUT);
+  pinMode(MOTOR_IN1, OUTPUT);
+  pinMode(MOTOR_IN2, OUTPUT);
   // Frequency and pulse break ratio can be configured
   // pinMode(MOTOR_ENA, PWM_MS_OUTPUT);
 
-  digitalWrite(23, LOW);
-  digitalWrite(24, LOW);
+  digitalWrite(MOTOR_IN1, LOW);
+  digitalWrite(MOTOR_IN2, LOW);
   // pwmWrite(MOTOR_ENA, ###);
 
   this->logger.log("Motor System Initialized.");

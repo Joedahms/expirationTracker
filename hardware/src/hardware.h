@@ -2,7 +2,10 @@
 #define HARDWARE_H
 
 #include <filesystem>
+#include <fstream>
 #include <glog/logging.h>
+#include <iostream>
+#include <string>
 #include <unistd.h>
 #include <wiringPi.h>
 #include <zmqpp/zmqpp.hpp>
@@ -11,15 +14,11 @@
 #include "../../food_item.h"
 #include "../../logger.h"
 
-#define MOTOR_IN1 23 // GPIO Pin for L298N IN1
-#define MOTOR_IN2 24 // GPIO Pin for L298N IN2
-#define MOTOR_ENA 18 // GPIO Pin forL298N enable (PWM Speed Control)
-
 class Hardware {
 public:
   Hardware(zmqpp::context& context);
 
-  const char* serialDevice = "/dev/ttyACM0";
+  const char* SerialDevice = "/dev/ttyACM0";
   int baud                 = 9600;
   int arduino_fd           = -1;
 
@@ -38,6 +37,9 @@ private:
 
   std::filesystem::path imageDirectory;
 
+  const int MOTOR_IN1 23; // GPIO Pin for L298N IN1
+  const int MOTOR_IN2 24; // GPIO Pin for L298N IN2
+  // const int MOTOR_ENA 18; // GPIO Pin forL298N enable (PWM Speed Control)
   float itemWeight = 0;
   char input[10];
   char response[64];
