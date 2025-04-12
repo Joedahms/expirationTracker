@@ -174,7 +174,7 @@ void DisplayEngine::checkState() {
 
   default:
     this->logger.log("Invalid state: " + engineStateToString(this->engineState));
-    LOG(FATAL) << "Invalid state: " << engineStateToString(this->engineState));
+    LOG(FATAL) << "Invalid state: " << engineStateToString(this->engineState);
     break;
   }
 }
