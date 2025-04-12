@@ -15,7 +15,6 @@ public:
   std::string sendMessage(const std::string& message, const std::string& endpoint);
   std::string receiveMessage(const std::string& response, const int timeout);
 
-  // void handle();
   void detectionSuccess();
 
 private:
@@ -24,16 +23,6 @@ private:
   zmqpp::socket requestHardwareSocket;
   zmqpp::socket requestVisionSocket;
   zmqpp::socket replySocket;
-
-  std::string startSignalToHardware();
-
-  void handleScanStarted();
-  void detectionFailure();
-  void scanCancelled();
-
-  void zeroWeightRetry();
-  void zeroWeightOverride();
-  void zeroWeightCancel();
 };
 
 #endif
