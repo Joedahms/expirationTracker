@@ -27,13 +27,13 @@ def getLocalIP():
         print(f"Failed to get local IP: {e}")
         return "127.0.0.1"
 
-def waitForPiDiscovery():
+def waitForPiDiscovery(discoveryPort):
     """Wait for a Raspberry Pi discovery request, then send the IP."""
     serverIP = getLocalIP()
-    print(f"Waiting for Raspberry Pi discovery on UDP {DISCOVERY_PORT}...")
+    print(f"Waiting for Raspberry Pi discovery on UDP {discoveryPort}...")
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.bind(("0.0.0.0", DISCOVERY_PORT))  # Listen on all interfaces
+    sock.bind(("0.0.0.0", discoveryPort))  # Listen on all interfaces
 
     while True:
         try:
@@ -57,7 +57,7 @@ def runServer():
     discoveryPort = network.get("discoveryPort", 5005)
 
     if not useEthernet:
-        waitForPiDiscovery()
+        waitForPiDiscovery(discoveryPort)
     else:
         print("Skipping discovery. Binding immediately.")
 
