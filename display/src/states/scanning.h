@@ -16,7 +16,7 @@
  */
 class Scanning : public State {
 public:
-  Scanning(struct DisplayGlobal displayGlobal);
+  Scanning(const DisplayGlobal& displayGlobal, const EngineState& state);
   EngineState checkKeystates();
   void update() override;
   void render() const override;
@@ -24,7 +24,6 @@ public:
 private:
   Logger logger;
 
-  SDL_Surface* windowSurface;
   Bird* birdPtr = nullptr;
   std::vector<ObstaclePair*> obstaclePairs;
   int score = 0;

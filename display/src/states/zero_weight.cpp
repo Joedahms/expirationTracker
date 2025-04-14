@@ -3,18 +3,9 @@
 #include "../log_files.h"
 #include "zero_weight.h"
 
-ZeroWeight::ZeroWeight(struct DisplayGlobal displayGlobal)
-    : logger(LogFiles::ZERO_WEIGHT) {
+ZeroWeight::ZeroWeight(const DisplayGlobal& displayGlobal, const EngineState& state)
+    : State(displayGlobal, state), logger(LogFiles::ZERO_WEIGHT) {
   this->logger.log("Constructing zero weight state");
-  this->currentState = EngineState::ZERO_WEIGHT;
-
-  this->displayGlobal = displayGlobal;
-
-  SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
-  SDL_Rect rootRectangle     = {0, 0, 0, 0};
-  rootRectangle.w            = windowSurface->w;
-  rootRectangle.h            = windowSurface->h;
-  this->rootElement          = std::make_shared<Container>(rootRectangle);
 
   std::shared_ptr<Button> retryButton = std::make_shared<Button>(
       this->displayGlobal, SDL_Rect{0, 50, 0, 0}, "Retry", SDL_Point{0, 0},

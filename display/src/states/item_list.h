@@ -13,7 +13,7 @@
  */
 class ItemList : public State {
 public:
-  ItemList(struct DisplayGlobal displayGlobal);
+  ItemList(const DisplayGlobal& displayGlobal, const EngineState& state);
   EngineState checkKeystates();
   void render() const override;
 

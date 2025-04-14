@@ -35,11 +35,13 @@ DisplayEngine::DisplayEngine(const char* windowTitle,
   initializeEngine(this->displayGlobal.window);
 
   // States
-  this->scanning   = std::make_unique<Scanning>(this->displayGlobal);
-  this->itemList   = std::make_unique<ItemList>(this->displayGlobal);
-  this->zeroWeight = std::make_unique<ZeroWeight>(this->displayGlobal);
-  this->cancelScanConfirmation =
-      std::make_unique<CancelScanConfirmation>(this->displayGlobal);
+  this->scanning = std::make_unique<Scanning>(this->displayGlobal, EngineState::SCANNING);
+  this->itemList =
+      std::make_unique<ItemList>(this->displayGlobal, EngineState::ITEM_LIST);
+  this->zeroWeight =
+      std::make_unique<ZeroWeight>(this->displayGlobal, EngineState::ZERO_WEIGHT);
+  this->cancelScanConfirmation = std::make_unique<CancelScanConfirmation>(
+      this->displayGlobal, EngineState::CANCEL_SCAN_CONFIRMATION);
 
   // this->engineState = this->itemList.get();
 
@@ -149,6 +151,12 @@ void DisplayEngine::start() {
 
   clean();
 }
+
+/*
+void DisplayEngine::checkState() {
+  this->engineState = this->engineState->getCurrentState();
+}
+*/
 
 /**
  * Check if the current state has requested a state switch.

@@ -6,7 +6,7 @@
 
 class CancelScanConfirmation : public State {
 public:
-  CancelScanConfirmation(struct DisplayGlobal displayglobal);
+  CancelScanConfirmation(const DisplayGlobal& displayGlobal, const EngineState& state);
   void render() const override;
 
 private:

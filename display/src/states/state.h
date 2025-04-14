@@ -14,6 +14,7 @@
 
 class State {
 public:
+  State(const DisplayGlobal& displayGlobal, const EngineState& state);
   virtual void handleEvents(bool* displayIsRunning);
   virtual void update();
   virtual void render() const = 0;
@@ -24,9 +25,11 @@ public:
   void setCurrentState(EngineState currentState);
 
 protected:
-  EngineState currentState;
   struct DisplayGlobal displayGlobal;
+  EngineState defaultState;
+  EngineState currentState;
   std::shared_ptr<Container> rootElement;
+  SDL_Surface* windowSurface = nullptr;
 };
 
 #endif

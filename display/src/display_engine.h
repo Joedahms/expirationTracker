@@ -52,7 +52,7 @@ private:
   DisplayHandler displayHandler;
   struct DisplayGlobal displayGlobal;
   EngineState engineState = EngineState::ITEM_LIST;
-  // State* engineState      = nullptr;
+  // State* engineState    = nullptr;
   bool displayIsRunning = false;
 
   // States

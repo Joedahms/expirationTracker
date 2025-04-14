@@ -3,6 +3,14 @@
 #include "../display_global.h"
 #include "state.h"
 
+State::State(const DisplayGlobal& displayGlobal, const EngineState& state)
+    : displayGlobal(displayGlobal), defaultState(state), currentState(state) {
+  this->windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
+  assert(windowSurface != NULL);
+  SDL_Rect rootRectangle = {0, 0, windowSurface->w, windowSurface->h};
+  this->rootElement      = std::make_shared<Container>(rootRectangle);
+}
+
 void State::handleEvents(bool* displayIsRunning) {
   SDL_Event event;
   while (SDL_PollEvent(&event) != 0) { // While there are events in the queue

@@ -16,21 +16,13 @@
 /**
  * @param displayGlobal Global display variables.
  */
-ItemList::ItemList(struct DisplayGlobal displayGlobal) : logger(LogFiles::ITEM_LIST) {
+ItemList::ItemList(const DisplayGlobal& displayGlobal, const EngineState& state)
+    : State(displayGlobal, state), logger(LogFiles::ITEM_LIST) {
   this->logger.log("Constructing item list state");
-  this->currentState = EngineState::ITEM_LIST;
-
-  this->displayGlobal = displayGlobal;
 
   this->mediator = std::make_shared<Mediator>(LogFiles::ITEM_LIST);
 
-  SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
-  previousUpdate             = std::chrono::steady_clock::now();
-
-  SDL_Rect rootRectangle = {0, 0, 0, 0};
-  rootRectangle.w        = windowSurface->w;
-  rootRectangle.h        = windowSurface->h;
-  this->rootElement      = std::make_shared<Container>(rootRectangle);
+  previousUpdate = std::chrono::steady_clock::now();
 
   // Start Scan
   SDL_Rect newScanButtonRectangle       = {200, 150, 200, 50};
