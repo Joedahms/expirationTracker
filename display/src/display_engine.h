@@ -52,7 +52,8 @@ private:
   DisplayHandler displayHandler;
   struct DisplayGlobal displayGlobal;
   EngineState engineState = EngineState::ITEM_LIST;
-  bool displayIsRunning   = false;
+  // State* engineState      = nullptr;
+  bool displayIsRunning = false;
 
   // States
   std::unique_ptr<Scanning> scanning;

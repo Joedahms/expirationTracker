@@ -29,10 +29,10 @@ Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger(LogFiles::SCANNI
   this->rootElement      = std::make_unique<Container>(rootRectangle);
 
   // Scan message
-  const char* progressMessageContent    = "Scanning In Progress";
-  SDL_Color progressMessageColor        = {0, 255, 0, 255}; // Green
-  SDL_Rect progressMessageRectangle     = {0, 100, 0, 0};
-  std::unique_ptr<Text> progressMessage = std::make_unique<Text>(
+  const std::string progressMessageContent = "Scanning In Progress";
+  const SDL_Color progressMessageColor     = {0, 255, 0, 255}; // Green
+  const SDL_Rect progressMessageRectangle  = {0, 100, 0, 0};
+  std::unique_ptr<Text> progressMessage    = std::make_unique<Text>(
       this->displayGlobal, progressMessageRectangle, DisplayGlobal::futuramFontPath,
       progressMessageContent, 24, progressMessageColor);
   progressMessage->setCenteredHorizontal();

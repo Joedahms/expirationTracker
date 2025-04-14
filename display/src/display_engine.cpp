@@ -41,6 +41,8 @@ DisplayEngine::DisplayEngine(const char* windowTitle,
   this->cancelScanConfirmation =
       std::make_unique<CancelScanConfirmation>(this->displayGlobal);
 
+  // this->engineState = this->itemList.get();
+
   displayIsRunning = true;
   this->logger.log("Engine is constructed and now running");
 }

@@ -17,6 +17,9 @@ public:
   virtual void handleEvents(bool* displayIsRunning);
   virtual void update();
   virtual void render() const = 0;
+  //  virtual void enter();
+  // virtual void exit();
+
   EngineState getCurrentState();
   void setCurrentState(EngineState currentState);
 
