@@ -26,9 +26,11 @@ sudo chmod 777 install.sh
 ````plaintext
 FOR ETHERNET CONNECTION TO WORK:
 
-Because there is no DHCP server inbetween the two devices in this ethernet connection, we must set a static IP for both ethernet interfaces.
+Because there is no DHCP server inbetween the two devices in this ethernet connection,
+we must set a static IP for both ethernet interfaces.
 
-YOU CAN SET IT TO WHATEVER STATIC IPS YOU WANT. You just must update the config.json file in vision/ accordingly. SERVER AND PI USE THIS, MAKE SURE BOTH HAVE ACCESS TO UPDATED VERSIONS.
+YOU CAN SET IT TO WHATEVER STATIC IPS YOU WANT. You just must update the config.json file in vision/ accordingly.
+SERVER AND PI USE THIS, MAKE SURE BOTH HAVE ACCESS TO UPDATED VERSIONS.
 
 Windows:
 Open ncpa.cpl (Run > ncpa.cpl)
