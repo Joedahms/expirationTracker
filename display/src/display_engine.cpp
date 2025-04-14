@@ -43,7 +43,7 @@ DisplayEngine::DisplayEngine(const char* windowTitle,
   this->cancelScanConfirmation = std::make_unique<CancelScanConfirmation>(
       this->displayGlobal, EngineState::CANCEL_SCAN_CONFIRMATION);
 
-  // this->engineState = this->itemList.get();
+  this->engineState = this->itemList.get();
 
   displayIsRunning = true;
   this->logger.log("Engine is constructed and now running");
@@ -137,9 +137,11 @@ void DisplayEngine::start() {
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 
     handleEvents();
-    checkState();
+    handleStateChange();
+    // checkState();
     checkKeystates();
-    checkState();
+    handleStateChange();
+    // checkState();
     update();
     renderState();
 
@@ -152,11 +154,17 @@ void DisplayEngine::start() {
   clean();
 }
 
-/*
-void DisplayEngine::checkState() {
-  this->engineState = this->engineState->getCurrentState();
+void DisplayEngine::handleStateChange() {
+  if (this->engineState.checkStateChange()) {
+    EngineState currentState = this->engineState.getCurrentState();
+    switch (currentState) {
+    case EngineState::SCANNING:
+      this->engineState = this->scanning.get();
+      break;
+    default:
+    }
+  }
 }
-*/
 
 /**
  * Check if the current state has requested a state switch.

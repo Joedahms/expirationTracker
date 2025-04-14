@@ -18,16 +18,19 @@ public:
   virtual void handleEvents(bool* displayIsRunning);
   virtual void update();
   virtual void render() const = 0;
-  //  virtual void enter();
+  // virtual void enter();
   // virtual void exit();
 
   EngineState getCurrentState();
   void setCurrentState(EngineState currentState);
 
+  bool checkStateChange();
+
 protected:
   struct DisplayGlobal displayGlobal;
-  EngineState defaultState;
+  const EngineState defaultState;
   EngineState currentState;
+
   std::shared_ptr<Container> rootElement;
   SDL_Surface* windowSurface = nullptr;
 };

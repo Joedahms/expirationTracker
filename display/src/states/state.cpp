@@ -4,7 +4,8 @@
 #include "state.h"
 
 State::State(const DisplayGlobal& displayGlobal, const EngineState& state)
-    : displayGlobal(displayGlobal), defaultState(state), currentState(state) {
+    : displayGlobal(displayGlobal), defaultState(state), currentState(state),
+      changeState(false) {
   this->windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
   assert(windowSurface != NULL);
   SDL_Rect rootRectangle = {0, 0, windowSurface->w, windowSurface->h};
@@ -30,4 +31,10 @@ EngineState State::getCurrentState() { return this->currentState; }
 
 void State::setCurrentState(EngineState currentState) {
   this->currentState = currentState;
+}
+
+bool checkStateChange() {
+  if (this->currentState != this->defaultState) {
+    return true;
+  }
 }
