@@ -194,6 +194,6 @@ void ImageProcessor::resetCancel() { cancelRequested = false; }
 
 bool ImageProcessor::isCancelRequested() { return cancelRequested.load(); }
 
-void ImageProcessor::notifyServer(const bool& isProcessing) {
-  this->modelHandler.notifyServer(isProcessing);
+void ImageProcessor::notifyServer(const std::string& notification) {
+  this->modelHandler.notifyServer(notification);
 }

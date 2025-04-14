@@ -21,7 +21,7 @@ public:
   ModelHandler(zmqpp::context&, std::string&);
   ClassifyObjectReturn classifyObject(const std::filesystem::path&, FoodItem&);
   std::chrono::year_month_day extractExpirationDate(const std::string&);
-  void notifyServer(const bool&);
+  void notifyServer(const std::string&);
 
 private:
   Logger logger;

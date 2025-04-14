@@ -116,7 +116,8 @@ std::string joinVector(const std::vector<std::string>& vec,
   return oss.str();
 }
 
-std::string discoverServerViaUDP() {
+std::string discoverServerViaUDP(const Logger& logger, const int& discoveryPort) {
+  logger.log("in discoverServerViaUDP");
   int sockfd;
   struct sockaddr_in serverAddr;
   socklen_t addrLen = sizeof(serverAddr);
@@ -137,7 +138,7 @@ std::string discoverServerViaUDP() {
   memset(&serverAddr, 0, sizeof(serverAddr));
   serverAddr.sin_family      = AF_INET;
   serverAddr.sin_addr.s_addr = inet_addr(BROADCAST_IP);
-  serverAddr.sin_port        = htons(DISCOVERY_PORT);
+  serverAddr.sin_port        = htons(discoveryPort);
 
   // Send discovery request
   std::string message = "DISCOVER_SERVER";
@@ -151,4 +152,21 @@ std::string discoverServerViaUDP() {
   close(sockfd);
 
   return std::string(buffer);
+}
+
+Config loadConfig(const std::filesystem::path& path) {
+  if (!std::filesystem::exists(path)) {
+    LOG(FATAL) << "Error: Given config path does not exist.";
+  }
+
+  std::ifstream f(path);
+  nlohmann::json data = nlohmann::json::parse(f);
+
+  Config cfg;
+  cfg.ethernetIP    = data["network"]["ethernetIP"];
+  cfg.serverPort    = data["network"]["serverPort"];
+  cfg.heartbeatPort = data["network"]["heartbeatPort"];
+  cfg.discoveryPort = data["network"]["discoveryPort"];
+  cfg.useEthernet   = data["network"]["useEthernet"];
+  return cfg;
 }
