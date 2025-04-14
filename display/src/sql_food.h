@@ -4,7 +4,7 @@
 #include <sqlite3.h>
 #include <vector>
 
-#include "../src/engine/elements/sort_method.h"
+#include "../src/elements/sort_method.h"
 
 void openDatabase(sqlite3**);
 void storeFoodItem(sqlite3*, struct FoodItem);

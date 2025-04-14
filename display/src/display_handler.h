@@ -10,29 +10,19 @@
 
 class DisplayHandler {
 public:
-  DisplayHandler(zmqpp::context& context, const std::string& engineEndpoint);
-  void handle();
+  DisplayHandler(const zmqpp::context& context);
+
+  std::string sendMessage(const std::string& message, const std::string& endpoint);
+  std::string receiveMessage(const std::string& response, const int timeout);
+
+  void detectionSuccess();
 
 private:
   Logger logger;
-  const std::string engineEndpoint;
 
-  zmqpp::socket requestEngineSocket;
   zmqpp::socket requestHardwareSocket;
   zmqpp::socket requestVisionSocket;
-
   zmqpp::socket replySocket;
-
-  std::string startSignalToHardware();
-
-  void handleScanStarted();
-  void detectionFailure();
-  void detectionSuccess();
-  void scanCancelled();
-
-  void zeroWeightRetry();
-  void zeroWeightOverride();
-  void zeroWeightCancel();
 };
 
 #endif
