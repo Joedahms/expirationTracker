@@ -10,7 +10,7 @@
 #include "hardware.h"
 #include "hardware_entry.h"
 
-/*
+/**
  * Entry into the hardware code.
  * Only called from main after hardware child process is forked.
  *
@@ -19,15 +19,19 @@
  * hardware, and display)
  * @return None
  */
-void hardwareEntry(zmqpp::context& context) {
+void hardwareEntry(zmqpp::context& context, bool usingMotor, bool usingCamera) {
   Logger logger("hardware_entry.txt");
   logger.log("Within hardware process");
 
-  Hardware hardware(context);
-  bool startSignalReceived = false;
-  int startSignalTimeoutMs = 1000;
-  hardware.initDC();
-  // TODO - Setup communication with Arduino for weight.
+  Hardware hardware(context, usingMotor, usingCamera);
+
+  bool startSignalReceived       = false;
+  const int startSignalTimeoutMs = 1000;
+
+  if (usingMotor) {
+    hardware.initDC();
+  }
+  //  TODO - Setup communication with Arduino for weight.
 
   while (1) {
     startSignalReceived = false;
