@@ -16,23 +16,15 @@ void visionEntry(zmqpp::context& context) {
   zmqpp::socket replySocket(context, zmqpp::socket_type::reply);
   replySocket.bind(VisionExternalEndpoints::visionMainEndpoint);
 
-  std::string serverIP         = discoverServerViaUDP();
-  std::string serverAddress    = "";
-  std::string heartbeatAddress = "";
-  if (!serverIP.empty()) {
-    std::cout << "Discovered Server IP: " << serverIP << std::endl;
-    serverAddress    = "tcp://" + serverIP + ":" + std::to_string(ZEROMQPORT);
-    heartbeatAddress = "tcp://" + serverIP + ":" + std::to_string(ZEROMQHEARTBEATPORT);
-  }
-  else {
-    LOG(FATAL) << "Failed to find server address.";
-  }
+  ServerAddress addresses = connectToServer(logger);
 
-  ImageProcessor processor(context, serverAddress);
+  ImageProcessor processor(context, addresses.serverAddress);
   std::atomic_bool isProcessing{false};
 
+  processor.notifyServer(NotifyServerConstants::connected);
+
   createListenerThread(context, processor);
-  createHeartBeatThread(context, isProcessing, heartbeatAddress);
+  createHeartBeatThread(context, isProcessing, addresses.heartbeatAddress);
 
   zmqpp::poller poller;
   poller.add(replySocket);
@@ -45,10 +37,10 @@ void visionEntry(zmqpp::context& context) {
       ;
     }
     isProcessing = true;
-    processor.notifyServer(true);
+    processor.notifyServer(NotifyServerConstants::start);
     processor.setFoodItem(foodItem);
     processor.process();
-    processor.notifyServer(false);
+    processor.notifyServer(NotifyServerConstants::stop);
     isProcessing = false;
 
     if (processor.isCancelRequested()) {
@@ -184,4 +176,35 @@ void createHeartBeatThread(zmqpp::context& context,
     }
   });
   thread.detach();
+}
+
+ServerAddress connectToServer(const Logger& logger) {
+  logger.log("in connectToServer");
+  std::filesystem::path path = "../vision/config.json";
+  Config cfg                 = loadConfig(path);
+  ServerAddress addresses{"", ""};
+  std::string serverIP = "";
+
+  if (cfg.useEthernet) {
+    logger.log("Using static ethernet IP set in" + path.string());
+    serverIP = cfg.ethernetIP;
+  }
+  else {
+    logger.log("Attempting server broadcast");
+    serverIP = discoverServerViaUDP(logger, cfg.discoveryPort);
+  }
+  if (!serverIP.empty()) {
+    logger.log("Discovered Server IP: " + serverIP);
+    std::cout << "Discovered Server IP: " + serverIP << std::endl;
+    addresses.serverAddress = "tcp://" + serverIP + ":" + std::to_string(cfg.serverPort);
+    addresses.heartbeatAddress =
+        "tcp://" + serverIP + ":" + std::to_string(cfg.heartbeatPort);
+    logger.log("server address: " + addresses.serverAddress);
+    logger.log("server address: " + addresses.heartbeatAddress);
+  }
+  else {
+    LOG(FATAL) << "Failed to find server address.";
+  }
+
+  return addresses;
 }

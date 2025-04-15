@@ -8,9 +8,12 @@ import json
 import time
 from easyOCR import performOCR
 
-PORT = "5555" #zeroMQ port
-HEARTBEAT_PORT = "5556"
 DISCOVERY_PORT = 5005 # UDP discovery port
+
+def loadConfig():
+    config_path = os.path.join(os.path.dirname(__file__), "../config.json")
+    with open(config_path, "r") as f:
+        return json.load(f)
 
 def getLocalIP():
     """Get the actual network IP of this machine (not 127.0.0.1)."""
@@ -24,13 +27,13 @@ def getLocalIP():
         print(f"Failed to get local IP: {e}")
         return "127.0.0.1"
 
-def waitForPiDiscovery():
+def waitForPiDiscovery(discoveryPort):
     """Wait for a Raspberry Pi discovery request, then send the IP."""
     serverIP = getLocalIP()
-    print(f"Waiting for Raspberry Pi discovery on UDP {DISCOVERY_PORT}...")
+    print(f"Waiting for Raspberry Pi discovery on UDP {discoveryPort}...")
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.bind(("0.0.0.0", DISCOVERY_PORT))  # Listen on all interfaces
+    sock.bind(("0.0.0.0", discoveryPort))  # Listen on all interfaces
 
     while True:
         try:
@@ -46,9 +49,20 @@ def waitForPiDiscovery():
             print(f"UDP error: {e}")
 
 def runServer():
-    waitForPiDiscovery()  # Wait for Raspberry Pi discovery
-    ADDRESS = f"tcp://0.0.0.0:{PORT}"  # Bind ZeroMQ to communicate with Pi
-    HEARTBEAT_ADDRESS = f"tcp://0.0.0.0:{HEARTBEAT_PORT}"
+    config = loadConfig()
+    network = config.get("network", {})
+    useEthernet = network.get("useEthernet", True) #default to ethernet if config is bad
+    port = network.get("serverPort", 5555)
+    heartbeatPort = network.get("heartbeatPort", 5556)
+    discoveryPort = network.get("discoveryPort", 5005)
+
+    if not useEthernet:
+        waitForPiDiscovery(discoveryPort)
+    else:
+        print("Skipping discovery. Binding immediately.")
+
+    ADDRESS = f"tcp://0.0.0.0:{port}"  # Bind ZeroMQ to communicate with Pi
+    HEARTBEAT_ADDRESS = f"tcp://0.0.0.0:{heartbeatPort}"
 
     # Create ZeroMQ context and socket
     context = zmq.Context()
@@ -67,6 +81,10 @@ def runServer():
     lastHeartbeatTime = time.time()
     activeProcessing = False
     try:
+        startMessage = socket.recv_string() #wait for the pi to be connected
+        if startMessage == "connected":
+            print("Pi is connected")
+            socket.send_string("awake")
         while True:
             print("Waiting for image from Raspberry Pi...")
 

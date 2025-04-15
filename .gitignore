@@ -2,7 +2,6 @@ build/
 yoloDarknet/yolov4.weights
 *.db
 .vscode
-images/
 vision/Models/__pycache__/
 *.swp
 /*/*.swp

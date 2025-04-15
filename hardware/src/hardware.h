@@ -16,7 +16,7 @@
 
 class Hardware {
 public:
-  Hardware(zmqpp::context& context);
+  Hardware(zmqpp::context& context, bool usingMotor, bool usingCamera);
 
   const char* SerialDevice = "/dev/ttyACM0";
   int baud                 = 9600;
@@ -43,6 +43,8 @@ private:
   float itemWeight = 0;
   char input[10];
   char response[64];
+  bool usingMotor;
+  bool usingCamera;
 
   int readLineFromArduino(char* buffer, int maxLen);
   float sendCommand(char commandChar);

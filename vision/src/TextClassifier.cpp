@@ -127,8 +127,18 @@ OCRResult TextClassifier::runModel(const std::filesystem::path& imagePath) {
   }
 }
 
-void TextClassifier::notifyServer(const bool& isProcessing) {
-  if (isProcessing) {
+void TextClassifier::notifyServer(const std::string& notification) {
+  if (notification == NotifyServerConstants::connected) {
+    this->requestSocket.send("connected");
+    zmqpp::message message;
+    this->requestSocket.receive(message);
+    std::string response;
+    message >> response;
+    if (response != "awake") {
+      LOG(FATAL) << "server did not acknowledge processing start.";
+    }
+  }
+  else if (notification == NotifyServerConstants::start) {
     this->requestSocket.send("start");
     zmqpp::message message;
     this->requestSocket.receive(message);
@@ -138,7 +148,7 @@ void TextClassifier::notifyServer(const bool& isProcessing) {
       LOG(FATAL) << "server did not acknowledge processing start.";
     }
   }
-  else {
+  else if (notification == NotifyServerConstants::stop) {
     this->requestSocket.send("stop");
     zmqpp::message message;
     this->requestSocket.receive(message);

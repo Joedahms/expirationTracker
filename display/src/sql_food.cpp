@@ -3,7 +3,7 @@
 #include <sqlite3.h>
 #include <sstream>
 
-#include "../../food_item.h"
+#include "../food_item.h"
 #include "sql_food.h"
 
 /**
@@ -171,8 +171,8 @@ std::vector<FoodItem> readAllFoodItems() {
   const char* selectAll = "SELECT * FROM foodItems;";
 
   std::vector<FoodItem> allFoodItems;
-  int sqlReturn = sqlite3_exec(database, selectAll, readAllFoodItemsCallback,
-                               &allFoodItems, &errorMessage);
+  sqlite3_exec(database, selectAll, readAllFoodItemsCallback, &allFoodItems,
+               &errorMessage);
 
   sqlite3_close(database);
   return allFoodItems;
@@ -234,8 +234,8 @@ std::vector<FoodItem> readAllFoodItemsSorted(SortMethod sortMethod) {
   char* errorMessage = nullptr;
 
   std::vector<FoodItem> allFoodItems;
-  int sqlReturn = sqlite3_exec(database, readSortedQuery.c_str(),
-                               readAllFoodItemsCallback, &allFoodItems, &errorMessage);
+  sqlite3_exec(database, readSortedQuery.c_str(), readAllFoodItemsCallback, &allFoodItems,
+               &errorMessage);
 
   sqlite3_close(database);
   return allFoodItems;
@@ -259,8 +259,8 @@ FoodItem readFoodItemById(const int& id) {
   selectId << "SELECT * FROM foodItems WHERE id = " << id << ";";
 
   FoodItem foodItem;
-  int sqlReturn = sqlite3_exec(database, selectId.str().c_str(), readFoodItemByIdCallback,
-                               &foodItem, &errorMessage);
+  sqlite3_exec(database, selectId.str().c_str(), readFoodItemByIdCallback, &foodItem,
+               &errorMessage);
 
   sqlite3_close(database);
   return foodItem;
