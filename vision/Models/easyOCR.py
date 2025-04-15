@@ -40,10 +40,13 @@ def isPLUClass(text):
         
     return None
 
+import re
+from datetime import datetime
+from dateutil.parser import parse
+
 def extractExpirationDate(textList):
     """Extract expiration dates from text and normalize them to YYYY/MM/DD format."""
-    
-    # List of valid month abbreviations and full names
+
     validMonths = {
         "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
         "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
@@ -51,52 +54,73 @@ def extractExpirationDate(textList):
         "july": 7, "august": 8, "september": 9, "october": 10, "november": 11, "december": 12
     }
 
-    # Common expiration date patterns
     datePatterns = [
-        re.compile(r'\b(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})\b'),  # MM/DD/YYYY or DD/MM/YYYY or YYYY/MM/DD
-        re.compile(r'\b(\d{4})[./-](\d{1,2})[./-](\d{1,2})\b'),  # YYYY-MM-DD or YYYY/MM/DD
-        re.compile(r'\b(\d{1,2}) ([A-Za-z]{3,}) (\d{2,4})\b', re.IGNORECASE),  # 12 Jan 2024 or 5 July 23
-        re.compile(r'\b([A-Za-z]{3,}) (\d{1,2}),? (\d{2,4})\b', re.IGNORECASE),  # Jan 12, 2024 or July 5 23
-        re.compile(r'\b(\d{1,2})[./-](\d{1,2})\b'),  # MM/DD or DD/MM (short format)
+        re.compile(r'\b(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})\b'),
+        re.compile(r'\b(\d{4})[./-](\d{1,2})[./-](\d{1,2})\b'),
+        re.compile(r'\b(\d{1,2}) ([A-Za-z]{3,}) (\d{2,4})\b', re.IGNORECASE),
+        re.compile(r'\b([A-Za-z]{3,}) (\d{1,2}),? (\d{2,4})\b', re.IGNORECASE),
+        re.compile(r'\b(\d{1,2})[./-](\d{1,2})\b'),
     ]
 
     detectedDates = []
 
     for text in textList:
+        found = False
         for pattern in datePatterns:
-            match = pattern.search(text)
-            if match:
+            for match in pattern.finditer(text):
                 groups = match.groups()
-                
+                day = month = year = None
+
                 try:
                     if len(groups) == 3:
-                        if groups[0].isalpha():  # Format: "Jan 12, 2024"
+                        if groups[0].isalpha():
                             month = validMonths.get(groups[0].lower())
                             day, year = int(groups[1]), int(groups[2])
-                        elif groups[1].isalpha():  # Format: "12 Jan 2024"
+                        elif groups[1].isalpha():
+                            day = int(groups[0])
                             month = validMonths.get(groups[1].lower())
-                            day, year = int(groups[0]), int(groups[2])
-                        else:  # Format: "MM/DD/YYYY" or "DD/MM/YYYY"
+                            year = int(groups[2])
+                        else:
                             first, second, third = map(int, groups)
-                            if first > 31:  # Assume YYYY/MM/DD
+                            if first > 31:
                                 year, month, day = first, second, third
-                            elif third > 31:  # Assume MM/DD/YYYY
+                            elif third > 31:
                                 month, day, year = first, second, third
-                            else:  # Assume DD/MM/YYYY
+                            else:
                                 day, month, year = first, second, third
-                    elif len(groups) == 2:  # Short format "MM/DD"
-                        month, day = map(int, groups)
-                        year = datetime.today().year  # Assume current year
-                    
-                    if year < 100:  # Convert two-digit years to four-digit
-                        year += 2000 if year < 50 else 1900
+                    elif len(groups) == 2:
+                        first, second = map(int, groups)
+                        year = datetime.today().year
+                        if first <= 12 and second > 12:
+                            month, day = first, second
+                        else:
+                            day, month = first, second
 
-                    normalizedDate = f"{year:04d}/{month:02d}/{day:02d}"
-                    detectedDates.append(normalizedDate)
+                    if not (month and day and year):
+                        continue
+
+                    if year < 100:
+                        year += 2000
+                    if year < 2000:
+                        continue
+
+                    dt = datetime(year, month, day)
+                    detectedDates.append(dt.strftime("%Y/%m/%d"))
+                    found = True
                 except (ValueError, TypeError):
-                    continue  # Skip invalid dates
+                    continue
+
+        # Fallback to dateutil.parser if nothing was found from regex
+        if not found:
+            try:
+                dt = parse(text, fuzzy=True)
+                if dt.year >= 2000:
+                    detectedDates.append(dt.strftime("%Y/%m/%d"))
+            except Exception:
+                continue
 
     return detectedDates
+
 
 def preprocessImage(img):
     print("Preprocessing image")
