@@ -346,21 +346,21 @@ void Hardware::rotateMotor(bool clockwise) {
   this->logger.log("Rotating platform");
   if (clockwise) {
     this->logger.log("Rotating clockwise.");
-    digitalWrite(MOTOR_IN1, HIGH);
-    digitalWrite(MOTOR_IN2, LOW);
+    digitalWrite(motor_in1, HIGH);
+    digitalWrite(motor_in2, LOW);
     // pwmWrite(MOTOR_ENA, 255); // Adjust speed
     usleep(1875000); // Rotate duration
-    digitalWrite(MOTOR_IN1, LOW);
-    digitalWrite(MOTOR_IN2, LOW); // HIGH,HIGH || LOW,LOW == off
+    digitalWrite(motor_in1, LOW);
+    digitalWrite(motor_in2, LOW); // HIGH,HIGH || LOW,LOW == off
   }
   else {
     this->logger.log("Rotating counter-clockwise.");
-    digitalWrite(MOTOR_IN1, LOW);
-    digitalWrite(MOTOR_IN2, HIGH);
+    digitalWrite(motor_in1, LOW);
+    digitalWrite(motor_in2, HIGH);
     // pwmWrite(MOTOR_ENA, 255);
-    usleep(1875000);
-    digitalWrite(MOTOR_IN1, LOW);
-    digitalWrite(MOTOR_IN2, LOW);
+    usleep(922852); // Rotate duration
+    digitalWrite(motor_in1, LOW);
+    digitalWrite(motor_in2, LOW);
   }
   this->logger.log("Platform successfully rotated");
 }
