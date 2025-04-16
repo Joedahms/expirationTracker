@@ -349,7 +349,7 @@ void Hardware::rotateMotor(bool clockwise) {
     digitalWrite(motor_in1, HIGH);
     digitalWrite(motor_in2, LOW);
     // pwmWrite(MOTOR_ENA, 255); // Adjust speed
-    usleep(1875000); // Rotate duration
+    usleep(922852); // Rotate duration
     digitalWrite(motor_in1, LOW);
     digitalWrite(motor_in2, LOW); // HIGH,HIGH || LOW,LOW == off
   }
