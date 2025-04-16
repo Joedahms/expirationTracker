@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "../display_global.h"
+#include "../display_handler.h"
 #include "../elements/button.h"
 #include "../elements/composite_element.h"
 #include "../elements/container.h"
@@ -18,8 +19,8 @@ public:
   virtual void handleEvents(bool* displayIsRunning);
   virtual void update();
   virtual void render() const = 0;
-  // virtual void enter();
-  // virtual void exit();
+  virtual void enter();
+  virtual void exit() = 0;
 
   EngineState getCurrentState();
   void setCurrentState(EngineState currentState);
@@ -33,6 +34,8 @@ protected:
 
   std::shared_ptr<Container> rootElement;
   SDL_Surface* windowSurface = nullptr;
+
+  DisplayHandler& displayHandler;
 };
 
 #endif

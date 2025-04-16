@@ -42,3 +42,20 @@ void ZeroWeight::render() const {
   this->rootElement->render();
   SDL_RenderPresent(this->displayGlobal.renderer);
 }
+
+void ZeroWeight::exit() {
+  // Override
+  if (this->currentState == EngineState::SCANNING) {
+    this->displayHandler.zeroWeightChoiceToHardware(Messages::OVERRIDE);
+  }
+  // Cancel
+  else if (this->currentState == EngineState::ITEM_LIST) {
+    this->displayHandler.zeroWeightChoiceToHardware(Messages::CANCEL);
+  }
+  // Retry
+  else if (this->retryScan) {
+    this->displayHandler.zeroWeightChoiceToHardware(Messages::RETRY);
+    this->retryScan = false;
+    this->displayHandler.startToHardware();
+  }
+}

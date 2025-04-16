@@ -5,7 +5,7 @@
 
 State::State(const DisplayGlobal& displayGlobal, const EngineState& state)
     : displayGlobal(displayGlobal), defaultState(state), currentState(state),
-      changeState(false) {
+      displayHandler(DisplayHandler::getInstance()) {
   this->windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
   assert(windowSurface != NULL);
   SDL_Rect rootRectangle = {0, 0, windowSurface->w, windowSurface->h};
@@ -27,14 +27,17 @@ void State::handleEvents(bool* displayIsRunning) {
 
 void State::update() { this->rootElement->update(); }
 
+void State::enter() { this->currentState = this->defaultState; }
+
 EngineState State::getCurrentState() { return this->currentState; }
 
 void State::setCurrentState(EngineState currentState) {
   this->currentState = currentState;
 }
 
-bool checkStateChange() {
+bool State::checkStateChange() {
   if (this->currentState != this->defaultState) {
     return true;
   }
+  return false;
 }

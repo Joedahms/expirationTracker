@@ -39,21 +39,15 @@ public:
 
   void start();
 
-  void checkState();
-  void handleEvents();
-  void checkKeystates();
-  void update();
-
   void renderState();
   void clean();
 
 private:
   Logger logger;
-  DisplayHandler displayHandler;
   struct DisplayGlobal displayGlobal;
-  // EngineState engineState = EngineState::ITEM_LIST;
-  State* engineState    = nullptr;
-  bool displayIsRunning = false;
+  State* engineState       = nullptr;
+  EngineState currentState = EngineState::ITEM_LIST;
+  bool displayIsRunning    = false;
 
   // States
   std::unique_ptr<Scanning> scanning;
@@ -61,12 +55,17 @@ private:
   std::unique_ptr<ZeroWeight> zeroWeight;
   std::unique_ptr<CancelScanConfirmation> cancelScanConfirmation;
 
+  void handleStateChange();
+  void handleEvents();
+  void update();
+
+  /*
   void checkScanning();
   void checkItemList();
   void checkZeroWeight();
   void checkCancelScanConfirmation();
+  */
 
-  void startToHardware();
   void zeroWeightChoiceToHardware(const std::string& zeroWeightChoice);
   void scanCancelledToVision();
 };

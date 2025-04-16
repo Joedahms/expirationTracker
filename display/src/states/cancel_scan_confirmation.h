@@ -8,6 +8,7 @@ class CancelScanConfirmation : public State {
 public:
   CancelScanConfirmation(const DisplayGlobal& displayGlobal, const EngineState& state);
   void render() const override;
+  void exit() override;
 
 private:
   Logger logger;

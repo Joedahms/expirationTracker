@@ -11,6 +11,8 @@ public:
   void setRetryScan(bool retryScan);
   bool getRetryScan();
 
+  void exit() override;
+
 private:
   Logger logger;
 

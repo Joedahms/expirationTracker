@@ -65,15 +65,19 @@ Scanning::Scanning(const DisplayGlobal& displayGlobal, const EngineState& state)
   this->logger.log("Constructed scanning state");
 }
 
-/**
- * Perform the appropriate action depending on which keyboard key has been pressed.
- *
- * @param None
- * @return The state the display is in after checking if any keys have been pressed
- */
-EngineState Scanning::checkKeystates() {
-  const Uint8* keystates = SDL_GetKeyboardState(NULL);
-  return EngineState::SCANNING;
+void Scanning::handleEvents(bool* displayIsRunning) {
+  SDL_Event event;
+  while (SDL_PollEvent(&event) != 0) { // While there are events in the queue
+    if (event.type == SDL_QUIT) {
+      *displayIsRunning = false;
+      break;
+    }
+    else {
+      this->rootElement->handleEvent(event);
+    }
+  }
+
+  this->currentState = this->displayHandler.checkDetectionResults(this->currentState);
 }
 
 /**
@@ -160,3 +164,5 @@ void Scanning::handleBirdCollision() {
     }
   }
 }
+
+void Scanning::exit() {}

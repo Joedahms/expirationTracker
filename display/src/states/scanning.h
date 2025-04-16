@@ -17,9 +17,10 @@
 class Scanning : public State {
 public:
   Scanning(const DisplayGlobal& displayGlobal, const EngineState& state);
-  EngineState checkKeystates();
+  void handleEvents(bool* displayIsRunning) override;
   void update() override;
   void render() const override;
+  void exit() override;
 
 private:
   Logger logger;

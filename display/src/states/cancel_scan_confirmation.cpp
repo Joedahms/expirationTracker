@@ -49,3 +49,9 @@ void CancelScanConfirmation::render() const {
   this->rootElement->render();
   SDL_RenderPresent(this->displayGlobal.renderer);
 }
+
+void CancelScanConfirmation::exit() {
+  if (this->currentState == EngineState::ITEM_LIST) {
+    this->displayHandler.scanCancelledToVision();
+  }
+}

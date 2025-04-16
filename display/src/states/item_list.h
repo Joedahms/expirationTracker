@@ -14,8 +14,9 @@
 class ItemList : public State {
 public:
   ItemList(const DisplayGlobal& displayGlobal, const EngineState& state);
-  EngineState checkKeystates();
+  void handleEvents(bool* displayIsRunning);
   void render() const override;
+  void exit() override;
 
 private:
   Logger logger;
