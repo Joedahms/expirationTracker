@@ -16,7 +16,7 @@ ScanSuccess::ScanSuccess(struct DisplayGlobal& displayGlobal, const EngineState&
   rootRectangle.h            = windowSurface->h;
   this->rootElement          = std::make_shared<Container>(rootRectangle);
 
-  const std::string successMessageContent = "Scan Successful!";
+  const std::string successMessageContent = "Scan successful, is this correct?";
   const SDL_Color successMessageColor     = {0, 255, 0, 255}; // Green
   const SDL_Rect successMessageRectangle  = {0, 100, 0, 0};
   std::unique_ptr<Text> successMessage    = std::make_unique<Text>(
@@ -26,13 +26,13 @@ ScanSuccess::ScanSuccess(struct DisplayGlobal& displayGlobal, const EngineState&
   this->rootElement->addElement(std::move(successMessage));
 
   std::shared_ptr<Button> yesButton = std::make_shared<Button>(
-      this->displayGlobal, SDL_Rect{0, 50, 0, 0}, "Yes", SDL_Point{0, 0},
+      this->displayGlobal, SDL_Rect{0, 150, 0, 0}, "Yes", SDL_Point{0, 0},
       [this]() {
         this->displayHandler.detectionSuccess();
         this->currentState = EngineState::ITEM_LIST;
       },
       LogFiles::SCAN_SUCCESS);
-  yesButton->setCentered();
+  yesButton->setCenteredHorizontal();
   this->rootElement->addElement(yesButton);
 
   std::shared_ptr<Button> noButton = std::make_shared<Button>(
