@@ -30,7 +30,7 @@ private:
 
   std::filesystem::path imageDirectory;
 
-  float itemWeight = 0;
+  float itemWeight    = 0;
   const int motor_in1 = 23; // GPIO Pin for L298N IN1
   const int motor_in2 = 24; // GPIO Pin for L298N IN2
   // const int motor_ena = 18; // GPIO Pin forL298N enable (PWM Speed Control)
