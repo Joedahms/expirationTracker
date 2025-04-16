@@ -44,11 +44,35 @@ DisplayEngine::DisplayEngine(const char* windowTitle,
       std::make_unique<ZeroWeight>(this->displayGlobal, EngineState::ZERO_WEIGHT);
   this->cancelScanConfirmation = std::make_unique<CancelScanConfirmation>(
       this->displayGlobal, EngineState::CANCEL_SCAN_CONFIRMATION);
+  this->scanSuccess =
+      std::make_unique<ScanSuccess>(this->displayGlobal, EngineState::SCAN_SUCCESS);
 
   this->engineState = this->itemList.get();
 
   displayIsRunning = true;
   this->logger.log("Engine is constructed and now running");
+}
+
+void DisplayEngine::start() {
+  LOG(INFO) << "SDL display process started successfully";
+
+  std::chrono::milliseconds msPerFrame = std::chrono::milliseconds(16);
+
+  while (this->displayIsRunning) {
+    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+
+    handleEvents();
+    handleStateChange();
+    update();
+    renderState();
+
+    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    std::chrono::milliseconds sleepDuration =
+        std::chrono::duration_cast<std::chrono::milliseconds>(start + msPerFrame - now);
+    std::this_thread::sleep_for(sleepDuration);
+  }
+
+  clean();
 }
 
 /**
@@ -130,56 +154,36 @@ void DisplayEngine::initializeEngine(SDL_Window* window) {
   this->logger.log("Engine initialized");
 }
 
-void DisplayEngine::start() {
-  LOG(INFO) << "SDL display process started successfully";
-
-  std::chrono::milliseconds msPerFrame = std::chrono::milliseconds(16);
-
-  while (this->displayIsRunning) {
-    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-
-    handleEvents();
-    handleStateChange();
-    update();
-    renderState();
-
-    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-    std::chrono::milliseconds sleepDuration =
-        std::chrono::duration_cast<std::chrono::milliseconds>(start + msPerFrame - now);
-    std::this_thread::sleep_for(sleepDuration);
-  }
-
-  clean();
-}
-
 void DisplayEngine::handleStateChange() {
   if (this->engineState->checkStateChange()) {
     this->engineState->exit();
     EngineState currentState = this->engineState->getCurrentState();
+
     switch (currentState) {
     case EngineState::SCANNING:
       this->engineState = this->scanning.get();
-      this->engineState->enter();
       break;
 
     case EngineState::ITEM_LIST:
       this->engineState = this->itemList.get();
-      this->engineState->enter();
       break;
 
     case EngineState::ZERO_WEIGHT:
       this->engineState = this->zeroWeight.get();
-      this->engineState->enter();
       break;
 
     case EngineState::CANCEL_SCAN_CONFIRMATION:
       this->engineState = this->cancelScanConfirmation.get();
-      this->engineState->enter();
+      break;
+
+    case EngineState::SCAN_SUCCESS:
+      this->engineState = this->scanSuccess.get();
       break;
 
     default:
       break;
     }
+    this->engineState->enter();
   }
 }
 

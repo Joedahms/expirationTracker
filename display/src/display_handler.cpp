@@ -204,9 +204,8 @@ EngineState DisplayHandler::checkDetectionResults(EngineState currentState) {
   }
 
   if (visionRequest == Messages::ITEM_DETECTION_SUCCEEDED) {
-    this->logger.log("New food item received, switching to item list state");
-    detectionSuccess();
-    return EngineState::ITEM_LIST;
+    this->logger.log("New food item received, switching to scan success state");
+    return EngineState::SCAN_SUCCESS;
   }
   else if (visionRequest == Messages::ITEM_DETECTION_FAILED) {
     this->logger.log("Item detection failed, switching to item list state");

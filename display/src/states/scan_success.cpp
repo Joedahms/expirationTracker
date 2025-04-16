@@ -3,8 +3,8 @@
 #include "../log_files.h"
 #include "scan_success.h"
 
-ScanSuccess::ScanSuccess(struct DisplayGlobal displayGlobal)
-    : logger(LogFiles::SCAN_SUCCESS) {
+ScanSuccess::ScanSuccess(struct DisplayGlobal& displayGlobal, const EngineState& state)
+    : State(displayGlobal, state), logger(LogFiles::SCAN_SUCCESS) {
   this->logger.log("Constructing scan success state");
   this->currentState = EngineState::SCAN_SUCCESS;
 
@@ -25,16 +25,32 @@ ScanSuccess::ScanSuccess(struct DisplayGlobal displayGlobal)
   successMessage->setCenteredHorizontal();
   this->rootElement->addElement(std::move(successMessage));
 
-  std::shared_ptr<Button> okButton = std::make_shared<Button>(
-      this->displayGlobal, SDL_Rect{0, 50, 0, 0}, "OK", SDL_Point{0, 0},
-      [this]() { retry(); }, LogFiles::SCAN_SUCCESS);
-  okButton->setCenteredHorizontal();
-  this->rootElement->addElement(okButton);
+  std::shared_ptr<Button> yesButton = std::make_shared<Button>(
+      this->displayGlobal, SDL_Rect{0, 50, 0, 0}, "Yes", SDL_Point{0, 0},
+      [this]() {
+        this->displayHandler.detectionSuccess();
+        this->currentState = EngineState::ITEM_LIST;
+      },
+      LogFiles::SCAN_SUCCESS);
+  yesButton->setCentered();
+  this->rootElement->addElement(yesButton);
+
+  std::shared_ptr<Button> noButton = std::make_shared<Button>(
+      this->displayGlobal, SDL_Rect{0, 200, 0, 0}, "No", SDL_Point{0, 0},
+      [this]() {
+        this->displayHandler.detectionSuccess();
+        this->currentState = EngineState::ITEM_LIST;
+      },
+      LogFiles::SCAN_SUCCESS);
+  noButton->setCenteredHorizontal();
+  this->rootElement->addElement(noButton);
 }
 
-void ZeroWeight::render() const {
+void ScanSuccess::render() const {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background
   SDL_RenderClear(this->displayGlobal.renderer);
   this->rootElement->render();
   SDL_RenderPresent(this->displayGlobal.renderer);
 }
+
+void ScanSuccess::exit() {}

@@ -12,6 +12,7 @@
 
 #include "states/cancel_scan_confirmation.h"
 #include "states/item_list.h"
+#include "states/scan_success.h"
 #include "states/scanning.h"
 #include "states/zero_weight.h"
 
@@ -28,19 +29,7 @@ public:
                 int screenHeight,
                 bool fullscreen,
                 const zmqpp::context& context);
-
-  SDL_Window* setupWindow(const char* windowTitle,
-                          int windowXPosition,
-                          int windowYPosition,
-                          int screenWidth,
-                          int screenHeight,
-                          bool fullscreen);
-  void initializeEngine(SDL_Window* window);
-
   void start();
-
-  void renderState();
-  void clean();
 
 private:
   Logger logger;
@@ -54,20 +43,21 @@ private:
   std::unique_ptr<ItemList> itemList;
   std::unique_ptr<ZeroWeight> zeroWeight;
   std::unique_ptr<CancelScanConfirmation> cancelScanConfirmation;
+  std::unique_ptr<ScanSuccess> scanSuccess;
+
+  SDL_Window* setupWindow(const char* windowTitle,
+                          int windowXPosition,
+                          int windowYPosition,
+                          int screenWidth,
+                          int screenHeight,
+                          bool fullscreen);
+  void initializeEngine(SDL_Window* window);
 
   void handleStateChange();
   void handleEvents();
   void update();
-
-  /*
-  void checkScanning();
-  void checkItemList();
-  void checkZeroWeight();
-  void checkCancelScanConfirmation();
-  */
-
-  void zeroWeightChoiceToHardware(const std::string& zeroWeightChoice);
-  void scanCancelledToVision();
+  void renderState();
+  void clean();
 };
 
 #endif

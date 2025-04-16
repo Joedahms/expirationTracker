@@ -5,11 +5,9 @@
 
 class ScanSuccess : public State {
 public:
-  ScanSuccess(struct DisplayGlobal displayGlobal);
+  ScanSuccess(struct DisplayGlobal& displayGlobal, const EngineState& state);
   void render() const override;
-
-  void setRetryScan(bool retryScan);
-  bool getRetryScan();
+  void exit() override;
 
 private:
   Logger logger;
