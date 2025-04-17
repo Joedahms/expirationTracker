@@ -108,7 +108,7 @@ std::string DisplayHandler::receiveMessage(const std::string& response,
  * @param None
  * @return None
  */
-void DisplayHandler::detectionSuccess() {
+FoodItem DisplayHandler::detectionSuccess() {
   this->logger.log("Item detection succeeded, receiving food item");
 
   FoodItem foodItem;
@@ -117,16 +117,10 @@ void DisplayHandler::detectionSuccess() {
     foodItemReceived =
         receiveFoodItem(this->replySocket, Messages::AFFIRMATIVE, foodItem);
   }
-
   this->logger.log("Food item received: ");
   foodItem.logToFile(this->logger);
 
-  this->logger.log("Storing food item in database");
-  sqlite3* database = nullptr;
-  openDatabase(&database);
-  storeFoodItem(database, foodItem);
-  sqlite3_close(database);
-  this->logger.log("Food item stored in database");
+  return foodItem;
 }
 
 /**

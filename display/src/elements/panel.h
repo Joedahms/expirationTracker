@@ -25,6 +25,10 @@ public:
         const int& id,
         const std::string& logFile);
 
+  Panel(struct DisplayGlobal displayGlobal,
+        const SDL_Rect& boundaryRectangle,
+        const std::string& logFile);
+
   void addText(const std::string& fontPath,
                const std::string& content,
                const int& fontSize,
@@ -36,7 +40,7 @@ public:
   void handleEventSelf(const SDL_Event& event) override;
 
 private:
-  int id = 0;
+  int id = -1;
 
   void addFoodItemName(const FoodItem& foodItem, const SDL_Point& relativePosition);
   void addFoodItemExpirationDate(const FoodItem& foodItem,

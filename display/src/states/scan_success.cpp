@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "../log_files.h"
+#include "../sql_food.h"
 #include "scan_success.h"
 
 ScanSuccess::ScanSuccess(struct DisplayGlobal& displayGlobal, const EngineState& state)
@@ -26,9 +27,9 @@ ScanSuccess::ScanSuccess(struct DisplayGlobal& displayGlobal, const EngineState&
   this->rootElement->addElement(std::move(successMessage));
 
   std::shared_ptr<Button> yesButton = std::make_shared<Button>(
-      this->displayGlobal, SDL_Rect{0, 150, 0, 0}, "Yes", SDL_Point{0, 0},
+      this->displayGlobal, SDL_Rect{0, 200, 0, 0}, "Yes", SDL_Point{0, 0},
       [this]() {
-        this->displayHandler.detectionSuccess();
+        correctItem();
         this->currentState = EngineState::ITEM_LIST;
       },
       LogFiles::SCAN_SUCCESS);
@@ -36,12 +37,8 @@ ScanSuccess::ScanSuccess(struct DisplayGlobal& displayGlobal, const EngineState&
   this->rootElement->addElement(yesButton);
 
   std::shared_ptr<Button> noButton = std::make_shared<Button>(
-      this->displayGlobal, SDL_Rect{0, 200, 0, 0}, "No", SDL_Point{0, 0},
-      [this]() {
-        this->displayHandler.detectionSuccess();
-        this->currentState = EngineState::ITEM_LIST;
-      },
-      LogFiles::SCAN_SUCCESS);
+      this->displayGlobal, SDL_Rect{0, 250, 0, 0}, "No", SDL_Point{0, 0},
+      [this]() { this->currentState = EngineState::ITEM_LIST; }, LogFiles::SCAN_SUCCESS);
   noButton->setCenteredHorizontal();
   this->rootElement->addElement(noButton);
 }
@@ -53,4 +50,25 @@ void ScanSuccess::render() const {
   SDL_RenderPresent(this->displayGlobal.renderer);
 }
 
+void ScanSuccess::enter() {
+  this->currentState              = this->defaultState;
+  this->foodItem                  = this->displayHandler.detectionSuccess();
+  SDL_Rect boundaryRectangle      = {0, 150, 400, 30};
+  std::shared_ptr<Panel> newPanel = std::make_shared<Panel>(
+      this->displayGlobal, boundaryRectangle, LogFiles::SCAN_SUCCESS);
+  newPanel->setCenteredHorizontal();
+  newPanel->addFoodItem(foodItem, SDL_Point{0, 0});
+  newPanel->addBorder(1);
+  this->rootElement->addElement(std::move(newPanel));
+}
+
 void ScanSuccess::exit() {}
+
+void ScanSuccess::correctItem() {
+  this->logger.log("Storing food item in database");
+  sqlite3* database = nullptr;
+  openDatabase(&database);
+  storeFoodItem(database, foodItem);
+  sqlite3_close(database);
+  this->logger.log("Food item stored in database");
+}

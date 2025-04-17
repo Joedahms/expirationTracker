@@ -27,7 +27,7 @@ public:
     s_instance = &instance;
   }
 
-  void detectionSuccess();
+  FoodItem detectionSuccess();
   EngineState startToHardware();
   void scanCancelledToVision();
   void zeroWeightChoiceToHardware(const std::string& zeroWeightChoice);

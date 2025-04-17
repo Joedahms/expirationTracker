@@ -28,6 +28,21 @@ Panel::Panel(struct DisplayGlobal displayGlobal,
 }
 
 /**
+ * @param displayGlobal
+ * @param boundaryRectangle Rectangle defining offset within parent (if any) and width +
+ * height
+ * @param settingId The primary key of the food item corresponding to this panel
+ */
+Panel::Panel(struct DisplayGlobal displayGlobal,
+             const SDL_Rect& boundaryRectangle,
+             const std::string& logFile) {
+  this->displayGlobal = displayGlobal;
+  setupPosition(boundaryRectangle);
+  this->logger  = std::make_unique<Logger>(logFile);
+  this->logFile = logFile;
+}
+
+/**
  * Add some text to a panel. Whatever text is added first will be displayed on the left
  * and any text added after that will be displayed moving right.
  *
@@ -61,9 +76,16 @@ void Panel::addFoodItem(const FoodItem& foodItem, const SDL_Point& relativePosit
   addFoodItemName(foodItem, relativePosition);
   addFoodItemExpirationDate(foodItem, relativePosition);
 
-  std::shared_ptr<NumberSetting> itemQuantity = std::make_shared<NumberSetting>(
-      this->displayGlobal, SDL_Rect{0, 0, 0, 0}, this->id, this->logFile);
-  addElement(std::move(itemQuantity));
+  if (this->id == -1) {
+    std::shared_ptr<NumberSetting> itemQuantity = std::make_shared<NumberSetting>(
+        this->displayGlobal, SDL_Rect{0, 0, 0, 0}, this->logFile);
+    addElement(std::move(itemQuantity));
+  }
+  else {
+    std::shared_ptr<NumberSetting> itemQuantity = std::make_shared<NumberSetting>(
+        this->displayGlobal, SDL_Rect{0, 0, 0, 0}, this->id, this->logFile);
+    addElement(std::move(itemQuantity));
+  }
 }
 
 /**
