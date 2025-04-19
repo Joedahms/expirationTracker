@@ -68,7 +68,7 @@ void ScanSuccess::enter() {
 
   SDL_Rect boundaryRectangle      = {0, 150, 400, 30};
   std::shared_ptr<Panel> newPanel = std::make_shared<Panel>(
-      this->displayGlobal, boundaryRectangle, LogFiles::SCAN_SUCCESS);
+      this->displayGlobal, boundaryRectangle, id, LogFiles::SCAN_SUCCESS);
   newPanel->setCenteredHorizontal();
   newPanel->addFoodItem(foodItem, SDL_Point{0, 0});
   newPanel->addBorder(1);
