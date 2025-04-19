@@ -62,10 +62,9 @@ void ScanSuccess::enter() {
   sqlite3* database = nullptr;
   openDatabase(&database);
   int id = storeFoodItem(database, foodItem);
+  foodItem.setId(id);
   sqlite3_close(database);
   this->logger.log("Food item stored in database");
-
-  std::cout << id << std::endl;
 
   SDL_Rect boundaryRectangle      = {0, 150, 400, 30};
   std::shared_ptr<Panel> newPanel = std::make_shared<Panel>(
