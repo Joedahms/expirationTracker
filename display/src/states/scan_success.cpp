@@ -61,11 +61,10 @@ void ScanSuccess::enter() {
   this->logger.log("Storing food item in database");
   sqlite3* database = nullptr;
   openDatabase(&database);
-  storeFoodItem(database, foodItem);
+  int id = storeFoodItem(database, foodItem);
   sqlite3_close(database);
   this->logger.log("Food item stored in database");
 
-  int id = this->foodItem.getId();
   std::cout << id << std::endl;
 
   SDL_Rect boundaryRectangle      = {0, 150, 400, 30};

@@ -7,7 +7,7 @@
 #include "../src/elements/sort_method.h"
 
 void openDatabase(sqlite3**);
-void storeFoodItem(sqlite3*, struct FoodItem);
+int storeFoodItem(sqlite3*, struct FoodItem);
 
 void setFoodItem(struct FoodItem& foodItem,
                  const std::string& columnValue,

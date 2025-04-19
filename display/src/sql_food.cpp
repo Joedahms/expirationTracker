@@ -48,7 +48,7 @@ void openDatabase(sqlite3** database) {
  * @param foodItem The food item to store
  * @return None
  */
-void storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
+int storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
   const char* insertSql =
       "INSERT INTO foodItems (name, category, scanDateYear, "
       "scanDateMonth, scanDateDay, expirationDateYear, expirationDateMonth, "
@@ -88,7 +88,11 @@ void storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
     LOG(FATAL) << "Execution Error: " << sqlite3_errmsg(database);
   }
 
+  int lastRowId = sqlite3_last_insert_rowid(database);
+
   sqlite3_finalize(statement);
+
+  return lastRowId;
 }
 
 /**
