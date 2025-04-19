@@ -20,14 +20,12 @@
  */
 class Panel : public CompositeElement {
 public:
-  Panel(struct DisplayGlobal displayGlobal,
-        const SDL_Rect& boundaryRectangle,
-        const int& id,
+  Panel(struct DisplayGlobal& displayGlobal,
+        const SDL_Rect boundaryRectangle,
+        const int id,
         const std::string& logFile);
 
-  Panel(struct DisplayGlobal displayGlobal,
-        const SDL_Rect& boundaryRectangle,
-        const std::string& logFile);
+  void setId(const int id);
 
   void addText(const std::string& fontPath,
                const std::string& content,

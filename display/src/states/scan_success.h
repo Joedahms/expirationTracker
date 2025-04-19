@@ -14,6 +14,7 @@ private:
   Logger logger;
   FoodItem foodItem;
   bool correctItem = false;
+  std::shared_ptr<Panel> scannedItemPanel;
 };
 
 #endif

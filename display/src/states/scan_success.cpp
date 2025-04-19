@@ -45,6 +45,13 @@ ScanSuccess::ScanSuccess(struct DisplayGlobal& displayGlobal, const EngineState&
       LogFiles::SCAN_SUCCESS);
   noButton->setCenteredHorizontal();
   this->rootElement->addElement(noButton);
+
+  SDL_Rect boundaryRectangle = {0, 150, 400, 30};
+  this->scannedItemPanel = std::make_shared<Panel>(this->displayGlobal, boundaryRectangle,
+                                                   -1, LogFiles::SCAN_SUCCESS);
+  this->scannedItemPanel->setCenteredHorizontal();
+  this->scannedItemPanel->addBorder(1);
+  this->rootElement->addElement(scannedItemPanel);
 }
 
 void ScanSuccess::render() const {
@@ -62,17 +69,10 @@ void ScanSuccess::enter() {
   sqlite3* database = nullptr;
   openDatabase(&database);
   int id = storeFoodItem(database, foodItem);
-  foodItem.setId(id);
   sqlite3_close(database);
   this->logger.log("Food item stored in database");
 
-  SDL_Rect boundaryRectangle      = {0, 150, 400, 30};
-  std::shared_ptr<Panel> newPanel = std::make_shared<Panel>(
-      this->displayGlobal, boundaryRectangle, id, LogFiles::SCAN_SUCCESS);
-  newPanel->setCenteredHorizontal();
-  newPanel->addFoodItem(foodItem, SDL_Point{0, 0});
-  newPanel->addBorder(1);
-  this->rootElement->addElement(newPanel);
+  this->scannedItemPanel->setId(id);
 }
 
 void ScanSuccess::exit() {

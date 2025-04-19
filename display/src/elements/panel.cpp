@@ -5,6 +5,7 @@
 
 #include "../display_global.h"
 #include "../sdl_debug.h"
+#include "../sql_food.h"
 #include "button.h"
 #include "element.h"
 #include "panel.h"
@@ -16,9 +17,9 @@
  * height
  * @param settingId The primary key of the food item corresponding to this panel
  */
-Panel::Panel(struct DisplayGlobal displayGlobal,
-             const SDL_Rect& boundaryRectangle,
-             const int& id,
+Panel::Panel(struct DisplayGlobal& displayGlobal,
+             const SDL_Rect boundaryRectangle,
+             const int id,
              const std::string& logFile)
     : id(id) {
   this->displayGlobal = displayGlobal;
@@ -27,19 +28,11 @@ Panel::Panel(struct DisplayGlobal displayGlobal,
   this->logFile = logFile;
 }
 
-/**
- * @param displayGlobal
- * @param boundaryRectangle Rectangle defining offset within parent (if any) and width +
- * height
- * @param settingId The primary key of the food item corresponding to this panel
- */
-Panel::Panel(struct DisplayGlobal displayGlobal,
-             const SDL_Rect& boundaryRectangle,
-             const std::string& logFile) {
-  this->displayGlobal = displayGlobal;
-  setupPosition(boundaryRectangle);
-  this->logger  = std::make_unique<Logger>(logFile);
-  this->logFile = logFile;
+void Panel::setId(const int id) {
+  this->id = id;
+  removeAllChildren();
+  FoodItem foodItem = readFoodItemById(this->id);
+  addFoodItem(foodItem, SDL_Point{0, 0});
 }
 
 /**
@@ -76,16 +69,9 @@ void Panel::addFoodItem(const FoodItem& foodItem, const SDL_Point& relativePosit
   addFoodItemName(foodItem, relativePosition);
   addFoodItemExpirationDate(foodItem, relativePosition);
 
-  if (this->id == -1) {
-    std::shared_ptr<NumberSetting> itemQuantity = std::make_shared<NumberSetting>(
-        this->displayGlobal, SDL_Rect{0, 0, 0, 0}, this->logFile);
-    addElement(std::move(itemQuantity));
-  }
-  else {
-    std::shared_ptr<NumberSetting> itemQuantity = std::make_shared<NumberSetting>(
-        this->displayGlobal, SDL_Rect{0, 0, 0, 0}, this->logFile, this->id);
-    addElement(std::move(itemQuantity));
-  }
+  std::shared_ptr<NumberSetting> itemQuantity = std::make_shared<NumberSetting>(
+      this->displayGlobal, SDL_Rect{0, 0, 0, 0}, this->logFile, this->id);
+  addElement(std::move(itemQuantity));
 }
 
 /**
