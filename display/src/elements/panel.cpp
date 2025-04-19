@@ -83,7 +83,7 @@ void Panel::addFoodItem(const FoodItem& foodItem, const SDL_Point& relativePosit
   }
   else {
     std::shared_ptr<NumberSetting> itemQuantity = std::make_shared<NumberSetting>(
-        this->displayGlobal, SDL_Rect{0, 0, 0, 0}, this->id, this->logFile);
+        this->displayGlobal, SDL_Rect{0, 0, 0, 0}, this->logFile, this->id);
     addElement(std::move(itemQuantity));
   }
 }

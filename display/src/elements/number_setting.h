@@ -18,10 +18,6 @@ public:
                 const std::string& logFile,
                 const int settingId = -1);
 
-  NumberSetting(struct DisplayGlobal displayGlobal,
-                const SDL_Rect& boundaryRectangle,
-                const std::string& logFile);
-
   void setSettingId(const int& newSettingId);
   void updateSelf() override;
   void handleEventSelf(const SDL_Event& event) override;
