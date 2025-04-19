@@ -10,12 +10,10 @@ public:
   void enter() override;
   void exit() override;
 
-  void correctItem();
-  void incorrectItem();
-
 private:
   Logger logger;
   FoodItem foodItem;
+  bool correctItem = false;
 };
 
 #endif

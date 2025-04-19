@@ -29,7 +29,7 @@ ScanSuccess::ScanSuccess(struct DisplayGlobal& displayGlobal, const EngineState&
   std::shared_ptr<Button> yesButton = std::make_shared<Button>(
       this->displayGlobal, SDL_Rect{0, 200, 0, 0}, "Yes", SDL_Point{0, 0},
       [this]() {
-        correctItem();
+        this->correctItem  = true;
         this->currentState = EngineState::ITEM_LIST;
       },
       LogFiles::SCAN_SUCCESS);
@@ -38,11 +38,7 @@ ScanSuccess::ScanSuccess(struct DisplayGlobal& displayGlobal, const EngineState&
 
   std::shared_ptr<Button> noButton = std::make_shared<Button>(
       this->displayGlobal, SDL_Rect{0, 250, 0, 0}, "No", SDL_Point{0, 0},
-      [this]() {
-        incorrectItem();
-        this->currentState = EngineState::ITEM_LIST;
-      },
-      LogFiles::SCAN_SUCCESS);
+      [this]() { this->currentState = EngineState::ITEM_LIST; }, LogFiles::SCAN_SUCCESS);
   noButton->setCenteredHorizontal();
   this->rootElement->addElement(noButton);
 }
@@ -75,17 +71,8 @@ void ScanSuccess::enter() {
   this->rootElement->addElement(newPanel);
 }
 
-void ScanSuccess::exit() {}
-
-void ScanSuccess::correctItem() {
-  /*
-  this->logger.log("Storing food item in database");
-  sqlite3* database = nullptr;
-  openDatabase(&database);
-  storeFoodItem(database, foodItem);
-  sqlite3_close(database);
-  this->logger.log("Food item stored in database");
-  */
+void ScanSuccess::exit() {
+  if (!this->correctItem) {
+    deleteById(this->foodItem.getId());
+  }
 }
-
-void ScanSuccess::incorrectItem() { deleteById(this->foodItem.getId()); }
