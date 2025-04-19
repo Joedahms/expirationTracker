@@ -38,7 +38,11 @@ ScanSuccess::ScanSuccess(struct DisplayGlobal& displayGlobal, const EngineState&
 
   std::shared_ptr<Button> noButton = std::make_shared<Button>(
       this->displayGlobal, SDL_Rect{0, 250, 0, 0}, "No", SDL_Point{0, 0},
-      [this]() { this->currentState = EngineState::ITEM_LIST; }, LogFiles::SCAN_SUCCESS);
+      [this]() {
+        this->correctItem  = false;
+        this->currentState = EngineState::ITEM_LIST;
+      },
+      LogFiles::SCAN_SUCCESS);
   noButton->setCenteredHorizontal();
   this->rootElement->addElement(noButton);
 }
