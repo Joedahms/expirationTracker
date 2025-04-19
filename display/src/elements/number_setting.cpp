@@ -44,6 +44,9 @@ NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal,
     this->settingValue = foodItem.getQuantity();
     this->children[1]->setContent(std::to_string(this->settingValue));
   }
+  else {
+    this->settingValue = 0;
+  }
 }
 
 /**

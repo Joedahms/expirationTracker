@@ -38,7 +38,11 @@ ScanSuccess::ScanSuccess(struct DisplayGlobal& displayGlobal, const EngineState&
 
   std::shared_ptr<Button> noButton = std::make_shared<Button>(
       this->displayGlobal, SDL_Rect{0, 250, 0, 0}, "No", SDL_Point{0, 0},
-      [this]() { this->currentState = EngineState::ITEM_LIST; }, LogFiles::SCAN_SUCCESS);
+      [this]() {
+        incorrectItem();
+        this->currentState = EngineState::ITEM_LIST;
+      },
+      LogFiles::SCAN_SUCCESS);
   noButton->setCenteredHorizontal();
   this->rootElement->addElement(noButton);
 }
@@ -51,24 +55,36 @@ void ScanSuccess::render() const {
 }
 
 void ScanSuccess::enter() {
-  this->currentState              = this->defaultState;
-  this->foodItem                  = this->displayHandler.detectionSuccess();
-  SDL_Rect boundaryRectangle      = {0, 150, 400, 30};
-  std::shared_ptr<Panel> newPanel = std::make_shared<Panel>(
-      this->displayGlobal, boundaryRectangle, LogFiles::SCAN_SUCCESS);
-  newPanel->setCenteredHorizontal();
-  newPanel->addFoodItem(foodItem, SDL_Point{0, 0});
-  newPanel->addBorder(1);
-  this->rootElement->addElement(std::move(newPanel));
-}
+  this->currentState = this->defaultState;
+  this->foodItem     = this->displayHandler.detectionSuccess();
 
-void ScanSuccess::exit() {}
-
-void ScanSuccess::correctItem() {
   this->logger.log("Storing food item in database");
   sqlite3* database = nullptr;
   openDatabase(&database);
   storeFoodItem(database, foodItem);
   sqlite3_close(database);
   this->logger.log("Food item stored in database");
+
+  SDL_Rect boundaryRectangle      = {0, 150, 400, 30};
+  std::shared_ptr<Panel> newPanel = std::make_shared<Panel>(
+      this->displayGlobal, boundaryRectangle, LogFiles::SCAN_SUCCESS);
+  newPanel->setCenteredHorizontal();
+  newPanel->addFoodItem(foodItem, SDL_Point{0, 0});
+  newPanel->addBorder(1);
+  this->rootElement->addElement(newPanel);
 }
+
+void ScanSuccess::exit() {}
+
+void ScanSuccess::correctItem() {
+  /*
+  this->logger.log("Storing food item in database");
+  sqlite3* database = nullptr;
+  openDatabase(&database);
+  storeFoodItem(database, foodItem);
+  sqlite3_close(database);
+  this->logger.log("Food item stored in database");
+  */
+}
+
+void ScanSuccess::incorrectItem() { deleteById(this->foodItem.getId()); }

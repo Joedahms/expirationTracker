@@ -11,6 +11,7 @@ public:
   void exit() override;
 
   void correctItem();
+  void incorrectItem();
 
 private:
   Logger logger;
