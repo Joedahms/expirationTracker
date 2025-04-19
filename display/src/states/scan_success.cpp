@@ -69,6 +69,7 @@ void ScanSuccess::enter() {
   sqlite3* database = nullptr;
   openDatabase(&database);
   int id = storeFoodItem(database, foodItem);
+  this->foodItem.setId(id);
   sqlite3_close(database);
   this->logger.log("Food item stored in database");
 
