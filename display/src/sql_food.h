@@ -19,20 +19,20 @@ int readAllFoodItemsCallback(void* foodItemVector,
                              char** columns,
                              char** columnNames);
 
-std::vector<FoodItem> readAllFoodItemsSorted(SortMethod sortMethod);
+std::vector<FoodItem> readAllFoodItemsSorted(const SortMethod& sortMethod);
 int readAllFoodItemsSortedCallback(void* foodItemVector,
                                    int numColumns,
                                    char** columns,
                                    char** columnNames);
 
-FoodItem readFoodItemById(const int& id);
+FoodItem readFoodItemById(const int id);
 int readFoodItemByIdCallback(void* passedFoodItem,
                              int numColumns,
                              char** columns,
                              char** columnNames);
 
-void updateFoodItemQuantity(const int& id, const int& newQuantity);
+void updateFoodItemQuantity(const int id, const int newQuantity);
 
-void deleteById(const int& id);
+void deleteById(const int id);
 
 #endif

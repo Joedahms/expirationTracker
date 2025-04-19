@@ -150,6 +150,7 @@ void setFoodItem(FoodItem& foodItem,
         expirationDate.year(), expirationDate.month(),
         std::chrono::day{static_cast<unsigned>(stoi(columnValue))}));
   }
+  // Weight not currently being used in any parts of the display but may want to add later
   /*
   else if (std::string(columnNames[i]) == "weight") {
     foodItem.weight = columns[i];
@@ -215,7 +216,7 @@ int readAllFoodItemsCallback(void* foodItemVector,
  * @return Vector of food item objects, each corresponding to a food item read from the
  * database.
  */
-std::vector<FoodItem> readAllFoodItemsSorted(SortMethod sortMethod) {
+std::vector<FoodItem> readAllFoodItemsSorted(const SortMethod& sortMethod) {
   std::string sqlSortMethod;
   switch (sortMethod) {
   case SortMethod::LOW_TO_HIGH:
@@ -253,7 +254,7 @@ std::vector<FoodItem> readAllFoodItemsSorted(SortMethod sortMethod) {
  * database.
  * @return The food item with the matching id
  */
-FoodItem readFoodItemById(const int& id) {
+FoodItem readFoodItemById(const int id) {
   sqlite3* database = nullptr;
   openDatabase(&database);
 
@@ -293,7 +294,13 @@ int readFoodItemByIdCallback(void* passedFoodItem,
   return 0;
 }
 
-void updateFoodItemQuantity(const int& id, const int& newQuantity) {
+/**
+ * Update the quantity of a food item.
+ *
+ * @param id The id of the food item to update.
+ * @param newQuantity The quantity to switch to.
+ */
+void updateFoodItemQuantity(const int id, const int newQuantity) {
   sqlite3* database = nullptr;
   openDatabase(&database);
   char* errorMessage = nullptr;
@@ -311,7 +318,13 @@ void updateFoodItemQuantity(const int& id, const int& newQuantity) {
   sqlite3_close(database);
 }
 
-void deleteById(const int& id) {
+/**
+ * Delete a food item from the database.
+ *
+ * @param id The id of the food item to delete.
+ * @return None
+ */
+void deleteById(const int id) {
   sqlite3* database = nullptr;
   openDatabase(&database);
   char* errorMessage = nullptr;

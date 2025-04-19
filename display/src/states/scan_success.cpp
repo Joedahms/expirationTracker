@@ -4,6 +4,10 @@
 #include "../sql_food.h"
 #include "scan_success.h"
 
+/**
+ * @param displayGlobal Pass to State
+ * @param state Pass to State
+ */
 ScanSuccess::ScanSuccess(struct DisplayGlobal& displayGlobal, const EngineState& state)
     : State(displayGlobal, state), logger(LogFiles::SCAN_SUCCESS) {
   this->logger.log("Constructing scan success state");
@@ -54,6 +58,12 @@ ScanSuccess::ScanSuccess(struct DisplayGlobal& displayGlobal, const EngineState&
   this->rootElement->addElement(scannedItemPanel);
 }
 
+/**
+ * Render
+ *
+ * @param None
+ * @return None
+ */
 void ScanSuccess::render() const {
   SDL_SetRenderDrawColor(this->displayGlobal.renderer, 0, 0, 0, 255); // Black background
   SDL_RenderClear(this->displayGlobal.renderer);
@@ -61,6 +71,13 @@ void ScanSuccess::render() const {
   SDL_RenderPresent(this->displayGlobal.renderer);
 }
 
+/**
+ * Perform actions upon entering state. Stores the successfully scanned food item to the
+ * database.
+ *
+ * @param None
+ * @return None
+ */
 void ScanSuccess::enter() {
   this->currentState = this->defaultState;
   this->foodItem     = this->displayHandler.detectionSuccess();
@@ -76,6 +93,13 @@ void ScanSuccess::enter() {
   this->scannedItemPanel->setId(id);
 }
 
+/**
+ * Perform actions upon exiting state. If the user pressed the no button, then the food
+ * item is deleted out of the database.
+ *
+ * @param None
+ * @return None
+ */
 void ScanSuccess::exit() {
   if (!this->correctItem) {
     deleteById(this->foodItem.getId());
