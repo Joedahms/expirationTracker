@@ -8,12 +8,12 @@ public:
   bool scored = false;
 
   ObstaclePair(const struct DisplayGlobal& displayGlobal,
-               const SDL_Rect& boundaryRectangle,
+               const std::string& logFile,
+               const SDL_Rect boundaryRectangle,
                const int windowWidth,
                const int respawnOffset,
                const int minHeight,
-               const int verticalGap,
-               const std::string& logFile);
+               const int verticalGap);
 
   SDL_Rect getTopObstacleRect();
   SDL_Rect getBottomObstacleRect();

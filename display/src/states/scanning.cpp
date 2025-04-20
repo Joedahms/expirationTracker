@@ -5,6 +5,7 @@
 #include <string>
 
 #include "../display_global.h"
+#include "../elements/button.h"
 #include "../elements/flappy_food/bird.h"
 #include "../elements/flappy_food/obstacle.h"
 #include "../elements/flappy_food/obstacle_pair.h"
@@ -16,65 +17,66 @@
 /**
  * @param displayGlobal Global variables
  */
-Scanning::Scanning(const DisplayGlobal& displayGlobal, const EngineState& state)
-    : State(displayGlobal, state), logger(LogFiles::SCANNING) {
-  this->logger.log("Constructing scanning state");
+Scanning::Scanning(const struct DisplayGlobal& displayGlobal, const EngineState& state)
+    : State(displayGlobal, LogFiles::SCANNING, state) {
+  this->logger->log("Constructing scanning state");
 
-  this->logger.log("Constructing scan message");
+  this->logger->log("Constructing scan message");
   const std::string progressMessageContent = "Scanning In Progress";
   const SDL_Color progressMessageColor     = {0, 255, 0, 255}; // Green
   const SDL_Rect progressMessageRectangle  = {0, 0, 0, 0};
   std::unique_ptr<Text> progressMessage    = std::make_unique<Text>(
-      this->displayGlobal, progressMessageRectangle, DisplayGlobal::futuramFontPath,
-      progressMessageContent, 24, progressMessageColor);
+      this->displayGlobal, this->logFile, progressMessageRectangle,
+      DisplayGlobal::futuramFontPath, progressMessageContent, 24, progressMessageColor);
   progressMessage->setCenteredHorizontal();
   this->rootElement->addElement(std::move(progressMessage));
-  this->logger.log("Scan message constructed");
+  this->logger->log("Scan message constructed");
 
-  this->logger.log("Constructing cancel scan button");
+  this->logger->log("Constructing cancel scan button");
   SDL_Rect cancelScanButtonRectangle       = {0, 50, 0, 0};
   std::unique_ptr<Button> cancelScanButton = std::make_unique<Button>(
-      this->displayGlobal, cancelScanButtonRectangle, "Cancel Scan", SDL_Point{10, 10},
-      [this]() { this->currentState = EngineState::CANCEL_SCAN_CONFIRMATION; },
-      LogFiles::SCANNING);
+      this->displayGlobal, this->logFile, cancelScanButtonRectangle, "Cancel Scan",
+      SDL_Point{10, 10},
+      [this]() { this->currentState = EngineState::CANCEL_SCAN_CONFIRMATION; });
   cancelScanButton->setCenteredHorizontal();
   rootElement->addElement(std::move(cancelScanButton));
-  this->logger.log("Cancel scan button constructed");
+  this->logger->log("Cancel scan button constructed");
 
-  this->logger.log("Constructing loading bar");
+  this->logger->log("Constructing loading bar");
   SDL_Rect loadingBarRectangle           = {0, 100, 200, 30};
   int loadingBarBorderThickness          = 3;
   float totalTimeSeconds                 = 20;
   float updatePeriodMs                   = 100;
   std::unique_ptr<LoadingBar> loadingBar = std::make_unique<LoadingBar>(
-      this->displayGlobal, loadingBarRectangle, loadingBarBorderThickness,
-      totalTimeSeconds, updatePeriodMs, LogFiles::SCANNING);
+      this->displayGlobal, this->logFile, loadingBarRectangle, loadingBarBorderThickness,
+      totalTimeSeconds, updatePeriodMs);
   loadingBar->setCenteredHorizontal();
   rootElement->addElement(std::move(loadingBar));
-  this->logger.log("Loading bar constructed");
+  this->logger->log("Loading bar constructed");
 
-  this->logger.log("Constructing bird");
-  SDL_Rect birdRect          = {20, 0, 32, 32};
-  birdRect.y                 = this->windowSurface->h - birdRect.h;
-  std::unique_ptr<Bird> bird = std::make_unique<Bird>(this->displayGlobal, birdRect);
-  birdPtr                    = bird.get();
+  this->logger->log("Constructing bird");
+  SDL_Rect birdRect = {20, 0, 32, 32};
+  birdRect.y        = this->windowSurface->h - birdRect.h;
+  std::unique_ptr<Bird> bird =
+      std::make_unique<Bird>(this->displayGlobal, this->logFile, birdRect);
+  birdPtr = bird.get();
   rootElement->addElement(std::move(bird));
-  this->logger.log("Bird constructed");
+  this->logger->log("Bird constructed");
 
   initializeObstacles();
 
-  this->logger.log("Constructing score text");
+  this->logger->log("Constructing score text");
   const std::string scoreTextContent = "0";
   const SDL_Color scoreTextColor     = {0, 255, 0, 255}; // Green
   const SDL_Rect scoreTextRect       = {0, 150, 0, 0};
-  this->scoreText = std::make_shared<Text>(this->displayGlobal, scoreTextRect,
-                                           DisplayGlobal::futuramFontPath,
+  this->scoreText = std::make_shared<Text>(this->displayGlobal, this->logFile,
+                                           scoreTextRect, DisplayGlobal::futuramFontPath,
                                            scoreTextContent, 24, scoreTextColor);
   this->scoreText->setCenteredHorizontal();
   this->rootElement->addElement(scoreText);
-  this->logger.log("Score text constructed");
+  this->logger->log("Score text constructed");
 
-  this->logger.log("Constructed scanning state");
+  this->logger->log("Constructed scanning state");
 }
 
 void Scanning::handleEvents(bool* displayIsRunning) {
@@ -151,8 +153,8 @@ void Scanning::initializeObstacles() {
     SDL_Rect boundaryRectangle = {xPosition, yPosition, pairWidth, pairHeight};
 
     std::shared_ptr<ObstaclePair> obstaclePair = std::make_shared<ObstaclePair>(
-        this->displayGlobal, boundaryRectangle, windowWidth, respawnOffset, minHeight,
-        verticalGap, LogFiles::SCANNING);
+        this->displayGlobal, this->logFile, boundaryRectangle, windowWidth, respawnOffset,
+        minHeight, verticalGap);
 
     obstaclePairs.push_back(obstaclePair);
 

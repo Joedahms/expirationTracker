@@ -17,19 +17,17 @@
  * @param displayGlobal Global display variables.
  */
 ItemList::ItemList(const DisplayGlobal& displayGlobal, const EngineState& state)
-    : State(displayGlobal, state), logger(LogFiles::ITEM_LIST) {
-  this->logger.log("Constructing item list state");
+    : State(displayGlobal, LogFiles::ITEM_LIST, state) {
+  this->logger->log("Constructing item list state");
 
   this->mediator = std::make_shared<Mediator>(LogFiles::ITEM_LIST);
-
-  previousUpdate = std::chrono::steady_clock::now();
 
   // Start Scan
   SDL_Rect newScanButtonRectangle       = {200, 150, 200, 50};
   std::shared_ptr<Button> newScanButton = std::make_shared<Button>(
-      this->displayGlobal, newScanButtonRectangle, "Scan New Item", SDL_Point{10, 10},
-      [this]() { this->currentState = this->displayHandler.startToHardware(); },
-      LogFiles::ITEM_LIST);
+      this->displayGlobal, this->logFile, newScanButtonRectangle, "Scan New Item",
+      SDL_Point{10, 10},
+      [this]() { this->currentState = this->displayHandler.startToHardware(); });
   newScanButton->setCenteredHorizontal();
   rootElement->addElement(std::move(newScanButton));
 
@@ -37,9 +35,9 @@ ItemList::ItemList(const DisplayGlobal& displayGlobal, const EngineState& state)
   SDL_Rect scrollBoxRect = {0, 0, 400, 100};
   int windowWidth, windowHeight;
   SDL_GetWindowSize(this->displayGlobal.window, &windowWidth, &windowHeight);
-  scrollBoxRect.h                      = windowHeight - 1;
-  std::shared_ptr<ScrollBox> scrollBox = std::make_shared<ScrollBox>(
-      this->displayGlobal, scrollBoxRect, LogFiles::ITEM_LIST);
+  scrollBoxRect.h = windowHeight - 1;
+  std::shared_ptr<ScrollBox> scrollBox =
+      std::make_shared<ScrollBox>(this->displayGlobal, this->logFile, scrollBoxRect);
 
   scrollBox->setPanelHeight(30);
   scrollBox->addBorder(1);
@@ -48,18 +46,18 @@ ItemList::ItemList(const DisplayGlobal& displayGlobal, const EngineState& state)
   this->rootElement->update();
 
   // Dropdown
-  std::shared_ptr<Dropdown> sortBy =
-      std::make_shared<Dropdown>(this->displayGlobal, SDL_Rect{450, 0, 0, 0}, "Sort by:");
+  std::shared_ptr<Dropdown> sortBy = std::make_shared<Dropdown>(
+      this->displayGlobal, this->logFile, SDL_Rect{450, 0, 0, 0}, "Sort by:");
 
   std::shared_ptr<Button> sortByExpirationLowToHigh = std::make_shared<Button>(
-      this->displayGlobal, SDL_Rect{0, 0, 0, 0}, "Expiration Date - Lowest to Highest",
-      SDL_Point{0, 0}, "low to high", LogFiles::ITEM_LIST);
+      this->displayGlobal, this->logFile, SDL_Rect{0, 0, 0, 0},
+      "Expiration Date - Lowest to Highest", SDL_Point{0, 0}, "low to high");
   sortByExpirationLowToHigh->initialize();
   this->mediator->addButton(sortByExpirationLowToHigh);
 
   std::shared_ptr<Button> sortByExpirationHighToLow = std::make_shared<Button>(
-      this->displayGlobal, SDL_Rect{0, 0, 0, 0}, "Expiration Date - Highest to Lowest",
-      SDL_Point{0, 0}, "high to low", LogFiles::ITEM_LIST);
+      this->displayGlobal, this->logFile, SDL_Rect{0, 0, 0, 0},
+      "Expiration Date - Highest to Lowest", SDL_Point{0, 0}, "high to low");
   sortByExpirationHighToLow->initialize();
   this->mediator->addButton(sortByExpirationHighToLow);
 
@@ -68,7 +66,7 @@ ItemList::ItemList(const DisplayGlobal& displayGlobal, const EngineState& state)
   sortBy->addOption(std::move(sortByExpirationHighToLow));
   this->rootElement->addElement(std::move(sortBy));
 
-  this->logger.log("Item list state constructed");
+  this->logger->log("Item list state constructed");
 }
 
 void ItemList::handleEvents(bool* displayIsRunning) {

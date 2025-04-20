@@ -3,10 +3,10 @@
 
 #include "bird.h"
 
-Bird::Bird(struct DisplayGlobal displayGlobal, const SDL_Rect& boundaryRectangle) {
-  this->displayGlobal     = displayGlobal;
-  this->boundaryRectangle = boundaryRectangle;
-  setupPosition(this->boundaryRectangle);
+Bird::Bird(const struct DisplayGlobal& displayGlobal,
+           const std::string& logFile,
+           const SDL_Rect boundaryRectangle)
+    : Element(displayGlobal, logFile, boundaryRectangle) {
   this->debugName = "bird";
 
   SDL_Surface* birdSurface = IMG_Load("../display/sprites/bird.png");

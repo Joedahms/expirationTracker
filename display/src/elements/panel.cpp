@@ -18,16 +18,11 @@
  * @param id The primary key of the food item corresponding to this panel
  * @param logFile Logfile to write logs to
  */
-Panel::Panel(struct DisplayGlobal& displayGlobal,
+Panel::Panel(const struct DisplayGlobal& displayGlobal,
+             const std::string& logFile,
              const SDL_Rect boundaryRectangle,
-             const int id,
-             const std::string& logFile)
-    : id(id) {
-  this->displayGlobal = displayGlobal;
-  setupPosition(boundaryRectangle);
-  this->logger  = std::make_unique<Logger>(logFile);
-  this->logFile = logFile;
-}
+             const int id)
+    : CompositeElement(displayGlobal, logFile, boundaryRectangle), id(id) {}
 
 /**
  * Set a new id. Updates information within the panel according to the new id.
@@ -58,9 +53,10 @@ void Panel::addText(const std::string& fontPath,
                     const int& fontSize,
                     const SDL_Color& color,
                     const SDL_Point& relativePosition) {
-  SDL_Rect textRectangle     = {relativePosition.x, relativePosition.y, 0, 0};
-  std::shared_ptr<Text> text = std::make_shared<Text>(this->displayGlobal, textRectangle,
-                                                      fontPath, content, fontSize, color);
+  SDL_Rect textRectangle = {relativePosition.x, relativePosition.y, 0, 0};
+  std::shared_ptr<Text> text =
+      std::make_shared<Text>(this->displayGlobal, this->logFile, textRectangle, fontPath,
+                             content, fontSize, color);
   addElement(std::move(text));
 }
 
@@ -76,7 +72,7 @@ void Panel::addFoodItem(const FoodItem& foodItem, const SDL_Point& relativePosit
   addFoodItemExpirationDate(foodItem, relativePosition);
 
   std::shared_ptr<NumberSetting> itemQuantity = std::make_shared<NumberSetting>(
-      this->displayGlobal, SDL_Rect{0, 0, 0, 0}, this->logFile, this->id);
+      this->displayGlobal, this->logFile, SDL_Rect{0, 0, 0, 0}, this->id);
   addElement(std::move(itemQuantity));
 }
 

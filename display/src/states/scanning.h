@@ -16,15 +16,13 @@
  */
 class Scanning : public State {
 public:
-  Scanning(const DisplayGlobal& displayGlobal, const EngineState& state);
+  Scanning(const struct DisplayGlobal& displayGlobal, const EngineState& state);
   void handleEvents(bool* displayIsRunning) override;
   void update() override;
   void render() const override;
   void exit() override;
 
 private:
-  Logger logger;
-
   Bird* birdPtr = nullptr;
   std::vector<std::shared_ptr<ObstaclePair>> obstaclePairs;
   int score = 0;

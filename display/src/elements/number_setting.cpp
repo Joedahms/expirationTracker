@@ -15,28 +15,24 @@
  * height
  * @param settingId The primary key of the food item corresponding to this object
  */
-NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal,
-                             const SDL_Rect& boundaryRectangle,
+NumberSetting::NumberSetting(const struct DisplayGlobal& displayGlobal,
                              const std::string& logFile,
+                             const SDL_Rect boundaryRectangle,
                              const int settingId)
-    : settingId(settingId) {
-  setupPosition(boundaryRectangle);
-  this->logger  = std::make_unique<Logger>(logFile);
-  this->logFile = logFile;
-
-  std::shared_ptr<Button> decreaseButton = std::make_shared<Button>(
-      displayGlobal, SDL_Rect{0, 0, 0, 0}, "-", SDL_Point{0, 0},
-      [this]() { this->settingValue--; }, this->logFile);
+    : CompositeElement(displayGlobal, logFile, boundaryRectangle), settingId(settingId) {
+  std::shared_ptr<Button> decreaseButton =
+      std::make_shared<Button>(this->displayGlobal, this->logFile, SDL_Rect{0, 0, 0, 0},
+                               "-", SDL_Point{0, 0}, [this]() { this->settingValue--; });
   addElement(std::move(decreaseButton));
 
-  std::shared_ptr<Text> text = std::make_shared<Text>(displayGlobal, SDL_Rect{0, 0, 0, 0},
-                                                      DisplayGlobal::futuramFontPath, "0",
-                                                      24, SDL_Color{0, 255, 0, 255});
+  std::shared_ptr<Text> text = std::make_shared<Text>(
+      this->displayGlobal, this->logFile, SDL_Rect{0, 0, 0, 0},
+      DisplayGlobal::futuramFontPath, "0", 24, SDL_Color{0, 255, 0, 255});
   addElement(std::move(text));
 
-  std::shared_ptr<Button> increaseButton = std::make_shared<Button>(
-      displayGlobal, SDL_Rect{0, 0, 0, 0}, "+", SDL_Point{0, 0},
-      [this]() { this->settingValue++; }, this->logFile);
+  std::shared_ptr<Button> increaseButton =
+      std::make_shared<Button>(this->displayGlobal, this->logFile, SDL_Rect{0, 0, 0, 0},
+                               "+", SDL_Point{0, 0}, [this]() { this->settingValue++; });
   addElement(std::move(increaseButton));
 
   if (settingId != -1) {

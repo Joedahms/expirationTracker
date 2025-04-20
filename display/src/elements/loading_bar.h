@@ -7,12 +7,12 @@
 
 class LoadingBar : public Element {
 public:
-  LoadingBar(struct DisplayGlobal displayGlobal,
+  LoadingBar(const struct DisplayGlobal& displayGlobal,
+             const std::string& logFile,
              const SDL_Rect boundaryRectangle,
              const int& borderThickness,
              const float& totalTimeSeconds,
-             const float& updatePeriodMs,
-             const std::string& logFile);
+             const float& updatePeriodMs);
 
   void update() override;
   void handleEvent(const SDL_Event& event) override;

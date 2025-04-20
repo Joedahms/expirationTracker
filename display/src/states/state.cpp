@@ -3,13 +3,17 @@
 #include "../display_global.h"
 #include "state.h"
 
-State::State(const DisplayGlobal& displayGlobal, const EngineState& state)
-    : displayGlobal(displayGlobal), defaultState(state), currentState(state),
-      displayHandler(DisplayHandler::getInstance()) {
+State::State(const struct DisplayGlobal& displayGlobal,
+             const std::string& logFile,
+             const EngineState& state)
+    : displayGlobal(displayGlobal), logFile(logFile), defaultState(state),
+      currentState(state), displayHandler(DisplayHandler::getInstance()) {
+  this->logger        = std::make_unique<Logger>(this->logFile);
   this->windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
   assert(windowSurface != NULL);
   SDL_Rect rootRectangle = {0, 0, windowSurface->w, windowSurface->h};
-  this->rootElement      = std::make_shared<Container>(rootRectangle);
+  this->rootElement =
+      std::make_shared<Container>(this->displayGlobal, this->logFile, rootRectangle);
 }
 
 void State::handleEvents(bool* displayIsRunning) {

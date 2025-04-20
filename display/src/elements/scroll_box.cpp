@@ -19,15 +19,10 @@
  * height
  * @param logFile The logfile to write logs to
  */
-ScrollBox::ScrollBox(struct DisplayGlobal displayGlobal,
-                     const SDL_Rect& boundaryRectangle,
-                     const std::string& logFile) {
-  this->displayGlobal     = displayGlobal;
-  this->previousUpdate    = std::chrono::steady_clock::now();
-  this->boundaryRectangle = boundaryRectangle;
-  this->logFile           = logFile;
-  this->logger            = std::make_unique<Logger>(logFile);
-}
+ScrollBox::ScrollBox(const struct DisplayGlobal& displayGlobal,
+                     const std::string& logFile,
+                     const SDL_Rect boundaryRectangle)
+    : CompositeElement(displayGlobal, logFile, boundaryRectangle) {}
 
 void ScrollBox::setPanelHeight(int panelHeight) { this->panelHeight = panelHeight; }
 
@@ -122,7 +117,7 @@ void ScrollBox::refreshPanels() {
 
   for (auto& foodItem : allFoodItems) {
     std::shared_ptr<Panel> newPanel = std::make_shared<Panel>(
-        this->displayGlobal, boundaryRectangle, foodItem.getId(), this->logFile);
+        this->displayGlobal, this->logFile, boundaryRectangle, foodItem.getId());
     boundaryRectangle.y += panelHeight;
 
     newPanel->addFoodItem(foodItem, SDL_Point{0, 0});

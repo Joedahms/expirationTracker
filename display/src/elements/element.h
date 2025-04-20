@@ -24,6 +24,9 @@ struct Acceleration {
  */
 class Element : public std::enable_shared_from_this<Element> {
 public:
+  Element(const struct DisplayGlobal& displayGlobal,
+          const std::string& logFile,
+          const SDL_Rect boundaryRectangle);
   virtual ~Element() = default;
   virtual void addElement(std::shared_ptr<Element> element) {}
   virtual void update();
@@ -76,22 +79,24 @@ private:
   void centerHorizontal();
 
 protected:
+  struct DisplayGlobal displayGlobal;
+  const std::string logFile;
   std::unique_ptr<Logger> logger;
-  std::string logFile;
   std::string debugName = "no debug name";
 
   std::chrono::steady_clock::time_point previousUpdate;
   std::chrono::steady_clock::time_point currentUpdate;
 
-  struct DisplayGlobal displayGlobal;
   SDL_Rect boundaryRectangle         = {0, 0, 0, 0};
   SDL_Point positionRelativeToParent = {0, 0};
   Element* parent                    = nullptr;
-  bool hasBorder                     = false;
-  int borderThickness                = 1;
-  bool centerWithinParent            = false;
-  bool centerVerticalWithinParent    = false;
-  bool centerHorizontalWithinParent  = false;
+
+  bool centerWithinParent           = false;
+  bool centerVerticalWithinParent   = false;
+  bool centerHorizontalWithinParent = false;
+
+  bool hasBorder      = false;
+  int borderThickness = 1;
 
   bool fixed          = true;
   bool held           = false;

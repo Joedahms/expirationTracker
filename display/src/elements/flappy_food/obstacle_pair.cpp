@@ -4,28 +4,26 @@
 #include "obstacle_pair.h"
 
 ObstaclePair::ObstaclePair(const struct DisplayGlobal& displayGlobal,
-                           const SDL_Rect& boundaryRectangle,
+                           const std::string& logFile,
+                           const SDL_Rect boundaryRectangle,
                            const int windowWidth,
                            const int respawnOffset,
                            const int minHeight,
-                           const int verticalGap,
-                           const std::string& logFile)
-    : windowWidth(windowWidth), respawnOffset(respawnOffset), minHeight(minHeight),
+                           const int verticalGap)
+    : CompositeElement(displayGlobal, logFile, boundaryRectangle),
+      windowWidth(windowWidth), respawnOffset(respawnOffset), minHeight(minHeight),
       verticalGap(verticalGap) {
-  this->displayGlobal = displayGlobal;
-  setupPosition(boundaryRectangle);
-  this->logger = std::make_unique<Logger>(logFile);
   this->logger->log("Constructing obstacle pair");
   this->velocity.x   = -3;
   this->fixed        = false;
   this->screenBoundX = false;
 
   std::unique_ptr<Obstacle> topObstacle = std::make_unique<Obstacle>(
-      this->displayGlobal, SDL_Rect{0, 0, this->boundaryRectangle.w, 0});
+      this->displayGlobal, this->logFile, SDL_Rect{0, 0, this->boundaryRectangle.w, 0});
   addElement(std::move(topObstacle));
 
   std::unique_ptr<Obstacle> bottomObstacle = std::make_unique<Obstacle>(
-      this->displayGlobal, SDL_Rect{0, 0, this->boundaryRectangle.w, 0});
+      this->displayGlobal, this->logFile, SDL_Rect{0, 0, this->boundaryRectangle.w, 0});
   addElement(std::move(bottomObstacle));
 
   randomizeGapPosition();

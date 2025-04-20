@@ -3,6 +3,15 @@
 
 #include "element.h"
 
+Element::Element(const struct DisplayGlobal& displayGlobal,
+                 const std::string& logFile,
+                 const SDL_Rect boundaryRectangle)
+    : displayGlobal(displayGlobal), logFile(logFile) {
+  this->logger         = std::make_unique<Logger>(this->logFile);
+  this->previousUpdate = std::chrono::steady_clock::now();
+  setupPosition(boundaryRectangle);
+}
+
 void Element::render() const {
   if (this->hasBorder) {
     renderBorder();

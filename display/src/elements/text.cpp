@@ -8,17 +8,15 @@
 #include "element.h"
 #include "text.h"
 
-Text::Text(struct DisplayGlobal displayGlobal,
-           const SDL_Rect& boundaryRectangle,
+Text::Text(const struct DisplayGlobal& displayGlobal,
+           const std::string& logFile,
+           const SDL_Rect boundaryRectangle,
            const std::string& fontPath,
            const std::string& content,
-           int fontSize,
-           SDL_Color color)
-    : content(content), fontSize(fontSize), color(color) {
-  this->displayGlobal = displayGlobal;
-
-  setupPosition(boundaryRectangle);
-
+           const int fontSize,
+           const SDL_Color color)
+    : Element(displayGlobal, logFile, boundaryRectangle), content(content),
+      fontSize(fontSize), color(color) {
   this->font = TTF_OpenFont(fontPath.c_str(), this->fontSize);
   if (this->font == NULL) {
     LOG(FATAL) << "Text failed to open font";

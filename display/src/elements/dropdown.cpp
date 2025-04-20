@@ -1,21 +1,19 @@
-#include "dropdown.h"
 #include "composite_element.h"
+#include "dropdown.h"
 
 /**
  * @param displayGlobal Global display variables
  * @param boundaryRectangle Rectangle defining offset from parent and width + height
  * @param titleContent What the title of the drop down should be
  */
-Dropdown::Dropdown(struct DisplayGlobal displayGlobal,
-                   const SDL_Rect& boundaryRectangle,
-                   const std::string& titleContent) {
-  this->displayGlobal = displayGlobal;
-
-  setupPosition(boundaryRectangle);
-
+Dropdown::Dropdown(const struct DisplayGlobal& displayGlobal,
+                   const std::string& logFile,
+                   const SDL_Rect boundaryRectangle,
+                   const std::string& titleContent)
+    : CompositeElement(displayGlobal, logFile, boundaryRectangle) {
   std::unique_ptr<Text> title = std::make_unique<Text>(
-      this->displayGlobal, SDL_Rect{0, 0, 0, 0}, this->displayGlobal.futuramFontPath,
-      titleContent, 24, SDL_Color{0, 255, 0, 255});
+      this->displayGlobal, this->logFile, SDL_Rect{0, 0, 0, 0},
+      this->displayGlobal.futuramFontPath, titleContent, 24, SDL_Color{0, 255, 0, 255});
   addElement(std::move(title));
 }
 

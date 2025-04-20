@@ -9,8 +9,9 @@
  */
 class Container : public CompositeElement {
 public:
-  Container();
-  Container(const SDL_Rect& boundaryRectangle);
+  Container(const struct DisplayGlobal& displayGlobal,
+            const std::string& logFile,
+            const SDL_Rect boundaryRectangle);
   void update() override;
   void handleEventSelf(const SDL_Event& event) override;
 

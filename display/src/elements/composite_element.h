@@ -10,6 +10,9 @@
  */
 class CompositeElement : public Element {
 public:
+  CompositeElement(const struct DisplayGlobal& displayGlobal,
+                   const std::string& logFile,
+                   const SDL_Rect boundaryRectangle);
   void addElement(std::shared_ptr<Element> element) override;
   void update() override;
   void render() const override;

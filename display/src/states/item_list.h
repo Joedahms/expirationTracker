@@ -19,11 +19,7 @@ public:
   void exit() override;
 
 private:
-  Logger logger;
-  std::chrono::steady_clock::time_point previousUpdate;
-  std::chrono::steady_clock::time_point currentUpdate;
   SDL_Point mousePosition;
-
   std::shared_ptr<Mediator> mediator;
 };
 

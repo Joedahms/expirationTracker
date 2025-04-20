@@ -13,9 +13,9 @@
  */
 class NumberSetting : public CompositeElement {
 public:
-  NumberSetting(struct DisplayGlobal displayGlobal,
-                const SDL_Rect& boundaryRectangle,
+  NumberSetting(const struct DisplayGlobal& displayGlobal,
                 const std::string& logFile,
+                const SDL_Rect boundaryRectangle,
                 const int settingId = -1);
 
   void setSettingId(const int& newSettingId);
