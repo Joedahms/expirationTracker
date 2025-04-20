@@ -6,7 +6,8 @@
 Bird::Bird(struct DisplayGlobal displayGlobal, const SDL_Rect& boundaryRectangle) {
   this->displayGlobal     = displayGlobal;
   this->boundaryRectangle = boundaryRectangle;
-  this->debugName         = "bird";
+  setupPosition(this->boundaryRectangle);
+  this->debugName = "bird";
 
   SDL_Surface* birdSurface = IMG_Load("../display/sprites/bird.png");
   if (birdSurface == NULL) {

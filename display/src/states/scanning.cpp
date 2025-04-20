@@ -54,7 +54,7 @@ Scanning::Scanning(const DisplayGlobal& displayGlobal, const EngineState& state)
   this->logger.log("Loading bar constructed");
 
   this->logger.log("Constructing bird");
-  SDL_Rect birdRectangle     = {0, 0, 32, 32};
+  SDL_Rect birdRectangle     = {20, 0, 32, 32};
   std::unique_ptr<Bird> bird = std::make_unique<Bird>(this->displayGlobal, birdRectangle);
   birdPtr                    = bird.get();
   rootElement->addElement(std::move(bird));
@@ -109,9 +109,13 @@ void Scanning::update() {
     SDL_Rect topRect          = obstaclePair->getTopObstacleRect();
     SDL_Rect bottomRect       = obstaclePair->getBottomObstacleRect();
 
-    std::cout << obstaclePairRect.x + obstaclePairRect.w << std::endl;
+    /*
+    std::cout << "bird x: " << birdRect.x << std::endl;
+    std::cout << "x: " << obstaclePairRect.x << std::endl;
+    std::cout << "w: " << obstaclePairRect.w << std::endl;
+    */
 
-    if (birdRect.x > obstaclePairRect.x + obstaclePairRect.w) {
+    if (birdRect.x >= obstaclePairRect.x + obstaclePairRect.w) {
       this->score++;
       obstaclePair->scored = true;
       std::cout << "score: " << this->score << std::endl;
