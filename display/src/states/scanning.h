@@ -29,6 +29,8 @@ private:
   std::vector<std::shared_ptr<ObstaclePair>> obstaclePairs;
   int score = 0;
 
+  std::shared_ptr<Text> scoreText;
+
   void initializeObstacles();
   std::vector<SDL_Rect> getBoundaryRectangles();
 

@@ -23,7 +23,7 @@ Scanning::Scanning(const DisplayGlobal& displayGlobal, const EngineState& state)
   this->logger.log("Constructing scan message");
   const std::string progressMessageContent = "Scanning In Progress";
   const SDL_Color progressMessageColor     = {0, 255, 0, 255}; // Green
-  const SDL_Rect progressMessageRectangle  = {0, 100, 0, 0};
+  const SDL_Rect progressMessageRectangle  = {0, 0, 0, 0};
   std::unique_ptr<Text> progressMessage    = std::make_unique<Text>(
       this->displayGlobal, progressMessageRectangle, DisplayGlobal::futuramFontPath,
       progressMessageContent, 24, progressMessageColor);
@@ -32,7 +32,7 @@ Scanning::Scanning(const DisplayGlobal& displayGlobal, const EngineState& state)
   this->logger.log("Scan message constructed");
 
   this->logger.log("Constructing cancel scan button");
-  SDL_Rect cancelScanButtonRectangle       = {0, 150, 0, 0};
+  SDL_Rect cancelScanButtonRectangle       = {0, 50, 0, 0};
   std::unique_ptr<Button> cancelScanButton = std::make_unique<Button>(
       this->displayGlobal, cancelScanButtonRectangle, "Cancel Scan", SDL_Point{10, 10},
       [this]() { this->currentState = EngineState::CANCEL_SCAN_CONFIRMATION; },
@@ -42,7 +42,7 @@ Scanning::Scanning(const DisplayGlobal& displayGlobal, const EngineState& state)
   this->logger.log("Cancel scan button constructed");
 
   this->logger.log("Constructing loading bar");
-  SDL_Rect loadingBarRectangle           = {0, 200, 200, 30};
+  SDL_Rect loadingBarRectangle           = {0, 100, 200, 30};
   int loadingBarBorderThickness          = 3;
   float totalTimeSeconds                 = 20;
   float updatePeriodMs                   = 100;
@@ -62,6 +62,17 @@ Scanning::Scanning(const DisplayGlobal& displayGlobal, const EngineState& state)
   this->logger.log("Bird constructed");
 
   initializeObstacles();
+
+  this->logger.log("Constructing score text");
+  const std::string scoreTextContent = "0";
+  const SDL_Color scoreTextColor     = {0, 255, 0, 255}; // Green
+  const SDL_Rect scoreTextRect       = {0, 150, 0, 0};
+  this->scoreText = std::make_shared<Text>(this->displayGlobal, scoreTextRect,
+                                           DisplayGlobal::futuramFontPath,
+                                           scoreTextContent, 24, scoreTextColor);
+  this->scoreText->setCenteredHorizontal();
+  this->rootElement->addElement(scoreText);
+  this->logger.log("Score text constructed");
 
   this->logger.log("Constructed scanning state");
 }
@@ -115,8 +126,8 @@ void Scanning::update() {
     SDL_Rect pairRect = obstaclePair->getBoundaryRectangle();
     if (birdRelative.x >= pairRect.x + pairRect.w) {
       this->score++;
+      this->scoreText->setContent(std::to_string(this->score));
       obstaclePair->scored = true;
-      std::cout << "score: " << this->score << std::endl;
     }
   }
 }
