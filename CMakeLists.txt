@@ -72,9 +72,10 @@ add_executable(expirationTracker
   display/src/elements/loading_bar.cpp
 
   # Game elements
-  display/src/elements/bird.cpp
-  display/src/elements/obstacle.cpp
-  display/src/elements/obstacle_pair.cpp
+  #  display/src/elements/flappy_food/flappy_food.cpp
+  display/src/elements/flappy_food/bird.cpp
+  display/src/elements/flappy_food/obstacle.cpp
+  display/src/elements/flappy_food/obstacle_pair.cpp
 
   # GUI States
   display/src/states/state.cpp

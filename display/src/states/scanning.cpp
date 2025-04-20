@@ -5,10 +5,10 @@
 #include <string>
 
 #include "../display_global.h"
-#include "../elements/bird.h"
+#include "../elements/flappy_food/bird.h"
+#include "../elements/flappy_food/obstacle.h"
+#include "../elements/flappy_food/obstacle_pair.h"
 #include "../elements/loading_bar.h"
-#include "../elements/obstacle.h"
-#include "../elements/obstacle_pair.h"
 #include "../elements/text.h"
 #include "../log_files.h"
 #include "scanning.h"

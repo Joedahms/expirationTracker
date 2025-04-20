@@ -6,8 +6,8 @@
 #include <string>
 
 #include "../display_global.h"
-#include "../elements/bird.h"
-#include "../elements/obstacle_pair.h"
+#include "../elements/flappy_food/bird.h"
+#include "../elements/flappy_food/obstacle_pair.h"
 #include "../engine_state.h"
 #include "state.h"
 

@@ -1,7 +1,7 @@
 #ifndef BIRD_H
 #define BIRD_H
 
-#include "element.h"
+#include "../element.h"
 
 class Bird : public Element {
 public:

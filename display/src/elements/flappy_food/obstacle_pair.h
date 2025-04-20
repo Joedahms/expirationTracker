@@ -1,7 +1,7 @@
 #ifndef OBSTACLE_PAIR_H
 #define OBSTACLE_PAIR_H
 
-#include "composite_element.h"
+#include "../composite_element.h"
 
 class ObstaclePair : public CompositeElement {
 public:
