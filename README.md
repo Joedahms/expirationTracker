@@ -22,13 +22,51 @@ for controlling all hardware components such as the cameras, weight sensor, and 
 sudo chmod 777 install.sh
 ./install.sh \
 ````
+### LAN Server Setup
+````plaintext
+FOR ETHERNET CONNECTION TO WORK:
+
+Because there is no DHCP server inbetween the two devices in this ethernet connection,
+we must set a static IP for both ethernet interfaces.
+
+YOU CAN SET IT TO WHATEVER STATIC IPS YOU WANT. You just must update the config.json file in vision/ accordingly.
+SERVER AND PI USE THIS, MAKE SURE BOTH HAVE ACCESS TO UPDATED VERSIONS.
+
+Windows:
+Open ncpa.cpl (Run > ncpa.cpl)
+
+Right-click Ethernet > Properties
+
+Select Internet Protocol Version 4 (TCP/IPv4) > click Properties
+
+Set:
+
+IP address: 192.168.137.1
+
+Subnet mask: 255.255.255.0
+
+Default gateway: leave blank
+
+DNS server: leave blank
+
+PI:
+
+sudo nmcli connection modify "Wired connection 1"
+ipv4.addresses 192.168.137.2/24
+ipv4.dns 8.8.8.8
+ipv4.method manual
+
+sudo nmcli connection up "Wired connection 1"
+
+REBOOT
+````
 ### WiringPi Setup
 #### For if you just need to make a file
-````plaintet
+````plaintext
 gcc -o myapp myapp.cpp -l wiringPi
 ````
 # Usage
-````plaintet
+````plaintext
 source models-venv/bin/activate
 $ ./expirationTracker
 ````
