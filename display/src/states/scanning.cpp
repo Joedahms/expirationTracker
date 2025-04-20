@@ -54,8 +54,9 @@ Scanning::Scanning(const DisplayGlobal& displayGlobal, const EngineState& state)
   this->logger.log("Loading bar constructed");
 
   this->logger.log("Constructing bird");
-  SDL_Rect birdRectangle     = {20, 0, 32, 32};
-  std::unique_ptr<Bird> bird = std::make_unique<Bird>(this->displayGlobal, birdRectangle);
+  SDL_Rect birdRect          = {20, 0, 32, 32};
+  birdRect.y                 = this->windowSurface->h - birdRect.h;
+  std::unique_ptr<Bird> bird = std::make_unique<Bird>(this->displayGlobal, birdRect);
   birdPtr                    = bird.get();
   rootElement->addElement(std::move(bird));
   this->logger.log("Bird constructed");
@@ -100,22 +101,19 @@ void Scanning::update() {
   this->rootElement->checkCollision(boundaryRectangles);
   handleBirdCollision();
 
-  SDL_Rect birdRect = this->birdPtr->getBoundaryRectangle();
+  SDL_Point birdRelative = this->birdPtr->getPositionRelativeToParent();
+  if (birdRelative.y < this->windowSurface->h - 400) {
+    this->birdPtr->setVelocity(Velocity{0, 0});
+    birdRelative.y++;
+    this->birdPtr->setPositionRelativeToParent(birdRelative);
+  }
   for (const auto& obstaclePair : this->obstaclePairs) {
     if (obstaclePair->scored) {
       continue;
     }
-    SDL_Rect obstaclePairRect = obstaclePair->getBoundaryRectangle();
-    SDL_Rect topRect          = obstaclePair->getTopObstacleRect();
-    SDL_Rect bottomRect       = obstaclePair->getBottomObstacleRect();
 
-    /*
-    std::cout << "bird x: " << birdRect.x << std::endl;
-    std::cout << "x: " << obstaclePairRect.x << std::endl;
-    std::cout << "w: " << obstaclePairRect.w << std::endl;
-    */
-
-    if (birdRect.x >= obstaclePairRect.x + obstaclePairRect.w) {
+    SDL_Rect pairRect = obstaclePair->getBoundaryRectangle();
+    if (birdRelative.x >= pairRect.x + pairRect.w) {
       this->score++;
       obstaclePair->scored = true;
       std::cout << "score: " << this->score << std::endl;

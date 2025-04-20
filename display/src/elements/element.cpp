@@ -62,7 +62,7 @@ void Element::hasParentUpdate() {
   else {
     if (!this->fixed) {
       this->acceleration.x = 0;
-      this->acceleration.y = 0.1;
+      this->acceleration.y = 0.2;
     }
 
     this->velocity.x += this->acceleration.x;
