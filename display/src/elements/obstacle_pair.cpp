@@ -3,20 +3,22 @@
 #include "obstacle.h"
 #include "obstacle_pair.h"
 
-ObstaclePair::ObstaclePair(DisplayGlobal displayGlobal,
+ObstaclePair::ObstaclePair(const struct DisplayGlobal& displayGlobal,
                            const SDL_Rect& boundaryRectangle,
-                           int windowWidth,
-                           int respawnOffset,
-                           std::string logFile)
-    : windowWidth(windowWidth), respawnOffset(respawnOffset) {
+                           const int windowWidth,
+                           const int respawnOffset,
+                           const int minHeight,
+                           const int verticalGap,
+                           const std::string& logFile)
+    : windowWidth(windowWidth), respawnOffset(respawnOffset), minHeight(minHeight),
+      verticalGap(verticalGap) {
   this->displayGlobal = displayGlobal;
   setupPosition(boundaryRectangle);
   this->logger = std::make_unique<Logger>(logFile);
   this->logger->log("Constructing obstacle pair");
-  this->velocity.x         = -3;
-  this->fixed              = false;
-  this->screenBoundX       = false;
-  this->obstaclePairHeight = boundaryRectangle.h;
+  this->velocity.x   = -3;
+  this->fixed        = false;
+  this->screenBoundX = false;
 
   std::unique_ptr<Obstacle> topObstacle = std::make_unique<Obstacle>(
       this->displayGlobal, SDL_Rect{0, 0, this->boundaryRectangle.w, 0});
@@ -48,25 +50,24 @@ SDL_Rect ObstaclePair::getBottomObstacleRect() {
  * @return None
  */
 void ObstaclePair::randomizeGapPosition() {
-  SDL_Rect boundaryRectangle = this->children[0]->getBoundaryRectangle();
+  SDL_Rect topRect = this->children[0]->getBoundaryRectangle();
 
   std::random_device r;
   std::default_random_engine e1(r());
-  int minHeight = 10;
-  int maxHeight = this->obstaclePairHeight - this->verticalObstacleGap - minHeight;
+  int maxHeight = this->boundaryRectangle.h - this->verticalGap - this->minHeight;
   std::uniform_int_distribution<int> uniform_dist(minHeight, maxHeight);
-  int obstacleHeight  = uniform_dist(e1);
-  boundaryRectangle.h = obstacleHeight;
-  this->children[0]->setBoundaryRectangle(boundaryRectangle);
+  int topHeight = uniform_dist(e1);
+  topRect.h     = topHeight;
+  this->children[0]->setBoundaryRectangle(topRect);
 
-  int yPosition  = this->verticalObstacleGap + obstacleHeight;
-  obstacleHeight = obstaclePairHeight - obstacleHeight - verticalObstacleGap;
+  int relativeYPosition = topHeight + this->verticalGap;
+  int bottomHeight      = this->boundaryRectangle.h - topHeight - this->verticalGap;
 
-  boundaryRectangle                  = this->children[1]->getBoundaryRectangle();
+  SDL_Rect bottomRect                = this->children[1]->getBoundaryRectangle();
   SDL_Point positionRelativeToParent = this->children[1]->getPositionRelativeToParent();
-  positionRelativeToParent.y         = yPosition;
-  boundaryRectangle.h                = obstacleHeight;
-  this->children[1]->setBoundaryRectangle(boundaryRectangle);
+  positionRelativeToParent.y         = relativeYPosition;
+  bottomRect.h                       = bottomHeight;
+  this->children[1]->setBoundaryRectangle(bottomRect);
   this->children[1]->setPositionRelativeToParent(positionRelativeToParent);
 }
 

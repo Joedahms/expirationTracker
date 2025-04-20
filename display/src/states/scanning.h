@@ -26,7 +26,7 @@ private:
   Logger logger;
 
   Bird* birdPtr = nullptr;
-  std::vector<ObstaclePair*> obstaclePairs;
+  std::vector<std::shared_ptr<ObstaclePair>> obstaclePairs;
   int score = 0;
 
   void initializeObstacles();

@@ -7,11 +7,13 @@ class ObstaclePair : public CompositeElement {
 public:
   bool scored = false;
 
-  ObstaclePair(struct DisplayGlobal displayGlobal,
+  ObstaclePair(const struct DisplayGlobal& displayGlobal,
                const SDL_Rect& boundaryRectangle,
-               int windowWidth,
-               int respawnOffset,
-               std::string logFile);
+               const int windowWidth,
+               const int respawnOffset,
+               const int minHeight,
+               const int verticalGap,
+               const std::string& logFile);
 
   SDL_Rect getTopObstacleRect();
   SDL_Rect getBottomObstacleRect();
@@ -19,11 +21,8 @@ public:
 private:
   const int windowWidth;
   const int respawnOffset;
-
-  //  const int obstacleMinHeight   = 0;
-  // const int obstacleMaxHeight   = 20;
-  int obstaclePairHeight        = 0;
-  const int verticalObstacleGap = 400;
+  const int minHeight;
+  const int verticalGap;
 
   void randomizeGapPosition();
   void updateSelf() override;

@@ -109,6 +109,8 @@ void Scanning::update() {
     SDL_Rect topRect          = obstaclePair->getTopObstacleRect();
     SDL_Rect bottomRect       = obstaclePair->getBottomObstacleRect();
 
+    std::cout << obstaclePairRect.x + obstaclePairRect.w << std::endl;
+
     if (birdRect.x > obstaclePairRect.x + obstaclePairRect.w) {
       this->score++;
       obstaclePair->scored = true;
@@ -118,33 +120,31 @@ void Scanning::update() {
 }
 
 void Scanning::initializeObstacles() {
+  const int pairWidth         = 40;
+  const int pairHeight        = 400;
+  const int horizontalPairGap = 150;
+  const int minHeight         = 20;
+  const int verticalGap       = 150;
+
   const int windowWidth  = this->windowSurface->w;
   const int windowHeight = this->windowSurface->h;
+  int xPosition          = windowWidth;
+  const int yPosition    = windowHeight - pairHeight;
 
-  const int obstacleWidth         = 40;
-  const int obstaclePairHeight    = 200;
-  const int horizontalObstacleGap = 70;
+  const int totalPairs    = (windowWidth / (pairWidth + horizontalPairGap)) + 1;
+  const int respawnOffset = windowWidth % (pairWidth + horizontalPairGap);
 
-  int totalObstaclePairs = windowWidth / (obstacleWidth + horizontalObstacleGap);
+  for (int i = 0; i < totalPairs; i++) {
+    SDL_Rect boundaryRectangle = {xPosition, yPosition, pairWidth, pairHeight};
 
-  totalObstaclePairs++;
-  const int respawnOffset = windowWidth % (obstacleWidth + horizontalObstacleGap);
+    std::shared_ptr<ObstaclePair> obstaclePair = std::make_shared<ObstaclePair>(
+        this->displayGlobal, boundaryRectangle, windowWidth, respawnOffset, minHeight,
+        verticalGap, LogFiles::SCANNING);
 
-  int xPosition       = windowWidth;
-  const int yPosition = windowHeight - obstaclePairHeight;
-
-  for (int i = 0; i < totalObstaclePairs; i++) {
-    SDL_Rect boundaryRectangle = {xPosition, yPosition, obstacleWidth,
-                                  obstaclePairHeight};
-
-    std::unique_ptr<ObstaclePair> obstaclePair =
-        std::make_unique<ObstaclePair>(this->displayGlobal, boundaryRectangle,
-                                       windowWidth, respawnOffset, LogFiles::SCANNING);
-
-    obstaclePairs.push_back(obstaclePair.get());
+    obstaclePairs.push_back(obstaclePair);
 
     this->rootElement->addElement(std::move(obstaclePair));
-    xPosition += obstacleWidth + horizontalObstacleGap;
+    xPosition += pairWidth + horizontalPairGap;
   }
 }
 
