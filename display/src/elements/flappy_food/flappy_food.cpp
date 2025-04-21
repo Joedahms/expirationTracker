@@ -63,7 +63,6 @@ void FlappyFood::reset() {
   this->birdPtr->setPositionRelativeToParent(birdPos);
   this->birdPtr->setFixed(true);
 
-  int xPosition = this->boundaryRectangle.w;
   for (auto& obstaclePair : this->obstaclePairs) {
     obstaclePair->reset();
   }
