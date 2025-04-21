@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "composite_element.h"
 #include "dropdown.h"
 
