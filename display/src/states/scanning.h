@@ -6,8 +6,6 @@
 #include <string>
 
 #include "../display_global.h"
-#include "../elements/flappy_food/bird.h"
-#include "../elements/flappy_food/obstacle_pair.h"
 #include "../engine_state.h"
 #include "state.h"
 
@@ -18,21 +16,8 @@ class Scanning : public State {
 public:
   Scanning(const struct DisplayGlobal& displayGlobal, const EngineState& state);
   void handleEvents(bool* displayIsRunning) override;
-  void update() override;
   void render() const override;
   void exit() override;
-
-private:
-  Bird* birdPtr = nullptr;
-  std::vector<std::shared_ptr<ObstaclePair>> obstaclePairs;
-  int score = 0;
-
-  std::shared_ptr<Text> scoreText;
-
-  void initializeObstacles();
-  std::vector<SDL_Rect> getBoundaryRectangles();
-
-  void handleBirdCollision();
 };
 
 #endif

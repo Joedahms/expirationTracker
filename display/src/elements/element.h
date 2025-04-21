@@ -98,13 +98,14 @@ protected:
   bool hasBorder      = false;
   int borderThickness = 1;
 
-  bool fixed          = true;
-  bool held           = false;
-  bool screenBoundX   = true;
-  bool screenBoundY   = true;
-  bool canCollide     = false;
-  bool collisionFixed = true;
-  bool hasCollided    = false;
+  bool gravityAffected = false;
+  bool fixed           = true;
+  bool held            = false;
+  bool screenBoundX    = true;
+  bool screenBoundY    = true;
+  bool canCollide      = false;
+  bool collisionFixed  = true;
+  bool hasCollided     = false;
 
   Velocity velocity         = {0, 0};
   Acceleration acceleration = {0, 0};

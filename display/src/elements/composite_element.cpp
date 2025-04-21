@@ -124,3 +124,22 @@ void CompositeElement::removeAllChildren() {
 
   this->children.clear();
 }
+
+void CompositeElement::containChildren() {
+  std::cout << "here" << std::endl;
+  for (auto& child : this->children) {
+    SDL_Rect childRect              = child->getBoundaryRectangle();
+    SDL_Point childRelativePosition = child->getPositionRelativeToParent();
+    Velocity childVelocity          = child->getVelocity();
+
+    if (childRect.y + childRect.h >
+        this->boundaryRectangle.y + this->boundaryRectangle.h) {
+      childRelativePosition.y--;
+      childVelocity.y = 0;
+    }
+
+    child->setBoundaryRectangle(childRect);
+    child->setPositionRelativeToParent(childRelativePosition);
+    child->setVelocity(childVelocity);
+  }
+}

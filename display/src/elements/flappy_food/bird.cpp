@@ -20,9 +20,10 @@ Bird::Bird(const struct DisplayGlobal& displayGlobal,
   }
   SDL_FreeSurface(birdSurface);
 
-  this->fixed          = false;
-  this->canCollide     = true;
-  this->collisionFixed = false;
+  this->fixed           = false;
+  this->gravityAffected = true;
+  this->canCollide      = true;
+  this->collisionFixed  = false;
 }
 
 /**

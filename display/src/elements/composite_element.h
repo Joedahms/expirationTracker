@@ -27,6 +27,7 @@ protected:
   virtual void handleEventSelf(const SDL_Event& event) = 0;
   void addBoundaryRectangleSelf(std::vector<SDL_Rect>& boundaryRectangles) const;
   void checkCollisionSelf(std::vector<SDL_Rect>& boundaryRectangles);
+  void containChildren();
 
   std::vector<std::shared_ptr<Element>> children;
 };
