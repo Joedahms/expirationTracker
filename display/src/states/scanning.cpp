@@ -31,14 +31,30 @@ Scanning::Scanning(const struct DisplayGlobal& displayGlobal, const EngineState&
   this->logger->log("Scan message constructed");
 
   this->logger->log("Constructing cancel scan button");
-  SDL_Rect cancelScanButtonRectangle       = {0, 50, 0, 0};
+  SDL_Rect cancelScanButtonRectangle       = {280, 50, 0, 0};
   std::unique_ptr<Button> cancelScanButton = std::make_unique<Button>(
       this->displayGlobal, this->logFile, cancelScanButtonRectangle, "Cancel Scan",
       SDL_Point{10, 10},
       [this]() { this->currentState = EngineState::CANCEL_SCAN_CONFIRMATION; });
-  cancelScanButton->setCenteredHorizontal();
-  rootElement->addElement(std::move(cancelScanButton));
+  this->rootElement->addElement(std::move(cancelScanButton));
   this->logger->log("Cancel scan button constructed");
+
+  this->logger->log("Constructing start game button");
+  SDL_Rect startGameRect            = {0, 50, 0, 0};
+  std::shared_ptr<Button> startGame = std::make_shared<Button>(
+      this->displayGlobal, this->logFile, startGameRect, "Start Game", SDL_Point{10, 10},
+      [this] { this->flappyFood->start(); });
+  startGame->setCenteredHorizontal();
+  this->rootElement->addElement(startGame);
+  this->logger->log("Start game button constructed");
+
+  this->logger->log("Constructing reset game button");
+  SDL_Rect resetGameRect            = {600, 50, 0, 0};
+  std::shared_ptr<Button> resetGame = std::make_shared<Button>(
+      this->displayGlobal, this->logFile, resetGameRect, "Reset Game", SDL_Point{10, 10},
+      [this] { this->flappyFood->reset(); });
+  this->rootElement->addElement(resetGame);
+  this->logger->log("Reset game button constructed");
 
   this->logger->log("Constructing loading bar");
   SDL_Rect loadingBarRectangle           = {0, 100, 200, 30};
@@ -52,7 +68,7 @@ Scanning::Scanning(const struct DisplayGlobal& displayGlobal, const EngineState&
   rootElement->addElement(std::move(loadingBar));
   this->logger->log("Loading bar constructed");
 
-  std::shared_ptr<FlappyFood> flappyFood = std::make_shared<FlappyFood>(
+  this->flappyFood = std::make_shared<FlappyFood>(
       this->displayGlobal, this->logFile,
       SDL_Rect{0, 0, this->windowSurface->w, this->windowSurface->h});
   this->rootElement->addElement(flappyFood);

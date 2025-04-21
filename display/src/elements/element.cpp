@@ -74,13 +74,13 @@ void Element::hasParentUpdate() {
       if (this->gravityAffected) {
         this->acceleration.y = 0.2;
       }
+
+      this->velocity.x += this->acceleration.x;
+      this->velocity.y += this->acceleration.y;
+
+      this->positionRelativeToParent.x += this->velocity.x;
+      this->positionRelativeToParent.y += this->velocity.y;
     }
-
-    this->velocity.x += this->acceleration.x;
-    this->velocity.y += this->acceleration.y;
-
-    this->positionRelativeToParent.x += this->velocity.x;
-    this->positionRelativeToParent.y += this->velocity.y;
     updatePosition();
   }
 }
@@ -363,6 +363,7 @@ void Element::fixCollision(const SDL_Point overlap, const SDL_Rect boundaryRecta
 }
 
 bool Element::getHasCollided() { return this->hasCollided; }
+void Element::setHasCollided(bool collided) { this->hasCollided = collided; }
 
 void Element::setFixed(bool fixed) { this->fixed = fixed; }
 
@@ -370,4 +371,8 @@ void Element::setCanCollide(bool canCollide) { this->canCollide = canCollide; }
 
 void Element::setCollisionFixed(bool collisionFixed) {
   this->collisionFixed = collisionFixed;
+}
+
+void Element::setGravityAffected(bool gravityAffected) {
+  this->gravityAffected = gravityAffected;
 }

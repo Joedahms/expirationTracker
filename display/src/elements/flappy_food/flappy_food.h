@@ -14,6 +14,9 @@ public:
              const std::string& logFile,
              const SDL_Rect boundaryRectangle);
 
+  void start();
+  void reset();
+
 private:
   Bird* birdPtr = nullptr;
   std::vector<std::shared_ptr<ObstaclePair>> obstaclePairs;

@@ -6,6 +6,7 @@
 #include <string>
 
 #include "../display_global.h"
+#include "../elements/flappy_food/flappy_food.h"
 #include "../engine_state.h"
 #include "state.h"
 
@@ -18,6 +19,9 @@ public:
   void handleEvents(bool* displayIsRunning) override;
   void render() const override;
   void exit() override;
+
+private:
+  std::shared_ptr<FlappyFood> flappyFood;
 };
 
 #endif

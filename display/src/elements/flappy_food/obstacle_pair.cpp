@@ -12,9 +12,8 @@ ObstaclePair::ObstaclePair(const struct DisplayGlobal& displayGlobal,
                            const int verticalGap)
     : CompositeElement(displayGlobal, logFile, boundaryRectangle),
       windowWidth(windowWidth), respawnOffset(respawnOffset), minHeight(minHeight),
-      verticalGap(verticalGap) {
+      verticalGap(verticalGap), startPosition(boundaryRectangle.x) {
   this->logger->log("Constructing obstacle pair");
-  this->velocity.x   = -3;
   this->fixed        = false;
   this->screenBoundX = false;
 
@@ -39,6 +38,11 @@ SDL_Rect ObstaclePair::getTopObstacleRect() {
 SDL_Rect ObstaclePair::getBottomObstacleRect() {
   SDL_Rect rect = this->children[1]->getBoundaryRectangle();
   return rect;
+}
+
+void ObstaclePair::reset() {
+  this->positionRelativeToParent.x = startPosition;
+  this->velocity.x                 = 0;
 }
 
 /**

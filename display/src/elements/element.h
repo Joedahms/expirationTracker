@@ -73,6 +73,8 @@ public:
   void setFixed(bool fixed);
   void setCanCollide(bool canCollide);
   void setCollisionFixed(bool collisionFixed);
+  void setGravityAffected(bool gravityAffected);
+  void setHasCollided(bool collided);
 
 private:
   void centerVertical();

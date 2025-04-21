@@ -36,6 +36,43 @@ FlappyFood::FlappyFood(const struct DisplayGlobal& displayGlobal,
   this->logger->log("Flappy food constructed");
 }
 
+/**
+ * Start the game by allowing the bird to fly and the obstacles to move.
+ *
+ * @param None
+ * @return None
+ */
+void FlappyFood::start() {
+  for (auto& obstaclePair : this->obstaclePairs) {
+    obstaclePair->setVelocity(Velocity{-3, 0});
+  }
+  this->birdPtr->setFixed(false);
+}
+
+/**
+ * Reset the game. Reset the score, put the bird on the ground, and move the obstacles
+ * back to their original positions.
+ *
+ * @param None
+ * @return None
+ */
+void FlappyFood::reset() {
+  SDL_Rect birdRect = this->birdPtr->getBoundaryRectangle();
+  SDL_Point birdPos = this->birdPtr->getPositionRelativeToParent();
+  birdPos.y         = this->boundaryRectangle.h - birdRect.h;
+  this->birdPtr->setPositionRelativeToParent(birdPos);
+  this->birdPtr->setFixed(true);
+
+  int xPosition = this->boundaryRectangle.w;
+  for (auto& obstaclePair : this->obstaclePairs) {
+    obstaclePair->reset();
+  }
+
+  this->score = 0;
+  this->scoreText->setContent(std::to_string(this->score));
+  this->birdPtr->setHasCollided(false);
+}
+
 void FlappyFood::initializeObstacles() {
   const int pairWidth         = 40;
   const int pairHeight        = 400;
@@ -88,7 +125,6 @@ void FlappyFood::updateSelf() {
   if (parent) {
     hasParentUpdate();
   }
-
   containChildren();
 
   std::vector<SDL_Rect> boundaryRectangles = getBoundaryRectangles();

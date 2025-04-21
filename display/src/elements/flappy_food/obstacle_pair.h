@@ -17,12 +17,14 @@ public:
 
   SDL_Rect getTopObstacleRect();
   SDL_Rect getBottomObstacleRect();
+  void reset();
 
 private:
   const int windowWidth;
   const int respawnOffset;
   const int minHeight;
   const int verticalGap;
+  const int startPosition;
 
   void randomizeGapPosition();
   void updateSelf() override;

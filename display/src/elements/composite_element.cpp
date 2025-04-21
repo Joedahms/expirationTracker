@@ -126,7 +126,6 @@ void CompositeElement::removeAllChildren() {
 }
 
 void CompositeElement::containChildren() {
-  std::cout << "here" << std::endl;
   for (auto& child : this->children) {
     SDL_Rect childRect              = child->getBoundaryRectangle();
     SDL_Point childRelativePosition = child->getPositionRelativeToParent();
