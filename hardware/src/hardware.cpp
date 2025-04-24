@@ -327,12 +327,12 @@ void Hardware::rotateAndCapture() {
     if (this->usingMotor) {
       rotateMotor(true);
     }
+    else {
+      this->logger.log("Simulate motor spinning");
+      sleep(2);
+    }
     // float weight = sendCommand('1');
     // OPTION: use weight to deteremine if item is still present
-
-    // Swap comment lines below if you don't want to wait on realistic motor rotation time
-    // usleep(500);
-    sleep(3);
 
     // Last iteration doensn't need to check signal
     if (angle == 7) {
