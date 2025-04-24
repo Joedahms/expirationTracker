@@ -260,7 +260,7 @@ int Hardware::readLineFromArduino(char* buffer, int maxLen) {
  * Arduino responds with:
  *  @return 1 -> item weight || -1 for no weight
  *  @return 2 -> 1 for confimation of tare
- *  @return 4 -> 1 for no weight || 0 for weight
+ *  @return 4 -> 1 - weight present || 0 - no weight
  *  @return The response from the Arduino.
  */
 float sendCommand(char commandChar) {
@@ -274,21 +274,18 @@ float sendCommand(char commandChar) {
   switch (commandChar) {
   case '1':
     {
-      // Expect float (weight or -1.0)
       this->logger.log("Received weight from Arduino: " + std::string(response));
       float value = atof(response);
       return value;
     }
   case '2':
     {
-      // Expect 0 or 1 (really just a 1 to confirm)
       this->logger.log("Received tare confirmation from Arduino: " +
                        std::string(response));
       return (float)atoi(response);
     }
   case '4':
     {
-      // Expect 0 or 1 (bool)
       this->logger.log("Received start weight confirmation from Arduino: " +
                        std::string(response));
       return (float)atoi(response);
