@@ -138,13 +138,28 @@ bool Hardware::checkStartSignal(int timeoutMs) {
               this->logger.log("Display decided to cancel, aborting scan");
             }
             else {
-              // TODO handle invalid zero weight response
+              this->logger.log("HELP! I SHOULDN'T BE HERE! (INVALID WEIGHT)");
             }
           }
           else {
             receivedRequest = true;
             this->replySocket.send(Messages::AFFIRMATIVE); // Respond to display
-            this->logger.log("Weight non zero, starting scan");
+            this->logger.log("Weight non zero, getting numeric weight and starting scan");
+            this->itemWeight = sendCommand('1') * -1.00f; // weight is negative
+            while (itemWeight == -1) {
+              int errcnt = 0;
+              this->logger.log("Weight error, retrying");
+              sendCommand('2');
+              this->itemWeight = sendCommand('1') * -1.00f;
+              errcnt++;
+              if (errcnt == 5) {
+                this->logger.log("Error getting weight, setting weight to 9999");
+                this->itemWeight = 9999.0f;
+                break;
+              }
+            }
+            this->logger.log("Weight received from Arduino: " +
+                             std::to_string(this->itemWeight));
           }
         }
       }
@@ -253,14 +268,14 @@ int Hardware::readLineFromArduino(char* buffer, int maxLen) {
  * Sends a command to the Arduino and reads the response.
  *
  * @param commandChar The command character to send.
- *  Pi 5 sends a:
+ *  Pi 5 sends:
  *  @param 1 -> request for weight
  *  @param 2 -> request for tare, notify of end of process
  *  @param 4 -> request for process start confimation
  * Arduino responds with:
  *  @return 1 -> item weight || -1 for no weight
  *  @return 2 -> 1 for confimation of tare
- *  @return 4 -> 1 for no weight || 0 for weight
+ *  @return 4 -> 1 - weight present || 0 - no weight
  *  @return The response from the Arduino.
  */
 float sendCommand(char commandChar) {
@@ -274,28 +289,25 @@ float sendCommand(char commandChar) {
   switch (commandChar) {
   case '1':
     {
-      // Expect float (weight or -1.0)
       this->logger.log("Received weight from Arduino: " + std::string(response));
       float value = atof(response);
       return value;
     }
   case '2':
     {
-      // Expect 0 or 1 (really just a 1 to confirm)
       this->logger.log("Received tare confirmation from Arduino: " +
                        std::string(response));
       return (float)atoi(response);
     }
   case '4':
     {
-      // Expect 0 or 1 (bool)
       this->logger.log("Received start weight confirmation from Arduino: " +
                        std::string(response));
       return (float)atoi(response);
     }
   default:
     fprintf(stderr, "Unknown command: %c\n", commandChar);
-    return -999.0f; // invalid fallback
+    return -1.0f; // invalid fallback
   }
 }
 
@@ -330,12 +342,11 @@ void Hardware::rotateAndCapture() {
     if (this->usingMotor) {
       rotateMotor(true);
     }
+    else {
+      sleep(3);
+    }
     // float weight = sendCommand('1');
     // OPTION: use weight to deteremine if item is still present
-
-    // Swap comment lines below if you don't want to wait on realistic motor rotation time
-    // usleep(500);
-    sleep(3);
 
     // Last iteration doensn't need to check signal
     if (angle == 7) {
@@ -386,8 +397,8 @@ bool Hardware::takePhotos(int angle) {
   const std::string sidePhoto =
       this->imageDirectory.string() + std::to_string(angle) + "_side.jpg";
 
-  const std::string command0 = cmd0 + np + res + out + topPhoto + to;
-  const std::string command1 = cmd0 + np + res + out + sidePhoto + to;
+  const std::string command0 = cmd0 + np + res + out + topPhoto;
+  const std::string command1 = cmd0 + np + res + out + sidePhoto;
   system(command0.c_str());
   system(command1.c_str());
 

@@ -56,7 +56,7 @@ int readLineFromArduino(char* buffer, int maxLen) {
  * @param 4 -> request for process start confimation
  * @return 1 -> item weight || -1 for no weight
  * @return 2 -> 1 for confimation of tare
- * @return 4 -> 1 for no weight || 0 for weight
+ * @return 4 -> 1 - weight present || 0 - no weight
  */
 int main(void) {
   const char* serialDevice = "/dev/ttyACM0";
