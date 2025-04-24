@@ -14,7 +14,9 @@
 #include "../../food_item.h"
 #include "../../logger.h"
 
-class Hardware {
+=======
+>>>>>>> 116-integration-of-hx711-weight-sensor-controls
+    class Hardware {
 public:
   Hardware(zmqpp::context& context, bool usingMotor, bool usingCamera);
 

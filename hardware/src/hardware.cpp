@@ -343,10 +343,12 @@ void Hardware::rotateAndCapture() {
       rotateMotor(true);
     }
     else {
-      sleep(3);
+      this->logger.log("Simulate motor spinning");
+      sleep(1);
     }
-    // float weight = sendCommand('1');
+
     // OPTION: use weight to deteremine if item is still present
+    // float weight = sendCommand('1');
 
     // Last iteration doensn't need to check signal
     if (angle == 7) {
@@ -426,7 +428,7 @@ void Hardware::rotateMotor(bool clockwise) {
     digitalWrite(MOTOR_IN1, HIGH);
     digitalWrite(MOTOR_IN2, LOW);
     // pwmWrite(MOTOR_ENA, 255); // Adjust speed
-    usleep(1875000); // Rotate duration
+    usleep(922852); // Rotate duration
     digitalWrite(MOTOR_IN1, LOW);
     digitalWrite(MOTOR_IN2, LOW); // HIGH,HIGH || LOW,LOW == off
   }
@@ -435,7 +437,7 @@ void Hardware::rotateMotor(bool clockwise) {
     digitalWrite(MOTOR_IN1, LOW);
     digitalWrite(MOTOR_IN2, HIGH);
     // pwmWrite(MOTOR_ENA, 255);
-    usleep(1875000);
+    usleep(922852); // Rotate duration
     digitalWrite(MOTOR_IN1, LOW);
     digitalWrite(MOTOR_IN2, LOW);
   }
