@@ -1,13 +1,3 @@
-#include <filesystem>
-#include <fstream>
-#include <glog/logging.h>
-#include <iostream>
-#include <string>
-#include <unistd.h>
-
-#include "../../food_item.h"
-#include "../../logger.h"
-#include "hardware.h"
 #include "hardware_entry.h"
 
 /**
@@ -32,6 +22,11 @@ void hardwareEntry(zmqpp::context& context, bool usingMotor, bool usingCamera) {
     hardware.initDC();
   }
   //  TODO - Setup communication with Arduino for weight.
+  Hardware hardware(context);
+  bool startSignalReceived = false;
+  int startSignalTimeoutMs = 1000;
+  hardware.initDC();
+  hardware.initSerialConnection(hardware.SerialDevice, hardware.baud);
 
   while (1) {
     startSignalReceived = false;
@@ -46,9 +41,19 @@ void hardwareEntry(zmqpp::context& context, bool usingMotor, bool usingCamera) {
     logger.log("Received start signal from display");
     bool scanSuccessful = hardware.startScan();
 
-    // TODO - Add logic to tare weight sensor
     if (scanSuccessful) {
       logger.log("Scan successful");
+      for (int i = 0; i < 5; i++) {
+        bool tareSuccess = (bool)hardware.sendCommand('2');
+        if (tareSuccess) {
+          logger.log("Tare successful");
+          break;
+        }
+        else {
+          logger.log("Tare unsuccessful, retrying...");
+          std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        }
+      }
     }
     else {
       logger.log("Scan unsuccessful");

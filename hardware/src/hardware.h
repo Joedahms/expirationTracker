@@ -1,22 +1,31 @@
 #ifndef HARDWARE_H
 #define HARDWARE_H
 
+#include <filesystem>
+#include <fstream>
+#include <glog/logging.h>
+#include <iostream>
+#include <string>
+#include <unistd.h>
+#include <wiringPi.h>
 #include <zmqpp/zmqpp.hpp>
 
 #include "../../endpoints.h"
+#include "../../food_item.h"
 #include "../../logger.h"
 
-// TODO Figure out a better way to represent the photo path
-//
-// There is the constant below IMAGE_DIRECTORY but ../images/temp is also
-// used in sendDataToVision. Need a way to better define the photo path.
-// Possibly even in main.cpp so that it can be passed to vision as well.
-
-class Hardware {
+=======
+>>>>>>> 116-integration-of-hx711-weight-sensor-controls
+    class Hardware {
 public:
   Hardware(zmqpp::context& context, bool usingMotor, bool usingCamera);
 
+  const char* SerialDevice = "/dev/ttyACM0";
+  int baud                 = 9600;
+  int arduino_fd           = -1;
+
   void initDC();
+  int initSerialConnection(const char* device, int baudRate);
   bool checkStartSignal(int timeoutMs);
   void sendStartToVision();
   bool startScan();
@@ -30,15 +39,17 @@ private:
 
   std::filesystem::path imageDirectory;
 
-  float itemWeight    = 0;
-  const int motor_in1 = 23; // GPIO Pin for L298N IN1
-  const int motor_in2 = 24; // GPIO Pin for L298N IN2
-  // const int motor_ena = 18; // GPIO Pin forL298N enable (PWM Speed Control)
-
+  const int MOTOR_IN1 23; // GPIO Pin for L298N IN1
+  const int MOTOR_IN2 24; // GPIO Pin for L298N IN2
+  // const int MOTOR_ENA 18; // GPIO Pin forL298N enable (PWM Speed Control)
+  float itemWeight = 0;
+  char input[10];
+  char response[64];
   bool usingMotor;
   bool usingCamera;
 
-  bool checkWeight();
+  int readLineFromArduino(char* buffer, int maxLen);
+  float sendCommand(char commandChar);
   void rotateAndCapture();
   bool takePhotos(int angle);
   void rotateMotor(bool clockwise);
