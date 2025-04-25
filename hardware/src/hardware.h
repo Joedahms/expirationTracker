@@ -24,6 +24,7 @@ public:
 
   void initDC();
   int initSerialConnection(const char* device, int baudRate);
+  float sendCommand(char commandChar);
   bool checkStartSignal(int timeoutMs);
   void sendStartToVision();
   bool startScan();
@@ -47,7 +48,6 @@ private:
   bool usingCamera;
 
   int readLineFromArduino(char* buffer, int maxLen);
-  float sendCommand(char commandChar);
   void rotateAndCapture();
   bool takePhotos(int angle);
   void rotateMotor(bool clockwise);
