@@ -3,7 +3,6 @@ from ultralytics import YOLO
 from datetime import datetime
 import re
 import cv2
-import re
 from dateutil.parser import parse
 import numpy as np
 from foodClasses import textClasses, pluMapping, openImageFoodItemList, openImagePackageItemList
