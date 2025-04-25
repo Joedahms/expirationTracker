@@ -1,7 +1,7 @@
-#include "wiringSerial.h"
 #include <wiringPi.h>
 
 #include "hardware.h"
+#include "wiringSerial.h"
 
 /**
  * @param context The zeroMQ context with which to creates with
@@ -113,7 +113,7 @@ bool Hardware::checkStartSignal(int timeoutMs) {
 
           this->logger.log("Received start signal from display, checking weight");
 
-          nonzeroWeight = (bool)hardware.sendCommand('4');
+          nonzeroWeight = (bool)Hardware.sendCommand('4');
           if (nonzeroWeight == false) {
             this->logger.log("Informing display that no weight detected on plaform");
             this->replySocket.send(Messages::ZERO_WEIGHT);
