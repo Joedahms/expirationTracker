@@ -373,6 +373,9 @@ void Hardware::rotateAndCapture() {
     }
     if (receivedStopSignal) {
       this->logger.log("AI Vision identified item. Stopping process.");
+      // shut down motor
+      digitalWrite(MOTOR_IN1, LOW);
+      digitalWrite(MOTOR_IN2, LOW);
       break;
     }
     this->logger.log("AI Vision did not identify item. Continuing process.");
