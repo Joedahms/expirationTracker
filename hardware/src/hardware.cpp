@@ -413,7 +413,7 @@ bool Hardware::takePhotos(int angle) {
       this->imageDirectory.string() + std::to_string(angle) + "_side.jpg";
 
   const std::string command0 = cmd0 + np + res + out + topPhoto;
-  const std::string command1 = cmd0 + np + res + out + sidePhoto;
+  const std::string command1 = cmd1 + np + res + out + sidePhoto;
   system(command0.c_str());
   system(command1.c_str());
 
