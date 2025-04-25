@@ -120,7 +120,7 @@ bool Hardware::checkStartSignal(int timeoutMs) {
 
           this->logger.log("Received start signal from display, checking weight");
 
-          nonzeroWeight = (bool)Hardware.sendCommand('4');
+          nonzeroWeight = (bool)hardware.sendCommand('4');
           if (nonzeroWeight == false) {
             this->logger.log("Informing display that no weight detected on plaform");
             this->replySocket.send(Messages::ZERO_WEIGHT);
@@ -288,7 +288,7 @@ int Hardware::readLineFromArduino(char* buffer, int maxLen) {
  *  @return 4 -> 1 - weight present || 0 - no weight
  *  @return The response from the Arduino.
  */
-float sendCommand(char commandChar) {
+float Hardware::sendCommand(char commandChar) {
   this->logger.log("Sending command to Arduino: " + std::string(1, commandChar));
   serialFlush(arduino_fd);
   serialPutchar(arduino_fd, commandChar);
