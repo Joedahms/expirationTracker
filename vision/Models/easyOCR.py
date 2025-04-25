@@ -2,11 +2,12 @@ import easyocr
 from ultralytics import YOLO
 from datetime import datetime
 import re
-import sys
 import cv2
+import re
+from dateutil.parser import parse
 import numpy as np
 from foodClasses import textClasses, pluMapping, openImageFoodItemList, openImagePackageItemList
-import matplotlib.pyplot as plt
+from difflib import SequenceMatcher
 
 try:
     reader = easyocr.Reader(['en'])
@@ -21,7 +22,6 @@ def cleanText(text):
     """ Normalize and clean extracted OCR text while keeping numbers. """
     return re.sub(r'[^a-zA-Z0-9\s]', '', text).strip().lower()
 
-from difflib import SequenceMatcher
 
 def isFoodClass(text):
     """Check if extracted text belongs to a known classification, with fuzzy fallback."""
@@ -50,9 +50,6 @@ def isPLUClass(text):
         
     return None
 
-import re
-from datetime import datetime
-from dateutil.parser import parse
 
 def extractExpirationDate(textList):
     """Extract expiration dates from text and normalize them to YYYY/MM/DD format."""
