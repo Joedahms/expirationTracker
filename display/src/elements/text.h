@@ -13,12 +13,13 @@
  */
 class Text : public Element {
 public:
-  Text(struct DisplayGlobal displayGlobal,
-       const SDL_Rect& boundaryRectangle,
+  Text(const struct DisplayGlobal& displayGlobal,
+       const std::string& logFile,
+       const SDL_Rect boundaryRectangle,
        const std::string& fontPath,
        const std::string& content,
-       int fontSize,
-       SDL_Color color);
+       const int fontSize,
+       const SDL_Color color);
   ~Text();
 
   void setContent(const std::string& content) override;

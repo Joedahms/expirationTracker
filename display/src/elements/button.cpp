@@ -15,18 +15,15 @@
  * @param textPadding How offset the text should be from parent
  * @param callback The callback function to execute when the button is clicked
  */
-Button::Button(struct DisplayGlobal displayGlobal,
-               const SDL_Rect& boundaryRectangle,
+Button::Button(const struct DisplayGlobal& displayGlobal,
+               const std::string& logFile,
+               const SDL_Rect boundaryRectangle,
                const std::string& textContent,
-               const SDL_Point& textPadding,
-               std::function<void()> callback,
-               const std::string& logFile)
-    : textContent(textContent), textPadding(textPadding), onClick(callback) {
-  this->logger = std::make_unique<Logger>(logFile);
-
-  this->displayGlobal = displayGlobal;
-
-  setupPosition(boundaryRectangle);
+               const SDL_Point textPadding,
+               std::function<void()> onClick)
+    : CompositeElement(displayGlobal, logFile, boundaryRectangle),
+      textContent(textContent), textPadding(textPadding), onClick(onClick) {
+  this->logger->log("Constructing " + this->textContent + " button");
 
   // Colors
   this->backgroundColor = {255, 0, 0, 255}; // Red
@@ -37,7 +34,7 @@ Button::Button(struct DisplayGlobal displayGlobal,
   SDL_Color textColor        = {255, 255, 0, 255}; // Yellow
   SDL_Rect textRect          = {textPadding.x, textPadding.y, 0, 0};
   std::shared_ptr<Text> text = std::make_shared<Text>(
-      this->displayGlobal, textRect, "../display/fonts/16020_FUTURAM.ttf",
+      this->displayGlobal, this->logFile, textRect, DisplayGlobal::futuramFontPath,
       this->textContent.c_str(), 24, textColor);
   text->setCentered();
 
@@ -49,21 +46,18 @@ Button::Button(struct DisplayGlobal displayGlobal,
   }
 
   addElement(std::move(text));
+  this->logger->log(this->textContent + " button constructed");
 }
 
-Button::Button(struct DisplayGlobal displayGlobal,
-               const SDL_Rect& boundaryRectangle,
+Button::Button(const struct DisplayGlobal& displayGlobal,
+               const std::string& logFile,
+               const SDL_Rect boundaryRectangle,
                const std::string& textContent,
-               const SDL_Point& textPadding,
-               const std::string& notifyMessage,
-               const std::string& logFile)
-    : textContent(textContent), textPadding(textPadding), notifyMessage(notifyMessage) {
-  this->logger = std::make_unique<Logger>(logFile);
+               const SDL_Point textPadding,
+               const std::string& notifyMessage)
+    : CompositeElement(displayGlobal, logFile, boundaryRectangle),
+      textContent(textContent), textPadding(textPadding), notifyMessage(notifyMessage) {
   this->logger->log("Constructing " + this->textContent + " button");
-
-  this->displayGlobal = displayGlobal;
-
-  setupPosition(boundaryRectangle);
 
   // Colors
   this->backgroundColor = {255, 0, 0, 255}; // Red
@@ -74,7 +68,7 @@ Button::Button(struct DisplayGlobal displayGlobal,
   SDL_Color textColor        = {255, 255, 0, 255}; // Yellow
   SDL_Rect textRect          = {textPadding.x, textPadding.y, 0, 0};
   std::shared_ptr<Text> text = std::make_shared<Text>(
-      this->displayGlobal, textRect, "../display/fonts/16020_FUTURAM.ttf",
+      this->displayGlobal, this->logFile, textRect, DisplayGlobal::futuramFontPath,
       this->textContent.c_str(), 24, textColor);
   text->setCentered();
 

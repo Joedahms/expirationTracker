@@ -1,16 +1,14 @@
 #include "loading_bar.h"
 
-LoadingBar::LoadingBar(struct DisplayGlobal displayGlobal,
+LoadingBar::LoadingBar(const struct DisplayGlobal& displayGlobal,
+                       const std::string& logFile,
                        const SDL_Rect boundaryRectangle,
                        const int& borderThickness,
                        const float& totalTimeSeconds,
-                       const float& updatePeriodMs,
-                       const std::string& logFile)
-    : totalTimeSeconds(totalTimeSeconds), updatePeriodMs(updatePeriodMs) {
-  this->logger          = std::make_unique<Logger>(logFile);
-  this->displayGlobal   = displayGlobal;
+                       const float& updatePeriodMs)
+    : Element(displayGlobal, logFile, boundaryRectangle),
+      totalTimeSeconds(totalTimeSeconds), updatePeriodMs(updatePeriodMs) {
   this->borderThickness = borderThickness;
-  setupPosition(boundaryRectangle);
 
   this->barRectangle = {this->boundaryRectangle.x + 1, this->boundaryRectangle.y, 0,
                         this->boundaryRectangle.h - 1};

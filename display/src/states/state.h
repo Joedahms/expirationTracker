@@ -5,25 +5,39 @@
 #include <vector>
 
 #include "../display_global.h"
-#include "../elements/button.h"
-#include "../elements/composite_element.h"
+#include "../display_handler.h"
 #include "../elements/container.h"
-#include "../elements/scroll_box.h"
-#include "../elements/text.h"
 #include "../engine_state.h"
+#include "../log_files.h"
 
 class State {
 public:
+  State(const struct DisplayGlobal& displayGlobal,
+        const std::string& logFile,
+        const EngineState& state);
   virtual void handleEvents(bool* displayIsRunning);
   virtual void update();
   virtual void render() const = 0;
+  virtual void enter();
+  virtual void exit() = 0;
+
   EngineState getCurrentState();
   void setCurrentState(EngineState currentState);
 
+  bool checkStateChange();
+
 protected:
-  EngineState currentState;
   struct DisplayGlobal displayGlobal;
+  const std::string logFile;
+  std::unique_ptr<Logger> logger;
+
+  const EngineState defaultState;
+  EngineState currentState;
+
   std::shared_ptr<Container> rootElement;
+  SDL_Surface* windowSurface = nullptr;
+
+  DisplayHandler& displayHandler;
 };
 
 #endif

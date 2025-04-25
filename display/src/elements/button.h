@@ -17,19 +17,19 @@
  */
 class Button : public CompositeElement {
 public:
-  Button(struct DisplayGlobal displayGlobal,
-         const SDL_Rect& boundaryRectangle,
+  Button(const struct DisplayGlobal& displayGlobal,
+         const std::string& logFile,
+         const SDL_Rect boundaryRectangle,
          const std::string& textContent,
-         const SDL_Point& textPadding,
-         std::function<void()> callback,
-         const std::string& logFile);
+         const SDL_Point textPadding,
+         std::function<void()> onClick);
 
-  Button(struct DisplayGlobal displayGlobal,
-         const SDL_Rect& boundaryRectangle,
+  Button(const struct DisplayGlobal& displayGlobal,
+         const std::string& logFile,
+         const SDL_Rect boundaryRectangle,
          const std::string& textContent,
-         const SDL_Point& textPadding,
-         const std::string& notifyMessage,
-         const std::string& logFile);
+         const SDL_Point textPadding,
+         const std::string& notifyMessage);
 
   void initialize();
   void updateSelf() override;
@@ -40,10 +40,11 @@ private:
   std::string textContent;
   SDL_Point textPadding = {0, 0};
   std::function<void()> onClick;
+  std::string notifyMessage;
+
   SDL_Color backgroundColor;
   SDL_Color defaultColor;
   SDL_Color hoveredColor;
-  std::string notifyMessage;
 
   void updateColor();
 };

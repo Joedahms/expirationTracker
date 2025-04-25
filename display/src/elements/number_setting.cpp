@@ -15,33 +15,34 @@
  * height
  * @param settingId The primary key of the food item corresponding to this object
  */
-NumberSetting::NumberSetting(struct DisplayGlobal displayGlobal,
-                             const SDL_Rect& boundaryRectangle,
-                             int settingId,
-                             const std::string& logFile)
-    : settingId(settingId) {
-  setupPosition(boundaryRectangle);
-  this->logger  = std::make_unique<Logger>(logFile);
-  this->logFile = logFile;
-
-  std::shared_ptr<Button> decreaseButton = std::make_shared<Button>(
-      displayGlobal, SDL_Rect{0, 0, 0, 0}, "-", SDL_Point{0, 0},
-      [this]() { this->settingValue--; }, this->logFile);
+NumberSetting::NumberSetting(const struct DisplayGlobal& displayGlobal,
+                             const std::string& logFile,
+                             const SDL_Rect boundaryRectangle,
+                             const int settingId)
+    : CompositeElement(displayGlobal, logFile, boundaryRectangle), settingId(settingId) {
+  std::shared_ptr<Button> decreaseButton =
+      std::make_shared<Button>(this->displayGlobal, this->logFile, SDL_Rect{0, 0, 0, 0},
+                               "-", SDL_Point{0, 0}, [this]() { this->settingValue--; });
   addElement(std::move(decreaseButton));
 
-  std::shared_ptr<Text> text = std::make_shared<Text>(displayGlobal, SDL_Rect{0, 0, 0, 0},
-                                                      DisplayGlobal::futuramFontPath, "0",
-                                                      24, SDL_Color{0, 255, 0, 255});
+  std::shared_ptr<Text> text = std::make_shared<Text>(
+      this->displayGlobal, this->logFile, SDL_Rect{0, 0, 0, 0},
+      DisplayGlobal::futuramFontPath, "0", 24, SDL_Color{0, 255, 0, 255});
   addElement(std::move(text));
 
-  std::shared_ptr<Button> increaseButton = std::make_shared<Button>(
-      displayGlobal, SDL_Rect{0, 0, 0, 0}, "+", SDL_Point{0, 0},
-      [this]() { this->settingValue++; }, this->logFile);
+  std::shared_ptr<Button> increaseButton =
+      std::make_shared<Button>(this->displayGlobal, this->logFile, SDL_Rect{0, 0, 0, 0},
+                               "+", SDL_Point{0, 0}, [this]() { this->settingValue++; });
   addElement(std::move(increaseButton));
 
-  FoodItem foodItem  = readFoodItemById(this->settingId);
-  this->settingValue = foodItem.getQuantity();
-  this->children[1]->setContent(std::to_string(this->settingValue));
+  if (settingId != -1) {
+    FoodItem foodItem  = readFoodItemById(this->settingId);
+    this->settingValue = foodItem.getQuantity();
+    this->children[1]->setContent(std::to_string(this->settingValue));
+  }
+  else {
+    this->settingValue = 0;
+  }
 }
 
 /**
@@ -75,17 +76,22 @@ void NumberSetting::updateSelf() {
     this->children[i]->setPositionRelativeToParent(childRelativePosition);
   }
 
-  FoodItem foodItem    = readFoodItemById(this->settingId);
-  int foodItemQuantity = foodItem.getQuantity();
-  if (foodItemQuantity == 0) {
-    deleteById(this->settingId);
+  if (this->settingId != -1) {
+    FoodItem foodItem    = readFoodItemById(this->settingId);
+    int foodItemQuantity = foodItem.getQuantity();
+    if (foodItemQuantity == 0) {
+      deleteById(this->settingId);
+    }
+    else if (foodItemQuantity != this->settingValue) {
+      updateFoodItemQuantity(this->settingId, this->settingValue);
+    }
+    /*
+    else {
+      this->children[1]->setContent(std::to_string(this->settingValue));
+    }
+  */
   }
-  else if (foodItemQuantity != this->settingValue) {
-    updateFoodItemQuantity(this->settingId, this->settingValue);
-  }
-  else {
-    this->children[1]->setContent(std::to_string(this->settingValue));
-  }
+  this->children[1]->setContent(std::to_string(this->settingValue));
 }
 
 void NumberSetting::handleEventSelf(const SDL_Event& event) {}

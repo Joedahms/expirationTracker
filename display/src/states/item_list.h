@@ -13,16 +13,13 @@
  */
 class ItemList : public State {
 public:
-  ItemList(struct DisplayGlobal displayGlobal);
-  EngineState checkKeystates();
+  ItemList(const DisplayGlobal& displayGlobal, const EngineState& state);
+  void handleEvents(bool* displayIsRunning) override;
   void render() const override;
+  void exit() override;
 
 private:
-  Logger logger;
-  std::chrono::steady_clock::time_point previousUpdate;
-  std::chrono::steady_clock::time_point currentUpdate;
   SDL_Point mousePosition;
-
   std::shared_ptr<Mediator> mediator;
 };
 

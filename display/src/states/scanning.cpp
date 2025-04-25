@@ -5,10 +5,9 @@
 #include <string>
 
 #include "../display_global.h"
-#include "../elements/bird.h"
+#include "../elements/button.h"
+#include "../elements/flappy_food/flappy_food.h"
 #include "../elements/loading_bar.h"
-#include "../elements/obstacle.h"
-#include "../elements/obstacle_pair.h"
 #include "../elements/text.h"
 #include "../log_files.h"
 #include "scanning.h"
@@ -16,67 +15,80 @@
 /**
  * @param displayGlobal Global variables
  */
-Scanning::Scanning(struct DisplayGlobal displayGlobal) : logger(LogFiles::SCANNING) {
-  this->logger.log("Constructing scanning state");
+Scanning::Scanning(const struct DisplayGlobal& displayGlobal, const EngineState& state)
+    : State(displayGlobal, LogFiles::SCANNING, state) {
+  this->logger->log("Constructing scanning state");
 
-  this->currentState  = EngineState::SCANNING;
-  this->displayGlobal = displayGlobal;
-  this->windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
-  assert(this->windowSurface != NULL);
-
-  // Root element
-  SDL_Rect rootRectangle = {0, 0, this->windowSurface->w, this->windowSurface->h};
-  this->rootElement      = std::make_unique<Container>(rootRectangle);
-
-  // Scan message
-  const char* progressMessageContent    = "Scanning In Progress";
-  SDL_Color progressMessageColor        = {0, 255, 0, 255}; // Green
-  SDL_Rect progressMessageRectangle     = {0, 100, 0, 0};
-  std::unique_ptr<Text> progressMessage = std::make_unique<Text>(
-      this->displayGlobal, progressMessageRectangle, DisplayGlobal::futuramFontPath,
-      progressMessageContent, 24, progressMessageColor);
+  this->logger->log("Constructing scan message");
+  const std::string progressMessageContent = "Scanning In Progress";
+  const SDL_Color progressMessageColor     = {0, 255, 0, 255}; // Green
+  const SDL_Rect progressMessageRectangle  = {0, 0, 0, 0};
+  std::unique_ptr<Text> progressMessage    = std::make_unique<Text>(
+      this->displayGlobal, this->logFile, progressMessageRectangle,
+      DisplayGlobal::futuramFontPath, progressMessageContent, 24, progressMessageColor);
   progressMessage->setCenteredHorizontal();
   this->rootElement->addElement(std::move(progressMessage));
+  this->logger->log("Scan message constructed");
 
-  // Cancel scan
-  SDL_Rect cancelScanButtonRectangle       = {0, 150, 0, 0};
+  this->logger->log("Constructing cancel scan button");
+  SDL_Rect cancelScanButtonRectangle       = {280, 50, 0, 0};
   std::unique_ptr<Button> cancelScanButton = std::make_unique<Button>(
-      this->displayGlobal, cancelScanButtonRectangle, "Cancel Scan", SDL_Point{10, 10},
-      [this]() { this->currentState = EngineState::CANCEL_SCAN_CONFIRMATION; },
-      LogFiles::SCANNING);
-  cancelScanButton->setCenteredHorizontal();
-  rootElement->addElement(std::move(cancelScanButton));
+      this->displayGlobal, this->logFile, cancelScanButtonRectangle, "Cancel Scan",
+      SDL_Point{10, 10},
+      [this]() { this->currentState = EngineState::CANCEL_SCAN_CONFIRMATION; });
+  this->rootElement->addElement(std::move(cancelScanButton));
+  this->logger->log("Cancel scan button constructed");
 
-  // Loading bar
-  SDL_Rect loadingBarRectangle           = {0, 200, 200, 30};
+  this->logger->log("Constructing start game button");
+  SDL_Rect startGameRect            = {0, 50, 0, 0};
+  std::shared_ptr<Button> startGame = std::make_shared<Button>(
+      this->displayGlobal, this->logFile, startGameRect, "Start Game", SDL_Point{10, 10},
+      [this] { this->flappyFood->start(); });
+  startGame->setCenteredHorizontal();
+  this->rootElement->addElement(startGame);
+  this->logger->log("Start game button constructed");
+
+  this->logger->log("Constructing reset game button");
+  SDL_Rect resetGameRect            = {600, 50, 0, 0};
+  std::shared_ptr<Button> resetGame = std::make_shared<Button>(
+      this->displayGlobal, this->logFile, resetGameRect, "Reset Game", SDL_Point{10, 10},
+      [this] { this->flappyFood->reset(); });
+  this->rootElement->addElement(resetGame);
+  this->logger->log("Reset game button constructed");
+
+  this->logger->log("Constructing loading bar");
+  SDL_Rect loadingBarRectangle           = {0, 100, 200, 30};
   int loadingBarBorderThickness          = 3;
   float totalTimeSeconds                 = 20;
   float updatePeriodMs                   = 100;
   std::unique_ptr<LoadingBar> loadingBar = std::make_unique<LoadingBar>(
-      this->displayGlobal, loadingBarRectangle, loadingBarBorderThickness,
-      totalTimeSeconds, updatePeriodMs, LogFiles::SCANNING);
+      this->displayGlobal, this->logFile, loadingBarRectangle, loadingBarBorderThickness,
+      totalTimeSeconds, updatePeriodMs);
   loadingBar->setCenteredHorizontal();
   rootElement->addElement(std::move(loadingBar));
+  this->logger->log("Loading bar constructed");
 
-  SDL_Rect birdRectangle     = {0, 0, 32, 32};
-  std::unique_ptr<Bird> bird = std::make_unique<Bird>(this->displayGlobal, birdRectangle);
-  birdPtr                    = bird.get();
-  rootElement->addElement(std::move(bird));
+  this->flappyFood = std::make_shared<FlappyFood>(
+      this->displayGlobal, this->logFile,
+      SDL_Rect{0, 0, this->windowSurface->w, this->windowSurface->h});
+  this->rootElement->addElement(flappyFood);
 
-  initializeObstacles();
-
-  this->logger.log("Constructed scanning state");
+  this->logger->log("Constructed scanning state");
 }
 
-/**
- * Perform the appropriate action depending on which keyboard key has been pressed.
- *
- * @param None
- * @return The state the display is in after checking if any keys have been pressed
- */
-EngineState Scanning::checkKeystates() {
-  const Uint8* keystates = SDL_GetKeyboardState(NULL);
-  return EngineState::SCANNING;
+void Scanning::handleEvents(bool* displayIsRunning) {
+  SDL_Event event;
+  while (SDL_PollEvent(&event) != 0) { // While there are events in the queue
+    if (event.type == SDL_QUIT) {
+      *displayIsRunning = false;
+      break;
+    }
+    else {
+      this->rootElement->handleEvent(event);
+    }
+  }
+
+  this->currentState = this->displayHandler.checkDetectionResults(this->currentState);
 }
 
 /**
@@ -92,74 +104,4 @@ void Scanning::render() const {
   SDL_RenderPresent(this->displayGlobal.renderer);
 }
 
-void Scanning::update() {
-  this->rootElement->update();
-
-  std::vector<SDL_Rect> boundaryRectangles = getBoundaryRectangles();
-  this->rootElement->checkCollision(boundaryRectangles);
-  handleBirdCollision();
-
-  SDL_Rect birdRect = this->birdPtr->getBoundaryRectangle();
-  for (const auto& obstaclePair : this->obstaclePairs) {
-    if (obstaclePair->scored) {
-      continue;
-    }
-    SDL_Rect obstaclePairRect = obstaclePair->getBoundaryRectangle();
-    SDL_Rect topRect          = obstaclePair->getTopObstacleRect();
-    SDL_Rect bottomRect       = obstaclePair->getBottomObstacleRect();
-
-    if (birdRect.x > obstaclePairRect.x + obstaclePairRect.w) {
-      this->score++;
-      obstaclePair->scored = true;
-      std::cout << "score: " << this->score << std::endl;
-    }
-  }
-}
-
-void Scanning::initializeObstacles() {
-  const int windowWidth  = this->windowSurface->w;
-  const int windowHeight = this->windowSurface->h;
-
-  const int obstacleWidth         = 40;
-  const int obstaclePairHeight    = 200;
-  const int horizontalObstacleGap = 70;
-
-  int totalObstaclePairs = windowWidth / (obstacleWidth + horizontalObstacleGap);
-
-  totalObstaclePairs++;
-  const int respawnOffset = windowWidth % (obstacleWidth + horizontalObstacleGap);
-
-  int xPosition       = windowWidth;
-  const int yPosition = windowHeight - obstaclePairHeight;
-
-  for (int i = 0; i < totalObstaclePairs; i++) {
-    SDL_Rect boundaryRectangle = {xPosition, yPosition, obstacleWidth,
-                                  obstaclePairHeight};
-
-    std::unique_ptr<ObstaclePair> obstaclePair =
-        std::make_unique<ObstaclePair>(this->displayGlobal, boundaryRectangle,
-                                       windowWidth, respawnOffset, LogFiles::SCANNING);
-
-    obstaclePairs.push_back(obstaclePair.get());
-
-    this->rootElement->addElement(std::move(obstaclePair));
-    xPosition += obstacleWidth + horizontalObstacleGap;
-  }
-}
-
-std::vector<SDL_Rect> Scanning::getBoundaryRectangles() {
-  std::vector<SDL_Rect> boundaryRectangles;
-
-  this->rootElement->addBoundaryRectangle(boundaryRectangles);
-
-  return boundaryRectangles;
-}
-
-void Scanning::handleBirdCollision() {
-  if (this->birdPtr->getHasCollided()) {
-    this->birdPtr->setVelocity(Velocity{0, 0});
-    for (const auto& obstaclePair : this->obstaclePairs) {
-      obstaclePair->setVelocity(Velocity{0, 0});
-    }
-  }
-}
+void Scanning::exit() {}
