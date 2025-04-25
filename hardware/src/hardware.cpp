@@ -1,4 +1,4 @@
-#include <wiringPi.h>
+#include "wiringPi.h"
 
 #include "hardware.h"
 #include "wiringSerial.h"
