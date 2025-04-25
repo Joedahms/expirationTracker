@@ -1,3 +1,6 @@
+#include "wiringSerial.h"
+#include <wiringPi.h>
+
 #include "hardware.h"
 
 /**

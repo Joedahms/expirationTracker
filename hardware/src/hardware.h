@@ -1,10 +1,13 @@
 #ifndef HARDWARE_H
 #define HARDWARE_H
 
+#include <errno.h>
 #include <filesystem>
 #include <fstream>
 #include <glog/logging.h>
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string>
 #include <unistd.h>
 #include <wiringPi.h>
@@ -13,7 +16,6 @@
 #include "../../endpoints.h"
 #include "../../food_item.h"
 #include "../../logger.h"
-
 class Hardware {
 public:
   Hardware(zmqpp::context& context, bool usingMotor, bool usingCamera);
