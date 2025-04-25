@@ -1,9 +1,9 @@
 #include "obstacle.h"
 
-Obstacle::Obstacle(struct DisplayGlobal displayGlobal,
-                   const SDL_Rect& boundaryRectangle) {
-  this->displayGlobal = displayGlobal;
-  setupPosition(boundaryRectangle);
+Obstacle::Obstacle(const struct DisplayGlobal& displayGlobal,
+                   const std::string& logFile,
+                   const SDL_Rect boundaryRectangle)
+    : Element(displayGlobal, logFile, boundaryRectangle) {
   this->screenBoundX = false;
   this->canCollide   = true;
 }

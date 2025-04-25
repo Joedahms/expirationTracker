@@ -3,10 +3,11 @@
 
 #include "bird.h"
 
-Bird::Bird(struct DisplayGlobal displayGlobal, const SDL_Rect& boundaryRectangle) {
-  this->displayGlobal     = displayGlobal;
-  this->boundaryRectangle = boundaryRectangle;
-  this->debugName         = "bird";
+Bird::Bird(const struct DisplayGlobal& displayGlobal,
+           const std::string& logFile,
+           const SDL_Rect boundaryRectangle)
+    : Element(displayGlobal, logFile, boundaryRectangle) {
+  this->debugName = "bird";
 
   SDL_Surface* birdSurface = IMG_Load("../display/sprites/bird.png");
   if (birdSurface == NULL) {
@@ -19,9 +20,10 @@ Bird::Bird(struct DisplayGlobal displayGlobal, const SDL_Rect& boundaryRectangle
   }
   SDL_FreeSurface(birdSurface);
 
-  this->fixed          = false;
-  this->canCollide     = true;
-  this->collisionFixed = false;
+  this->fixed           = false;
+  this->gravityAffected = true;
+  this->canCollide      = true;
+  this->collisionFixed  = false;
 }
 
 /**

@@ -1,6 +1,11 @@
 #include "composite_element.h"
 #include "element.h"
 
+CompositeElement::CompositeElement(const struct DisplayGlobal& displayGlobal,
+                                   const std::string& logFile,
+                                   const SDL_Rect boundaryRectangle)
+    : Element(displayGlobal, logFile, boundaryRectangle) {}
+
 /**
  * Update this element then update all of its children.
  *
@@ -100,5 +105,40 @@ void CompositeElement::checkCollision(std::vector<SDL_Rect>& boundaryRectangles)
   }
   for (auto& element : this->children) {
     element->checkCollision(boundaryRectangles);
+  }
+}
+
+/**
+ * Remove all child elements from this composite element.
+ * This will destroy elements if this composite holds the last reference.
+ *
+ * @param None
+ * @return None
+ */
+void CompositeElement::removeAllChildren() {
+  for (auto& child : this->children) {
+    if (child) {
+      child->setParent(nullptr);
+    }
+  }
+
+  this->children.clear();
+}
+
+void CompositeElement::containChildren() {
+  for (auto& child : this->children) {
+    SDL_Rect childRect              = child->getBoundaryRectangle();
+    SDL_Point childRelativePosition = child->getPositionRelativeToParent();
+    Velocity childVelocity          = child->getVelocity();
+
+    if (childRect.y + childRect.h >
+        this->boundaryRectangle.y + this->boundaryRectangle.h) {
+      childRelativePosition.y--;
+      childVelocity.y = 0;
+    }
+
+    child->setBoundaryRectangle(childRect);
+    child->setPositionRelativeToParent(childRelativePosition);
+    child->setVelocity(childVelocity);
   }
 }

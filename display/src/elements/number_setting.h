@@ -13,18 +13,19 @@
  */
 class NumberSetting : public CompositeElement {
 public:
-  NumberSetting(struct DisplayGlobal displayGlobal,
-                const SDL_Rect& boundaryRectangle,
-                int settingId,
-                const std::string& logFile);
+  NumberSetting(const struct DisplayGlobal& displayGlobal,
+                const std::string& logFile,
+                const SDL_Rect boundaryRectangle,
+                const int settingId = -1);
 
   void setSettingId(const int& newSettingId);
   void updateSelf() override;
   void handleEventSelf(const SDL_Event& event) override;
 
 private:
-  int settingValue = -1;
-  int settingId    = -1;
+  bool databaseConnected = false;
+  int settingValue       = -1;
+  int settingId;
 };
 
 #endif

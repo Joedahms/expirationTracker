@@ -1,34 +1,27 @@
 #include <iostream>
 
+#include "../elements/button.h"
 #include "../log_files.h"
 #include "zero_weight.h"
 
-ZeroWeight::ZeroWeight(struct DisplayGlobal displayGlobal)
-    : logger(LogFiles::ZERO_WEIGHT) {
-  this->logger.log("Constructing zero weight state");
-  this->currentState = EngineState::ZERO_WEIGHT;
+ZeroWeight::ZeroWeight(const struct DisplayGlobal& displayGlobal,
+                       const EngineState& state)
+    : State(displayGlobal, LogFiles::ZERO_WEIGHT, state) {
+  this->logger->log("Constructing zero weight state");
 
-  this->displayGlobal = displayGlobal;
-
-  SDL_Surface* windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
-  SDL_Rect rootRectangle     = {0, 0, 0, 0};
-  rootRectangle.w            = windowSurface->w;
-  rootRectangle.h            = windowSurface->h;
-  this->rootElement          = std::make_shared<Container>(rootRectangle);
-
-  std::shared_ptr<Button> retryButton = std::make_shared<Button>(
-      this->displayGlobal, SDL_Rect{0, 50, 0, 0}, "Retry", SDL_Point{0, 0},
-      [this]() { retry(); }, LogFiles::ZERO_WEIGHT);
+  std::shared_ptr<Button> retryButton =
+      std::make_shared<Button>(this->displayGlobal, this->logFile, SDL_Rect{0, 50, 0, 0},
+                               "Retry", SDL_Point{0, 0}, [this]() { retry(); });
   retryButton->setCenteredHorizontal();
 
-  std::shared_ptr<Button> overrideButton = std::make_shared<Button>(
-      this->displayGlobal, SDL_Rect{0, 150, 0, 0}, "Override", SDL_Point{0, 0},
-      [this]() { override(); }, LogFiles::ZERO_WEIGHT);
+  std::shared_ptr<Button> overrideButton =
+      std::make_shared<Button>(this->displayGlobal, this->logFile, SDL_Rect{0, 150, 0, 0},
+                               "Override", SDL_Point{0, 0}, [this]() { override(); });
   overrideButton->setCenteredHorizontal();
 
-  std::shared_ptr<Button> cancelButton = std::make_shared<Button>(
-      this->displayGlobal, SDL_Rect{0, 250, 0, 0}, "Cancel", SDL_Point{0, 0},
-      [this]() { cancel(); }, LogFiles::ZERO_WEIGHT);
+  std::shared_ptr<Button> cancelButton =
+      std::make_shared<Button>(this->displayGlobal, this->logFile, SDL_Rect{0, 250, 0, 0},
+                               "Cancel", SDL_Point{0, 0}, [this]() { cancel(); });
   cancelButton->setCenteredHorizontal();
 
   this->rootElement->addElement(retryButton);
@@ -50,4 +43,21 @@ void ZeroWeight::render() const {
   SDL_RenderClear(this->displayGlobal.renderer);
   this->rootElement->render();
   SDL_RenderPresent(this->displayGlobal.renderer);
+}
+
+void ZeroWeight::exit() {
+  // Override
+  if (this->currentState == EngineState::SCANNING) {
+    this->displayHandler.zeroWeightChoiceToHardware(Messages::OVERRIDE);
+  }
+  // Cancel
+  else if (this->currentState == EngineState::ITEM_LIST) {
+    this->displayHandler.zeroWeightChoiceToHardware(Messages::CANCEL);
+  }
+  // Retry
+  else if (this->retryScan) {
+    this->displayHandler.zeroWeightChoiceToHardware(Messages::RETRY);
+    this->retryScan = false;
+    this->displayHandler.startToHardware();
+  }
 }

@@ -24,6 +24,9 @@ struct Acceleration {
  */
 class Element : public std::enable_shared_from_this<Element> {
 public:
+  Element(const struct DisplayGlobal& displayGlobal,
+          const std::string& logFile,
+          const SDL_Rect boundaryRectangle);
   virtual ~Element() = default;
   virtual void addElement(std::shared_ptr<Element> element) {}
   virtual void update();
@@ -70,36 +73,41 @@ public:
   void setFixed(bool fixed);
   void setCanCollide(bool canCollide);
   void setCollisionFixed(bool collisionFixed);
+  void setGravityAffected(bool gravityAffected);
+  void setHasCollided(bool collided);
 
 private:
   void centerVertical();
   void centerHorizontal();
 
 protected:
+  struct DisplayGlobal displayGlobal;
+  const std::string logFile;
   std::unique_ptr<Logger> logger;
-  std::string logFile;
   std::string debugName = "no debug name";
 
   std::chrono::steady_clock::time_point previousUpdate;
   std::chrono::steady_clock::time_point currentUpdate;
 
-  struct DisplayGlobal displayGlobal;
   SDL_Rect boundaryRectangle         = {0, 0, 0, 0};
   SDL_Point positionRelativeToParent = {0, 0};
   Element* parent                    = nullptr;
-  bool hasBorder                     = false;
-  int borderThickness                = 1;
-  bool centerWithinParent            = false;
-  bool centerVerticalWithinParent    = false;
-  bool centerHorizontalWithinParent  = false;
 
-  bool fixed          = true;
-  bool held           = false;
-  bool screenBoundX   = true;
-  bool screenBoundY   = true;
-  bool canCollide     = false;
-  bool collisionFixed = true;
-  bool hasCollided    = false;
+  bool centerWithinParent           = false;
+  bool centerVerticalWithinParent   = false;
+  bool centerHorizontalWithinParent = false;
+
+  bool hasBorder      = false;
+  int borderThickness = 1;
+
+  bool gravityAffected = false;
+  bool fixed           = true;
+  bool held            = false;
+  bool screenBoundX    = true;
+  bool screenBoundY    = true;
+  bool canCollide      = false;
+  bool collisionFixed  = true;
+  bool hasCollided     = false;
 
   Velocity velocity         = {0, 0};
   Acceleration acceleration = {0, 0};

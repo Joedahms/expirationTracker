@@ -1,11 +1,9 @@
 #include "container.h"
 
-Container::Container() {}
-
-Container::Container(const SDL_Rect& boundaryRectangle) {
-  this->boundaryRectangle = boundaryRectangle;
-  setupPosition(boundaryRectangle);
-}
+Container::Container(const struct DisplayGlobal& displayGlobal,
+                     const std::string& logFile,
+                     const SDL_Rect boundaryRectangle)
+    : CompositeElement(displayGlobal, logFile, boundaryRectangle) {}
 
 void Container::update() {
   updateSelf();
