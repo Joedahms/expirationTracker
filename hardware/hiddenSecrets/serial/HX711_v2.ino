@@ -45,7 +45,6 @@ void setup() {
   // Useful in permanent scale projects.
   zeroFactor = scale.read_average(); // Get a baseline reading
   setupDone  = true;
-  Serial.println(setupDone);
 }
 
 /**
