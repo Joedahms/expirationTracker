@@ -120,8 +120,8 @@ bool Hardware::checkStartSignal(int timeoutMs) {
 
           this->logger.log("Received start signal from display, checking weight");
 
-          nonzeroWeight = (bool)this->sendCommand('4');
-          if (nonzeroWeight == false) {
+          int weight = this->sendCommand('1');
+          if (weight == -1) {
             this->logger.log("Informing display that no weight detected on plaform");
             this->replySocket.send(Messages::ZERO_WEIGHT);
             this->logger.log("Informed display that no weight detected on platform");
