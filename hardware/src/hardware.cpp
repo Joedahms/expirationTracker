@@ -155,8 +155,8 @@ bool Hardware::checkStartSignal(int timeoutMs) {
             receivedRequest = true;
             this->replySocket.send(Messages::AFFIRMATIVE); // Respond to display
             this->logger.log("Weight non zero, getting numeric weight and starting scan");
-            this->itemWeight = sendCommand('1') // * -1.00f; // weight is negative
-                while (itemWeight == -1) {
+            this->itemWeight = sendCommand('1'); // * -1.00f; // weight is negative
+            while (itemWeight == -1) {
               int errcnt = 0;
               this->logger.log("Weight error, retrying");
               sendCommand('2');
