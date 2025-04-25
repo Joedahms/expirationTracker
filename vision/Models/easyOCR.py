@@ -21,15 +21,26 @@ def cleanText(text):
     """ Normalize and clean extracted OCR text while keeping numbers. """
     return re.sub(r'[^a-zA-Z0-9\s]', '', text).strip().lower()
 
+from difflib import SequenceMatcher
+
 def isFoodClass(text):
-    """ Check if extracted text belongs to a known classification. """
-    lowercaseTextClasses = set(cls.lower() for cls in textClasses)
-    words = cleanText(text).split()
-    for word in words:
-        if len(word) > 2 and word.lower() in lowercaseTextClasses:
-            return {"type": "classification", "value": word}  # Return food category
+    """Check if extracted text belongs to a known classification, with fuzzy fallback."""
+    lowercaseTextClasses = [cls.lower() for cls in textClasses]
+    cleanedText = cleanText(text).lower()
+
+    # 1. Exact phrase search first
+    for cls in lowercaseTextClasses:
+        if cls in cleanedText:
+            return {"type": "classification", "value": cls}
+
+    # 2. Fuzzy matching fallback
+    for cls in lowercaseTextClasses:
+        matcher = SequenceMatcher(None, cls, cleanedText)
+        if matcher.find_longest_match(0, len(cls), 0, len(cleanedText)).size / len(cls) > 0.8:
+            return {"type": "classification", "value": cls}
 
     return None
+
 
 def isPLUClass(text):
     words = cleanText(text).split()
