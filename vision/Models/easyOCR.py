@@ -26,7 +26,6 @@ def isFoodClass(text):
     lowercaseTextClasses = set(cls.lower() for cls in textClasses)
     words = cleanText(text).split()
     for word in words:
-        print(f"Text found: {word}")
         if len(word) > 2 and word.lower() in lowercaseTextClasses:
             return {"type": "classification", "value": word}  # Return food category
 
@@ -55,25 +54,62 @@ def extractExpirationDate(textList):
     }
 
     datePatterns = [
+        # 1. Compact: DDMonYYYY (23Mar2021)
+        re.compile(r'\b(\d{1,2})([A-Za-z]{3,9})(\d{2,4})\b', re.IGNORECASE),
+
+        # 2. Verbose with ordinal (December 31st, 2023)
+        re.compile(r'\b([A-Za-z]{3,9}) (\d{1,2})(?:st|nd|rd|th)?,? (\d{2,4})\b', re.IGNORECASE),
+
+        # 3. Month DD, YYYY (March 23, 2021)
+        re.compile(r'\b([A-Za-z]{3,9}) (\d{1,2}),? (\d{2,4})\b', re.IGNORECASE),
+
+        # 4. DD Month YYYY (23 Mar 2021)
+        re.compile(r'\b(\d{1,2}) ([A-Za-z]{3,9}) (\d{2,4})\b', re.IGNORECASE),
+
+        # 5. DD-MM-YYYY / DD.MM.YYYY / DD/MM/YYYY (31-12-2023)
         re.compile(r'\b(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})\b'),
+
+        # 6. YYYY-MM-DD / YYYY.MM.DD / YYYY/MM/DD (2023-12-31)
         re.compile(r'\b(\d{4})[./-](\d{1,2})[./-](\d{1,2})\b'),
-        re.compile(r'\b(\d{1,2}) ([A-Za-z]{3,}) (\d{2,4})\b', re.IGNORECASE),
-        re.compile(r'\b([A-Za-z]{3,}) (\d{1,2}),? (\d{2,4})\b', re.IGNORECASE),
-        re.compile(r'\b(\d{1,2})[./-](\d{1,2})\b'),
+
+        # 7. Year-first space-separated (2023 31 12)
+        re.compile(r'\b(\d{4})\s+(\d{1,2})\s+(\d{1,2})(?!\d)'),
+
+
+        # 8. Year-Month (YYYY-MM) (2023-12)
+        re.compile(r'\b(\d{4})[./-](\d{1,2})\b'),
+
+        # 9. Month-Year (Dec-2023)
+        re.compile(r'\b([A-Za-z]{3,9})[./-](\d{2,4})\b', re.IGNORECASE),
+
+        # 10. Numeric Month-Year (12/2023)
+        re.compile(r'\b(\d{1,2})[./-](\d{4})\b'),
+
+        # 11. Standalone Year (2025)
+        re.compile(r'\b(20\d{2})\b'),
     ]
 
     detectedDates = []
 
     for text in textList:
+        print(f"Text found: {text}")
         found = False
         for pattern in datePatterns:
             for match in pattern.finditer(text):
+                print(f"Pattern matched: {match.group()}")
                 groups = match.groups()
                 day = month = year = None
 
                 try:
                     if len(groups) == 3:
-                        if groups[0].isalpha():
+                        if pattern.pattern.startswith(r'\b(\d{4})'):  # Handle year-first patterns
+                            year, second, third = map(int, groups)
+                            # Assume second and third are day/month, disambiguate
+                            if second > 12:  # Assume day-month-year
+                                day, month = second, third
+                            else:  # Assume month-day-year
+                                month, day = second, third
+                        elif groups[0].isalpha():
                             month = validMonths.get(groups[0].lower())
                             day, year = int(groups[1]), int(groups[2])
                         elif groups[1].isalpha():
@@ -87,7 +123,7 @@ def extractExpirationDate(textList):
                             elif third > 31:
                                 month, day, year = first, second, third
                             else:
-                                day, month, year = first, second, third
+                                day, month, year = first, second, third       
                     elif len(groups) == 2:
                         first, second = map(int, groups)
                         year = datetime.today().year
@@ -108,7 +144,7 @@ def extractExpirationDate(textList):
                     detectedDates.append(dt.strftime("%Y/%m/%d"))
                     found = True
                 except (ValueError, TypeError):
-                    continue
+                    continue #invalid date
 
         # Fallback to dateutil.parser if nothing was found from regex
         if not found:
