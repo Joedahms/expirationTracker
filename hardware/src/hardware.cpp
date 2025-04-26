@@ -120,17 +120,13 @@ bool Hardware::checkStartSignal(int timeoutMs) {
 
           this->logger.log("Received start signal from display, checking weight");
 
-          int weight = this->sendCommand('1');
-          weight     = this->sendCommand('1');
+          // Discard first weight then read
+          int weight = sendCommand(this->READ_WEIGHT);
+          weight     = sendCommand(this->READ_WEIGHT);
+
           if (weight == -1) {
-            this->logger.log("Informing display that no weight detected on plaform");
-            this->replySocket.send(Messages::ZERO_WEIGHT);
-            this->logger.log("Informed display that no weight detected on platform");
-            std::string zeroWeightResponse;
-            this->logger.log("Waiting for zero weight response from display");
-            this->replySocket.receive(zeroWeightResponse);
-            this->logger.log("Received zero weight response from display " +
-                             zeroWeightResponse);
+            this->logger.log("Zero weight on platform");
+            std::string zeroWeightResponse = getZeroWeightResponse();
 
             if (zeroWeightResponse == Messages::RETRY) {
               this->replySocket.send(Messages::AFFIRMATIVE);
@@ -153,24 +149,9 @@ bool Hardware::checkStartSignal(int timeoutMs) {
             }
           }
           else {
+            this->logger.log("Non-zero weight on platform: " + std::to_string(weight));
             receivedRequest = true;
             this->replySocket.send(Messages::AFFIRMATIVE); // Respond to display
-            this->logger.log("Weight non zero, getting numeric weight and starting scan");
-            this->itemWeight = sendCommand('1'); // * -1.00f; // weight is negative
-            while (itemWeight == -1) {
-              int errcnt = 0;
-              this->logger.log("Weight error, retrying");
-              sendCommand('2');
-              this->itemWeight = sendCommand('1') * -1.00f;
-              errcnt++;
-              if (errcnt == 5) {
-                this->logger.log("Error getting weight, setting weight to 9999");
-                this->itemWeight = 9999.0f;
-                break;
-              }
-            }
-            this->logger.log("Weight received from Arduino: " +
-                             std::to_string(this->itemWeight));
           }
         }
       }
@@ -477,4 +458,15 @@ bool Hardware::capturePhoto(int angle) {
   this->logger.log("Exiting capturePhoto at angle: " + std::to_string(angle));
   // Always returns true
   return true;
+}
+
+std::string Hardware::getZeroWeightResponse() {
+  this->logger.log("Informing display that no weight detected on plaform");
+  this->replySocket.send(Messages::ZERO_WEIGHT);
+  this->logger.log("Informed display that no weight detected on platform");
+  std::string zeroWeightResponse;
+  this->logger.log("Waiting for zero weight response from display");
+  this->replySocket.receive(zeroWeightResponse);
+  this->logger.log("Received zero weight response from display " + zeroWeightResponse);
+  return zeroWeightResponse;
 }
