@@ -2,11 +2,11 @@ import easyocr
 from ultralytics import YOLO
 from datetime import datetime
 import re
-import sys
 import cv2
+from dateutil.parser import parse
 import numpy as np
 from foodClasses import textClasses, pluMapping, openImageFoodItemList, openImagePackageItemList
-import matplotlib.pyplot as plt
+from difflib import SequenceMatcher
 
 try:
     reader = easyocr.Reader(['en'])
@@ -21,16 +21,25 @@ def cleanText(text):
     """ Normalize and clean extracted OCR text while keeping numbers. """
     return re.sub(r'[^a-zA-Z0-9\s]', '', text).strip().lower()
 
+
 def isFoodClass(text):
-    """ Check if extracted text belongs to a known classification. """
-    lowercaseTextClasses = set(cls.lower() for cls in textClasses)
-    words = cleanText(text).split()
-    for word in words:
-        print(f"Text found: {word}")
-        if len(word) > 2 and word.lower() in lowercaseTextClasses:
-            return {"type": "classification", "value": word}  # Return food category
+    """Check if extracted text belongs to a known classification, with fuzzy fallback."""
+    lowercaseTextClasses = [cls.lower() for cls in textClasses]
+    cleanedText = cleanText(text).lower()
+
+    # 1. Exact phrase search first
+    for cls in lowercaseTextClasses:
+        if cls in cleanedText:
+            return {"type": "classification", "value": cls}
+
+    # 2. Fuzzy matching fallback
+    for cls in lowercaseTextClasses:
+        matcher = SequenceMatcher(None, cls, cleanedText)
+        if matcher.find_longest_match(0, len(cls), 0, len(cleanedText)).size / len(cls) > 0.8:
+            return {"type": "classification", "value": cls}
 
     return None
+
 
 def isPLUClass(text):
     words = cleanText(text).split()
@@ -40,10 +49,10 @@ def isPLUClass(text):
         
     return None
 
+
 def extractExpirationDate(textList):
     """Extract expiration dates from text and normalize them to YYYY/MM/DD format."""
-    
-    # List of valid month abbreviations and full names
+
     validMonths = {
         "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
         "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
@@ -51,52 +60,110 @@ def extractExpirationDate(textList):
         "july": 7, "august": 8, "september": 9, "october": 10, "november": 11, "december": 12
     }
 
-    # Common expiration date patterns
     datePatterns = [
-        re.compile(r'\b(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})\b'),  # MM/DD/YYYY or DD/MM/YYYY or YYYY/MM/DD
-        re.compile(r'\b(\d{4})[./-](\d{1,2})[./-](\d{1,2})\b'),  # YYYY-MM-DD or YYYY/MM/DD
-        re.compile(r'\b(\d{1,2}) ([A-Za-z]{3,}) (\d{2,4})\b', re.IGNORECASE),  # 12 Jan 2024 or 5 July 23
-        re.compile(r'\b([A-Za-z]{3,}) (\d{1,2}),? (\d{2,4})\b', re.IGNORECASE),  # Jan 12, 2024 or July 5 23
-        re.compile(r'\b(\d{1,2})[./-](\d{1,2})\b'),  # MM/DD or DD/MM (short format)
+        # 1. Compact: DDMonYYYY (23Mar2021)
+        re.compile(r'\b(\d{1,2})([A-Za-z]{3,9})(\d{2,4})\b', re.IGNORECASE),
+
+        # 2. Verbose with ordinal (December 31st, 2023)
+        re.compile(r'\b([A-Za-z]{3,9}) (\d{1,2})(?:st|nd|rd|th)?,? (\d{2,4})\b', re.IGNORECASE),
+
+        # 3. Month DD, YYYY (March 23, 2021)
+        re.compile(r'\b([A-Za-z]{3,9}) (\d{1,2}),? (\d{2,4})\b', re.IGNORECASE),
+
+        # 4. DD Month YYYY (23 Mar 2021)
+        re.compile(r'\b(\d{1,2}) ([A-Za-z]{3,9}) (\d{2,4})\b', re.IGNORECASE),
+
+        # 5. DD-MM-YYYY / DD.MM.YYYY / DD/MM/YYYY (31-12-2023)
+        re.compile(r'\b(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})\b'),
+
+        # 6. YYYY-MM-DD / YYYY.MM.DD / YYYY/MM/DD (2023-12-31)
+        re.compile(r'\b(\d{4})[./-](\d{1,2})[./-](\d{1,2})\b'),
+
+        # 7. Year-first space-separated (2023 31 12)
+        re.compile(r'\b(\d{4})\s+(\d{1,2})\s+(\d{1,2})(?!\d)'),
+
+
+        # 8. Year-Month (YYYY-MM) (2023-12)
+        re.compile(r'\b(\d{4})[./-](\d{1,2})\b'),
+
+        # 9. Month-Year (Dec-2023)
+        re.compile(r'\b([A-Za-z]{3,9})[./-](\d{2,4})\b', re.IGNORECASE),
+
+        # 10. Numeric Month-Year (12/2023)
+        re.compile(r'\b(\d{1,2})[./-](\d{4})\b'),
+
+        # 11. Standalone Year (2025)
+        re.compile(r'\b(20\d{2})\b'),
     ]
 
     detectedDates = []
 
     for text in textList:
+        print(f"Text found: {text}")
+        found = False
         for pattern in datePatterns:
-            match = pattern.search(text)
-            if match:
+            for match in pattern.finditer(text):
+                print(f"Pattern matched: {match.group()}")
                 groups = match.groups()
-                
+                day = month = year = None
+
                 try:
                     if len(groups) == 3:
-                        if groups[0].isalpha():  # Format: "Jan 12, 2024"
+                        if pattern.pattern.startswith(r'\b(\d{4})'):  # Handle year-first patterns
+                            year, second, third = map(int, groups)
+                            # Assume second and third are day/month, disambiguate
+                            if second > 12:  # Assume day-month-year
+                                day, month = second, third
+                            else:  # Assume month-day-year
+                                month, day = second, third
+                        elif groups[0].isalpha():
                             month = validMonths.get(groups[0].lower())
                             day, year = int(groups[1]), int(groups[2])
-                        elif groups[1].isalpha():  # Format: "12 Jan 2024"
+                        elif groups[1].isalpha():
+                            day = int(groups[0])
                             month = validMonths.get(groups[1].lower())
-                            day, year = int(groups[0]), int(groups[2])
-                        else:  # Format: "MM/DD/YYYY" or "DD/MM/YYYY"
+                            year = int(groups[2])
+                        else:
                             first, second, third = map(int, groups)
-                            if first > 31:  # Assume YYYY/MM/DD
+                            if first > 31:
                                 year, month, day = first, second, third
-                            elif third > 31:  # Assume MM/DD/YYYY
+                            elif third > 31:
                                 month, day, year = first, second, third
-                            else:  # Assume DD/MM/YYYY
-                                day, month, year = first, second, third
-                    elif len(groups) == 2:  # Short format "MM/DD"
-                        month, day = map(int, groups)
-                        year = datetime.today().year  # Assume current year
-                    
-                    if year < 100:  # Convert two-digit years to four-digit
-                        year += 2000 if year < 50 else 1900
+                            else:
+                                day, month, year = first, second, third       
+                    elif len(groups) == 2:
+                        first, second = map(int, groups)
+                        year = datetime.today().year
+                        if first <= 12 and second > 12:
+                            month, day = first, second
+                        else:
+                            day, month = first, second
 
-                    normalizedDate = f"{year:04d}/{month:02d}/{day:02d}"
-                    detectedDates.append(normalizedDate)
+                    if not (month and day and year):
+                        continue
+
+                    if year < 100:
+                        year += 2000
+                    if year < 2000:
+                        continue
+
+                    dt = datetime(year, month, day)
+                    detectedDates.append(dt.strftime("%Y/%m/%d"))
+                    found = True
                 except (ValueError, TypeError):
-                    continue  # Skip invalid dates
+                    continue #invalid date
+
+        # Fallback to dateutil.parser if nothing was found from regex
+        if not found:
+            try:
+                dt = parse(text, fuzzy=True)
+                if dt.year >= 2000:
+                    detectedDates.append(dt.strftime("%Y/%m/%d"))
+            except Exception:
+                continue
 
     return detectedDates
+
 
 def preprocessImage(img):
     print("Preprocessing image")
