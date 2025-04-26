@@ -182,7 +182,6 @@ void Hardware::sendStartToVision() {
 
   FoodItem foodItem(this->imageDirectory, scanDate, this->itemWeight);
 
-  /*
   std::string response;
   this->logger.log("Sending start signal to vision: ");
   this->requestVisionSocket.send(Messages::START_SCAN);
@@ -191,14 +190,11 @@ void Hardware::sendStartToVision() {
   if (response != Messages::AFFIRMATIVE) {
     LOG(FATAL) << "ERROR sending start scan to vision";
   }
-  this->logger.log("Received ack, sending food item.");
-  */
-  this->logger.log("Sending start signal to vision: ");
+  this->logger.log("Received ack, sending food item: ");
   foodItem.logToFile(this->logger);
-  std::string response = sendFoodItem(this->requestVisionSocket, foodItem, this->logger);
-  this->logger.log("Start signal sent to vision");
+  response = sendFoodItem(this->requestVisionSocket, foodItem, this->logger);
   if (response == Messages::AFFIRMATIVE) {
-    this->logger.log("Vision acknowledged start signal");
+    this->logger.log("Vision acknowledged food item");
   }
   else {
     LOG(FATAL) << "Error sending start signal to vision";
