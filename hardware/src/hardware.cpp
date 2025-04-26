@@ -121,10 +121,12 @@ bool Hardware::checkStartSignal(int timeoutMs) {
           this->logger.log("Received start signal from display, checking weight");
 
           // Discard first weight then read
-          int weight = sendCommand(this->READ_WEIGHT);
-          weight     = sendCommand(this->READ_WEIGHT);
+          float weight = sendCommand(this->READ_WEIGHT);
+          weight       = sendCommand(this->READ_WEIGHT);
 
-          if (weight == -1) {
+          bool validWeight = checkValidWeight(weight);
+
+          if (validWeight) {
             this->logger.log("Zero weight on platform");
             std::string zeroWeightResponse = getZeroWeightResponse();
 
@@ -469,4 +471,13 @@ std::string Hardware::getZeroWeightResponse() {
   this->replySocket.receive(zeroWeightResponse);
   this->logger.log("Received zero weight response from display " + zeroWeightResponse);
   return zeroWeightResponse;
+}
+
+bool Hardware::checkValidWeight(float weight) {
+  if (weight < .5) {
+    return false;
+  }
+  else {
+    return true;
+  }
 }
