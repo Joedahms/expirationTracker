@@ -34,10 +34,8 @@ void hardwareEntry(zmqpp::context& context, bool usingMotor, bool usingCamera) {
       }
     }
     logger.log("Received start signal from display");
-    // bool scanSuccessful = hardware.startScan();
-    hardware.startScan();
+    bool scanSuccessful = hardware.startScan();
 
-    /*
     if (scanSuccessful) {
       logger.log("Scan successful");
       for (int i = 0; i < 5; i++) {
@@ -55,6 +53,5 @@ void hardwareEntry(zmqpp::context& context, bool usingMotor, bool usingCamera) {
     else {
       logger.log("Scan unsuccessful");
     }
-  */
   }
 }
