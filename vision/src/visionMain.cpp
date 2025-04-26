@@ -14,7 +14,7 @@ void visionEntry(zmqpp::context& context) {
   logger.log("Within vision process");
 
   zmqpp::socket replySocket(context, zmqpp::socket_type::reply);
-  replySocket.bind(VisionExternalEndpoints::visionMainEndpoint);
+  replySocket.bind(ExternalEndpoints::visionEndpoint);
 
   ServerAddress addresses = connectToServer(logger);
 
