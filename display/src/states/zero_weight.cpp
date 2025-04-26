@@ -34,6 +34,7 @@ bool ZeroWeight::getRetryScan() { return this->retryScan; }
 
 void ZeroWeight::retry() {
   this->displayHandler.zeroWeightChoiceToHardware(Messages::RETRY);
+  this->displayHandler.startToHardware();
 }
 
 void ZeroWeight::override() { this->currentState = EngineState::SCANNING; }
