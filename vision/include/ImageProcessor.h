@@ -22,6 +22,7 @@ public:
   void resetCancel();
   bool isCancelRequested();
   void notifyServer(const std::string&);
+
   void stopHardware();
 
 private:
