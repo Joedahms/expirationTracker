@@ -474,7 +474,7 @@ std::string Hardware::getZeroWeightResponse() {
 }
 
 bool Hardware::checkValidWeight(float weight) {
-  if (weight < .5) {
+  if (weight < 0 || weight < .5) {
     return false;
   }
   else {
