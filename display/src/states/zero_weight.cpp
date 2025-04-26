@@ -35,6 +35,7 @@ bool ZeroWeight::getRetryScan() { return this->retryScan; }
 void ZeroWeight::retry() {
   this->displayHandler.zeroWeightChoiceToHardware(Messages::RETRY);
   this->currentState = this->displayHandler.startToHardware();
+  this->retryScan    = true;
 }
 
 void ZeroWeight::override() { this->currentState = EngineState::SCANNING; }
@@ -48,10 +49,17 @@ void ZeroWeight::render() const {
   SDL_RenderPresent(this->displayGlobal.renderer);
 }
 
+void ZeroWeight::enter() {
+  this->currentState = this->defaultState;
+  this->retryScan    = false;
+}
+
 void ZeroWeight::exit() {
   // Override
   if (this->currentState == EngineState::SCANNING) {
-    this->displayHandler.zeroWeightChoiceToHardware(Messages::OVERRIDE);
+    if (this->retryScan == false) {
+      this->displayHandler.zeroWeightChoiceToHardware(Messages::OVERRIDE);
+    }
   }
   // Cancel
   else if (this->currentState == EngineState::ITEM_LIST) {
