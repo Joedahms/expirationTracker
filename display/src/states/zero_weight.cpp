@@ -32,7 +32,9 @@ ZeroWeight::ZeroWeight(const struct DisplayGlobal& displayGlobal,
 void ZeroWeight::setRetryScan(bool retryScan) { this->retryScan = retryScan; }
 bool ZeroWeight::getRetryScan() { return this->retryScan; }
 
-void ZeroWeight::retry() { this->retryScan = true; }
+void ZeroWeight::retry() {
+  this->displayHandler.zeroWeightChoiceToHardware(Messages::RETRY);
+}
 
 void ZeroWeight::override() { this->currentState = EngineState::SCANNING; }
 
@@ -54,10 +56,12 @@ void ZeroWeight::exit() {
   else if (this->currentState == EngineState::ITEM_LIST) {
     this->displayHandler.zeroWeightChoiceToHardware(Messages::CANCEL);
   }
+  /*
   // Retry
   else if (this->retryScan) {
     this->displayHandler.zeroWeightChoiceToHardware(Messages::RETRY);
     this->retryScan = false;
     this->displayHandler.startToHardware();
   }
+  */
 }
