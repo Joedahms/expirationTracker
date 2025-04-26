@@ -129,6 +129,7 @@ bool Hardware::checkStartSignal(int timeoutMs) {
           if (validWeight) {
             this->logger.log("Non-zero weight on platform: " + std::to_string(weight));
             receivedRequest = true;
+            nonzeroWeight   = true;
             this->replySocket.send(Messages::AFFIRMATIVE); // Respond to display
           }
           else {
