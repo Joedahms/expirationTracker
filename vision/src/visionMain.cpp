@@ -66,7 +66,7 @@ bool startSignalCheck(zmqpp::socket& replySocket,
   try {
     if (poller.poll(1000)) {
       if (poller.has_input(replySocket)) {
-        receiveFoodItem(replySocket, Messages::AFFIRMATIVE, foodItem);
+        // receiveFoodItem(replySocket, Messages::AFFIRMATIVE, foodItem);
         logger.log("Received start signal: ");
         foodItem.logToFile(logger);
         return true;
