@@ -195,9 +195,10 @@ void Hardware::sendStartToVision() {
   this->logger.log("Received ack, sending food item.");
   */
   this->logger.log("Sending start signal to vision");
-  std::string response = sendFoodItem(this->requestVisionSocket, foodItem);
+  std::string response = sendFoodItem(this->requestVisionSocket, foodItem, this->logger);
+  this->logger.log("Start signal sent to vision");
   if (response == Messages::AFFIRMATIVE) {
-    this->logger.log("Successfully sent start signal to vision");
+    this->logger.log("Vision acknowledged start signal");
   }
   else {
     LOG(FATAL) << "Error sending start signal to vision";

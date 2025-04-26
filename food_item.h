@@ -54,7 +54,7 @@ private:
 };
 
 FoodCategories foodCategoryFromString(const std::string&);
-std::string sendFoodItem(zmqpp::socket& socket, const FoodItem& foodItem);
+std::string sendFoodItem(zmqpp::socket& socket, const FoodItem& foodItem, Logger& logger);
 bool receiveFoodItem(zmqpp::socket& socket,
                      const std::string& response,
                      struct FoodItem& foodItem);
