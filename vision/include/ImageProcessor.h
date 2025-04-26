@@ -22,6 +22,7 @@ public:
   void resetCancel();
   bool isCancelRequested();
   void notifyServer(const std::string&);
+  void stopHardware();
 
 private:
   Logger logger;
@@ -42,7 +43,6 @@ private:
   void processImagePair(int, ClassifyObjectReturn&);
 
   void foodItemToDisplay();
-  void stopHardware();
 };
 
 #endif
