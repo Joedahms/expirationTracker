@@ -11,7 +11,7 @@ ZeroWeight::ZeroWeight(const struct DisplayGlobal& displayGlobal,
 
   const std::string titleContent = "No weight detected on platform";
   const SDL_Color titleColor     = {0, 255, 0, 255}; // Green
-  const SDL_Rect titleRect       = {0, 100, 0, 0};
+  const SDL_Rect titleRect       = {0, 50, 0, 0};
   std::unique_ptr<Text> title    = std::make_unique<Text>(
       this->displayGlobal, this->logFile, titleRect, DisplayGlobal::futuramFontPath,
       titleContent, 24, titleColor);
@@ -19,7 +19,7 @@ ZeroWeight::ZeroWeight(const struct DisplayGlobal& displayGlobal,
   this->rootElement->addElement(std::move(title));
 
   std::shared_ptr<Button> retryButton =
-      std::make_shared<Button>(this->displayGlobal, this->logFile, SDL_Rect{0, 50, 0, 0},
+      std::make_shared<Button>(this->displayGlobal, this->logFile, SDL_Rect{0, 100, 0, 0},
                                "Retry", SDL_Point{0, 0}, [this]() { retry(); });
   retryButton->setCenteredHorizontal();
 
