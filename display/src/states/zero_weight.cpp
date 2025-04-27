@@ -18,19 +18,21 @@ ZeroWeight::ZeroWeight(const struct DisplayGlobal& displayGlobal,
   title->setCenteredHorizontal();
   this->rootElement->addElement(std::move(title));
 
+  const SDL_Point buttonTextPadding = {10, 10};
+
   std::shared_ptr<Button> retryButton = std::make_shared<Button>(
       this->displayGlobal, this->logFile, SDL_Rect{0, 100, 0, 0},
-      "Retry Weight Measurement", SDL_Point{0, 0}, [this]() { retry(); });
+      "Retry Weight Measurement", buttonTextPadding, [this]() { retry(); });
   retryButton->setCenteredHorizontal();
 
   std::shared_ptr<Button> overrideButton = std::make_shared<Button>(
       this->displayGlobal, this->logFile, SDL_Rect{0, 150, 0, 0},
-      "Override and Start Scan", SDL_Point{0, 0}, [this]() { override(); });
+      "Override and Start Scan", buttonTextPadding, [this]() { override(); });
   overrideButton->setCenteredHorizontal();
 
   std::shared_ptr<Button> cancelButton =
       std::make_shared<Button>(this->displayGlobal, this->logFile, SDL_Rect{0, 200, 0, 0},
-                               "Cancel", SDL_Point{0, 0}, [this]() { cancel(); });
+                               "Cancel", buttonTextPadding, [this]() { cancel(); });
   cancelButton->setCenteredHorizontal();
 
   this->rootElement->addElement(retryButton);
