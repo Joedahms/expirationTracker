@@ -105,15 +105,26 @@ void ImageProcessor::processImagePair(int currentImageNumber,
 
   ClassifyObjectReturn sideImageReturn =
       this->modelHandler.classifyObject(sideImage, this->foodItem);
-  ClassifyObjectReturn topImageReturn =
-      this->modelHandler.classifyObject(topImage, this->foodItem);
-
-  if (sideImageReturn.foodItem || topImageReturn.foodItem) {
-    this->logger.log("Food item found.");
+  if (sideImageReturn.foodItem) {
+    this->logger.log("Food item found in side image.");
     classifyObjectReturn.foodItem = true;
   }
-  if (sideImageReturn.expirationDate || topImageReturn.expirationDate) {
-    this->logger.log("Expiration date found.");
+  if (sideImageReturn.expirationDate) {
+    this->logger.log("Expiration date found in side image.");
+    classifyObjectReturn.expirationDate = true;
+  }
+  if (classifyObjectReturn.foodItem && classifyObjectReturn.expirationDate) {
+    return;
+  }
+
+  ClassifyObjectReturn topImageReturn =
+      this->modelHandler.classifyObject(topImage, this->foodItem);
+  if (topImageReturn.foodItem) {
+    this->logger.log("Food item found in top image.");
+    classifyObjectReturn.foodItem = true;
+  }
+  if (topImageReturn.expirationDate) {
+    this->logger.log("Expiration date found in top image.");
     classifyObjectReturn.expirationDate = true;
   }
 }
