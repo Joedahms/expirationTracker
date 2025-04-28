@@ -219,7 +219,7 @@ def performOCR(image):
         height, width = image.shape[:2]
         print(f"Image height: {height} pixels")
         print(f"Image width: {width} pixels")
-        modelResults = yolo(image, imgsz=(height,width)) #yolo(image) returns a list of 'results', we should only have one because only a single image
+        modelResults = yolo(image, conf=0.7, imgsz=(height,width)) #yolo(image) returns a list of 'results', we should only have one because only a single image
         
         print("Detection complete. Filtering objects...")
         for modelResult in modelResults:
