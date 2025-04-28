@@ -215,7 +215,7 @@ def performOCR(image):
     try:
         print("Running YOLO to detect object...")
         #run yolo on unprocessed image
-        modelResults = yolo(image, conf=.5) #yolo(image) returns a list of 'results', we should only have one because only a single image
+        modelResults = yolo(image) #yolo(image) returns a list of 'results', we should only have one because only a single image
         
         print("Detection complete. Filtering objects...")
         for modelResult in modelResults:
