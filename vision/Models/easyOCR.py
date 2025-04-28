@@ -82,7 +82,6 @@ def extractExpirationDate(textList):
         # 7. Year-first space-separated (2023 31 12)
         re.compile(r'\b(\d{4})\s+(\d{1,2})\s+(\d{1,2})(?!\d)'),
 
-
         # 8. Year-Month (YYYY-MM) (2023-12)
         re.compile(r'\b(\d{4})[./-](\d{1,2})\b'),
 
@@ -155,6 +154,7 @@ def extractExpirationDate(textList):
 
         # Fallback to dateutil.parser if nothing was found from regex
         if not found:
+            print("Expiration date not found from regex, defaulting to dateutil")
             try:
                 dt = parse(text, fuzzy=True)
                 if dt.year >= 2000:
@@ -212,11 +212,11 @@ def performOCR(image):
     if isinstance(processedImage, str):
         return {"Error": processedImage}
 
-
     try:
         print("Running YOLO to detect object...")
         #run yolo on unprocessed image
         modelResults = yolo(image, conf=.5) #yolo(image) returns a list of 'results', we should only have one because only a single image
+        
         print("Detection complete. Filtering objects...")
         for modelResult in modelResults:
             for box in modelResult.boxes:
