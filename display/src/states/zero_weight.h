@@ -11,6 +11,7 @@ public:
   void setRetryScan(bool retryScan);
   bool getRetryScan();
 
+  void enter() override;
   void exit() override;
 
 private:

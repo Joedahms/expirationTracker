@@ -120,16 +120,21 @@ bool Hardware::checkStartSignal(int timeoutMs) {
 
           this->logger.log("Received start signal from display, checking weight");
 
-          nonzeroWeight = (bool)this->sendCommand('4');
-          if (nonzeroWeight == false) {
-            this->logger.log("Informing display that no weight detected on plaform");
-            this->replySocket.send(Messages::ZERO_WEIGHT);
-            this->logger.log("Informed display that no weight detected on platform");
-            std::string zeroWeightResponse;
-            this->logger.log("Waiting for zero weight response from display");
-            this->replySocket.receive(zeroWeightResponse);
-            this->logger.log("Received zero weight response from display " +
-                             zeroWeightResponse);
+          // Discard first weight then read
+          float weight = sendCommand(this->READ_WEIGHT);
+          weight       = sendCommand(this->READ_WEIGHT);
+
+          bool validWeight = checkValidWeight(weight);
+
+          if (validWeight) {
+            this->logger.log("Non-zero weight on platform: " + std::to_string(weight));
+            receivedRequest = true;
+            nonzeroWeight   = true;
+            this->replySocket.send(Messages::AFFIRMATIVE); // Respond to display
+          }
+          else {
+            this->logger.log("Zero weight on platform");
+            std::string zeroWeightResponse = getZeroWeightResponse();
 
             if (zeroWeightResponse == Messages::RETRY) {
               this->replySocket.send(Messages::AFFIRMATIVE);
@@ -150,26 +155,6 @@ bool Hardware::checkStartSignal(int timeoutMs) {
             else {
               this->logger.log("HELP! I SHOULDN'T BE HERE! (INVALID WEIGHT)");
             }
-          }
-          else {
-            receivedRequest = true;
-            this->replySocket.send(Messages::AFFIRMATIVE); // Respond to display
-            this->logger.log("Weight non zero, getting numeric weight and starting scan");
-            this->itemWeight = sendCommand('1') * -1.00f; // weight is negative
-            while (itemWeight == -1) {
-              int errcnt = 0;
-              this->logger.log("Weight error, retrying");
-              sendCommand('2');
-              this->itemWeight = sendCommand('1') * -1.00f;
-              errcnt++;
-              if (errcnt == 5) {
-                this->logger.log("Error getting weight, setting weight to 9999");
-                this->itemWeight = 9999.0f;
-                break;
-              }
-            }
-            this->logger.log("Weight received from Arduino: " +
-                             std::to_string(this->itemWeight));
           }
         }
       }
@@ -199,17 +184,17 @@ void Hardware::sendStartToVision() {
 
   std::string response;
   this->logger.log("Sending start signal to vision: ");
-  foodItem.logToFile(this->logger);
   this->requestVisionSocket.send(Messages::START_SCAN);
   this->logger.log("Awaiting ack from vision.");
   this->requestVisionSocket.receive(response);
   if (response != Messages::AFFIRMATIVE) {
     LOG(FATAL) << "ERROR sending start scan to vision";
   }
-  this->logger.log("Received ack, sending food item.");
-  response = sendFoodItem(this->requestVisionSocket, foodItem);
+  this->logger.log("Received ack, sending food item: ");
+  foodItem.logToFile(this->logger);
+  response = sendFoodItem(this->requestVisionSocket, foodItem, this->logger);
   if (response == Messages::AFFIRMATIVE) {
-    this->logger.log("Successfully sent start signal to vision");
+    this->logger.log("Vision acknowledged food item");
   }
   else {
     LOG(FATAL) << "Error sending start signal to vision";
@@ -476,4 +461,24 @@ bool Hardware::capturePhoto(int angle) {
   this->logger.log("Exiting capturePhoto at angle: " + std::to_string(angle));
   // Always returns true
   return true;
+}
+
+std::string Hardware::getZeroWeightResponse() {
+  this->logger.log("Informing display that no weight detected on plaform");
+  this->replySocket.send(Messages::ZERO_WEIGHT);
+  this->logger.log("Informed display that no weight detected on platform");
+  std::string zeroWeightResponse;
+  this->logger.log("Waiting for zero weight response from display");
+  this->replySocket.receive(zeroWeightResponse);
+  this->logger.log("Received zero weight response from display " + zeroWeightResponse);
+  return zeroWeightResponse;
+}
+
+bool Hardware::checkValidWeight(float weight) {
+  if (weight < 0.0 || weight < 0.5) {
+    return false;
+  }
+  else {
+    return true;
+  }
 }

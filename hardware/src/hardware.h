@@ -30,9 +30,10 @@ private:
 
   std::filesystem::path imageDirectory;
 
-  const int MOTOR_IN1 = 23; // GPIO Pin for L298N IN1
-  const int MOTOR_IN2 = 24; // GPIO Pin for L298N IN2
-  // const int MOTOR_ENA 18; // GPIO Pin forL298N enable (PWM Speed Control)
+  const int MOTOR_IN1    = 23; // GPIO Pin for L298N IN1
+  const int MOTOR_IN2    = 24; // GPIO Pin for L298N IN2
+  const char READ_WEIGHT = '1';
+
   float itemWeight = 0;
   char input[10];
   char response[64];
@@ -40,6 +41,10 @@ private:
   bool usingCamera;
 
   int readLineFromArduino(char* buffer, int maxLen);
+
+  std::string getZeroWeightResponse();
+  bool checkValidWeight(float weight);
+
   void rotateAndCapture();
   bool takePhotos(int angle);
   void rotateMotor(bool clockwise);

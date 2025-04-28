@@ -8,6 +8,7 @@
 
 #include "food_item.h"
 #include "fooditem.pb.h"
+#include "logger.h"
 
 /**
  * Convert a food category enum to string
@@ -83,13 +84,21 @@ void FoodItem::setQuantity(const int& quantity) { this->quantity = quantity; }
  * @param item food item to print
  */
 
-std::string sendFoodItem(zmqpp::socket& socket, const FoodItem& foodItem) {
+std::string sendFoodItem(zmqpp::socket& socket,
+                         const FoodItem& foodItem,
+                         Logger& logger) {
+  logger.log("Converting food item to proto");
   FoodItemProto::FoodItem protoFoodItem = convertToProto(foodItem);
   std::string serializedString;
+  logger.log("Serializing proto");
   protoFoodItem.SerializeToString(&serializedString);
+  logger.log("Sending food item");
   socket.send(serializedString);
+  logger.log("Food item sent");
   std::string response;
+  logger.log("Receiving response");
   socket.receive(response);
+  logger.log("Response received");
   return response;
 }
 
