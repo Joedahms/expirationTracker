@@ -10,6 +10,9 @@ public:
 
   OCRResult runModel(const std::filesystem::path&) override;
   OCRResult handleClassification(const std::filesystem::path&) override;
+
+private:
+  void handleSideImage(const std::filesystem::path& sideImagePath);
 };
 
 #endif

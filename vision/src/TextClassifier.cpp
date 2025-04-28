@@ -46,12 +46,17 @@ OCRResult TextClassifier::runModel(const std::filesystem::path& imagePath) {
     LOG(FATAL) << "Error: Could not load image.";
     return classifications;
   }
+
   if (imagePath.string().find("side") != std::string::npos) {
+    handleSideImage(imagePath);
+
+    /*
     this->logger.log("Side image detected. Rotating now.");
     cv::rotate(image, image, cv::ROTATE_90_COUNTERCLOCKWISE);
     if (!cv::imwrite(imagePath, image)) {
       this->logger.log("Failed to save rotated image: " + imagePath.string());
     }
+    */
   }
 
   this->logger.log("Image loaded");
@@ -165,5 +170,17 @@ void TextClassifier::notifyServer(const std::string& notification) {
     if (response != "yes") {
       LOG(FATAL) << "server did not acknowledge processing stop.";
     }
+  }
+}
+
+void TextClassifier::handleSideImage(const std::filesystem::path& sideImagePath) {
+  this->logger.log("Side image detected. Rotating now.");
+  cv::Mat image = cv::imread(sideImagePath);
+  cv::rotate(image, image, cv::ROTATE_90_CLOCKWISE);
+  if (!cv::imwrite(sideImagePath, image)) {
+    this->logger.log("Failed to save rotated image: " + sideImagePath.string());
+  }
+  else {
+    this->logger.log("Successfully saved rotated image: " + sideImagePath.string());
   }
 }
