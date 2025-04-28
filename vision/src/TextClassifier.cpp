@@ -42,10 +42,18 @@ OCRResult TextClassifier::runModel(const std::filesystem::path& imagePath) {
   this->logger.log("Loading image");
   cv::Mat image = cv::imread(imagePath);
   if (image.empty()) {
-    this->logger.log("Error loading image" + imagePath.string());
+    this->logger.log("Error loading image: " + imagePath.string());
     LOG(FATAL) << "Error: Could not load image.";
     return classifications;
   }
+  if (imagePath.string().find("side") != std::string::npos) {
+    this->logger.log("Side image detected. Rotating now.");
+    cv::rotate(image, image, cv::ROTATE_90_COUNTERCLOCKWISE);
+    if (!cv::imwrite(imagePath, image)) {
+      this->logger.log("Failed to save rotated image: " + imagePath.string());
+    }
+  }
+
   this->logger.log("Image loaded");
   // Encode image as JPG
   this->logger.log("Compressing image");
