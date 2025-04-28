@@ -9,19 +9,30 @@ ZeroWeight::ZeroWeight(const struct DisplayGlobal& displayGlobal,
     : State(displayGlobal, LogFiles::ZERO_WEIGHT, state) {
   this->logger->log("Constructing zero weight state");
 
-  std::shared_ptr<Button> retryButton =
-      std::make_shared<Button>(this->displayGlobal, this->logFile, SDL_Rect{0, 50, 0, 0},
-                               "Retry", SDL_Point{0, 0}, [this]() { retry(); });
+  const std::string titleContent = "NO WEIGHT DETECTED ON PLATFORM";
+  const SDL_Color titleColor     = {0, 255, 0, 255}; // Green
+  const SDL_Rect titleRect       = {0, 50, 0, 0};
+  std::unique_ptr<Text> title    = std::make_unique<Text>(
+      this->displayGlobal, this->logFile, titleRect, DisplayGlobal::futuramFontPath,
+      titleContent, 24, titleColor);
+  title->setCenteredHorizontal();
+  this->rootElement->addElement(std::move(title));
+
+  const SDL_Point buttonTextPadding = {10, 10};
+
+  std::shared_ptr<Button> retryButton = std::make_shared<Button>(
+      this->displayGlobal, this->logFile, SDL_Rect{0, 125, 0, 0},
+      "Retry Weight Measurement", buttonTextPadding, [this]() { retry(); });
   retryButton->setCenteredHorizontal();
 
-  std::shared_ptr<Button> overrideButton =
-      std::make_shared<Button>(this->displayGlobal, this->logFile, SDL_Rect{0, 150, 0, 0},
-                               "Override", SDL_Point{0, 0}, [this]() { override(); });
+  std::shared_ptr<Button> overrideButton = std::make_shared<Button>(
+      this->displayGlobal, this->logFile, SDL_Rect{0, 200, 0, 0},
+      "Override and Start Scan", buttonTextPadding, [this]() { override(); });
   overrideButton->setCenteredHorizontal();
 
   std::shared_ptr<Button> cancelButton =
-      std::make_shared<Button>(this->displayGlobal, this->logFile, SDL_Rect{0, 250, 0, 0},
-                               "Cancel", SDL_Point{0, 0}, [this]() { cancel(); });
+      std::make_shared<Button>(this->displayGlobal, this->logFile, SDL_Rect{0, 275, 0, 0},
+                               "Cancel", buttonTextPadding, [this]() { cancel(); });
   cancelButton->setCenteredHorizontal();
 
   this->rootElement->addElement(retryButton);
