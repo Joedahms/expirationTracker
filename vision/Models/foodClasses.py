@@ -31,7 +31,8 @@ textClasses = {
     "Applesauce",
     "Honey",
     "Flour",
-    "Barbecue Sauce"
+    "Barbecue Sauce",
+    "Beans"
 }
 
 
