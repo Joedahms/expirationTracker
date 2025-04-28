@@ -44,7 +44,10 @@ ClassifyObjectReturn ModelHandler::classifyObject(const std::filesystem::path& i
       foodItem.setCategory(FoodCategories::packaged);
     }
   }
-  else if (result.hasExpirationDates()) {
+  else {
+    this->logger.log("No food detected.");
+  }
+  if (result.hasExpirationDates()) {
     // OCR return expiration date in form YYYY/MM/DD
     this->logger.log("Expiration date detected. Updating FoodItem class.");
     foodItem.setExpirationDate(
@@ -52,7 +55,7 @@ ClassifyObjectReturn ModelHandler::classifyObject(const std::filesystem::path& i
     classifyObjectReturn.expirationDate = true;
   }
   else {
-    this->logger.log("No food or expiration date detected.");
+    this->logger.log("No expiration date detected.");
   }
   this->logger.log(
       "Object classification complete. Returning result to image processor.");
