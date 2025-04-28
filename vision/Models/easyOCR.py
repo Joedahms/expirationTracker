@@ -241,7 +241,8 @@ def performOCR(image):
                     croppedText = processedImage[y1:y2, x1:x2]
 
                     # Recognize text using EasyOCR
-                    textResults = reader.readtext(croppedText, detail=0, paragraph=True, text_threshold=0.5)
+#                    textResults = reader.readtext(croppedText, detail=0, paragraph=True, text_threshold=0.5)
+                    textResults = reader.readtext(image, detail=0, paragraph=True, text_threshold=0.5)
 
                     print("Text extraction complete!")
 
