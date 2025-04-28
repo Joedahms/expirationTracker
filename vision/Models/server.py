@@ -118,9 +118,6 @@ def runServer():
                         print(f"Decoding image.")
                         # Decode image
                         image = cv2.imdecode(np.frombuffer(imageData, dtype=np.uint8), cv2.IMREAD_COLOR)
-                        height, width = image.shape[:2]
-                        print(f"Image height: {height} pixels")
-                        print(f"Image width: {width} pixels")
                         if image is None:
                             print("Error: Failed to decode image.")
                             socket.send_string("ERROR: Image decoding failed")
