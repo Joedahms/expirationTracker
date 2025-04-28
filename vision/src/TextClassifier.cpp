@@ -49,14 +49,6 @@ OCRResult TextClassifier::runModel(const std::filesystem::path& imagePath) {
 
   if (imagePath.string().find("side") != std::string::npos) {
     handleSideImage(imagePath);
-
-    /*
-    this->logger.log("Side image detected. Rotating now.");
-    cv::rotate(image, image, cv::ROTATE_90_COUNTERCLOCKWISE);
-    if (!cv::imwrite(imagePath, image)) {
-      this->logger.log("Failed to save rotated image: " + imagePath.string());
-    }
-    */
   }
 
   this->logger.log("Image loaded");
