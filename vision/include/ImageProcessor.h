@@ -40,6 +40,8 @@ private:
 
   void detectionSucceeded();
   void detectionFailed();
+  void detectionCancelled();
+
   AnalyzeObjectReturn analyze();
   void processImagePair(int, ClassifyObjectReturn&);
 

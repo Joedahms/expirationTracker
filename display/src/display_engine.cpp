@@ -182,6 +182,10 @@ void DisplayEngine::handleStateChange() {
       this->engineState = this->scanSuccess.get();
       break;
 
+    case EngineState::SCAN_FAILURE:
+      this->engineState = this->scanFailure.get();
+      break;
+
     default:
       break;
     }

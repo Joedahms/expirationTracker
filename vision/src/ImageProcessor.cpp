@@ -34,9 +34,9 @@ void ImageProcessor::process() {
     return;
   }
 
-  AnalyzeObjectReturn detectedFoodItem = analyze();
+  AnalyzeObjectReturn analyzedObject = analyze();
 
-  switch (detectedFoodItem) {
+  switch (analyzedObject) {
   case AnalyzeObjectReturn::Success:
     detectionSucceeded();
     break;
@@ -44,9 +44,7 @@ void ImageProcessor::process() {
     detectionFailed();
     break;
   case AnalyzeObjectReturn::Cancel:
-    this->logger.log("Detection of food item cancelled");
-    stopHardware();
-    break;
+    detectionCancelled();
   default:
     break;
   }
@@ -141,6 +139,13 @@ void ImageProcessor::detectionFailed() {
   else {
     LOG(FATAL) << "Received invalid message from display";
   }
+
+  stopHardware();
+}
+
+void ImageProcessor::detectionCancelled() {
+  this->logger.log("Item detection cancelled, stopping hardware...");
+  stopHardware();
 }
 
 void ImageProcessor::foodItemToDisplay() {
