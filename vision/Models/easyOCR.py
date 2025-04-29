@@ -243,6 +243,8 @@ def performOCR(image):
                     print(f"{className} in open image list...")
                     if className == "Lemon":
                         className = "Orange"
+                    elif className == "Cucumber":
+                        className = "Banana"
                     foodLabels.append(className)
                     result["Food Labels"] = foodLabels
                     return result
