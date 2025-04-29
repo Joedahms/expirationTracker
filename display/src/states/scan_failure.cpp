@@ -7,7 +7,7 @@ ScanFailure::ScanFailure(const struct DisplayGlobal& displayGlobal,
     : State(displayGlobal, LogFiles::SCAN_FAILURE, state) {
   this->logger->log("Constructing scan failure state");
 
-  const std::string messageContent = "Scan successful, is this correct?";
+  const std::string messageContent = "Scan failed";
   const SDL_Color messageColor     = {0, 255, 0, 255}; // Green
   const SDL_Rect messageRectangle  = {0, 100, 0, 0};
   std::unique_ptr<Text> message    = std::make_unique<Text>(
