@@ -110,7 +110,6 @@ void createListenerThread(zmqpp::context& context, ImageProcessor& processor) {
         logger.log("Cancel command received.");
         listenerSocket.send(Messages::AFFIRMATIVE);
         processor.requestCancel();
-        processor.stopHardware();
         logger.log("Cancel received.");
       }
       else if (command == Messages::START_SCAN) {
