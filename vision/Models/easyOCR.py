@@ -82,7 +82,6 @@ def extractExpirationDate(textList):
         # 7. Year-first space-separated (2023 31 12)
         re.compile(r'\b(\d{4})\s+(\d{1,2})\s+(\d{1,2})(?!\d)'),
 
-
         # 8. Year-Month (YYYY-MM) (2023-12)
         re.compile(r'\b(\d{4})[./-](\d{1,2})\b'),
 
@@ -155,6 +154,7 @@ def extractExpirationDate(textList):
 
         # Fallback to dateutil.parser if nothing was found from regex
         if not found:
+            print("Expiration date not found from regex, defaulting to dateutil")
             try:
                 dt = parse(text, fuzzy=True)
                 if dt.year >= 2000:
@@ -212,20 +212,35 @@ def performOCR(image):
     if isinstance(processedImage, str):
         return {"Error": processedImage}
 
-
     try:
         print("Running YOLO to detect object...")
-        #run yolo on unprocessed image
-        modelResults = yolo(image, conf=.5) #yolo(image) returns a list of 'results', we should only have one because only a single image
+
+        height, width = image.shape[:2]
+
+        # Calculate the largest multiple of 32 that's <= current dimensions
+        new_height = height - (height % 32)
+        new_width = width - (width % 32)
+
+        # Ensure dimensions don't go below 32
+        new_height = max(32, new_height)
+        new_width = max(32, new_width)
+
+        # Resize the image
+        resized_image = cv2.resize(image, (new_width, new_height))
+
+        print(f"Resized image dimensions: {resized_image.shape[:2]}")
+        modelResults = yolo(resized_image, conf=0.7, imgsz=(new_height, new_width))
+        
         print("Detection complete. Filtering objects...")
         for modelResult in modelResults:
             for box in modelResult.boxes:
                 #cycle through detection boxes from model
                 classID = int(box.cls[0])
                 className = yolo.names[classID]
+                print("Found: ", {className})
                 if classID in openImageFoodItemList:
                     #if detected known food item (mostly produce)
-                    print(f"Recognized {className}...")
+                    print(f"{className} in open image list...")
                     foodLabels.append(className)
                     result["Food Labels"] = foodLabels
                     return result
