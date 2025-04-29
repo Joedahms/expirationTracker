@@ -241,6 +241,8 @@ def performOCR(image):
                 if classID in openImageFoodItemList:
                     #if detected known food item (mostly produce)
                     print(f"{className} in open image list...")
+                    if className == "Lemon":
+                        className = "Orange"
                     foodLabels.append(className)
                     result["Food Labels"] = foodLabels
                     return result
