@@ -214,27 +214,18 @@ def performOCR(image):
 
     try:
         print("Running YOLO to detect object...")
-        #run yolo on unprocessed image
-
-        '''
-        height, width = image.shape[:2]
-        print(f"Image height: {height} pixels")
-        print(f"Image width: {width} pixels")
-        modelResults = yolo(image, conf=0.7, imgsz=(height,width)) #yolo(image) returns a list of 'results', we should only have one because only a single image
-        #modelResults = yolo(image, conf=0.5) #yolo(image) returns a list of 'results', we should only have one because only a single image
-        '''
 
         height, width = image.shape[:2]
 
-# Calculate the largest multiple of 32 that's <= current dimensions
+        # Calculate the largest multiple of 32 that's <= current dimensions
         new_height = height - (height % 32)
         new_width = width - (width % 32)
 
-# Ensure dimensions don't go below 32
+        # Ensure dimensions don't go below 32
         new_height = max(32, new_height)
         new_width = max(32, new_width)
 
-# Resize the image
+        # Resize the image
         resized_image = cv2.resize(image, (new_width, new_height))
 
         print(f"Resized image dimensions: {resized_image.shape[:2]}")
