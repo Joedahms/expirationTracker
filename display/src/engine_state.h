@@ -8,7 +8,8 @@ enum class EngineState {
   ITEM_LIST,
   ZERO_WEIGHT,
   CANCEL_SCAN_CONFIRMATION,
-  SCAN_SUCCESS
+  SCAN_SUCCESS,
+  SCAN_FAILURE
 };
 
 std::string engineStateToString(EngineState engineState);

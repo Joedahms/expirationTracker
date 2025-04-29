@@ -6,3 +6,4 @@ const std::string LogFiles::ZERO_WEIGHT = "logs/display/states/zero_weight.txt";
 const std::string LogFiles::CANCEL_SCAN_CONFIRMATION =
     "logs/display/states/cancel_scan_confirmation.txt";
 const std::string LogFiles::SCAN_SUCCESS = "logs/display/states/scan_success.txt";
+const std::string LogFiles::SCAN_FAILURE = "logs/display/states/scan_failure.txt";
