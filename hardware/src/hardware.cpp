@@ -118,7 +118,8 @@ bool Hardware::checkStartSignal(int timeoutMs) {
           std::string request;
           this->replySocket.receive(request);
 
-          this->logger.log("Received start signal from display, checking weight");
+          this->logger.log("Received start signal from display: " + request +
+                           ", checking weight");
 
           // Discard first weight then read
           float weight = sendCommand(this->READ_WEIGHT);
@@ -320,7 +321,7 @@ float Hardware::sendCommand(char commandChar) {
  */
 void Hardware::rotateAndCapture() {
   for (int angle = 0; angle < 8; angle++) {
-    this->logger.log("At location " + std::to_string(angle) + " of 8");
+    this->logger.log("At location " + std::to_string(angle + 1) + " of 8");
 
     // Leaving in T/F logic in case we need to add error handling later
     if (this->usingCamera) {
