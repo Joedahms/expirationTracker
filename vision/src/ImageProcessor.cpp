@@ -132,7 +132,7 @@ void ImageProcessor::setFoodItem(struct FoodItem& foodItem) { this->foodItem = f
 
 void ImageProcessor::detectionSucceeded() {
   this->logger.log("Item successfully detected");
-  stopHardware();
+  // stopHardware();
   foodItemToDisplay();
 }
 
@@ -151,7 +151,7 @@ void ImageProcessor::detectionFailed() {
     LOG(FATAL) << "Received invalid message from display";
   }
 
-  stopHardware();
+  // stopHardware();
 }
 
 void ImageProcessor::detectionCancelled() {
