@@ -34,9 +34,9 @@ void ImageProcessor::process() {
     return;
   }
 
-  AnalyzeObjectReturn detectedFoodItem = analyze();
+  AnalyzeObjectReturn analyzedObject = analyze();
 
-  switch (detectedFoodItem) {
+  switch (analyzedObject) {
   case AnalyzeObjectReturn::Success:
     detectionSucceeded();
     break;
@@ -44,9 +44,7 @@ void ImageProcessor::process() {
     detectionFailed();
     break;
   case AnalyzeObjectReturn::Cancel:
-    this->logger.log("Detection of food item cancelled");
-    stopHardware();
-    break;
+    detectionCancelled();
   default:
     break;
   }
@@ -154,6 +152,11 @@ void ImageProcessor::detectionFailed() {
   }
 }
 
+void ImageProcessor::detectionCancelled() {
+  this->logger.log("Item detection cancelled, stopping hardware...");
+  stopHardware();
+}
+
 void ImageProcessor::foodItemToDisplay() {
   this->logger.log("Indicating detection success to display");
   this->requestDisplaySocket.send(Messages::ITEM_DETECTION_SUCCEEDED);
@@ -193,8 +196,8 @@ void ImageProcessor::stopHardware() {
       this->logger.log("Hardware requested retransmission");
     }
     else {
-      this->logger.log("Received invalid message from hardware");
-      LOG(FATAL) << "Received invalid message from hardware";
+      this->logger.log("Received invalid message from hardware: " + response);
+      LOG(FATAL) << "Received invalid message from hardware: " << response;
     }
   }
 }

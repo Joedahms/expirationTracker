@@ -12,6 +12,7 @@
 
 #include "states/cancel_scan_confirmation.h"
 #include "states/item_list.h"
+#include "states/scan_failure.h"
 #include "states/scan_success.h"
 #include "states/scanning.h"
 #include "states/zero_weight.h"
@@ -44,6 +45,7 @@ private:
   std::unique_ptr<ZeroWeight> zeroWeight;
   std::unique_ptr<CancelScanConfirmation> cancelScanConfirmation;
   std::unique_ptr<ScanSuccess> scanSuccess;
+  std::unique_ptr<ScanFailure> scanFailure;
 
   SDL_Window* setupWindow(const char* windowTitle,
                           int windowXPosition,

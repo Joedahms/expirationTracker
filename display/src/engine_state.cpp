@@ -12,6 +12,8 @@ std::string engineStateToString(EngineState engineState) {
     return "CANCEL_SCAN_CONFIRMATION";
   case EngineState::SCAN_SUCCESS:
     return "SCAN_SUCCESS";
+  case EngineState::SCAN_FAILURE:
+    return "SCAN_FAILURE";
   default:
     return "UNKNOWN";
   }

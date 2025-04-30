@@ -202,8 +202,8 @@ EngineState DisplayHandler::checkDetectionResults(EngineState currentState) {
     return EngineState::SCAN_SUCCESS;
   }
   else if (visionRequest == Messages::ITEM_DETECTION_FAILED) {
-    this->logger.log("Item detection failed, switching to item list state");
-    return EngineState::ITEM_LIST;
+    this->logger.log("Item detection failed, switching to scan failure state");
+    return EngineState::SCAN_FAILURE;
   }
   else {
     this->logger.log("Invalid request received from vision: " + visionRequest);

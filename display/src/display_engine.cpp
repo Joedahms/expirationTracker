@@ -46,6 +46,8 @@ DisplayEngine::DisplayEngine(const char* windowTitle,
       this->displayGlobal, EngineState::CANCEL_SCAN_CONFIRMATION);
   this->scanSuccess =
       std::make_unique<ScanSuccess>(this->displayGlobal, EngineState::SCAN_SUCCESS);
+  this->scanFailure =
+      std::make_unique<ScanFailure>(this->displayGlobal, EngineState::SCAN_FAILURE);
 
   this->engineState = this->itemList.get();
 
@@ -178,6 +180,10 @@ void DisplayEngine::handleStateChange() {
 
     case EngineState::SCAN_SUCCESS:
       this->engineState = this->scanSuccess.get();
+      break;
+
+    case EngineState::SCAN_FAILURE:
+      this->engineState = this->scanFailure.get();
       break;
 
     default:
