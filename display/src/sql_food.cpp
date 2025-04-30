@@ -229,9 +229,9 @@ std::vector<FoodItem> readAllFoodItemsSorted(const SortMethod& sortMethod) {
     LOG(FATAL) << "Invalid sort method";
   }
 
-  std::string readSortedQuery = "SELECT * FROM foodItems ORDER BY scanDateYear " +
-                                sqlSortMethod + ", scanDateMonth " + sqlSortMethod +
-                                ", scanDateDay " + sqlSortMethod + ";";
+  std::string readSortedQuery = "SELECT * FROM foodItems ORDER BY expirationDateYear " +
+                                sqlSortMethod + ", expirationDateMonth " + sqlSortMethod +
+                                ", expirationDateDay " + sqlSortMethod + ";";
 
   sqlite3* database = nullptr;
   openDatabase(&database);
