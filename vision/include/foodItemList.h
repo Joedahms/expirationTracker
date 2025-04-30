@@ -10,7 +10,7 @@ struct FoodInfo {
 
 inline std::unordered_map<std::string, FoodInfo> knownFoodData = {
     // Open Image foods
-    {"Apple", {30}},
+    {"Apple", {15}},
     {"Bagel", {5}},
     {"Banana", {7}},
     {"Beer", {365}},
