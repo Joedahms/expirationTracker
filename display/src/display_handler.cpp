@@ -124,30 +124,6 @@ FoodItem DisplayHandler::detectionSuccess() {
 }
 
 /**
- * If there is no weight on the platform, the user is given the chance to decide what they
- * want to do. Once the user has decided what they want to do, this function sends their
- * decision to hardware.
- *
- * @param zeroWeightChoice What the user wants to do about no weight detected.
- * @return None
- */
-void DisplayHandler::zeroWeightChoiceToHardware(const std::string& zeroWeightChoice) {
-  this->logger.log("Sending zero weight choice: " + zeroWeightChoice + " to hardware");
-
-  std::string hardwareResponse =
-      sendMessage(zeroWeightChoice, ExternalEndpoints::hardwareEndpoint);
-
-  if (hardwareResponse == Messages::AFFIRMATIVE) {
-    this->logger.log(
-        "Zero weight choice successfully sent to hardware, switching to scanning state");
-  }
-  else {
-    this->logger.log("Invalid response received from hardware: " + hardwareResponse);
-    LOG(FATAL) << "Invalid response received from hardware: " << hardwareResponse;
-  }
-}
-
-/**
  * Indicate to vision that the user requested that the scan be cancelled.
  *
  * @param None
@@ -178,10 +154,6 @@ EngineState DisplayHandler::startToHardware() {
   if (hardwareResponse == Messages::AFFIRMATIVE) {
     this->logger.log("Hardware starting scan");
     return EngineState::SCANNING;
-  }
-  else if (hardwareResponse == Messages::ZERO_WEIGHT) {
-    this->logger.log("Hardware indicated zero weight on platform");
-    return EngineState::ZERO_WEIGHT;
   }
   else {
     this->logger.log("Invalid response received from hardware: " + hardwareResponse);

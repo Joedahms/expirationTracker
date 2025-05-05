@@ -47,7 +47,6 @@ void FoodItem::logToFile(const Logger& logger) const {
              std::to_string(static_cast<unsigned>(exp.month())) + "-" +
              std::to_string(static_cast<unsigned>(exp.day())));
 
-  logger.log("Weight: " + std::to_string(this->weight) + " kg");
   logger.log("Quantity: " + std::to_string(this->quantity));
   logger.log("==================================");
 }
@@ -60,7 +59,6 @@ std::chrono::year_month_day FoodItem::getScanDate() const { return this->scanDat
 std::chrono::year_month_day FoodItem::getExpirationDate() const {
   return this->expirationDate;
 }
-float FoodItem::getWeight() const { return this->weight; }
 int FoodItem::getQuantity() const { return this->quantity; }
 
 void FoodItem::setId(const int& id) { this->id = id; }
@@ -75,7 +73,6 @@ void FoodItem::setScanDate(const std::chrono::year_month_day& scanDate) {
 void FoodItem::setExpirationDate(const std::chrono::year_month_day& expirationDate) {
   this->expirationDate = expirationDate;
 }
-void FoodItem::setWeight(const float& weight) { this->weight = weight; }
 void FoodItem::setQuantity(const int& quantity) { this->quantity = quantity; }
 
 /**
@@ -128,7 +125,6 @@ FoodItemProto::FoodItem convertToProto(const FoodItem& foodItem) {
   protoFoodItem.set_name(foodItem.getName());
   protoFoodItem.set_category(
       static_cast<FoodItemProto::FoodCategory>(foodItem.getCategory()));
-  protoFoodItem.set_weight(foodItem.getWeight());
   protoFoodItem.set_quantity(foodItem.getQuantity());
 
   // Handle dates
@@ -153,7 +149,6 @@ FoodItem convertFromProto(const FoodItemProto::FoodItem& protoFoodItem) {
   item.setImagePath(protoFoodItem.image_path());
   item.setName(protoFoodItem.name());
   item.setCategory(static_cast<FoodCategories>(protoFoodItem.category()));
-  item.setWeight(protoFoodItem.weight());
   item.setQuantity(protoFoodItem.quantity());
 
   // Handle dates

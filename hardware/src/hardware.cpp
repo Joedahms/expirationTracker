@@ -86,48 +86,9 @@ bool Hardware::checkStartSignal(int timeoutMs) {
 
     if (poller.poll(timeoutMs)) {
       if (poller.has_input(this->replySocket)) {
-        bool nonzeroWeight          = false;
-        bool zeroWeightDecisionMade = false;
-        while (nonzeroWeight == false && zeroWeightDecisionMade == false) {
-          std::string request;
-          this->replySocket.receive(request);
-
-          this->logger.log("Received start signal from display: " + request +
-                           ", checking weight");
-
-          bool validWeight = checkValidWeight(1);
-
-          if (validWeight) {
-            this->logger.log("Non-zero weight on platform: " + std::to_string(1));
-            receivedRequest = true;
-            nonzeroWeight   = true;
-            this->replySocket.send(Messages::AFFIRMATIVE); // Respond to display
-          }
-          else {
-            this->logger.log("Zero weight on platform");
-            std::string zeroWeightResponse = getZeroWeightResponse();
-
-            if (zeroWeightResponse == Messages::RETRY) {
-              this->replySocket.send(Messages::AFFIRMATIVE);
-              this->logger.log("Display decided to retry");
-              continue;
-            }
-            else if (zeroWeightResponse == Messages::OVERRIDE) {
-              receivedRequest        = true;
-              zeroWeightDecisionMade = true;
-              this->replySocket.send(Messages::AFFIRMATIVE);
-              this->logger.log("Display decided to override zero weight, starting scan");
-            }
-            else if (zeroWeightResponse == Messages::CANCEL) {
-              zeroWeightDecisionMade = true;
-              this->replySocket.send(Messages::AFFIRMATIVE);
-              this->logger.log("Display decided to cancel, aborting scan");
-            }
-            else {
-              this->logger.log("HELP! I SHOULDN'T BE HERE! (INVALID WEIGHT)");
-            }
-          }
-        }
+        std::string request;
+        this->replySocket.receive(request);
+        this->replySocket.send(Messages::AFFIRMATIVE); // Respond to display
       }
     }
     else {
@@ -151,7 +112,7 @@ void Hardware::sendStartToVision() {
 
   std::chrono::year_month_day scanDate = std::chrono::floor<std::chrono::days>(now);
 
-  FoodItem foodItem(this->imageDirectory, scanDate, 1);
+  FoodItem foodItem(this->imageDirectory, scanDate);
 
   std::string response;
   this->logger.log("Sending start signal to vision: ");
@@ -239,9 +200,6 @@ void Hardware::rotateAndCapture() {
       sleep(1);
     }
 
-    // OPTION: use weight to deteremine if item is still present
-    // float weight = sendCommand('1');
-
     // Last iteration doensn't need to check signal
     if (angle == 7) {
       return;
@@ -265,7 +223,6 @@ void Hardware::rotateAndCapture() {
     }
     if (receivedStopSignal) {
       this->logger.log("AI Vision identified item. Stopping process.");
-      // shut down motor
       digitalWrite(MOTOR_IN1, LOW);
       digitalWrite(MOTOR_IN2, LOW);
       break;
@@ -358,24 +315,4 @@ bool Hardware::capturePhoto(int angle) {
   this->logger.log("Exiting capturePhoto at angle: " + std::to_string(angle));
   // Always returns true
   return true;
-}
-
-std::string Hardware::getZeroWeightResponse() {
-  this->logger.log("Informing display that no weight detected on plaform");
-  this->replySocket.send(Messages::ZERO_WEIGHT);
-  this->logger.log("Informed display that no weight detected on platform");
-  std::string zeroWeightResponse;
-  this->logger.log("Waiting for zero weight response from display");
-  this->replySocket.receive(zeroWeightResponse);
-  this->logger.log("Received zero weight response from display " + zeroWeightResponse);
-  return zeroWeightResponse;
-}
-
-bool Hardware::checkValidWeight(float weight) {
-  if (weight < 0.0 || weight < 0.5) {
-    return false;
-  }
-  else {
-    return true;
-  }
 }

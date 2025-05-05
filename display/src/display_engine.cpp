@@ -40,8 +40,6 @@ DisplayEngine::DisplayEngine(const char* windowTitle,
   this->scanning = std::make_unique<Scanning>(this->displayGlobal, EngineState::SCANNING);
   this->itemList =
       std::make_unique<ItemList>(this->displayGlobal, EngineState::ITEM_LIST);
-  this->zeroWeight =
-      std::make_unique<ZeroWeight>(this->displayGlobal, EngineState::ZERO_WEIGHT);
   this->cancelScanConfirmation = std::make_unique<CancelScanConfirmation>(
       this->displayGlobal, EngineState::CANCEL_SCAN_CONFIRMATION);
   this->scanSuccess =
@@ -168,10 +166,6 @@ void DisplayEngine::handleStateChange() {
 
     case EngineState::ITEM_LIST:
       this->engineState = this->itemList.get();
-      break;
-
-    case EngineState::ZERO_WEIGHT:
-      this->engineState = this->zeroWeight.get();
       break;
 
     case EngineState::CANCEL_SCAN_CONFIRMATION:

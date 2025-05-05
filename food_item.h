@@ -16,13 +16,11 @@ class FoodItem {
 public:
   FoodItem() = default;
   FoodItem(const std::filesystem::path& imagePath,
-           const std::chrono::year_month_day& scanDate,
-           const float& weight)
-      : imagePath(imagePath), scanDate(scanDate), weight(weight) {}
+           const std::chrono::year_month_day& scanDate)
+      : imagePath(imagePath), scanDate(scanDate) {}
 
   std::string categoryToString() const;
 
-  // TODO print food item
   void logToFile(const Logger& logger) const;
   int getId() const;
   std::filesystem::path getImagePath() const;
@@ -30,7 +28,6 @@ public:
   FoodCategories getCategory() const;
   std::chrono::year_month_day getScanDate() const;
   std::chrono::year_month_day getExpirationDate() const;
-  float getWeight() const;
   int getQuantity() const;
 
   void setId(const int& id);
@@ -39,7 +36,6 @@ public:
   void setCategory(const FoodCategories& category);
   void setScanDate(const std::chrono::year_month_day& scanDate);
   void setExpirationDate(const std::chrono::year_month_day& expirationDate);
-  void setWeight(const float& weight);
   void setQuantity(const int& quantity);
 
 private:
@@ -49,7 +45,6 @@ private:
   FoodCategories category;
   std::chrono::year_month_day scanDate;
   std::chrono::year_month_day expirationDate;
-  float weight;
   int quantity;
 };
 

@@ -28,7 +28,6 @@ void openDatabase(sqlite3** database) {
                                "expirationDateYear INTEGER,"
                                "expirationDateMonth INTEGER,"
                                "expirationDateDay INTEGER,"
-                               "weight FLOAT,"
                                "quantity INTEGER);";
 
   char* errorMessage = nullptr;
@@ -52,7 +51,7 @@ int storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
   const char* insertSql =
       "INSERT INTO foodItems (name, category, scanDateYear, "
       "scanDateMonth, scanDateDay, expirationDateYear, expirationDateMonth, "
-      "expirationDateDay, weight, quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+      "expirationDateDay, quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
   sqlite3_stmt* statement = nullptr;
   int sqlReturn = sqlite3_prepare_v2(database, insertSql, -1, &statement, nullptr);
@@ -80,7 +79,6 @@ int storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
   sqlite3_bind_int(statement, 6, expirationDateYear);
   sqlite3_bind_int(statement, 7, expirationDateMonth);
   sqlite3_bind_int(statement, 8, expirationDateDay);
-  sqlite3_bind_double(statement, 9, foodItem.getWeight());
   sqlite3_bind_int(statement, 10, foodItem.getQuantity());
 
   sqlReturn = sqlite3_step(statement);
@@ -150,12 +148,6 @@ void setFoodItem(FoodItem& foodItem,
         expirationDate.year(), expirationDate.month(),
         std::chrono::day{static_cast<unsigned>(stoi(columnValue))}));
   }
-  // Weight not currently being used in any parts of the display but may want to add later
-  /*
-  else if (std::string(columnNames[i]) == "weight") {
-    foodItem.weight = columns[i];
-  }
-  */
   else if (columnName == "quantity") {
     foodItem.setQuantity(stoi(columnValue));
   }

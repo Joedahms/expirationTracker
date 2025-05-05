@@ -81,7 +81,6 @@ add_executable(expirationTracker
   display/src/states/state.cpp
   display/src/states/scanning.cpp
   display/src/states/item_list.cpp
-  display/src/states/zero_weight.cpp
   display/src/states/cancel_scan_confirmation.cpp
   display/src/states/scan_success.cpp
   display/src/states/scan_failure.cpp

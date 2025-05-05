@@ -32,9 +32,6 @@ private:
   const bool usingMotor;
   const bool usingCamera;
 
-  std::string getZeroWeightResponse();
-  bool checkValidWeight(float weight);
-
   void rotateAndCapture();
   bool takePhotos(int angle);
   void rotateMotor(bool clockwise);

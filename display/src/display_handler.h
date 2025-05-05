@@ -30,7 +30,6 @@ public:
   FoodItem detectionSuccess();
   EngineState startToHardware();
   void scanCancelledToVision();
-  void zeroWeightChoiceToHardware(const std::string& zeroWeightChoice);
   EngineState checkDetectionResults(EngineState currentState);
   void ignoreVision();
 
