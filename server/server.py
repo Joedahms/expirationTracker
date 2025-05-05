@@ -49,6 +49,37 @@ def waitForPiDiscovery(discoveryPort):
         except Exception as e:
             print(f"UDP error: {e}")
 
+def handleControlMessage(socket, messageParts):
+    command = messageParts[0].decode()
+    if command == "start":
+        print("Processing started.")
+        socket.send_string("yes")
+    elif command == "stop":
+        print("Processing stopped.")
+        socket.send_string("yes")
+
+def handleImage(socket, messageParts):
+    imageSize = struct.unpack("Q", messageParts[0])[0]
+    imageData = messageParts[1]
+
+    print(f"Image is {imageSize} bytes!")
+
+    print(f"Decoding image.")
+
+    image = cv2.imdecode(np.frombuffer(imageData, dtype=np.uint8), cv2.IMREAD_COLOR)
+    if image is None:
+        print("Error: Failed to decode image.")
+        socket.send_string("ERROR: Image decoding failed")
+        continue
+
+    print(f"Image decoded. Now beginning AI processing.")
+    result = json.dumps(performOCR(image))
+
+    print(f"Processing complete. Sending result back.")
+    socket.send_string(result)
+    print(f"Sent response: {result}")
+
+
 def runServer():
     config = loadConfig()
     network = config.get("network", {})
@@ -84,43 +115,9 @@ def runServer():
                 messageParts = socket.recv_multipart()  
                 try:
                     if len(messageParts) == 1:
-                        # Handle control message
-                        command = messageParts[0].decode()
-                        if command == "start":
-                            activeProcessing = True
-                            print("Processing started.")
-                            socket.send_string("yes")
-                        elif command == "stop":
-                            activeProcessing = False
-                            print("Processing stopped.")
-                            socket.send_string("yes")
-                        else:
-                            print(f"Unknown command: {command}")
-                            socket.send_string("ERROR: Unknown command")
-                    elif len(messageParts) == 2 and activeProcessing:
-                        print(f"Request received!")
-                        imageSize = struct.unpack("Q", messageParts[0])[0]
-                        imageData = messageParts[1]
-
-                        print(f"Image is {imageSize} bytes!")
-
-                        print(f"Decoding image.")
-                        # Decode image
-                        image = cv2.imdecode(np.frombuffer(imageData, dtype=np.uint8), cv2.IMREAD_COLOR)
-                        if image is None:
-                            print("Error: Failed to decode image.")
-                            socket.send_string("ERROR: Image decoding failed")
-                            continue
-                        
-                        print(f"Image decoded. Now beginning AI processing.")
-
-                        # Perform OCR
-                        result = json.dumps(performOCR(image))
-
-                        print(f"Processing complete. Sending result back.")
-                        # Send response
-                        socket.send_string(result)
-                        print(f"Sent response: {result}")
+                        handleControlMessage(socket, messageParts)
+                    elif len(messageParts) == 2:
+                        handleImage(socket, messageParts)
 
                 except Exception as e:
                     print(f"Processing error: {e}")
