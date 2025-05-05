@@ -55,6 +55,8 @@ def runServer():
     port = network.get("serverPort", DEFAULT_PORT)
     discoveryPort = network.get("discoveryPort", DEFAULT_DISCOVERY_PORT)
 
+    waitForPiDiscovery(discoveryPort)
+
     ADDRESS = f"tcp://0.0.0.0:{port}"  # Bind ZeroMQ to communicate with Pi
 
     # Create ZeroMQ context and socket
