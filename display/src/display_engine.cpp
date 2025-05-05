@@ -162,7 +162,7 @@ void DisplayEngine::handleStateChange() {
     switch (currentState) {
     case EngineState::SCANNING:
       this->engineState = this->scanning.get();
-      this->scanning.enter();
+      this->scanning->enter();
       break;
 
     case EngineState::ITEM_LIST:
