@@ -15,7 +15,6 @@
 #include "states/scan_failure.h"
 #include "states/scan_success.h"
 #include "states/scanning.h"
-#include "states/zero_weight.h"
 
 #include "display_global.h"
 #include "display_handler.h"
@@ -42,7 +41,6 @@ private:
   // States
   std::unique_ptr<Scanning> scanning;
   std::unique_ptr<ItemList> itemList;
-  std::unique_ptr<ZeroWeight> zeroWeight;
   std::unique_ptr<CancelScanConfirmation> cancelScanConfirmation;
   std::unique_ptr<ScanSuccess> scanSuccess;
   std::unique_ptr<ScanFailure> scanFailure;
