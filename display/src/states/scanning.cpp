@@ -104,4 +104,9 @@ void Scanning::render() const {
   SDL_RenderPresent(this->displayGlobal.renderer);
 }
 
+void Scanning::enter() {
+  this->currentState = this->defaultState;
+  this->displayHandler.startToHardware();
+}
+
 void Scanning::exit() {}
