@@ -1,8 +1,10 @@
 import socket
 
+from get_local_ip import getLocalIp
+
 def waitForPiDiscovery(discoveryPort):
     """Wait for a Raspberry Pi discovery request, then send the IP."""
-    serverIP = getLocalIP()
+    serverIP = getLocalIp()
     print(f"Waiting for Raspberry Pi discovery on UDP {discoveryPort}...")
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
