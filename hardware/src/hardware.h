@@ -6,17 +6,13 @@
 #include "../../endpoints.h"
 #include "../../food_item.h"
 #include "../../logger.h"
+#include "hardware_flags.h"
+
 class Hardware {
 public:
-  Hardware(zmqpp::context& context, bool usingMotor, bool usingCamera);
-
-  const char* SerialDevice = "/dev/ttyACM0";
-  int baud                 = 9600;
-  int arduino_fd           = -1;
+  Hardware(zmqpp::context& context, const HardwareFlags& hardwareFlags);
 
   void initDC();
-  int initSerialConnection(const char* device, int baudRate);
-  float sendCommand(char commandChar);
   bool checkStartSignal(int timeoutMs);
   void sendStartToVision();
   bool startScan();
@@ -30,17 +26,11 @@ private:
 
   std::filesystem::path imageDirectory;
 
-  const int MOTOR_IN1    = 23; // GPIO Pin for L298N IN1
-  const int MOTOR_IN2    = 24; // GPIO Pin for L298N IN2
-  const char READ_WEIGHT = '1';
+  const int MOTOR_IN1 = 23;
+  const int MOTOR_IN2 = 24;
 
-  float itemWeight = 0;
-  char input[10];
-  char response[64];
-  bool usingMotor;
-  bool usingCamera;
-
-  int readLineFromArduino(char* buffer, int maxLen);
+  const bool usingMotor;
+  const bool usingCamera;
 
   std::string getZeroWeightResponse();
   bool checkValidWeight(float weight);
