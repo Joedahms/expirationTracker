@@ -7,7 +7,8 @@
 
 void connectToServer() {
   std::filesystem::path currentPath = std::filesystem::current_path();
-  std::filesystem::path filePath    = currentPath / "../../network_config.json";
+  std::cout << currentPath << std::endl;
+  std::filesystem::path filePath = currentPath / "../../network_config.json";
 
   std::ifstream file(filePath);
 
