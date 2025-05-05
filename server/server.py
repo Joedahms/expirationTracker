@@ -9,7 +9,7 @@ import time
 from easyOCR import performOCR
 
 DEFAULT_DISCOVERY_PORT = 5005
-DEFAULT_PORT == 5555
+DEFAULT_PORT = 5555
 
 def loadConfig():
     config_path = os.path.join(os.path.dirname(__file__), "config.json")
