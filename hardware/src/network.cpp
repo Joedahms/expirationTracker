@@ -15,26 +15,19 @@ void connectToServer() {
   }
 
   // Parse the JSON from the file stream
-  nlohmann::json data = nlohmann::json::parse(file);
+  try {
+    nlohmann::json data = nlohmann::json::parse(file);
 
-  // Now you can work with the JSON data
-
-  // Example: Iterate through an array
-  if (data.contains("network") && data["network"].is_array()) {
-    for (const auto& item : data["network"]) {
-      std::cout << "Item: " << item << std::endl;
+    // Example: Iterate through an array
+    if (data.contains("network") && data["network"].is_array()) {
+      for (const auto& item : data["network"]) {
+        std::cout << "Item: " << item << std::endl;
+      }
     }
-  }
 
-  /*
-        // Example: Access a nested object
-        if (data.contains("address") && data["address"].is_object()) {
-            if (data["address"].contains("city")) {
-                std::string city = data["address"]["city"];
-                std::cout << "City: " << city << std::endl;
-            }
-        }
-*/
+  } catch (const nlohmann::json::parse_error& e) {
+    std::cerr << "JSON parsing error: " << e.what() << std::endl;
+  }
 
   /*
   std::string serverIp      = getServerIp();
