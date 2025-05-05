@@ -356,6 +356,7 @@ void Hardware::connectToServer() {
   std::string log = "Connected to server on " + serverAddress;
   this->logger.log(log);
   std::cout << log << std::endl;
+  sendMessage(this->requestServerSocket, "connected");
 }
 
 std::string Hardware::getServerIp() {
