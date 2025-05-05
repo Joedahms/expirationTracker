@@ -18,7 +18,7 @@
  * hardware, and display)
  */
 Hardware::Hardware(zmqpp::context& context, const HardwareFlags& hardwareFlags)
-    : logger("hardware_log.txt"),
+    : logger("hardware_log.txt"), network("../network_config.json"),
       requestServerSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
       replySocket(context, zmqpp::socket_type::reply),
@@ -40,7 +40,7 @@ Hardware::Hardware(zmqpp::context& context, const HardwareFlags& hardwareFlags)
   }
 
   try {
-    connectToServer();
+    this->network.connectToServer(this->requestServerSocket, this->logger);
     this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
     this->replySocket.bind(ExternalEndpoints::hardwareEndpoint);
   } catch (const zmqpp::exception& e) {

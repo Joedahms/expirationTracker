@@ -7,6 +7,7 @@
 #include "../../food_item.h"
 #include "../../logger.h"
 #include "hardware_flags.h"
+#include "network.h"
 
 class Hardware {
 public:
@@ -23,6 +24,7 @@ private:
   const std::string SERVER_PORT = "5555";
 
   Logger logger;
+  Network network;
 
   zmqpp::socket requestServerSocket;
   zmqpp::socket requestDisplaySocket;
