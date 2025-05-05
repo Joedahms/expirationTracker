@@ -8,10 +8,11 @@ import json
 import time
 from easyOCR import performOCR
 
-DISCOVERY_PORT = 5005 # UDP discovery port
+DEFAULT_DISCOVERY_PORT = 5005
+DEFAULT_PORT == 5555
 
 def loadConfig():
-    config_path = os.path.join(os.path.dirname(__file__), "../config.json")
+    config_path = os.path.join(os.path.dirname(__file__), "config.json")
     with open(config_path, "r") as f:
         return json.load(f)
 
@@ -51,18 +52,10 @@ def waitForPiDiscovery(discoveryPort):
 def runServer():
     config = loadConfig()
     network = config.get("network", {})
-    useEthernet = network.get("useEthernet", True) #default to ethernet if config is bad
-    port = network.get("serverPort", 5555)
-    heartbeatPort = network.get("heartbeatPort", 5556)
-    discoveryPort = network.get("discoveryPort", 5005)
-
-    if not useEthernet:
-        waitForPiDiscovery(discoveryPort)
-    else:
-        print("Skipping discovery. Binding immediately.")
+    port = network.get("serverPort", DEFAULT_PORT)
+    discoveryPort = network.get("discoveryPort", DEFAULT_DISCOVERY_PORT)
 
     ADDRESS = f"tcp://0.0.0.0:{port}"  # Bind ZeroMQ to communicate with Pi
-    HEARTBEAT_ADDRESS = f"tcp://0.0.0.0:{heartbeatPort}"
 
     # Create ZeroMQ context and socket
     context = zmq.Context()
@@ -78,8 +71,6 @@ def runServer():
     poller = zmq.Poller()
     poller.register(socket, zmq.POLLIN)
 
-    lastHeartbeatTime = time.time()
-    activeProcessing = False
     try:
         startMessage = socket.recv_string() #wait for the pi to be connected
         if startMessage == "connected":
@@ -133,30 +124,14 @@ def runServer():
                         socket.send_string(result)
                         print(f"Sent response: {result}")
 
-                        # Reset heartbeat timer after processing completes
-                        lastHeartbeatTime = time.time()
                 except Exception as e:
                     print(f"Processing error: {e}")
                     socket.send_string("ERROR: Exception during processing")
-            elif not activeProcessing:
-                try:
-                    heartbeatmessage = heartbeatSocket.recv_string(flags=zmq.NOBLOCK)
-                    if heartbeatmessage == "heartbeat":
-                        print("Received heartbeat")
-                        heartbeatSocket.send_string("alive")
-                        lastHeartbeatTime = time.time()
-                except zmq.Again:
-                    pass  # No heartbeat received
-
-                if time.time() - lastHeartbeatTime > 10:
-                    print("Pi disconnect detected. Restarting server...")
-                    break
     except KeyboardInterrupt:
         print("Server interrupted")
     finally:
         # Clean up
         socket.close()
-        heartbeatSocket.close()
         context.term()
         print("Server terminated")
 
