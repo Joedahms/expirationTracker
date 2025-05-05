@@ -1,3 +1,4 @@
+#include <arpa/inet.h>
 #include <errno.h>
 #include <filesystem>
 #include <fstream>
@@ -17,7 +18,7 @@
  */
 Hardware::Hardware(zmqpp::context& context, const HardwareFlags& hardwareFlags)
     : logger("hardware_log.txt"),
-      requestVisionSocket(context, zmqpp::socket_type::request),
+      requestServerSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
       replySocket(context, zmqpp::socket_type::reply),
       usingMotor(hardwareFlags.usingMotor), usingCamera(hardwareFlags.usingCamera) {
@@ -38,11 +39,80 @@ Hardware::Hardware(zmqpp::context& context, const HardwareFlags& hardwareFlags)
   }
 
   try {
-    this->requestVisionSocket.connect(ExternalEndpoints::visionEndpoint);
+    connectToServer();
+
     this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
     this->replySocket.bind(ExternalEndpoints::hardwareEndpoint);
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
+  }
+}
+
+std::string Hardware::sendMessage(zmqpp::socket& socket, const std::string& message) {
+  this->logger.log("Sending message: " + message);
+  socket.send(message);
+  this->logger.log("Message sent, awaiting response");
+  std::string response;
+  socket.receive(response);
+  this->logger.log("Response received: " + response);
+  return response;
+}
+
+std::string Hardware::receiveMessage(const std::string& response, const int timeoutMS) {
+  try {
+    std::string request = "null";
+    if (timeoutMS == 0) {
+      this->logger.log("Receiving message with no timeout");
+      this->replySocket.receive(request, true);
+    }
+    else {
+      this->logger.log("Receiving message with " + std::to_string(timeoutMS) +
+                       " ms timeout");
+      zmqpp::poller poller;
+      poller.add(this->replySocket);
+
+      if (poller.poll(timeoutMS)) {
+        if (poller.has_input(this->replySocket)) {
+          this->replySocket.receive(request);
+          this->logger.log("Received message: " + request);
+          this->replySocket.send(response);
+        }
+      }
+    }
+
+    return request;
+  } catch (const zmqpp::exception& e) {
+    LOG(FATAL) << "zmqpp error when receiving message: " << e.what();
+  }
+}
+
+void Hardware::start() {
+  bool startSignalReceived       = false;
+  const int startSignalTimeoutMs = 1000;
+
+  if (this->usingMotor) {
+    initDC();
+  }
+
+  while (1) {
+    startSignalReceived = false;
+    while (startSignalReceived == false) {
+      logger.log("Waiting for start signal from display");
+
+      startSignalReceived = checkStartSignal(startSignalTimeoutMs);
+      if (startSignalReceived == false) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+      }
+      else {
+        FoodItem foodItem;
+        logger.log("Waiting for Food Item");
+
+        sendMessage(requestServerSocket, "start");
+        sendMessage(requestServerSocket, "stop");
+      }
+    }
+    logger.log("Received start signal from display");
+    startScan();
   }
 }
 
@@ -101,39 +171,6 @@ bool Hardware::checkStartSignal(int timeoutMs) {
 }
 
 /**
- * Sends the photo directory and weight data to the AI Vision system.
- *
- * @param weight The weight of the object on the platform.
- * @return None
- */
-void Hardware::sendStartToVision() {
-  const std::chrono::time_point<std::chrono::system_clock> now{
-      std::chrono::system_clock::now()};
-
-  std::chrono::year_month_day scanDate = std::chrono::floor<std::chrono::days>(now);
-
-  FoodItem foodItem(this->imageDirectory, scanDate);
-
-  std::string response;
-  this->logger.log("Sending start signal to vision: ");
-  this->requestVisionSocket.send(Messages::START_SCAN);
-  this->logger.log("Awaiting ack from vision.");
-  this->requestVisionSocket.receive(response);
-  if (response != Messages::AFFIRMATIVE) {
-    LOG(FATAL) << "ERROR sending start scan to vision";
-  }
-  this->logger.log("Received ack, sending food item: ");
-  foodItem.logToFile(this->logger);
-  response = sendFoodItem(this->requestVisionSocket, foodItem, this->logger);
-  if (response == Messages::AFFIRMATIVE) {
-    this->logger.log("Vision acknowledged food item");
-  }
-  else {
-    LOG(FATAL) << "Error sending start signal to vision";
-  }
-}
-
-/**
  * Start the scan of a new food item.
  *
  * @param usingCamera True if a raspberry pi camera is connected and can be used to take
@@ -185,11 +222,6 @@ void Hardware::rotateAndCapture() {
       if (takePhotos(angle) == false) {
         this->logger.log("Error taking photos");
       }
-    }
-
-    // Initiate image scanning on server
-    if (angle == 0) {
-      sendStartToVision();
     }
 
     if (this->usingMotor) {
@@ -315,4 +347,47 @@ bool Hardware::capturePhoto(int angle) {
   this->logger.log("Exiting capturePhoto at angle: " + std::to_string(angle));
   // Always returns true
   return true;
+}
+
+void Hardware::connectToServer() {
+  std::string serverIp      = getServerIp();
+  std::string serverAddress = "tcp://" + serverIp + ":" + this->SERVER_PORT;
+  this->requestServerSocket.connect(serverAddress);
+}
+
+std::string Hardware::getServerIp() {
+  int sockfd;
+  struct sockaddr_in serverAddr;
+  socklen_t addrLen = sizeof(serverAddr);
+  char buffer[1024] = {0};
+
+  // Create UDP socket
+  sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+  if (sockfd < 0) {
+    LOG(FATAL) << ("UDP socket creation failed");
+    return "";
+  }
+
+  // Enable broadcast mode
+  int broadcastEnable = 1;
+  setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &broadcastEnable, sizeof(broadcastEnable));
+
+  // Set destination address
+  memset(&serverAddr, 0, sizeof(serverAddr));
+  serverAddr.sin_family      = AF_INET;
+  serverAddr.sin_addr.s_addr = inet_addr("255.255.255.255");
+  serverAddr.sin_port        = htons(this->DISCOVERY_PORT);
+
+  // Send discovery request
+  std::string message = "DISCOVER_SERVER";
+  sendto(sockfd, message.c_str(), message.size(), 0, (struct sockaddr*)&serverAddr,
+         addrLen);
+
+  std::cout << "Discovery request sent, waiting for response..." << std::endl;
+
+  // Wait for response
+  recvfrom(sockfd, buffer, sizeof(buffer), 0, (struct sockaddr*)&serverAddr, &addrLen);
+  close(sockfd);
+
+  return std::string(buffer);
 }

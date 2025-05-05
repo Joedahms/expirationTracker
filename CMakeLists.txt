@@ -95,7 +95,6 @@ add_executable(expirationTracker
   vision/src/OCRResult.cpp
   
   #Hardware process after forked from main
-  hardware/src/hardware_entry.cpp
   hardware/src/hardware.cpp
 
   ${PROTO_SRCS}

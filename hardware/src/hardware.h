@@ -12,15 +12,25 @@ class Hardware {
 public:
   Hardware(zmqpp::context& context, const HardwareFlags& hardwareFlags);
 
-  void initDC();
-  bool checkStartSignal(int timeoutMs);
-  void sendStartToVision();
-  bool startScan();
+  void start();
 
 private:
+  void initDC();
+  bool checkStartSignal(int timeoutMs);
+  bool startScan();
+
+  const int DISCOVERY_PORT      = 5005;
+  const std::string SERVER_PORT = "5555";
+
   Logger logger;
 
-  zmqpp::socket requestVisionSocket;
+  std::string getServerIp();
+  void connectToServer();
+
+  std::string sendMessage(zmqpp::socket& socket, const std::string& message);
+  std::string receiveMessage(const std::string& response, const int timeout);
+
+  zmqpp::socket requestServerSocket;
   zmqpp::socket requestDisplaySocket;
   zmqpp::socket replySocket;
 
