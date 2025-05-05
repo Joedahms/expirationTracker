@@ -59,21 +59,17 @@ void Hardware::start() {
   while (1) {
     startSignalReceived = false;
     while (startSignalReceived == false) {
-      logger.log("Waiting for start signal from display");
-
       startSignalReceived = checkStartSignal(startSignalTimeoutMs);
       if (startSignalReceived == false) {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
       }
       else {
-        FoodItem foodItem;
-        logger.log("Waiting for Food Item");
-
-        sendMessage(requestServerSocket, "start", this->logger);
-        sendMessage(requestServerSocket, "stop", this->logger);
       }
     }
-    logger.log("Received start signal from display");
+
+    // sendMessage(requestServerSocket, "start", this->logger);
+    // sendMessage(requestServerSocket, "stop", this->logger);
+
     startScan();
   }
 }
@@ -111,6 +107,7 @@ bool Hardware::checkStartSignal(int timeoutMs) {
       if (poller.has_input(this->replySocket)) {
         std::string request;
         this->replySocket.receive(request);
+        this->logger.log("Received start signal from display");
         this->replySocket.send(Messages::AFFIRMATIVE); // Respond to display
       }
     }
