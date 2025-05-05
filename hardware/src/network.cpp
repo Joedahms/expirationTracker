@@ -6,8 +6,10 @@
 #include "network.h"
 
 void connectToServer() {
-  // Create an input file stream
-  std::ifstream file("../../network_config.json");
+  std::filesystem::path currentPath = std::filesystem::current_path();
+  std::filesystem::path filePath    = currentPath / "../../network_config.json";
+
+  std::ifstream file(filePath);
 
   // Check if file opened successfully
   if (!file.is_open()) {
