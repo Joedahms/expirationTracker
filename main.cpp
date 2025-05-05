@@ -9,28 +9,25 @@
 #include "hardware/src/hardware_entry.h"
 #include "vision/include/visionMain.h"
 
-void checkCommandLineArgs(int argc, char* argv[], bool& usingMotor, bool& usingCamera);
+HardwareFlags checkCommandLineArgs(int argc, char* argv[]);
 
 int initDisplay(zmqpp::context& context, Logger& mainLogger);
 int initHardware(zmqpp::context& context,
                  Logger& mainLogger,
-                 const bool usingMotor,
-                 const bool usingCamera);
+                 const HardwareFlags& hardwareFlags);
 int initVision(zmqpp::context& context, Logger& mainLogger);
 
 int main(int argc, char* argv[]) {
   Logger mainLogger("main.txt");
   zmqpp::context context;
 
-  bool usingMotor  = true;
-  bool usingCamera = true;
-  checkCommandLineArgs(argc, argv, usingMotor, usingCamera);
+  HardwareFlags hardwareFlags = checkCommandLineArgs(argc, argv);
 
   int displayPid = initDisplay(context, mainLogger);
   if (displayPid == 0) {
     return 0;
   }
-  int hardwarePid = initHardware(context, mainLogger, usingMotor, usingCamera);
+  int hardwarePid = initHardware(context, mainLogger, hardwareFlags);
   if (hardwarePid == 0) {
     return 0;
   }
@@ -57,28 +54,29 @@ int main(int argc, char* argv[]) {
  *
  * @param argc Number of command line arguments.
  * @param argv The command line arguments passed.
- * @param usingMotor Flag indicating whether or not to use the DC motor when performing a
- * scan.
- * @param usingCamera Flag indicating whether to use the camera(s) when performing a scan.
- * @return None
+ * @return Hardware Flags
  */
-void checkCommandLineArgs(int argc, char* argv[], bool& usingMotor, bool& usingCamera) {
+HardwareFlags checkCommandLineArgs(int argc, char* argv[]) {
   const std::string noMotorFlag  = "-nomo";
   const std::string noCameraFlag = "-nocam";
+
+  HardwareFlags hardwareFlags;
 
   for (int i = 1; i < argc; i++) {
     std::string arg(argv[i]);
     if (arg == noMotorFlag) {
-      usingMotor = false;
+      hardwareFlags.usingMotor = false;
     }
     else if (arg == noCameraFlag) {
-      usingCamera = false;
+      hardwareFlags.usingCamera = false;
     }
   }
 
   std::cout << "Starting expiration tracker..." << std::endl;
-  std::cout << "Using motor: " << usingMotor << std::endl;
-  std::cout << "Using camera: " << usingCamera << std::endl;
+  std::cout << "Using motor: " << hardwareFlags.usingMotor << std::endl;
+  std::cout << "Using camera: " << hardwareFlags.usingCamera << std::endl;
+
+  return hardwareFlags;
 }
 
 /**
@@ -130,8 +128,7 @@ int initDisplay(zmqpp::context& context, Logger& mainLogger) {
  */
 int initHardware(zmqpp::context& context,
                  Logger& mainLogger,
-                 const bool usingMotor,
-                 const bool usingCamera) {
+                 const HardwareFlags& hardwareFlags) {
   mainLogger.log("Starting hardware process..");
 
   int hardwarePid;
@@ -142,7 +139,7 @@ int initHardware(zmqpp::context& context,
   else if (hardwarePid == 0) {
     google::InitGoogleLogging("hardware");
 
-    hardwareEntry(context, usingMotor, usingCamera);
+    hardwareEntry(context, hardwareFlags);
     LOG(INFO) << "Hardware process";
     return 0;
   }

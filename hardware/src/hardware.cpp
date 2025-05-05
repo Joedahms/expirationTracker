@@ -15,13 +15,12 @@
  * @param externalEndpoints Endpoints to the main components of the system (vision,
  * hardware, and display)
  */
-Hardware::Hardware(zmqpp::context& context, bool usingMotor, bool usingCamera)
+Hardware::Hardware(zmqpp::context& context, const HardwareFlags& hardwareFlags)
     : logger("hardware_log.txt"),
       requestVisionSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
       replySocket(context, zmqpp::socket_type::reply),
-      // imageDirectory(std::filesystem::current_path() / "tmp/images/"),
-      usingMotor(usingMotor), usingCamera(usingCamera) {
+      usingMotor(hardwareFlags.usingMotor), usingCamera(hardwareFlags.usingCamera) {
   if (this->usingCamera) {
     this->imageDirectory = std::filesystem::current_path() / "tmp/images/";
 
@@ -71,31 +70,6 @@ void Hardware::initDC() {
 }
 
 /**
- * Initializes the serial connection to the Arduino.
- *
- * @param device The serial device to connect to (e.g., "/dev/ttyACM0").
- * @param baudRate The baud rate for the serial connection (e.g., 9600).
- * @return 0 on success, 1 on failure.
- */
-int Hardware::initSerialConnection(const char* device, int baudRate) {
-  arduino_fd = serialOpen(device, baudRate);
-  this->logger.log("Attempting to open serial device: " + std::string(device));
-  if (arduino_fd < 0) {
-    this->logger.log("Error: Unable to open serial device " + std::string(device));
-    return 1;
-  }
-
-  if (wiringPiSetup() == -1) {
-    this->logger.log("Error: Unable to initialize wiringPi");
-    return 1;
-  }
-
-  serialFlush(arduino_fd);
-  this->logger.log("Serial device opened successfully: " + std::string(device));
-  return 0;
-}
-
-/**
  * Checks for a start signal from the display. Return if have not received a message by
  * the timeout.
  *
@@ -121,14 +95,10 @@ bool Hardware::checkStartSignal(int timeoutMs) {
           this->logger.log("Received start signal from display: " + request +
                            ", checking weight");
 
-          // Discard first weight then read
-          float weight = sendCommand(this->READ_WEIGHT);
-          weight       = sendCommand(this->READ_WEIGHT);
-
-          bool validWeight = checkValidWeight(weight);
+          bool validWeight = checkValidWeight(1);
 
           if (validWeight) {
-            this->logger.log("Non-zero weight on platform: " + std::to_string(weight));
+            this->logger.log("Non-zero weight on platform: " + std::to_string(1));
             receivedRequest = true;
             nonzeroWeight   = true;
             this->replySocket.send(Messages::AFFIRMATIVE); // Respond to display
@@ -181,7 +151,7 @@ void Hardware::sendStartToVision() {
 
   std::chrono::year_month_day scanDate = std::chrono::floor<std::chrono::days>(now);
 
-  FoodItem foodItem(this->imageDirectory, scanDate, this->itemWeight);
+  FoodItem foodItem(this->imageDirectory, scanDate, 1);
 
   std::string response;
   this->logger.log("Sending start signal to vision: ");
@@ -231,80 +201,6 @@ bool Hardware::startScan() {
   rotateAndCapture();
   this->logger.log("Scan complete");
   return true;
-}
-
-/**
- * Reads a line from the Arduino serial port.
- *
- * @param buffer The buffer to store the read line.
- * @param maxLen The maximum length of the buffer.
- * @return The number of characters read.
- */
-int Hardware::readLineFromArduino(char* buffer, int maxLen) {
-  int i       = 0;
-  int timeout = 1000; // 1000 ms timeout
-  this->logger.log("Reading line from Arduino");
-  while (i < maxLen - 1 && timeout--) {
-    if (serialDataAvail(arduino_fd)) {
-      char c = serialGetchar(arduino_fd);
-      if (c == '\n')
-        break;
-      buffer[i++] = c;
-    }
-    else {
-      usleep(1000); // 1 ms wait
-    }
-  }
-  buffer[i] = '\0';
-  this->logger.log("Read line from Arduino: " + std::string(buffer));
-  return i;
-}
-
-/**
- * Sends a command to the Arduino and reads the response.
- *
- * @param commandChar The command character to send.
- *  Pi 5 sends:
- *  @param 1 -> request for weight
- *  @param 2 -> request for tare, notify of end of process
- *  @param 4 -> request for process start confimation
- * Arduino responds with:
- *  @return 1 -> item weight || -1 for no weight
- *  @return 2 -> 1 for confimation of tare
- *  @return 4 -> 1 - weight present || 0 - no weight
- *  @return The response from the Arduino.
- */
-float Hardware::sendCommand(char commandChar) {
-  this->logger.log("Sending command to Arduino: " + std::string(1, commandChar));
-  serialFlush(arduino_fd);
-  serialPutchar(arduino_fd, commandChar);
-
-  char response[64];
-  readLineFromArduino(response, sizeof(response));
-
-  switch (commandChar) {
-  case '1':
-    {
-      this->logger.log("Received weight from Arduino: " + std::string(response));
-      float value = atof(response);
-      return value;
-    }
-  case '2':
-    {
-      this->logger.log("Received tare confirmation from Arduino: " +
-                       std::string(response));
-      return (float)atoi(response);
-    }
-  case '4':
-    {
-      this->logger.log("Received start weight confirmation from Arduino: " +
-                       std::string(response));
-      return (float)atoi(response);
-    }
-  default:
-    fprintf(stderr, "Unknown command: %c\n", commandChar);
-    return -1.0f; // invalid fallback
-  }
 }
 
 /**

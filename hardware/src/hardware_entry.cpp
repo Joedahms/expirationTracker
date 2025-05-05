@@ -9,19 +9,18 @@
  * hardware, and display)
  * @return None
  */
-void hardwareEntry(zmqpp::context& context, bool usingMotor, bool usingCamera) {
+void hardwareEntry(zmqpp::context& context, const HardwareFlags& hardwareFlags) {
   Logger logger("hardware_entry.txt");
   logger.log("Within hardware process");
 
-  Hardware hardware(context, usingMotor, usingCamera);
+  Hardware hardware(context, hardwareFlags);
 
   bool startSignalReceived       = false;
   const int startSignalTimeoutMs = 1000;
 
-  if (usingMotor) {
+  if (hardwareFlags.usingMotor) {
     hardware.initDC();
   }
-  hardware.initSerialConnection(hardware.SerialDevice, hardware.baud);
 
   while (1) {
     startSignalReceived = false;
@@ -34,24 +33,6 @@ void hardwareEntry(zmqpp::context& context, bool usingMotor, bool usingCamera) {
       }
     }
     logger.log("Received start signal from display");
-    bool scanSuccessful = hardware.startScan();
-
-    if (scanSuccessful) {
-      logger.log("Scan successful");
-      for (int i = 0; i < 5; i++) {
-        bool tareSuccess = (bool)hardware.sendCommand('2');
-        if (tareSuccess) {
-          logger.log("Tare successful");
-          break;
-        }
-        else {
-          logger.log("Tare unsuccessful, retrying...");
-          std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        }
-      }
-    }
-    else {
-      logger.log("Scan unsuccessful");
-    }
+    hardware.startScan();
   }
 }

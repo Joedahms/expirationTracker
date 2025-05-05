@@ -3,6 +3,6 @@
 
 #include "hardware.h"
 
-void hardwareEntry(zmqpp::context& context, bool usingMotor, bool usingCamera);
+void hardwareEntry(zmqpp::context& context, const HardwareFlags& hardwareFlags);
 
 #endif
