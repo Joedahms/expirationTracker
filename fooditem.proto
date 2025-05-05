@@ -25,6 +25,5 @@ message FoodItem {
   FoodCategory category = 4;
   Date scan_date        = 5;
   Date expiration_date  = 6;
-  float weight          = 7;
-  int32 quantity        = 8;
+  int32 quantity        = 7;
 }

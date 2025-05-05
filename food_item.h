@@ -30,7 +30,6 @@ public:
   FoodCategories getCategory() const;
   std::chrono::year_month_day getScanDate() const;
   std::chrono::year_month_day getExpirationDate() const;
-  float getWeight() const;
   int getQuantity() const;
 
   void setId(const int& id);
@@ -39,7 +38,6 @@ public:
   void setCategory(const FoodCategories& category);
   void setScanDate(const std::chrono::year_month_day& scanDate);
   void setExpirationDate(const std::chrono::year_month_day& expirationDate);
-  void setWeight(const float& weight);
   void setQuantity(const int& quantity);
 
 private:
@@ -49,7 +47,6 @@ private:
   FoodCategories category;
   std::chrono::year_month_day scanDate;
   std::chrono::year_month_day expirationDate;
-  float weight;
   int quantity;
 };
 
