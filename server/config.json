@@ -1,6 +1,6 @@
 {
     "network": {
         "serverPort": 5555,
-        "discoveryPort": 5005,
+        "discoveryPort": 5005
     }
 }
