@@ -85,15 +85,6 @@ add_executable(expirationTracker
   display/src/states/scan_success.cpp
   display/src/states/scan_failure.cpp
 
-  # Vision process after forked from main
-  vision/src/helperFunctions.cpp
-  vision/src/ImageProcessor.cpp
-  vision/src/IModel.cpp
-  vision/src/ModelHandler.cpp
-  vision/src/TextClassifier.cpp
-  vision/src/visionMain.cpp
-  vision/src/OCRResult.cpp
-  
   #Hardware process after forked from main
   hardware/src/hardware.cpp
 
