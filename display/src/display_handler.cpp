@@ -155,10 +155,6 @@ EngineState DisplayHandler::startToHardware() {
     this->logger.log("Hardware starting scan");
     return EngineState::SCANNING;
   }
-  else if (hardwareResponse == Messages::ZERO_WEIGHT) {
-    this->logger.log("Hardware indicated zero weight on platform");
-    return EngineState::ZERO_WEIGHT;
-  }
   else {
     this->logger.log("Invalid response received from hardware: " + hardwareResponse);
     LOG(FATAL) << "Invalid response received from hardware: " << hardwareResponse;

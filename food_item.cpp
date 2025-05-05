@@ -47,7 +47,6 @@ void FoodItem::logToFile(const Logger& logger) const {
              std::to_string(static_cast<unsigned>(exp.month())) + "-" +
              std::to_string(static_cast<unsigned>(exp.day())));
 
-  logger.log("Weight: " + std::to_string(this->weight) + " kg");
   logger.log("Quantity: " + std::to_string(this->quantity));
   logger.log("==================================");
 }
