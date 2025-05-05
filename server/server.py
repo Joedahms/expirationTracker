@@ -62,10 +62,6 @@ def runServer():
     socket = context.socket(zmq.REP)
     socket.bind(ADDRESS)
 
-    heartbeatSocket = context.socket(zmq.REP)
-    heartbeatSocket.bind(HEARTBEAT_ADDRESS)
-    heartbeatSocket.RCVTIMEO = 0  # non-blocking receive
-    
     print(f"Server started on {ADDRESS}")
     
     poller = zmq.Poller()
