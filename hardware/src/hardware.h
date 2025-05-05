@@ -24,12 +24,6 @@ private:
 
   Logger logger;
 
-  std::string getServerIp();
-  void connectToServer();
-
-  std::string sendMessage(zmqpp::socket& socket, const std::string& message);
-  std::string receiveMessage(const std::string& response, const int timeout);
-
   zmqpp::socket requestServerSocket;
   zmqpp::socket requestDisplaySocket;
   zmqpp::socket replySocket;
@@ -45,7 +39,6 @@ private:
   void rotateAndCapture();
   bool takePhotos(int angle);
   void rotateMotor(bool clockwise);
-  bool capturePhoto(int angle);
 };
 
 #endif

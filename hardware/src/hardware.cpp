@@ -1,4 +1,3 @@
-#include <arpa/inet.h>
 #include <errno.h>
 #include <filesystem>
 #include <fstream>
@@ -8,7 +7,9 @@
 #include <unistd.h>
 #include <wiringPi.h>
 
+#include "../../zero.h"
 #include "hardware.h"
+#include "network.h"
 #include "wiringSerial.h"
 
 /**
@@ -40,49 +41,10 @@ Hardware::Hardware(zmqpp::context& context, const HardwareFlags& hardwareFlags)
 
   try {
     connectToServer();
-
     this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
     this->replySocket.bind(ExternalEndpoints::hardwareEndpoint);
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
-  }
-}
-
-std::string Hardware::sendMessage(zmqpp::socket& socket, const std::string& message) {
-  this->logger.log("Sending message: " + message);
-  socket.send(message);
-  this->logger.log("Message sent, awaiting response");
-  std::string response;
-  socket.receive(response);
-  this->logger.log("Response received: " + response);
-  return response;
-}
-
-std::string Hardware::receiveMessage(const std::string& response, const int timeoutMS) {
-  try {
-    std::string request = "null";
-    if (timeoutMS == 0) {
-      this->logger.log("Receiving message with no timeout");
-      this->replySocket.receive(request, true);
-    }
-    else {
-      this->logger.log("Receiving message with " + std::to_string(timeoutMS) +
-                       " ms timeout");
-      zmqpp::poller poller;
-      poller.add(this->replySocket);
-
-      if (poller.poll(timeoutMS)) {
-        if (poller.has_input(this->replySocket)) {
-          this->replySocket.receive(request);
-          this->logger.log("Received message: " + request);
-          this->replySocket.send(response);
-        }
-      }
-    }
-
-    return request;
-  } catch (const zmqpp::exception& e) {
-    LOG(FATAL) << "zmqpp error when receiving message: " << e.what();
   }
 }
 
@@ -107,8 +69,8 @@ void Hardware::start() {
         FoodItem foodItem;
         logger.log("Waiting for Food Item");
 
-        sendMessage(requestServerSocket, "start");
-        sendMessage(requestServerSocket, "stop");
+        sendMessage(requestServerSocket, "start", this->logger);
+        sendMessage(requestServerSocket, "stop", this->logger);
       }
     }
     logger.log("Received start signal from display");
@@ -116,27 +78,18 @@ void Hardware::start() {
   }
 }
 
-/**
- * Initializes GPIO and sensors.
- *
- * @return None
- */
 void Hardware::initDC() {
-  // Uses BCM numbering of the GPIOs and directly accesses the GPIO registers.
+  this->logger.log("Initializing Motor");
+
   wiringPiSetupPinType(WPI_PIN_BCM);
 
-  this->logger.log("Motor System Initialization");
-  // Setup DC Motor Driver Pins
   pinMode(MOTOR_IN1, OUTPUT);
   pinMode(MOTOR_IN2, OUTPUT);
-  // Frequency and pulse break ratio can be configured
-  // pinMode(MOTOR_ENA, PWM_MS_OUTPUT);
 
   digitalWrite(MOTOR_IN1, LOW);
   digitalWrite(MOTOR_IN2, LOW);
-  // pwmWrite(MOTOR_ENA, ###);
 
-  this->logger.log("Motor System Initialized.");
+  this->logger.log("Motor Initialized.");
 }
 
 /**
@@ -304,15 +257,13 @@ bool Hardware::takePhotos(int angle) {
  *
  * @return None
  */
-// likely needs to be updated after testing to confirm direction
 void Hardware::rotateMotor(bool clockwise) {
   this->logger.log("Rotating platform");
   if (clockwise) {
     this->logger.log("Rotating clockwise.");
     digitalWrite(MOTOR_IN1, HIGH);
     digitalWrite(MOTOR_IN2, LOW);
-    // pwmWrite(MOTOR_ENA, 255); // Adjust speed
-    usleep(902852); // Rotate duration
+    usleep(902852);
     digitalWrite(MOTOR_IN1, LOW);
     digitalWrite(MOTOR_IN2, LOW); // HIGH,HIGH || LOW,LOW == off
   }
@@ -320,78 +271,9 @@ void Hardware::rotateMotor(bool clockwise) {
     this->logger.log("Rotating counter-clockwise.");
     digitalWrite(MOTOR_IN1, LOW);
     digitalWrite(MOTOR_IN2, HIGH);
-    // pwmWrite(MOTOR_ENA, 255);
-    usleep(902852); // Rotate duration
+    usleep(902852);
     digitalWrite(MOTOR_IN1, LOW);
     digitalWrite(MOTOR_IN2, LOW);
   }
   this->logger.log("Platform successfully rotated");
-}
-
-/**
- * Test Function
- * Captures a photo at the given angle and saves it to the image directory
- *
- * @param int angle - the position of the platform for unique photo ID
- * @return bool - always true
- */
-bool Hardware::capturePhoto(int angle) {
-  this->logger.log("Capturing photo at position: " + std::to_string(angle));
-  std::string fileName =
-      this->imageDirectory.string() + std::to_string(angle) + "_test.jpg";
-
-  std::string command = "rpicam-jpeg -n -t 50 1920:1080:12:U --output " + fileName;
-  system(command.c_str());
-
-  this->logger.log("Photo successfully captured at position: " + std::to_string(angle));
-  this->logger.log("Exiting capturePhoto at angle: " + std::to_string(angle));
-  // Always returns true
-  return true;
-}
-
-void Hardware::connectToServer() {
-  std::string serverIp      = getServerIp();
-  std::string serverAddress = "tcp://" + serverIp + ":" + this->SERVER_PORT;
-  this->requestServerSocket.connect(serverAddress);
-  std::string log = "Connected to server on " + serverAddress;
-  this->logger.log(log);
-  std::cout << log << std::endl;
-  sendMessage(this->requestServerSocket, "connected");
-}
-
-std::string Hardware::getServerIp() {
-  int sockfd;
-  struct sockaddr_in serverAddr;
-  socklen_t addrLen = sizeof(serverAddr);
-  char buffer[1024] = {0};
-
-  // Create UDP socket
-  sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-  if (sockfd < 0) {
-    LOG(FATAL) << ("UDP socket creation failed");
-    return "";
-  }
-
-  // Enable broadcast mode
-  int broadcastEnable = 1;
-  setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &broadcastEnable, sizeof(broadcastEnable));
-
-  // Set destination address
-  memset(&serverAddr, 0, sizeof(serverAddr));
-  serverAddr.sin_family      = AF_INET;
-  serverAddr.sin_addr.s_addr = inet_addr("255.255.255.255");
-  serverAddr.sin_port        = htons(this->DISCOVERY_PORT);
-
-  // Send discovery request
-  std::string message = "DISCOVER_SERVER";
-  sendto(sockfd, message.c_str(), message.size(), 0, (struct sockaddr*)&serverAddr,
-         addrLen);
-
-  std::cout << "Discovery request sent, waiting for response..." << std::endl;
-
-  // Wait for response
-  recvfrom(sockfd, buffer, sizeof(buffer), 0, (struct sockaddr*)&serverAddr, &addrLen);
-  close(sockfd);
-
-  return std::string(buffer);
 }

@@ -7,14 +7,16 @@ import time
 
 from easyOCR import performOCR
 from load_config import loadConfig
+from get_local_ip import getLocalIp
 from wait_for_pi_discovery import waitForPiDiscovery
 from handler import handleControlMessage, handleImage
 
 DEFAULT_DISCOVERY_PORT = 5005
 DEFAULT_PORT = 5555
+CONFIG_FILENAME = "../network_config.json"
 
 def runServer():
-    config = loadConfig()
+    config = loadConfig(CONFIG_FILENAME)
     network = config.get("network", {})
     port = network.get("serverPort", DEFAULT_PORT)
     discoveryPort = network.get("discoveryPort", DEFAULT_DISCOVERY_PORT)

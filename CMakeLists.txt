@@ -44,6 +44,7 @@ add_executable(expirationTracker
   food_item.cpp
   endpoints.cpp
   logger.cpp
+  zero.cpp
 
   # Handler for messages from other processes and the display engine
   display/src/display_handler.cpp
@@ -87,6 +88,7 @@ add_executable(expirationTracker
 
   #Hardware process after forked from main
   hardware/src/hardware.cpp
+  hardware/src/network.cpp
 
   ${PROTO_SRCS}
   ${PROTO_HDRS}
