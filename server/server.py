@@ -70,7 +70,6 @@ def handleImage(socket, messageParts):
     if image is None:
         print("Error: Failed to decode image.")
         socket.send_string("ERROR: Image decoding failed")
-        continue
 
     print(f"Image decoded. Now beginning AI processing.")
     result = json.dumps(performOCR(image))
