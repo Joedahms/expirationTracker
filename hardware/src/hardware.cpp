@@ -168,11 +168,8 @@ void Hardware::rotateAndCapture() {
   for (int angle = 0; angle < 8; angle++) {
     this->logger.log("At location " + std::to_string(angle + 1) + " of 8");
 
-    // Leaving in T/F logic in case we need to add error handling later
     if (this->usingCamera) {
-      if (takePhotos(angle) == false) {
-        this->logger.log("Error taking photos");
-      }
+      takePhotos();
     }
 
     if (this->usingMotor) {
@@ -200,7 +197,7 @@ void Hardware::rotateAndCapture() {
         receivedStopSignal = true;
       }
       else {
-        this->logger.log("Received other from vision: " + request);
+        this->logger.log("Received other: " + request);
         this->replySocket.send(Messages::RETRANSMIT);
       }
     }
@@ -221,29 +218,26 @@ void Hardware::rotateAndCapture() {
  * @param int angle - the position of the platform for unique photo ID
  * @return bool - always true
  */
-bool Hardware::takePhotos(int angle) {
+void Hardware::takePhotos() {
   this->logger.log("Taking photos at position: " + std::to_string(angle));
   const std::string cmd0 = "rpicam-jpeg --camera 0";
   const std::string cmd1 = "rpicam-jpeg --camera 1";
   const std::string np   = " --nopreview";
   const std::string res  = " --width 4608 --height 2592";
   const std::string out  = " --output ";
-  const std::string to = " --timeout 50"; // DO NOT SET TO 0! Will cause infinite preview!
-  const std::string topPhoto =
+
+  const std::string topPhotoPath =
       this->imageDirectory.string() + std::to_string(angle) + "_top.jpg";
-  const std::string sidePhoto =
+  const std::string sidePhotoPath =
       this->imageDirectory.string() + std::to_string(angle) + "_side.jpg";
 
-  const std::string command0 = cmd0 + np + res + out + topPhoto;
-  const std::string command1 = cmd1 + np + res + out + sidePhoto;
+  const std::string command0 = cmd0 + np + res + out + topPhotoPath;
+  const std::string command1 = cmd1 + np + res + out + sidePhotoPath;
   system(command0.c_str());
   system(command1.c_str());
 
-  this->logger.log("Photos successfully captured at position: " + std::to_string(angle));
-  this->logger.log("Exiting takePhotos at angle: " + std::to_string(angle));
-
-  // Always returns true
-  return true;
+  this->logger.log("Photos successfully captured at position: " +
+                   std::to_string(this->angle));
 }
 
 /**

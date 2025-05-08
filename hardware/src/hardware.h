@@ -38,8 +38,10 @@ private:
   const bool usingMotor;
   const bool usingCamera;
 
+  int angle = 0;
+
   void rotateAndCapture();
-  bool takePhotos(int angle);
+  void takePhotos();
   void rotateMotor(bool clockwise);
 };
 
