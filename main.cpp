@@ -6,8 +6,7 @@
 
 #include "display/src/display_engine.h"
 #include "endpoints.h"
-#include "hardware/src/hardware_entry.h"
-#include "vision/include/visionMain.h"
+#include "hardware/src/hardware.h"
 
 HardwareFlags checkCommandLineArgs(int argc, char* argv[]);
 
@@ -15,7 +14,6 @@ int initDisplay(zmqpp::context& context, Logger& mainLogger);
 int initHardware(zmqpp::context& context,
                  Logger& mainLogger,
                  const HardwareFlags& hardwareFlags);
-int initVision(zmqpp::context& context, Logger& mainLogger);
 
 int main(int argc, char* argv[]) {
   Logger mainLogger("main.txt");
@@ -31,10 +29,6 @@ int main(int argc, char* argv[]) {
   if (hardwarePid == 0) {
     return 0;
   }
-  int visionPid = initVision(context, mainLogger);
-  if (visionPid == 0) {
-    return 0;
-  }
 
   int status;
   waitpid(displayPid, &status, 0);
@@ -42,9 +36,6 @@ int main(int argc, char* argv[]) {
 
   waitpid(hardwarePid, &status, 0);
   mainLogger.log("Hardware process terminated with status: " + status);
-
-  waitpid(visionPid, &status, 0);
-  mainLogger.log("Vision process terminated with status: " + status);
 
   return 0;
 }
@@ -139,41 +130,14 @@ int initHardware(zmqpp::context& context,
   else if (hardwarePid == 0) {
     google::InitGoogleLogging("hardware");
 
-    hardwareEntry(context, hardwareFlags);
+    Hardware hardware(context, hardwareFlags);
+    hardware.start();
+
     LOG(INFO) << "Hardware process";
     return 0;
   }
   else {
     mainLogger.log("Hardware process started successfully");
     return hardwarePid;
-  }
-}
-
-/**
- * Initialize the vision process.
- *
- * @param context zeroMQ context for creating zeroMQ sockets.
- * @param mainLogger Logger for writing to main's log file.
- * @return The PID of vision process forked off from main. Is zero in return from child
- * process.
- */
-int initVision(zmqpp::context& context, Logger& mainLogger) {
-  mainLogger.log("Starting vision process..");
-
-  int visionPid;
-  if ((visionPid = fork()) == -1) {
-    mainLogger.log("Error starting vision process");
-    LOG(FATAL) << "Error starting vision process";
-  }
-  else if (visionPid == 0) {
-    google::InitGoogleLogging("vision");
-
-    visionEntry(context);
-    LOG(INFO) << "Vision process";
-    return 0;
-  }
-  else {
-    mainLogger.log("Vision process started successfully");
-    return visionPid;
   }
 }

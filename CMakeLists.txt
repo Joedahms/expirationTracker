@@ -44,6 +44,7 @@ add_executable(expirationTracker
   food_item.cpp
   endpoints.cpp
   logger.cpp
+  zero.cpp
 
   # Handler for messages from other processes and the display engine
   display/src/display_handler.cpp
@@ -85,18 +86,9 @@ add_executable(expirationTracker
   display/src/states/scan_success.cpp
   display/src/states/scan_failure.cpp
 
-  # Vision process after forked from main
-  vision/src/helperFunctions.cpp
-  vision/src/ImageProcessor.cpp
-  vision/src/IModel.cpp
-  vision/src/ModelHandler.cpp
-  vision/src/TextClassifier.cpp
-  vision/src/visionMain.cpp
-  vision/src/OCRResult.cpp
-  
   #Hardware process after forked from main
-  hardware/src/hardware_entry.cpp
   hardware/src/hardware.cpp
+  hardware/src/network.cpp
 
   ${PROTO_SRCS}
   ${PROTO_HDRS}

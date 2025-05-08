@@ -7,7 +7,9 @@
 #include <unistd.h>
 #include <wiringPi.h>
 
+#include "../../zero.h"
 #include "hardware.h"
+#include "network.h"
 #include "wiringSerial.h"
 
 /**
@@ -16,8 +18,8 @@
  * hardware, and display)
  */
 Hardware::Hardware(zmqpp::context& context, const HardwareFlags& hardwareFlags)
-    : logger("hardware_log.txt"),
-      requestVisionSocket(context, zmqpp::socket_type::request),
+    : logger("hardware_log.txt"), network("../network_config.json"),
+      requestServerSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
       replySocket(context, zmqpp::socket_type::reply),
       usingMotor(hardwareFlags.usingMotor), usingCamera(hardwareFlags.usingCamera) {
@@ -38,7 +40,7 @@ Hardware::Hardware(zmqpp::context& context, const HardwareFlags& hardwareFlags)
   }
 
   try {
-    this->requestVisionSocket.connect(ExternalEndpoints::visionEndpoint);
+    this->network.connectToServer(this->requestServerSocket, this->logger);
     this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
     this->replySocket.bind(ExternalEndpoints::hardwareEndpoint);
   } catch (const zmqpp::exception& e) {
@@ -46,27 +48,44 @@ Hardware::Hardware(zmqpp::context& context, const HardwareFlags& hardwareFlags)
   }
 }
 
-/**
- * Initializes GPIO and sensors.
- *
- * @return None
- */
+void Hardware::start() {
+  bool startSignalReceived       = false;
+  const int startSignalTimeoutMs = 1000;
+
+  if (this->usingMotor) {
+    initDC();
+  }
+
+  while (1) {
+    startSignalReceived = false;
+    while (startSignalReceived == false) {
+      startSignalReceived = checkStartSignal(startSignalTimeoutMs);
+      if (startSignalReceived == false) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+      }
+      else {
+      }
+    }
+
+    // sendMessage(requestServerSocket, "start", this->logger);
+    // sendMessage(requestServerSocket, "stop", this->logger);
+
+    startScan();
+  }
+}
+
 void Hardware::initDC() {
-  // Uses BCM numbering of the GPIOs and directly accesses the GPIO registers.
+  this->logger.log("Initializing Motor");
+
   wiringPiSetupPinType(WPI_PIN_BCM);
 
-  this->logger.log("Motor System Initialization");
-  // Setup DC Motor Driver Pins
   pinMode(MOTOR_IN1, OUTPUT);
   pinMode(MOTOR_IN2, OUTPUT);
-  // Frequency and pulse break ratio can be configured
-  // pinMode(MOTOR_ENA, PWM_MS_OUTPUT);
 
   digitalWrite(MOTOR_IN1, LOW);
   digitalWrite(MOTOR_IN2, LOW);
-  // pwmWrite(MOTOR_ENA, ###);
 
-  this->logger.log("Motor System Initialized.");
+  this->logger.log("Motor Initialized.");
 }
 
 /**
@@ -88,6 +107,8 @@ bool Hardware::checkStartSignal(int timeoutMs) {
       if (poller.has_input(this->replySocket)) {
         std::string request;
         this->replySocket.receive(request);
+        this->logger.log("Received start signal from display");
+        receivedRequest = true;
         this->replySocket.send(Messages::AFFIRMATIVE); // Respond to display
       }
     }
@@ -97,39 +118,6 @@ bool Hardware::checkStartSignal(int timeoutMs) {
     return receivedRequest;
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
-  }
-}
-
-/**
- * Sends the photo directory and weight data to the AI Vision system.
- *
- * @param weight The weight of the object on the platform.
- * @return None
- */
-void Hardware::sendStartToVision() {
-  const std::chrono::time_point<std::chrono::system_clock> now{
-      std::chrono::system_clock::now()};
-
-  std::chrono::year_month_day scanDate = std::chrono::floor<std::chrono::days>(now);
-
-  FoodItem foodItem(this->imageDirectory, scanDate);
-
-  std::string response;
-  this->logger.log("Sending start signal to vision: ");
-  this->requestVisionSocket.send(Messages::START_SCAN);
-  this->logger.log("Awaiting ack from vision.");
-  this->requestVisionSocket.receive(response);
-  if (response != Messages::AFFIRMATIVE) {
-    LOG(FATAL) << "ERROR sending start scan to vision";
-  }
-  this->logger.log("Received ack, sending food item: ");
-  foodItem.logToFile(this->logger);
-  response = sendFoodItem(this->requestVisionSocket, foodItem, this->logger);
-  if (response == Messages::AFFIRMATIVE) {
-    this->logger.log("Vision acknowledged food item");
-  }
-  else {
-    LOG(FATAL) << "Error sending start signal to vision";
   }
 }
 
@@ -180,16 +168,8 @@ void Hardware::rotateAndCapture() {
   for (int angle = 0; angle < 8; angle++) {
     this->logger.log("At location " + std::to_string(angle + 1) + " of 8");
 
-    // Leaving in T/F logic in case we need to add error handling later
     if (this->usingCamera) {
-      if (takePhotos(angle) == false) {
-        this->logger.log("Error taking photos");
-      }
-    }
-
-    // Initiate image scanning on server
-    if (angle == 0) {
-      sendStartToVision();
+      takePhotos();
     }
 
     if (this->usingMotor) {
@@ -217,7 +197,7 @@ void Hardware::rotateAndCapture() {
         receivedStopSignal = true;
       }
       else {
-        this->logger.log("Received other from vision: " + request);
+        this->logger.log("Received other: " + request);
         this->replySocket.send(Messages::RETRANSMIT);
       }
     }
@@ -238,29 +218,26 @@ void Hardware::rotateAndCapture() {
  * @param int angle - the position of the platform for unique photo ID
  * @return bool - always true
  */
-bool Hardware::takePhotos(int angle) {
+void Hardware::takePhotos() {
   this->logger.log("Taking photos at position: " + std::to_string(angle));
   const std::string cmd0 = "rpicam-jpeg --camera 0";
   const std::string cmd1 = "rpicam-jpeg --camera 1";
   const std::string np   = " --nopreview";
   const std::string res  = " --width 4608 --height 2592";
   const std::string out  = " --output ";
-  const std::string to = " --timeout 50"; // DO NOT SET TO 0! Will cause infinite preview!
-  const std::string topPhoto =
+
+  const std::string topPhotoPath =
       this->imageDirectory.string() + std::to_string(angle) + "_top.jpg";
-  const std::string sidePhoto =
+  const std::string sidePhotoPath =
       this->imageDirectory.string() + std::to_string(angle) + "_side.jpg";
 
-  const std::string command0 = cmd0 + np + res + out + topPhoto;
-  const std::string command1 = cmd1 + np + res + out + sidePhoto;
+  const std::string command0 = cmd0 + np + res + out + topPhotoPath;
+  const std::string command1 = cmd1 + np + res + out + sidePhotoPath;
   system(command0.c_str());
   system(command1.c_str());
 
-  this->logger.log("Photos successfully captured at position: " + std::to_string(angle));
-  this->logger.log("Exiting takePhotos at angle: " + std::to_string(angle));
-
-  // Always returns true
-  return true;
+  this->logger.log("Photos successfully captured at position: " +
+                   std::to_string(this->angle));
 }
 
 /**
@@ -272,15 +249,13 @@ bool Hardware::takePhotos(int angle) {
  *
  * @return None
  */
-// likely needs to be updated after testing to confirm direction
 void Hardware::rotateMotor(bool clockwise) {
   this->logger.log("Rotating platform");
   if (clockwise) {
     this->logger.log("Rotating clockwise.");
     digitalWrite(MOTOR_IN1, HIGH);
     digitalWrite(MOTOR_IN2, LOW);
-    // pwmWrite(MOTOR_ENA, 255); // Adjust speed
-    usleep(902852); // Rotate duration
+    usleep(902852);
     digitalWrite(MOTOR_IN1, LOW);
     digitalWrite(MOTOR_IN2, LOW); // HIGH,HIGH || LOW,LOW == off
   }
@@ -288,31 +263,9 @@ void Hardware::rotateMotor(bool clockwise) {
     this->logger.log("Rotating counter-clockwise.");
     digitalWrite(MOTOR_IN1, LOW);
     digitalWrite(MOTOR_IN2, HIGH);
-    // pwmWrite(MOTOR_ENA, 255);
-    usleep(902852); // Rotate duration
+    usleep(902852);
     digitalWrite(MOTOR_IN1, LOW);
     digitalWrite(MOTOR_IN2, LOW);
   }
   this->logger.log("Platform successfully rotated");
-}
-
-/**
- * Test Function
- * Captures a photo at the given angle and saves it to the image directory
- *
- * @param int angle - the position of the platform for unique photo ID
- * @return bool - always true
- */
-bool Hardware::capturePhoto(int angle) {
-  this->logger.log("Capturing photo at position: " + std::to_string(angle));
-  std::string fileName =
-      this->imageDirectory.string() + std::to_string(angle) + "_test.jpg";
-
-  std::string command = "rpicam-jpeg -n -t 50 1920:1080:12:U --output " + fileName;
-  system(command.c_str());
-
-  this->logger.log("Photo successfully captured at position: " + std::to_string(angle));
-  this->logger.log("Exiting capturePhoto at angle: " + std::to_string(angle));
-  // Always returns true
-  return true;
 }

@@ -18,6 +18,7 @@ public:
   Scanning(const struct DisplayGlobal& displayGlobal, const EngineState& state);
   void handleEvents(bool* displayIsRunning) override;
   void render() const override;
+  void enter() override;
   void exit() override;
 
 private:
