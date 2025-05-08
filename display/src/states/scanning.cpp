@@ -107,7 +107,7 @@ void Scanning::render() const {
 void Scanning::enter() {
   std::cout << "here" << std::endl;
   this->currentState = this->defaultState;
-  this->displayHandler.startToHardware();
+  // this->displayHandler.startToHardware();
 }
 
 void Scanning::exit() {}
