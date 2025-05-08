@@ -17,34 +17,23 @@
  * @param externalEndpoints Endpoints to the main components of the system (vision,
  * hardware, and display)
  */
-Hardware::Hardware(zmqpp::context& context, const HardwareFlags& hardwareFlags)
+Hardware::Hardware(zmqpp::context& context,
+                   const std::filesystem::path& imageDirectory,
+                   const HardwareFlags& hardwareFlags)
     : logger("hardware_log.txt"), network("../network_config.json"),
+      imageDirectory(imageDirectory), topCamera(imageDirectory, "top"),
+      sideCamera(imageDirectory, "side"),
       requestServerSocket(context, zmqpp::socket_type::request),
       requestDisplaySocket(context, zmqpp::socket_type::request),
       replySocket(context, zmqpp::socket_type::reply),
       usingMotor(hardwareFlags.usingMotor), usingCamera(hardwareFlags.usingCamera) {
-  if (this->usingCamera) {
-    this->imageDirectory = std::filesystem::current_path() / "tmp/images/";
-
-    if (!std::filesystem::exists(imageDirectory)) {
-      if (std::filesystem::create_directories(imageDirectory)) {
-        this->logger.log("Created directory: " + imageDirectory.string());
-      }
-      else {
-        this->logger.log("Failed to create directory: " + imageDirectory.string());
-      }
-    }
-  }
-  else {
-    this->imageDirectory = std::filesystem::current_path() / "../images/Banana";
-  }
-
   try {
     this->network.connectToServer(this->requestServerSocket, this->logger);
     this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
     this->replySocket.bind(ExternalEndpoints::hardwareEndpoint);
   } catch (const zmqpp::exception& e) {
-    LOG(FATAL) << e.what();
+    std::cerr << e.what();
+    exit(1);
   }
 }
 
@@ -169,7 +158,9 @@ void Hardware::rotateAndCapture() {
     this->logger.log("At location " + std::to_string(angle + 1) + " of 8");
 
     if (this->usingCamera) {
-      takePhotos();
+      // takePhotos();
+      topCamera.takePhoto(angle);
+      sideCamera.takePhoto(angle);
     }
 
     if (this->usingMotor) {
@@ -218,6 +209,7 @@ void Hardware::rotateAndCapture() {
  * @param int angle - the position of the platform for unique photo ID
  * @return bool - always true
  */
+/*
 void Hardware::takePhotos() {
   this->logger.log("Taking photos at position: " + std::to_string(angle));
   const std::string cmd0 = "rpicam-jpeg --camera 0";
@@ -239,6 +231,7 @@ void Hardware::takePhotos() {
   this->logger.log("Photos successfully captured at position: " +
                    std::to_string(this->angle));
 }
+*/
 
 /**
  * Controls platform rotation with L298N motor driver.
