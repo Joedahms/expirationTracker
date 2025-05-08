@@ -29,7 +29,6 @@ public:
 
   FoodItem detectionSuccess();
   EngineState startToHardware();
-  void scanCancelledToVision();
   EngineState checkDetectionResults(EngineState currentState);
   void ignoreVision();
 
@@ -40,7 +39,6 @@ private:
   Logger logger;
 
   zmqpp::socket requestHardwareSocket;
-  zmqpp::socket requestVisionSocket;
   zmqpp::socket replySocket;
 
   static DisplayHandler* s_instance;

@@ -1,6 +1,5 @@
 #include "endpoints.h"
 
-const std::string ExternalEndpoints::visionEndpoint   = "ipc:///tmp/vision_endpoint";
 const std::string ExternalEndpoints::hardwareEndpoint = "ipc:///tmp/hardware_endpoint";
 const std::string ExternalEndpoints::displayEndpoint  = "ipc:///tmp/display_endpoint";
 

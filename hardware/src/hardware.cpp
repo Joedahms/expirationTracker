@@ -3,6 +3,7 @@
 #include <fstream>
 #include <glog/logging.h>
 #include <iostream>
+#include <opencv2/opencv.hpp>
 #include <string>
 #include <unistd.h>
 #include <wiringPi.h>
@@ -203,37 +204,6 @@ void Hardware::rotateAndCapture() {
 }
 
 /**
- * Takes two photos, one top & side, saves them to the image directory, and logs
- * Note: current "top camera" is ribbon port closer to USB
- *
- * @param int angle - the position of the platform for unique photo ID
- * @return bool - always true
- */
-/*
-void Hardware::takePhotos() {
-  this->logger.log("Taking photos at position: " + std::to_string(angle));
-  const std::string cmd0 = "rpicam-jpeg --camera 0";
-  const std::string cmd1 = "rpicam-jpeg --camera 1";
-  const std::string np   = " --nopreview";
-  const std::string res  = " --width 4608 --height 2592";
-  const std::string out  = " --output ";
-
-  const std::string topPhotoPath =
-      this->imageDirectory.string() + std::to_string(angle) + "_top.jpg";
-  const std::string sidePhotoPath =
-      this->imageDirectory.string() + std::to_string(angle) + "_side.jpg";
-
-  const std::string command0 = cmd0 + np + res + out + topPhotoPath;
-  const std::string command1 = cmd1 + np + res + out + sidePhotoPath;
-  system(command0.c_str());
-  system(command1.c_str());
-
-  this->logger.log("Photos successfully captured at position: " +
-                   std::to_string(this->angle));
-}
-*/
-
-/**
  * Controls platform rotation with L298N motor driver.
  * Rotates for a fixed duration.
  * Timing will need to be adjusted.
@@ -261,4 +231,46 @@ void Hardware::rotateMotor(bool clockwise) {
     digitalWrite(MOTOR_IN2, LOW);
   }
   this->logger.log("Platform successfully rotated");
+}
+
+void Hardware::sendPhotos() {
+  this->logger.log("Sending angle " + std::to_string(this->angle) + " photos");
+
+  std::filesystem::path topImagePath =
+      imageDirectory / (std::to_string(this->angle) + "_top.jpg");
+  std::filesystem::path sideImagePath =
+      imageDirectory / (std::to_string(this->angle) + "_side.jpg");
+
+  this->logger.log("Looking for image: " + topImagePath.string());
+  this->logger.log("Looking for image: " + sideImagePath.string());
+
+  bool topExists  = false;
+  bool sideExists = false;
+
+  while (!(topExists && sideExists)) { // Wait until BOTH images exist
+    topExists  = std::filesystem::exists(topImagePath);
+    sideExists = std::filesystem::exists(sideImagePath);
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  }
+
+  std::ifstream topImage(topImagePath, std::ios::binary | std::ios::ate);
+  if (!topImage) {
+    std::cerr << "Failed to open file: " << topImagePath << std::endl;
+    exit(1);
+  }
+
+  std::streamsize topImageSize = topImage.tellg();
+  topImage.seekg(0, std::ios::beg);
+
+  std::vector<char> buffer(topImageSize);
+  if (!topImage.read(buffer.data(), topImageSize)) {
+    std::cerr << "Failed to read file" << std::endl;
+    exit(1);
+  }
+
+  zmqpp::message message(buffer.data(), buffer.size());
+  this->requestServerSocket.send(message);
+
+  std::string response;
+  this->requestServerSocket.receive(response);
 }

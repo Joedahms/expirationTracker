@@ -16,11 +16,9 @@ DisplayHandler* DisplayHandler::s_instance = nullptr;
 DisplayHandler::DisplayHandler(const zmqpp::context& context)
     : logger("display_handler.txt"),
       requestHardwareSocket(context, zmqpp::socket_type::request),
-      requestVisionSocket(context, zmqpp::socket_type::request),
       replySocket(context, zmqpp::socket_type::reply) {
   try {
     this->requestHardwareSocket.connect(ExternalEndpoints::hardwareEndpoint);
-    this->requestVisionSocket.connect(ExternalEndpoints::visionEndpoint);
     this->replySocket.bind(ExternalEndpoints::displayEndpoint);
   } catch (const zmqpp::exception& e) {
     LOG(FATAL) << e.what();
@@ -45,14 +43,6 @@ std::string DisplayHandler::sendMessage(const std::string& message,
       this->requestHardwareSocket.send(message);
       this->logger.log("Message sent to hardware, awaiting response");
       this->requestHardwareSocket.receive(response);
-      this->logger.log("Response received: " + response);
-      return response;
-    }
-    else if (endpoint == ExternalEndpoints::visionEndpoint) {
-      this->logger.log("Sending message to vision: " + message);
-      this->requestVisionSocket.send(message);
-      this->logger.log("Message sent to vision, awaiting response");
-      this->requestVisionSocket.receive(response);
       this->logger.log("Response received: " + response);
       return response;
     }
@@ -121,28 +111,6 @@ FoodItem DisplayHandler::detectionSuccess() {
   foodItem.logToFile(this->logger);
 
   return foodItem;
-}
-
-/**
- * Indicate to vision that the user requested that the scan be cancelled.
- *
- * @param None
- * @return None
- */
-void DisplayHandler::scanCancelledToVision() {
-  this->logger.log("Scan cancelled, sending scan cancelled message to vision");
-
-  std::string visionResponse =
-      sendMessage(Messages::SCAN_CANCELLED, ExternalEndpoints::visionEndpoint);
-
-  this->logger.log("Received response from vision");
-  if (visionResponse == Messages::AFFIRMATIVE) {
-    this->logger.log("Vision received scan cancelled message");
-  }
-  else {
-    this->logger.log("Invalid response received from vision: " + visionResponse);
-    LOG(FATAL) << "Invalid response received from vision: " << visionResponse;
-  }
 }
 
 EngineState DisplayHandler::startToHardware() {

@@ -132,7 +132,7 @@ int initHardware(zmqpp::context& context,
 
     std::filesystem::path imageDirectory;
     if (hardwareFlags.usingCamera) {
-      imageDirectory = std::filesystem::current_path() / "tmp/images/";
+      imageDirectory = std::filesystem::current_path() / "../images/cam";
 
       if (!std::filesystem::exists(imageDirectory)) {
         if (std::filesystem::create_directories(imageDirectory)) {

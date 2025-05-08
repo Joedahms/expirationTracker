@@ -13,7 +13,6 @@ private:
   const std::filesystem::path outputDirectory;
   std::string orientation;
   std::string cameraNumber;
-  // void sendPhoto();
 };
 
 #endif

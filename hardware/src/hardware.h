@@ -32,6 +32,7 @@ private:
   const std::filesystem::path imageDirectory;
   Camera topCamera;
   Camera sideCamera;
+  void sendPhotos();
 
   zmqpp::socket requestServerSocket;
   zmqpp::socket requestDisplaySocket;
@@ -46,7 +47,6 @@ private:
   int angle = 0;
 
   void rotateAndCapture();
-  // void takePhotos();
   void rotateMotor(bool clockwise);
 };
 
