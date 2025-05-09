@@ -30,7 +30,7 @@ Hardware::Hardware(zmqpp::context& context,
       replySocket(context, zmqpp::socket_type::reply),
       usingMotor(hardwareFlags.usingMotor), usingCamera(hardwareFlags.usingCamera) {
   try {
-    this->network.connectToServer(this->requestServerSocket, this->logger);
+    // this->network.connectToServer(this->requestServerSocket, this->logger);
     this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
     this->replySocket.bind(ExternalEndpoints::hardwareEndpoint);
   } catch (const zmqpp::exception& e) {
