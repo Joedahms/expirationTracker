@@ -278,14 +278,8 @@ void Hardware::sendPhotos() {
   cv::Mat gray;
   cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
 
-  // Create output image
-  cv::Mat inverted;
-
-  // Invert the colors
-  cv::bitwise_not(gray, inverted);
-
-  cv::imwrite(topImagePath, inverted);
-  tess.SetImage(inverted.data, inverted.cols, inverted.rows, 1, inverted.step);
+  cv::imwrite(topImagePath, gray);
+  tess.SetImage(gray.data, gray.cols, gray.rows, 1, gray.step);
 
   char* outText = tess.GetUTF8Text();
   std::cout << "Output:\n" << outText << std::endl;
