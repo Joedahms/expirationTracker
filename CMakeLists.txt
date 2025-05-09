@@ -11,7 +11,6 @@ set(CXXFLAGS "-Wall")
 set(CMAKE_CXX_FLAGS "${CXXFLAGS}")
 
 # Find required packages
-find_package(glog 0.4.0 REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
@@ -19,10 +18,10 @@ find_package(OpenCV REQUIRED)
 find_package(SQLite3 REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(Protobuf REQUIRED)
-find_package(Tesseract REQUIRED)
-find_package(Leptonica REQUIRED)
 
 pkg_check_modules(ZMQ REQUIRED libzmq)
+pkg_check_modules(Tesseract REQUIRED tesseract)
+pkg_check_modules(Leptonica REQUIRED lept)
 
 set(ZMQPP_INCLUDE_DIRS "/usr/local/include")
 set(ZMQPP_LIBRARIES "zmqpp")
@@ -36,6 +35,8 @@ include_directories(
   ${OpenCV_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}
   ${PROTOBUF_INCLUDE_DIRS}
+  ${Tesseract_INCLUDE_DIRS}
+  ${Leptonica_INCLUDE_DIRS}
 )
 
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS fooditem.proto)
@@ -99,21 +100,23 @@ add_executable(expirationTracker
 
 # Link all libraries
 target_link_libraries(expirationTracker
-  glog::glog
-  ${SDL2_LIBRARIES}
-  SDL2_image
-  SDL2_ttf
+  ${SDL3_LIBRARIES}
+  SDL3_image
+  SDL3_ttf
   ${OpenCV_LIBS}
-  sqlite3
+  sqlite4
   ${ZMQ_LIBRARIES}
   ${ZMQPP_LIBRARIES}
   ${PROTOBUF_LIBRARIES}
   wiringPi
-  Tesseract::Tesseract
+  ${Tesseract_LIBRARIES}
+  ${Leptonica_LIBRARIES}
 )
 
 # Add library search directories if needed
 link_directories(
   ${ZMQ_LIBRARY_DIRS}
   ${ZMQPP_LIBRARY_DIRS}
+  ${Tesseract_INCLUDE_DIRS}
+  ${Leptonica_INCLUDE_DIRS}
 )
