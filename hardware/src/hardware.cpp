@@ -271,17 +271,9 @@ void Hardware::sendPhotos() {
     exit(1);
   }
 
-  // Convert to grayscale
-  Pix* gray = pixConvertRGBToGray(image, 0.3, 0.5, 0.2);
+  Pix* gray = pixConvertTo8(image, FALSE);
 
-  // Enhance contrast
-  Pix* enhanced = pixContrastTRC(gray, NULL, 1.8);
-
-  // Adaptive binarization
-  // Another way to do adaptive thresholding
-  // Pix* binary = pixBlockBinarize(enhanced, 15, 15, 0.1);
-
-  tess.SetImage(enhanced);
+  tess.SetImage(gray);
 
   char* outText = tess.GetUTF8Text();
   std::cout << "Output:\n" << outText << std::endl;
@@ -292,7 +284,6 @@ void Hardware::sendPhotos() {
 
   // Clean up
   pixDestroy(&gray);
-  pixDestroy(&enhanced);
 
   /*
   std::ifstream topImage(topImagePath, std::ios::binary | std::ios::ate);
