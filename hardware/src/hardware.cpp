@@ -164,6 +164,7 @@ void Hardware::rotateAndCapture() {
       // takePhotos();
       topCamera.takePhoto(angle);
       sideCamera.takePhoto(angle);
+      sendPhotos();
     }
 
     if (this->usingMotor) {
