@@ -52,6 +52,6 @@ void CancelScanConfirmation::render() const {
 
 void CancelScanConfirmation::exit() {
   if (this->currentState == EngineState::ITEM_LIST) {
-    this->displayHandler.scanCancelledToVision();
+    // this->displayHandler.scanCancelledToVision();
   }
 }

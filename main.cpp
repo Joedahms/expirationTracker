@@ -130,7 +130,24 @@ int initHardware(zmqpp::context& context,
   else if (hardwarePid == 0) {
     google::InitGoogleLogging("hardware");
 
-    Hardware hardware(context, hardwareFlags);
+    std::filesystem::path imageDirectory;
+    if (hardwareFlags.usingCamera) {
+      imageDirectory = std::filesystem::current_path() / "../images/cam/";
+
+      if (!std::filesystem::exists(imageDirectory)) {
+        if (std::filesystem::create_directories(imageDirectory)) {
+          mainLogger.log("Created directory: " + imageDirectory.string());
+        }
+        else {
+          mainLogger.log("Failed to create directory: " + imageDirectory.string());
+        }
+      }
+    }
+    else {
+      imageDirectory = std::filesystem::current_path() / "../images/Banana";
+    }
+
+    Hardware hardware(context, imageDirectory, hardwareFlags);
     hardware.start();
 
     LOG(INFO) << "Hardware process";

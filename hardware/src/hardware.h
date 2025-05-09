@@ -6,12 +6,15 @@
 #include "../../endpoints.h"
 #include "../../food_item.h"
 #include "../../logger.h"
+#include "camera.h"
 #include "hardware_flags.h"
 #include "network.h"
 
 class Hardware {
 public:
-  Hardware(zmqpp::context& context, const HardwareFlags& hardwareFlags);
+  Hardware(zmqpp::context& context,
+           const std::filesystem::path& imageDirectory,
+           const HardwareFlags& hardwareFlags);
 
   void start();
 
@@ -26,11 +29,14 @@ private:
   Logger logger;
   Network network;
 
+  const std::filesystem::path imageDirectory;
+  Camera topCamera;
+  Camera sideCamera;
+  void sendPhotos();
+
   zmqpp::socket requestServerSocket;
   zmqpp::socket requestDisplaySocket;
   zmqpp::socket replySocket;
-
-  std::filesystem::path imageDirectory;
 
   const int MOTOR_IN1 = 23;
   const int MOTOR_IN2 = 24;
@@ -41,7 +47,6 @@ private:
   int angle = 0;
 
   void rotateAndCapture();
-  void takePhotos();
   void rotateMotor(bool clockwise);
 };
 
