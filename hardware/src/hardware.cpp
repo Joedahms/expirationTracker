@@ -163,7 +163,7 @@ void Hardware::rotateAndCapture() {
     if (this->usingCamera) {
       // takePhotos();
       topCamera.takePhoto(angle);
-      sideCamera.takePhoto(angle);
+      // sideCamera.takePhoto(angle);
       sendPhotos();
     }
 
@@ -271,7 +271,17 @@ void Hardware::sendPhotos() {
     exit(1);
   }
 
-  tess.SetImage(image);
+  // Convert to grayscale
+  Pix* gray = pixConvertRGBToGray(image, 0.3, 0.5, 0.2);
+
+  // Enhance contrast
+  Pix* enhanced = pixContrastTRC(gray, NULL, 1.8);
+
+  // Adaptive binarization
+  // Another way to do adaptive thresholding
+  // Pix* binary = pixBlockBinarize(enhanced, 15, 15, 0.1);
+
+  tess.SetImage(enhanced);
 
   char* outText = tess.GetUTF8Text();
   std::cout << "Output:\n" << outText << std::endl;
@@ -279,6 +289,10 @@ void Hardware::sendPhotos() {
   delete[] outText;
   tess.End();
   pixDestroy(&image);
+
+  // Clean up
+  pixDestroy(&gray);
+  pixDestroy(&enhanced);
 
   /*
   std::ifstream topImage(topImagePath, std::ios::binary | std::ios::ate);
