@@ -39,5 +39,6 @@ std::string receiveMessage(zmqpp::socket& socket,
     return request;
   } catch (const zmqpp::exception& e) {
     std::cerr << "zmqpp error when receiving message: " << e.what();
+    exit(1);
   }
 }
