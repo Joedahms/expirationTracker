@@ -100,11 +100,11 @@ add_executable(expirationTracker
 
 # Link all libraries
 target_link_libraries(expirationTracker
-  ${SDL3_LIBRARIES}
-  SDL3_image
-  SDL3_ttf
+  ${SDL2_LIBRARIES}
+  SDL2_image
+  SDL2_ttf
   ${OpenCV_LIBS}
-  sqlite4
+  sqlite3
   ${ZMQ_LIBRARIES}
   ${ZMQPP_LIBRARIES}
   ${PROTOBUF_LIBRARIES}

@@ -108,7 +108,8 @@ bool Hardware::checkStartSignal(int timeoutMs) {
     }
     return receivedRequest;
   } catch (const zmqpp::exception& e) {
-    LOG(FATAL) << e.what();
+    std::cerr << "Error checking start signal" << e.what();
+    exit(1);
   }
 }
 
@@ -242,8 +243,11 @@ void Hardware::sendPhotos() {
   std::filesystem::path sideImagePath =
       imageDirectory / (std::to_string(this->angle) + "_side.jpg");
 
-  this->logger.log("Looking for image: " + topImagePath.string());
-  this->logger.log("Looking for image: " + sideImagePath.string());
+  const std::string topImagePathString  = topImagePath.string();
+  const std::string sideImagePathString = sideImagePath.string();
+
+  this->logger.log("Looking for image: " + topImagePathString);
+  this->logger.log("Looking for image: " + sideImagePathString);
 
   bool topExists  = false;
   bool sideExists = false;
@@ -260,7 +264,20 @@ void Hardware::sendPhotos() {
     exit(1);
   }
 
-  Pix image = pixRead
+  Pix* image = pixRead(topImagePathString.c_str());
+  if (!image) {
+    std::cerr << "Failed to read image: " << topImagePathString;
+    exit(1);
+  }
+
+  tess.SetImage(image);
+
+  char* outText = tess.GetUTF8Text();
+  std::cout << "Output:\n" << outText << std::endl;
+
+  delete[] outText;
+  tess.End();
+  pixDestroy(&image);
 
   /*
   std::ifstream topImage(topImagePath, std::ios::binary | std::ios::ate);
