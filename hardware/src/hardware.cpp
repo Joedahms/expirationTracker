@@ -1,10 +1,11 @@
 #include <errno.h>
 #include <filesystem>
 #include <fstream>
-#include <glog/logging.h>
 #include <iostream>
+#include <leptonica/allheaders.h>
 #include <opencv2/opencv.hpp>
 #include <string>
+#include <tesseract/baseapi.h>
 #include <unistd.h>
 #include <wiringPi.h>
 
@@ -253,6 +254,15 @@ void Hardware::sendPhotos() {
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
 
+  tesseract::TessBaseAPI tess;
+  if (tess.Init(nullptr, "eng")) {
+    std::cerr << "Could not initialize tesseract";
+    exit(1);
+  }
+
+  Pix image = pixRead
+
+  /*
   std::ifstream topImage(topImagePath, std::ios::binary | std::ios::ate);
   if (!topImage) {
     std::cerr << "Failed to open file: " << topImagePath << std::endl;
@@ -273,4 +283,5 @@ void Hardware::sendPhotos() {
 
   std::string response;
   this->requestServerSocket.receive(response);
+  */
 }

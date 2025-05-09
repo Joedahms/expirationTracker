@@ -19,6 +19,8 @@ find_package(OpenCV REQUIRED)
 find_package(SQLite3 REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(Protobuf REQUIRED)
+find_package(Tesseract REQUIRED)
+find_package(Leptonica REQUIRED)
 
 pkg_check_modules(ZMQ REQUIRED libzmq)
 
@@ -107,6 +109,7 @@ target_link_libraries(expirationTracker
   ${ZMQPP_LIBRARIES}
   ${PROTOBUF_LIBRARIES}
   wiringPi
+  Tesseract::Tesseract
 )
 
 # Add library search directories if needed
