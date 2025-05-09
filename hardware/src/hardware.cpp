@@ -273,25 +273,19 @@ void Hardware::sendPhotos() {
   }
   */
 
-  std::cout << "here 1" << std::endl;
-
   // Load image and convert to grayscale
   cv::Mat image = cv::imread(topImagePath);
   cv::Mat gray;
   cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
 
-  std::cout << "here 2" << std::endl;
+  // Create output image
+  cv::Mat inverted;
 
-  // Apply fixed threshold
-  cv::Mat binary;
-  cv::threshold(gray, binary, 128, 255, cv::THRESH_BINARY);
+  // Invert the colors
+  cv::bitwise_not(image, inverted);
 
-  std::cout << "here 3" << std::endl;
-
-  cv::imwrite(topImagePath, binary);
-  tess.SetImage(binary.data, binary.cols, binary.rows, 1, binary.step);
-
-  std::cout << "here 4" << std::endl;
+  cv::imwrite(topImagePath, inverted);
+  tess.SetImage(inverted.data, inverted.cols, inverted.rows, 1, inverted.step);
 
   char* outText = tess.GetUTF8Text();
   std::cout << "Output:\n" << outText << std::endl;
