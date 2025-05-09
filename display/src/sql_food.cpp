@@ -15,7 +15,8 @@
 void openDatabase(sqlite3** database) {
   int sqlReturn = sqlite3_open("test.db", database);
   if (sqlReturn != SQLITE_OK) {
-    LOG(FATAL) << "Error opening database: " << sqlite3_errmsg(*database);
+    std::cerr << "Error opening database: " << sqlite3_errmsg(*database);
+    exit(1);
   }
 
   const char* createSqlTable = "CREATE TABLE IF NOT EXISTS foodItems("
@@ -33,8 +34,9 @@ void openDatabase(sqlite3** database) {
   char* errorMessage = nullptr;
   sqlReturn          = sqlite3_exec(*database, createSqlTable, NULL, NULL, &errorMessage);
   if (sqlReturn != SQLITE_OK) {
-    LOG(FATAL) << "SQL Exec Error: " << errorMessage;
+    std::cerr << "SQL Exec Error: " << errorMessage;
     sqlite3_free(errorMessage);
+    exit(1);
   }
 }
 
@@ -56,7 +58,8 @@ int storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
   sqlite3_stmt* statement = nullptr;
   int sqlReturn = sqlite3_prepare_v2(database, insertSql, -1, &statement, nullptr);
   if (sqlReturn != SQLITE_OK) {
-    LOG(FATAL) << "Prepare error: " << sqlite3_errmsg(database);
+    std::cerr << "Prepare error: " << sqlite3_errmsg(database);
+    exit(1);
   }
 
   // Pull date elements out of chrono
@@ -83,7 +86,8 @@ int storeFoodItem(sqlite3* database, struct FoodItem foodItem) {
 
   sqlReturn = sqlite3_step(statement);
   if (sqlReturn != SQLITE_DONE) {
-    LOG(FATAL) << "Execution Error: " << sqlite3_errmsg(database);
+    std::cerr << "Execution Error: " << sqlite3_errmsg(database);
+    exit(1);
   }
 
   int lastRowId = sqlite3_last_insert_rowid(database);
@@ -218,7 +222,8 @@ std::vector<FoodItem> readAllFoodItemsSorted(const SortMethod& sortMethod) {
     sqlSortMethod = "DESC";
     break;
   default:
-    LOG(FATAL) << "Invalid sort method";
+    std::cerr << "Invalid sort method";
+    exit(1);
   }
 
   std::string readSortedQuery = "SELECT * FROM foodItems ORDER BY expirationDateYear " +
@@ -304,7 +309,8 @@ void updateFoodItemQuantity(const int id, const int newQuantity) {
   int sqlReturn =
       sqlite3_exec(database, updateId.str().c_str(), nullptr, nullptr, &errorMessage);
   if (sqlReturn != SQLITE_OK) {
-    LOG(FATAL) << "Error updating food item";
+    std::cerr << "Error updating food item";
+    exit(1);
   }
 
   sqlite3_close(database);
@@ -327,7 +333,8 @@ void deleteById(const int id) {
   int sqlReturn =
       sqlite3_exec(database, deleteQuery.c_str(), nullptr, nullptr, &errorMessage);
   if (sqlReturn != SQLITE_OK) {
-    LOG(FATAL) << "Error deleting food item";
+    std::cerr << "Error deleting food item";
+    exit(1);
   }
 
   sqlite3_close(database);

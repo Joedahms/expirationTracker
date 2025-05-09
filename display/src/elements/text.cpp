@@ -1,6 +1,5 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
-#include <glog/logging.h>
 #include <iostream>
 #include <string>
 
@@ -19,7 +18,8 @@ Text::Text(const struct DisplayGlobal& displayGlobal,
       fontSize(fontSize), color(color) {
   this->font = TTF_OpenFont(fontPath.c_str(), this->fontSize);
   if (this->font == NULL) {
-    LOG(FATAL) << "Text failed to open font";
+    std::cerr << "Text failed to open font";
+    exit(1);
   }
 
   SDL_Surface* textSurface =

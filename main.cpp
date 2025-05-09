@@ -83,12 +83,10 @@ int initDisplay(zmqpp::context& context, Logger& mainLogger) {
 
   int displayPid;
   if ((displayPid = fork()) == -1) {
-    mainLogger.log("Error starting display process");
-    LOG(FATAL) << "Error starting display process";
+    std::cerr << "Error forking display process";
+    exit(1);
   }
   else if (displayPid == 0) {
-    google::InitGoogleLogging("display");
-
     const int windowWidth  = 1024;
     const int windowHeight = 600;
     const bool fullscreen  = false;
@@ -97,7 +95,6 @@ int initDisplay(zmqpp::context& context, Logger& mainLogger) {
                                 windowWidth, windowHeight, fullscreen, context);
     displayEngine.start();
 
-    LOG(INFO) << "Display process";
     return 0;
   }
   else {
@@ -124,12 +121,10 @@ int initHardware(zmqpp::context& context,
 
   int hardwarePid;
   if ((hardwarePid = fork()) == -1) {
-    mainLogger.log("Error starting hardware process");
-    LOG(FATAL) << "Error starting hardware process";
+    std::cerr << "Error forking hardware process";
+    exit(1);
   }
   else if (hardwarePid == 0) {
-    google::InitGoogleLogging("hardware");
-
     std::filesystem::path imageDirectory;
     if (hardwareFlags.usingCamera) {
       imageDirectory = std::filesystem::current_path() / "../images/cam/";
@@ -150,7 +145,6 @@ int initHardware(zmqpp::context& context,
     Hardware hardware(context, imageDirectory, hardwareFlags);
     hardware.start();
 
-    LOG(INFO) << "Hardware process";
     return 0;
   }
   else {
