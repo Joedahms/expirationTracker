@@ -265,25 +265,35 @@ void Hardware::sendPhotos() {
     exit(1);
   }
 
+  /*
   Pix* image = pixRead(topImagePathString.c_str());
   if (!image) {
     std::cerr << "Failed to read image: " << topImagePathString;
     exit(1);
   }
+  */
 
-  Pix* gray = pixConvertTo8(image, FALSE);
+  // Load image and convert to grayscale
+  cv::Mat image = cv::imread(topImagePath);
+  cv::Mat gray;
+  cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
 
-  tess.SetImage(gray);
+  // Apply fixed threshold
+  cv::Mat binary;
+  cv::threshold(gray, binary, 128, 255, cv::THRESH_BINARY);
+
+  cv::imwrite(topImagePath, binary);
+  tess.SetImage(binary.data, binary.cols, binary.rows, 1, binary.step);
 
   char* outText = tess.GetUTF8Text();
   std::cout << "Output:\n" << outText << std::endl;
 
   delete[] outText;
   tess.End();
-  pixDestroy(&image);
+  // pixDestroy(&image);
 
   // Clean up
-  pixDestroy(&gray);
+  // pixDestroy(&gray);
 
   /*
   std::ifstream topImage(topImagePath, std::ios::binary | std::ios::ate);
