@@ -163,7 +163,7 @@ void Hardware::rotateAndCapture() {
     if (this->usingCamera) {
       // takePhotos();
       topCamera.takePhoto(angle);
-      // sideCamera.takePhoto(angle);
+      sideCamera.takePhoto(angle);
       sendPhotos();
     }
 
