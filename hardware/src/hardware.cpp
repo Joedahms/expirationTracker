@@ -282,7 +282,7 @@ void Hardware::sendPhotos() {
   cv::Mat inverted;
 
   // Invert the colors
-  cv::bitwise_not(image, inverted);
+  cv::bitwise_not(gray, inverted);
 
   cv::imwrite(topImagePath, inverted);
   tess.SetImage(inverted.data, inverted.cols, inverted.rows, 1, inverted.step);
