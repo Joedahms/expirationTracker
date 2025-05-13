@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "../display_global.h"
-#include "../display_handler.h"
+#include "../display_messenger.h"
 #include "../elements/container.h"
 #include "../engine_state.h"
 #include "../log_files.h"
@@ -37,7 +37,7 @@ protected:
   std::shared_ptr<Container> rootElement;
   SDL_Surface* windowSurface = nullptr;
 
-  DisplayHandler& displayHandler;
+  DisplayMessenger& displayMessenger;
 };
 
 #endif

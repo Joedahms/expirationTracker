@@ -8,7 +8,7 @@
 #include "../../logger.h"
 #include "camera.h"
 #include "hardware_flags.h"
-#include "network.h"
+#include "hardware_messenger.h"
 
 class Hardware {
 public:
@@ -20,23 +20,18 @@ public:
 
 private:
   void initDC();
-  bool checkStartSignal(int timeoutMs);
   bool startScan();
 
   const int DISCOVERY_PORT      = 5005;
   const std::string SERVER_PORT = "5555";
 
   Logger logger;
-  Network network;
+  HardwareMessenger hardwareMessenger;
 
   const std::filesystem::path imageDirectory;
   Camera topCamera;
   Camera sideCamera;
   void sendPhotos();
-
-  zmqpp::socket requestServerSocket;
-  zmqpp::socket requestDisplaySocket;
-  zmqpp::socket replySocket;
 
   const int MOTOR_IN1 = 23;
   const int MOTOR_IN2 = 24;

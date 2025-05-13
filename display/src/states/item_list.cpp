@@ -27,7 +27,7 @@ ItemList::ItemList(const DisplayGlobal& displayGlobal, const EngineState& state)
   std::shared_ptr<Button> newScanButton = std::make_shared<Button>(
       this->displayGlobal, this->logFile, newScanButtonRectangle, "Scan New Item",
       SDL_Point{10, 10},
-      [this]() { this->currentState = this->displayHandler.startToHardware(); });
+      [this]() { this->currentState = this->displayMessenger.startToHardware(); });
   newScanButton->setCenteredHorizontal();
   rootElement->addElement(std::move(newScanButton));
 
@@ -80,7 +80,7 @@ void ItemList::handleEvents(bool* displayIsRunning) {
       this->rootElement->handleEvent(event);
     }
   }
-  this->displayHandler.ignoreVision();
+  this->displayMessenger.ignoreVision();
 }
 
 void ItemList::render() const {

@@ -88,7 +88,7 @@ void Scanning::handleEvents(bool* displayIsRunning) {
     }
   }
 
-  this->currentState = this->displayHandler.checkDetectionResults(this->currentState);
+  this->currentState = this->displayMessenger.checkDetectionResults(this->currentState);
 }
 
 /**

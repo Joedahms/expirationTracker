@@ -17,7 +17,7 @@
 #include "states/scanning.h"
 
 #include "display_global.h"
-#include "display_handler.h"
+#include "display_messenger.h"
 #include "engine_state.h"
 
 class DisplayEngine {
