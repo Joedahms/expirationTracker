@@ -95,11 +95,13 @@ add_executable(expirationTracker
 )
 
 add_executable(server
-  server/server.cpp
   food_item.cpp
   endpoints.cpp
   logger.cpp
   messenger.cpp
+
+  server/server.cpp
+  server/server_messenger.cpp
 
   ${PROTO_SRCS}
   ${PROTO_HDRS}

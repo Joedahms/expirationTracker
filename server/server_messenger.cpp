@@ -1,3 +1,6 @@
+#include <filesystem>
+#include <nlohmann/json.hpp>
+
 #include "server_messenger.h"
 
 ServerMessenger::ServerMessenger(zmqpp::context& context,
