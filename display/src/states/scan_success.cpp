@@ -70,7 +70,7 @@ void ScanSuccess::render() const {
  */
 void ScanSuccess::enter() {
   this->currentState = this->defaultState;
-  this->foodItem     = this->displayHandler.detectionSuccess();
+  this->foodItem     = this->displayMessenger.detectionSuccess();
 
   this->logger->log("Storing food item in database");
   sqlite3* database = nullptr;

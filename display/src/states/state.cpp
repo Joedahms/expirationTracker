@@ -7,7 +7,7 @@ State::State(const struct DisplayGlobal& displayGlobal,
              const std::string& logFile,
              const EngineState& state)
     : displayGlobal(displayGlobal), logFile(logFile), defaultState(state),
-      currentState(state), displayHandler(DisplayHandler::getInstance()) {
+      currentState(state), displayMessenger(DisplayMessenger::getInstance()) {
   this->logger        = std::make_unique<Logger>(this->logFile);
   this->windowSurface = SDL_GetWindowSurface(this->displayGlobal.window);
   assert(windowSurface != NULL);

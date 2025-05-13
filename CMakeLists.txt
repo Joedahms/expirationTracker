@@ -46,7 +46,7 @@ add_executable(expirationTracker
   messenger.cpp
 
   # Handler for messages from other processes and the display engine
-  display/src/display_handler.cpp
+  display/src/display_messenger.cpp
 
   # Database operations on food items
   display/src/sql_food.cpp

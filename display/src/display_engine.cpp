@@ -29,7 +29,7 @@ DisplayEngine::DisplayEngine(const char* windowTitle,
     : logger("display_engine.txt") {
   this->logger.log("Constructing display engine");
 
-  DisplayHandler::init(context);
+  DisplayMessenger::init(context);
 
   this->displayGlobal.window = setupWindow(windowTitle, windowXPosition, windowYPosition,
                                            screenWidth, screenHeight, fullscreen);
