@@ -20,8 +20,6 @@ find_package(PkgConfig REQUIRED)
 find_package(Protobuf REQUIRED)
 
 pkg_check_modules(ZMQ REQUIRED libzmq)
-pkg_check_modules(Tesseract REQUIRED tesseract)
-pkg_check_modules(Leptonica REQUIRED lept)
 
 set(ZMQPP_INCLUDE_DIRS "/usr/local/include")
 set(ZMQPP_LIBRARIES "zmqpp")
@@ -35,8 +33,6 @@ include_directories(
   ${OpenCV_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}
   ${PROTOBUF_INCLUDE_DIRS}
-  ${Tesseract_INCLUDE_DIRS}
-  ${Leptonica_INCLUDE_DIRS}
 )
 
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS fooditem.proto)
@@ -109,14 +105,10 @@ target_link_libraries(expirationTracker
   ${ZMQPP_LIBRARIES}
   ${PROTOBUF_LIBRARIES}
   wiringPi
-  ${Tesseract_LIBRARIES}
-  ${Leptonica_LIBRARIES}
 )
 
 # Add library search directories if needed
 link_directories(
   ${ZMQ_LIBRARY_DIRS}
   ${ZMQPP_LIBRARY_DIRS}
-  ${Tesseract_INCLUDE_DIRS}
-  ${Leptonica_INCLUDE_DIRS}
 )

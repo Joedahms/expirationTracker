@@ -45,7 +45,6 @@ cd ../../..
 rm -rf zero
 
 sudo apt install nlohmann-json3-dev
-sudo apt install tesseract-ocr libtesseract-dev
 
 # Compile
 cmake ..

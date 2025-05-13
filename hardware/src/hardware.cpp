@@ -2,10 +2,8 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <leptonica/allheaders.h>
 #include <opencv2/opencv.hpp>
 #include <string>
-#include <tesseract/baseapi.h>
 #include <unistd.h>
 #include <wiringPi.h>
 
@@ -57,9 +55,6 @@ void Hardware::start() {
       else {
       }
     }
-
-    // sendMessage(requestServerSocket, "start", this->logger);
-    // sendMessage(requestServerSocket, "stop", this->logger);
 
     startScan();
   }
@@ -259,39 +254,6 @@ void Hardware::sendPhotos() {
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
 
-  tesseract::TessBaseAPI tess;
-  if (tess.Init(nullptr, "eng")) {
-    std::cerr << "Could not initialize tesseract";
-    exit(1);
-  }
-
-  /*
-  Pix* image = pixRead(topImagePathString.c_str());
-  if (!image) {
-    std::cerr << "Failed to read image: " << topImagePathString;
-    exit(1);
-  }
-  */
-
-  // Load image and convert to grayscale
-  cv::Mat image = cv::imread(topImagePath);
-  cv::Mat gray;
-  cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
-
-  cv::imwrite(topImagePath, gray);
-  tess.SetImage(gray.data, gray.cols, gray.rows, 1, gray.step);
-
-  char* outText = tess.GetUTF8Text();
-  std::cout << "Output:\n" << outText << std::endl;
-
-  delete[] outText;
-  tess.End();
-  // pixDestroy(&image);
-
-  // Clean up
-  // pixDestroy(&gray);
-
-  /*
   std::ifstream topImage(topImagePath, std::ios::binary | std::ios::ate);
   if (!topImage) {
     std::cerr << "Failed to open file: " << topImagePath << std::endl;
@@ -312,5 +274,4 @@ void Hardware::sendPhotos() {
 
   std::string response;
   this->requestServerSocket.receive(response);
-  */
 }
