@@ -11,7 +11,6 @@ set(CXXFLAGS "-Wall")
 set(CMAKE_CXX_FLAGS "${CXXFLAGS}")
 
 # Find required packages
-find_package(glog 0.4.0 REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
@@ -97,7 +96,6 @@ add_executable(expirationTracker
 
 # Link all libraries
 target_link_libraries(expirationTracker
-  glog::glog
   ${SDL2_LIBRARIES}
   SDL2_image
   SDL2_ttf

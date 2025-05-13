@@ -1,5 +1,3 @@
-#include <glog/logging.h>
-
 #include "button.h"
 #include "dropdown.h"
 #include "element.h"
@@ -36,6 +34,7 @@ void Mediator::notify(std::shared_ptr<Element> sender, const std::string& event)
     this->scrollBox->setSortMethod(SortMethod::HIGH_TO_LOW);
   }
   else {
-    LOG(FATAL) << "Mediator received invalid notification";
+    std::cerr << "Mediator received invalid notification";
+    exit(1);
   }
 }

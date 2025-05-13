@@ -21,7 +21,8 @@ DisplayHandler::DisplayHandler(const zmqpp::context& context)
     this->requestHardwareSocket.connect(ExternalEndpoints::hardwareEndpoint);
     this->replySocket.bind(ExternalEndpoints::displayEndpoint);
   } catch (const zmqpp::exception& e) {
-    LOG(FATAL) << e.what();
+    std::cerr << "ZMQ error when constructing display handler: " << e.what();
+    exit(1);
   }
 }
 
@@ -47,10 +48,12 @@ std::string DisplayHandler::sendMessage(const std::string& message,
       return response;
     }
     else {
-      LOG(FATAL) << "Attempt to send message to invalid endpoint";
+      std::cerr << "Attempt to send message to invalid endpoint";
+      exit(1);
     }
   } catch (const zmqpp::exception& e) {
-    LOG(FATAL) << "zmqpp error when sending message: " << e.what();
+    std::cerr << "zmqpp error when sending message: " << e.what();
+    exit(1);
   }
 }
 
@@ -88,7 +91,8 @@ std::string DisplayHandler::receiveMessage(const std::string& response,
 
     return request;
   } catch (const zmqpp::exception& e) {
-    LOG(FATAL) << "zmqpp error when receiving message: " << e.what();
+    std::cerr << "ZMQ error when receiving message: " << e.what();
+    exit(1);
   }
 }
 
@@ -124,8 +128,8 @@ EngineState DisplayHandler::startToHardware() {
     return EngineState::SCANNING;
   }
   else {
-    this->logger.log("Invalid response received from hardware: " + hardwareResponse);
-    LOG(FATAL) << "Invalid response received from hardware: " << hardwareResponse;
+    std::cerr << "Invalid response received from hardware: " << hardwareResponse;
+    exit(1);
   }
 }
 
@@ -146,8 +150,8 @@ EngineState DisplayHandler::checkDetectionResults(EngineState currentState) {
     return EngineState::SCAN_FAILURE;
   }
   else {
-    this->logger.log("Invalid request received from vision: " + visionRequest);
-    LOG(FATAL) << "Invalid request received from vision: " << visionRequest;
+    std::cerr << "Invalid request received from vision: " << visionRequest;
+    exit(1);
   }
 }
 

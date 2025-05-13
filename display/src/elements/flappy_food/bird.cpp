@@ -1,5 +1,4 @@
 #include <SDL2/SDL_image.h>
-#include <glog/logging.h>
 
 #include "bird.h"
 
@@ -11,12 +10,14 @@ Bird::Bird(const struct DisplayGlobal& displayGlobal,
 
   SDL_Surface* birdSurface = IMG_Load("../display/sprites/bird.png");
   if (birdSurface == NULL) {
-    LOG(FATAL) << "error creating surface";
+    std::cerr << "Error creating surface";
+    exit(1);
   }
 
   this->texture = SDL_CreateTextureFromSurface(this->displayGlobal.renderer, birdSurface);
   if (this->texture == 0) {
-    LOG(FATAL) << "error creating texture from surface";
+    std::cerr << "error creating texture from surface";
+    exit(1);
   }
   SDL_FreeSurface(birdSurface);
 

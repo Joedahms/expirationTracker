@@ -9,9 +9,6 @@ sudo apt install make g++ cmake
 sudo chmod -R 777 /home/pi/Documents/raspi-yolo/images
 sudo apt install libcamera-apps libcamera-dev
 
-# Glog
-sudo apt install libgoogle-glog-dev
-
 # OPENCV
 sudo apt install libopencv-dev
 
@@ -47,18 +44,7 @@ sudo make install
 cd ../../..
 rm -rf zero
 
-#json
 sudo apt install nlohmann-json3-dev
-
-# Python virtual envrionment
-mkdir build
-cd build
-python3 -m venv models-venv
-source models-venv/bin/activate
-pip install easyocr
-pip install ultralytics
-pip install pyzmq
-deactivate
 
 # Compile
 cmake ..

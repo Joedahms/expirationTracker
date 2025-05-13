@@ -1,7 +1,6 @@
 #define SCROLL_AMOUNT 4
 
 #include <SDL2/SDL.h>
-#include <glog/logging.h>
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -96,7 +95,8 @@ void ScrollBox::setSortMethod(SortMethod sortMethod) {
     this->logger->log("Scrollbox sort method changed to high to low");
     break;
   default:
-    LOG(FATAL) << "Attempt to set sort method to invalid method";
+    std::cerr << "Attempt to set sort method to invalid method";
+    exit(1);
   }
 
   refreshPanels();

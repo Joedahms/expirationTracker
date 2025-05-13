@@ -1,7 +1,6 @@
 #include <errno.h>
 #include <filesystem>
 #include <fstream>
-#include <glog/logging.h>
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <string>
@@ -29,7 +28,7 @@ Hardware::Hardware(zmqpp::context& context,
       replySocket(context, zmqpp::socket_type::reply),
       usingMotor(hardwareFlags.usingMotor), usingCamera(hardwareFlags.usingCamera) {
   try {
-    this->network.connectToServer(this->requestServerSocket, this->logger);
+    // this->network.connectToServer(this->requestServerSocket, this->logger);
     this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
     this->replySocket.bind(ExternalEndpoints::hardwareEndpoint);
   } catch (const zmqpp::exception& e) {
@@ -56,9 +55,6 @@ void Hardware::start() {
       else {
       }
     }
-
-    // sendMessage(requestServerSocket, "start", this->logger);
-    // sendMessage(requestServerSocket, "stop", this->logger);
 
     startScan();
   }
@@ -107,7 +103,8 @@ bool Hardware::checkStartSignal(int timeoutMs) {
     }
     return receivedRequest;
   } catch (const zmqpp::exception& e) {
-    LOG(FATAL) << e.what();
+    std::cerr << "Error checking start signal" << e.what();
+    exit(1);
   }
 }
 
@@ -162,6 +159,7 @@ void Hardware::rotateAndCapture() {
       // takePhotos();
       topCamera.takePhoto(angle);
       sideCamera.takePhoto(angle);
+      sendPhotos();
     }
 
     if (this->usingMotor) {
@@ -241,8 +239,11 @@ void Hardware::sendPhotos() {
   std::filesystem::path sideImagePath =
       imageDirectory / (std::to_string(this->angle) + "_side.jpg");
 
-  this->logger.log("Looking for image: " + topImagePath.string());
-  this->logger.log("Looking for image: " + sideImagePath.string());
+  const std::string topImagePathString  = topImagePath.string();
+  const std::string sideImagePathString = sideImagePath.string();
+
+  this->logger.log("Looking for image: " + topImagePathString);
+  this->logger.log("Looking for image: " + sideImagePathString);
 
   bool topExists  = false;
   bool sideExists = false;
