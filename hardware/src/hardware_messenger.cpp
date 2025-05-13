@@ -22,11 +22,10 @@ HardwareMessenger::HardwareMessenger(zmqpp::context& context,
 
   nlohmann::json config = nlohmann::json::parse(file);
 
-  this->serverPort    = config["network"]["serverPort"];
-  this->discoveryPort = config["network"]["discoveryPort"];
+  this->serverAddress = config["network"]["serverAddress"];
 
   try {
-    connectToServer(this->requestServerSocket, logger);
+    this->requestServerSocket.connect(this->serverAddress);
     this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
     this->replySocket.bind(ExternalEndpoints::hardwareEndpoint);
   } catch (const zmqpp::exception& e) {
@@ -74,48 +73,4 @@ bool HardwareMessenger::checkStopSignal(const int timeoutMs, Logger& logger) {
     logger.log("Did not receive stop signal");
     return false;
   }
-}
-
-void HardwareMessenger::connectToServer(zmqpp::socket& socket, Logger& logger) {
-  std::string serverIp = getServerIp();
-  std::string serverAddress =
-      "tcp://" + serverIp + ":" + std::to_string(this->serverPort);
-  socket.connect(serverAddress);
-  std::string log = "Connected to server on " + serverAddress;
-  logger.log(log);
-  std::cout << log << std::endl;
-
-  Messenger messenger;
-  messenger.sendMessage(socket, "connected", logger);
-}
-
-std::string HardwareMessenger::getServerIp() {
-  int sockfd;
-  struct sockaddr_in serverAddr;
-  socklen_t addrLen = sizeof(serverAddr);
-  char buffer[1024] = {0};
-
-  sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-  if (sockfd < 0) {
-    std::cerr << "UDP socket creation failed";
-    return "";
-  }
-
-  int broadcastEnable = 1;
-  setsockopt(sockfd, SOL_SOCKET, SO_BROADCAST, &broadcastEnable, sizeof(broadcastEnable));
-
-  memset(&serverAddr, 0, sizeof(serverAddr));
-  serverAddr.sin_family      = AF_INET;
-  serverAddr.sin_addr.s_addr = inet_addr("255.255.255.255");
-  serverAddr.sin_port        = htons(this->discoveryPort);
-
-  std::string message = "DISCOVER_SERVER";
-  sendto(sockfd, message.c_str(), message.size(), 0, (struct sockaddr*)&serverAddr,
-         addrLen);
-
-  std::cout << "Discovery request sent, waiting for response..." << std::endl;
-  recvfrom(sockfd, buffer, sizeof(buffer), 0, (struct sockaddr*)&serverAddr, &addrLen);
-  close(sockfd);
-
-  return std::string(buffer);
 }

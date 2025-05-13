@@ -17,11 +17,7 @@ private:
   zmqpp::socket requestDisplaySocket;
   zmqpp::socket replySocket;
 
-  void connectToServer(zmqpp::socket& socket, Logger& logger);
-  std::string getServerIp();
-
-  int serverPort    = -1;
-  int discoveryPort = -1;
+  std::string serverAddress;
 };
 
 #endif

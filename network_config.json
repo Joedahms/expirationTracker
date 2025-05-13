@@ -1,6 +1,5 @@
 {
     "network": {
-        "serverPort": 5555,
-        "discoveryPort": 5005
+      "serverAddress": "tcp://10.0.1.22:5555"
     }
 }

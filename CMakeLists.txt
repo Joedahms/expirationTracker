@@ -94,6 +94,17 @@ add_executable(expirationTracker
   ${PROTO_HDRS}
 )
 
+add_executable(server
+  server/server.cpp
+  food_item.cpp
+  endpoints.cpp
+  logger.cpp
+  messenger.cpp
+
+  ${PROTO_SRCS}
+  ${PROTO_HDRS}
+)
+
 # Link all libraries
 target_link_libraries(expirationTracker
   ${SDL2_LIBRARIES}
@@ -105,6 +116,12 @@ target_link_libraries(expirationTracker
   ${ZMQPP_LIBRARIES}
   ${PROTOBUF_LIBRARIES}
   wiringPi
+)
+
+target_link_libraries(server
+  ${ZMQ_LIBRARIES}
+  ${ZMQPP_LIBRARIES}
+  ${PROTOBUF_LIBRARIES}
 )
 
 # Add library search directories if needed
