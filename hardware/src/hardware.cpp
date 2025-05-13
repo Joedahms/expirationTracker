@@ -7,7 +7,6 @@
 #include <unistd.h>
 #include <wiringPi.h>
 
-#include "../../zero.h"
 #include "hardware.h"
 #include "network.h"
 #include "wiringSerial.h"
@@ -48,11 +47,10 @@ void Hardware::start() {
   while (1) {
     startSignalReceived = false;
     while (startSignalReceived == false) {
-      startSignalReceived = checkStartSignal(startSignalTimeoutMs);
+      startSignalReceived = this->hardwareMessenger.checkStartSignal(
+          this->replySocket, startSignalTimeoutMs, this->logger);
       if (startSignalReceived == false) {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-      }
-      else {
       }
     }
 
@@ -72,40 +70,6 @@ void Hardware::initDC() {
   digitalWrite(MOTOR_IN2, LOW);
 
   this->logger.log("Motor Initialized.");
-}
-
-/**
- * Checks for a start signal from the display. Return if have not received a message by
- * the timeout.
- *
- * @param None
- * @return bool - True if start signal received, false otherwise
- */
-bool Hardware::checkStartSignal(int timeoutMs) {
-  bool receivedRequest = false;
-  this->logger.log("Checking for start signal from display");
-
-  try {
-    zmqpp::poller poller;
-    poller.add(this->replySocket);
-
-    if (poller.poll(timeoutMs)) {
-      if (poller.has_input(this->replySocket)) {
-        std::string request;
-        this->replySocket.receive(request);
-        this->logger.log("Received start signal from display");
-        receivedRequest = true;
-        this->replySocket.send(Messages::AFFIRMATIVE); // Respond to display
-      }
-    }
-    else {
-      this->logger.log("Did not receive start signal from display");
-    }
-    return receivedRequest;
-  } catch (const zmqpp::exception& e) {
-    std::cerr << "Error checking start signal" << e.what();
-    exit(1);
-  }
 }
 
 /**

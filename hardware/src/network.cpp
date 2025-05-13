@@ -3,7 +3,7 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 
-#include "../../zero.h"
+#include "../../messenger.h"
 #include "network.h"
 
 Network::Network(const std::string& configFilename) {
@@ -29,7 +29,9 @@ void Network::connectToServer(zmqpp::socket& socket, Logger& logger) {
   std::string log = "Connected to server on " + serverAddress;
   logger.log(log);
   std::cout << log << std::endl;
-  sendMessage(socket, "connected", logger);
+
+  Messenger messenger;
+  messenger.sendMessage(socket, "connected", logger);
 }
 
 std::string Network::getServerIp() {

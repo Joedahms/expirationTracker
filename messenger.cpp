@@ -1,8 +1,8 @@
-#include "zero.h"
+#include "messenger.h"
 
-std::string sendMessage(zmqpp::socket& socket,
-                        const std::string& message,
-                        Logger& logger) {
+std::string Messenger::sendMessage(zmqpp::socket& socket,
+                                   const std::string& message,
+                                   Logger& logger) {
   logger.log("Sending message: " + message);
   socket.send(message);
   logger.log("Message sent, awaiting response");
@@ -12,10 +12,10 @@ std::string sendMessage(zmqpp::socket& socket,
   return response;
 }
 
-std::string receiveMessage(zmqpp::socket& socket,
-                           const std::string& response,
-                           const int timeoutMs,
-                           Logger& logger) {
+std::string Messenger::receiveMessage(zmqpp::socket& socket,
+                                      const std::string& response,
+                                      const int timeoutMs,
+                                      Logger& logger) {
   try {
     std::string request = "null";
     if (timeoutMs == 0) {

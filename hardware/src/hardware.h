@@ -8,6 +8,7 @@
 #include "../../logger.h"
 #include "camera.h"
 #include "hardware_flags.h"
+#include "hardware_messenger.h"
 #include "network.h"
 
 class Hardware {
@@ -20,7 +21,6 @@ public:
 
 private:
   void initDC();
-  bool checkStartSignal(int timeoutMs);
   bool startScan();
 
   const int DISCOVERY_PORT      = 5005;
@@ -28,6 +28,7 @@ private:
 
   Logger logger;
   Network network;
+  HardwareMessenger hardwareMessenger;
 
   const std::filesystem::path imageDirectory;
   Camera topCamera;
