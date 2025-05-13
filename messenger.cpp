@@ -3,13 +3,19 @@
 std::string Messenger::sendMessage(zmqpp::socket& socket,
                                    const std::string& message,
                                    Logger& logger) {
-  logger.log("Sending message: " + message);
-  socket.send(message);
-  logger.log("Message sent, awaiting response");
-  std::string response;
-  socket.receive(response);
-  logger.log("Response received: " + response);
-  return response;
+  try {
+    logger.log("Sending message: " + message);
+    socket.send(message);
+    logger.log("Message sent, awaiting response");
+    std::string response;
+    socket.receive(response);
+    logger.log("Response received: " + response);
+    return response;
+
+  } catch (const zmqpp::exception& e) {
+    std::cerr << "zmqpp error when sending message: " << e.what();
+    exit(1);
+  }
 }
 
 std::string Messenger::receiveMessage(zmqpp::socket& socket,
