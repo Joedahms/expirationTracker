@@ -8,7 +8,6 @@
 #include <wiringPi.h>
 
 #include "hardware.h"
-#include "network.h"
 #include "wiringSerial.h"
 
 /**
@@ -19,22 +18,11 @@
 Hardware::Hardware(zmqpp::context& context,
                    const std::filesystem::path& imageDirectory,
                    const HardwareFlags& hardwareFlags)
-    : logger("hardware_log.txt"), network("../network_config.json"),
+    : logger("hardware_log.txt"),
+      hardwareMessenger(context, "../network_config.json", logger),
       imageDirectory(imageDirectory), topCamera(imageDirectory, "top"),
-      sideCamera(imageDirectory, "side"),
-      requestServerSocket(context, zmqpp::socket_type::request),
-      requestDisplaySocket(context, zmqpp::socket_type::request),
-      replySocket(context, zmqpp::socket_type::reply),
-      usingMotor(hardwareFlags.usingMotor), usingCamera(hardwareFlags.usingCamera) {
-  try {
-    // this->network.connectToServer(this->requestServerSocket, this->logger);
-    this->requestDisplaySocket.connect(ExternalEndpoints::displayEndpoint);
-    this->replySocket.bind(ExternalEndpoints::hardwareEndpoint);
-  } catch (const zmqpp::exception& e) {
-    std::cerr << e.what();
-    exit(1);
-  }
-}
+      sideCamera(imageDirectory, "side"), usingMotor(hardwareFlags.usingMotor),
+      usingCamera(hardwareFlags.usingCamera) {}
 
 void Hardware::start() {
   bool startSignalReceived       = false;
@@ -47,8 +35,8 @@ void Hardware::start() {
   while (1) {
     startSignalReceived = false;
     while (startSignalReceived == false) {
-      startSignalReceived = this->hardwareMessenger.checkStartSignal(
-          this->replySocket, startSignalTimeoutMs, this->logger);
+      startSignalReceived =
+          this->hardwareMessenger.checkStartSignal(startSignalTimeoutMs, this->logger);
       if (startSignalReceived == false) {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
       }
@@ -139,29 +127,13 @@ void Hardware::rotateAndCapture() {
       return;
     }
 
-    this->logger.log("Checking for stop signal from vision");
-    bool receivedStopSignal = false;
-    bool receivedRequest    = false;
-    std::string request;
-    receivedRequest = this->replySocket.receive(request, true);
-    if (receivedRequest) {
-      if (request == Messages::ITEM_DETECTION_SUCCEEDED) {
-        this->logger.log("Received stop signal from vision");
-        this->replySocket.send(Messages::AFFIRMATIVE);
-        receivedStopSignal = true;
-      }
-      else {
-        this->logger.log("Received other: " + request);
-        this->replySocket.send(Messages::RETRANSMIT);
-      }
-    }
-    if (receivedStopSignal) {
-      this->logger.log("AI Vision identified item. Stopping process.");
+    int checkStopTimeoutMs = 1000;
+    bool stopReceived =
+        this->hardwareMessenger.checkStopSignal(checkStopTimeoutMs, this->logger);
+    if (stopReceived) {
       digitalWrite(MOTOR_IN1, LOW);
       digitalWrite(MOTOR_IN2, LOW);
-      break;
     }
-    this->logger.log("AI Vision did not identify item. Continuing process.");
   }
 }
 
@@ -218,6 +190,7 @@ void Hardware::sendPhotos() {
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
 
+  /*
   std::ifstream topImage(topImagePath, std::ios::binary | std::ios::ate);
   if (!topImage) {
     std::cerr << "Failed to open file: " << topImagePath << std::endl;
@@ -238,4 +211,5 @@ void Hardware::sendPhotos() {
 
   std::string response;
   this->requestServerSocket.receive(response);
+  */
 }
