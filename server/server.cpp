@@ -3,6 +3,10 @@
 #include "server_messenger.h"
 
 int main(void) {
-  std::cout << "here" << std::endl;
+  zmqpp::context context;
+  Logger serverLogger("server.txt");
+
+  ServerMessenger ServerMessenger(context, "../network_config.json", serverLogger);
+
   return 0;
 }
