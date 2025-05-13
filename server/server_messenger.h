@@ -9,6 +9,8 @@ public:
                   const std::string& configFilename,
                   Logger& logger);
 
+  void receivePhoto(Logger& logger);
+
 private:
   zmqpp::socket replySocket;
 };

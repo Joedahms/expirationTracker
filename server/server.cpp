@@ -6,7 +6,11 @@ int main(void) {
   zmqpp::context context;
   Logger serverLogger("server.txt");
 
-  ServerMessenger ServerMessenger(context, "../network_config.json", serverLogger);
+  ServerMessenger serverMessenger(context, "../network_config.json", serverLogger);
+
+  while (1) {
+    serverMessenger.receivePhoto(serverLogger);
+  }
 
   return 0;
 }

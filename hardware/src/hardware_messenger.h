@@ -1,6 +1,8 @@
 #ifndef HARDWARE_MESSENGER_H
 #define HARDWARE_MESSENGER_H
 
+#include <filesystem>
+
 #include "../../messenger.h"
 
 class HardwareMessenger : public Messenger {
@@ -11,6 +13,9 @@ public:
 
   bool checkStartSignal(const int timeoutMs, Logger& logger);
   bool checkStopSignal(const int timeoutMs, Logger& logger);
+  void sendPhotos(Logger& logger,
+                  const std::filesystem::path& imageDirectory,
+                  const int angle);
 
 private:
   zmqpp::socket requestServerSocket;

@@ -26,3 +26,9 @@ ServerMessenger::ServerMessenger(zmqpp::context& context,
     exit(1);
   }
 }
+
+void ServerMessenger::receivePhoto(Logger& logger) {
+  std::string message;
+  message = receiveMessage(this->replySocket, "yuh", 1000, logger);
+  std::cout << message.length();
+}

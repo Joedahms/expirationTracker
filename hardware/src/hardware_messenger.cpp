@@ -74,3 +74,50 @@ bool HardwareMessenger::checkStopSignal(const int timeoutMs, Logger& logger) {
     return false;
   }
 }
+
+void HardwareMessenger::sendPhotos(Logger& logger,
+                                   const std::filesystem::path& imageDirectory,
+                                   const int angle) {
+  logger.log("Sending angle " + std::to_string(angle) + " photos");
+
+  std::filesystem::path topImagePath =
+      imageDirectory / (std::to_string(angle) + "_top.jpg");
+  std::filesystem::path sideImagePath =
+      imageDirectory / (std::to_string(angle) + "_side.jpg");
+
+  const std::string topImagePathString  = topImagePath.string();
+  const std::string sideImagePathString = sideImagePath.string();
+
+  logger.log("Looking for image: " + topImagePathString);
+  logger.log("Looking for image: " + sideImagePathString);
+
+  bool topExists  = false;
+  bool sideExists = false;
+
+  while (!(topExists && sideExists)) { // Wait until BOTH images exist
+    topExists  = std::filesystem::exists(topImagePath);
+    sideExists = std::filesystem::exists(sideImagePath);
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  }
+
+  std::ifstream topImage(topImagePath, std::ios::binary | std::ios::ate);
+  if (!topImage) {
+    std::cerr << "Failed to open file: " << topImagePath << std::endl;
+    exit(1);
+  }
+
+  std::streamsize topImageSize = topImage.tellg();
+  topImage.seekg(0, std::ios::beg);
+
+  std::vector<char> buffer(topImageSize);
+  if (!topImage.read(buffer.data(), topImageSize)) {
+    std::cerr << "Failed to read file" << std::endl;
+    exit(1);
+  }
+
+  // zmqpp::message message(buffer.data(), buffer.size());
+  std::string message(buffer.data(), buffer.size());
+  sendMessage(this->requestServerSocket, message, logger);
+
+  std::string response = receiveMessage(this->replySocket, "yuh", 1000, logger);
+}

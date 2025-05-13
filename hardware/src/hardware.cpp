@@ -111,7 +111,7 @@ void Hardware::rotateAndCapture() {
       // takePhotos();
       topCamera.takePhoto(angle);
       sideCamera.takePhoto(angle);
-      sendPhotos();
+      this->hardwareMessenger.sendPhotos(this->logger, this->imageDirectory, angle);
     }
 
     if (this->usingMotor) {
@@ -165,51 +165,4 @@ void Hardware::rotateMotor(bool clockwise) {
     digitalWrite(MOTOR_IN2, LOW);
   }
   this->logger.log("Platform successfully rotated");
-}
-
-void Hardware::sendPhotos() {
-  this->logger.log("Sending angle " + std::to_string(this->angle) + " photos");
-
-  std::filesystem::path topImagePath =
-      imageDirectory / (std::to_string(this->angle) + "_top.jpg");
-  std::filesystem::path sideImagePath =
-      imageDirectory / (std::to_string(this->angle) + "_side.jpg");
-
-  const std::string topImagePathString  = topImagePath.string();
-  const std::string sideImagePathString = sideImagePath.string();
-
-  this->logger.log("Looking for image: " + topImagePathString);
-  this->logger.log("Looking for image: " + sideImagePathString);
-
-  bool topExists  = false;
-  bool sideExists = false;
-
-  while (!(topExists && sideExists)) { // Wait until BOTH images exist
-    topExists  = std::filesystem::exists(topImagePath);
-    sideExists = std::filesystem::exists(sideImagePath);
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-  }
-
-  /*
-  std::ifstream topImage(topImagePath, std::ios::binary | std::ios::ate);
-  if (!topImage) {
-    std::cerr << "Failed to open file: " << topImagePath << std::endl;
-    exit(1);
-  }
-
-  std::streamsize topImageSize = topImage.tellg();
-  topImage.seekg(0, std::ios::beg);
-
-  std::vector<char> buffer(topImageSize);
-  if (!topImage.read(buffer.data(), topImageSize)) {
-    std::cerr << "Failed to read file" << std::endl;
-    exit(1);
-  }
-
-  zmqpp::message message(buffer.data(), buffer.size());
-  this->requestServerSocket.send(message);
-
-  std::string response;
-  this->requestServerSocket.receive(response);
-  */
 }

@@ -31,7 +31,6 @@ private:
   const std::filesystem::path imageDirectory;
   Camera topCamera;
   Camera sideCamera;
-  void sendPhotos();
 
   const int MOTOR_IN1 = 23;
   const int MOTOR_IN2 = 24;
