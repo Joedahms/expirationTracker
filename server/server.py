@@ -5,7 +5,7 @@ import numpy as np
 import socket
 import time
 
-from easyOCR import performOCR
+#from easyOCR import performOCR
 from load_config import loadConfig
 from get_local_ip import getLocalIp
 from wait_for_pi_discovery import waitForPiDiscovery

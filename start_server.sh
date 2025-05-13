@@ -1,6 +1,5 @@
 #!/bin/bash
 
-cd build
-source models-venv/bin/activate
-cd ../server
+cd server
+source easyocr_env/bin/activate
 python3 server.py

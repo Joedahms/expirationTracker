@@ -2,7 +2,8 @@ build/
 yoloDarknet/yolov4.weights
 *.db
 .vscode
-vision/Models/__pycache__/
+server/easyocr_env
+server/__pycache__
 *.swp
 /*/*.swp
 /*/*/*.swp

@@ -1,5 +1,5 @@
 import easyocr
-from ultralytics import YOLO
+#from ultralytics import YOLO
 from datetime import datetime
 import re
 import cv2
@@ -229,6 +229,7 @@ def performOCR(image):
         resized_image = cv2.resize(image, (new_width, new_height))
 
         print(f"Resized image dimensions: {resized_image.shape[:2]}")
+        """
         modelResults = yolo(resized_image, conf=0.7, imgsz=(new_height, new_width))
         
         print("Detection complete. Filtering objects...")
@@ -264,6 +265,7 @@ def performOCR(image):
 
                     print("Text extraction complete!")
 
+            """
 
         if textResults is None:
             print("No known objects detected. Scanning image for text.")
